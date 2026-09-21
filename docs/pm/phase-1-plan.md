@@ -1,56 +1,89 @@
-# Phase-1 plan — scope + budget
+# Phase plan — Chaos Atelier
 
-Stamped 2026-09-21 from Design / Client / Test / Finance cuts. PM consolidate. **No work until Jonathan opens the lane.**
+Updated 2026-09-21 after bible dictionary [#3](https://github.com/jc-renaisssance/chaos-atelier/pull/3) merge + Jonathan locks. **No Cursor budget add-on until monthly reset.** PixelLab may burn **this month’s remaining** quota when a gen lane is stamped.
 
-## Goal
+## Review stamp (Aizen / #3)
 
-Ship one accountable loop: **client brief → craft (Material / Construction / Enchantment) → adventure report → shop**. Prove data-driven tags + readable reports. Park encyclopedia / bosses / scars / named recipes.
+Docs OK for now:
 
-## Shared spine (from team cuts)
+| Lock | Where |
+|------|--------|
+| Metal family + multi-stack slots | `11` / `12` |
+| Pos + **neg** synergies; neg `outlook_order` **above** peers | `14` |
+| Rare / legendary **skip all neg syn** | `14` |
+| Outlook = max order; Phase-1 gen batch **50** (+ optional `atelier_own_basic`) | `15` |
+| **Owner = player clothier** (pool + player skills), not shop NPC; Phase-1 `own_basic` only | `16` / `01` |
+| Chapter: boss announced at start → shop → craft/task → shop → boss | `01` |
 
-1. **Data-first** — tag catalog + one synergy resolver + headless client×threat×build harness before content piles.
-2. **Pass look early** — overall adventure trend (not every-cell non-cliff); stamp which tags/stats fired.
-3. **Spend gates day one** — gen + Cursor caps before Cloud Agent / PixelLab open.
-4. **Single-concern PRs** — bible ≠ Client ≠ art; no gens on locked icons.
+Open balance numbers stay first-pass until Mid/Mid smoke.
 
-## Scope by seat
+---
 
-| Seat | In Phase-1 | Park |
-|------|------------|------|
-| **Design** | Bible current; icon grain + tag color grammar; Material/Construction/Enchantment socket/size; tiny starter modular icon set; optional 1–2 placeholder portraits | Encyclopedia full illos; named unique-gear art; boss art; shop chrome; gens before socket + budget stamp |
-| **Client** | Godot scaffold: one loop UI; tag schema + one resolver; headless harness + stampable report; placeholder art wiring; tuner/share-string; bible-driven single-concern PRs | Encyclopedia / scars / bosses / special clients; named recipes; real atlases; polish shop; full catalog |
-| **Test** | Harness with Client; pass-look docs; smoke Mid/Mid after Design lever; APPLYING confirm on new mults; stamp template under `docs/` | Boss/special matrices; encyclopedia coverage; inventing synergy keys; dump farms |
-| **Finance** | Phase-1 cost envelope + spend gates; monetization *sketch* (Phase-1 free; Phase-2 IAP thesis) | Live IAP wiring; paid encyclopedia frames; spend beyond caps |
+## Phase targets
 
-## Sequence (when Jonathan opens)
+### Phase 0 — Bible (NOW → done when stamped)
 
-1. **Jonathan** — stamp spend envelope below (or revise numbers).
-2. **Harribel** — stand spend watches (PixelLab / Cursor on-demand / Grok quiet).
-3. **Design** — socket + grain + tag grammar (docs); then starter icons under gen cap.
-4. **Client** — catalog schema + resolver + loop UI + harness (placeholders OK).
-5. **Test** — smoke + stamp template with Client; dumps only after Design lever + pass look.
-6. **PM** — board hygiene; merge single-concern PRs into `dev`.
+- [x] Vision / loop / craft / clients / progression / art / phases seed
+- [x] Materials dictionary + constructions + enchantments + synergies + outlook list + player owners
+- [ ] PM phase plan (this doc) on `dev`
+- [ ] Jonathan stamp: open next lane (more docs polish vs Client vs gen)
 
-## Budget envelope (tools)
+**Exit:** dictionary is the contract; no src required.
 
-| Line | Cap | Notes |
-|------|-----|--------|
-| PixelLab | **≤100 gens** Phase-1 soft cap | Design 60–100 ask; freeze + re-stamp if blown; **no gens on locked icons** |
-| Cursor on-demand | **≤$25** until included resets | Client primary (~$15–30 ask clipped to share); Test ~$5–15 shared; prefer included when available |
-| Grok Bot | **Quiet** | No noisy routines; chat-only for coord |
-| Client eng | ~3–6 PRs loop + ~1–2 harness | After bible greenlight |
-| Test | ~1–2 harness PRs; ~5–15 smoke runs | No full matrix until Design asks |
+### Phase 1A — Docs harden (default next if Jonathan wants more paper)
 
-**Hard stops:** unlocked “one more gen / one more dump”; parallel Cloud Agents; gens before socket stamp.
+- Threat / chapter-boss stub table (tags the announced boss cares about)
+- Rarity band rules (how rare/legendary is computed from stacks)
+- Starter deck + `own_basic` shop weights (which commons stock)
+- Harness stamp field list locked for Test (`powers_fired`, neg ids, stacks, `outlook_order`, `player_owner_id`, chapter boss id)
+- Optional: trim / expand dictionary only if Jonathan asks
 
-## Monetization (sketch only)
+**Budget:** ~$0 Cursor on-demand (GitHub docs). No gens.
 
-- Phase-1 = **free** vertical slice.
-- Phase-2 thesis (docs only): cosmetics (coatings / shop chrome / discovery frames), battle pass, craft utilities — so shop meta doesn’t assume free-forever.
-- No revenue numbers until the loop is playable.
+### Phase 1B — Client vertical slice (when Jonathan opens eng)
 
-## Open until Jonathan stamps
+Ship **one** loop as `own_basic`:
 
-- [ ] Confirm or revise ≤100 gens / ≤$25 on-demand
-- [ ] Confirm `dev` PR flow + when Cloud Agent / on-demand may open
-- [ ] Name first Design lever after catalog exists
+1. Chapter start shows boss
+2. Atelier shop (basic pool)
+3. Craft: construction + multi-stack materials + 0–1 enchant
+4. Resolver: tags → powers (skip neg on rare/legendary) → outlook = max order
+5. Adventure report (tags fired / outcome)
+6. Shop → repeat → boss
+
+Also: data tables from `10`–`16`, **one** resolver, headless harness + stamp, placeholders for looks.
+
+**Park:** multi-owner unlocks, encyclopedia, scars, named-unique art, full 408 outlook matrix, skill owners.
+
+**Budget:** Cursor ≤ remaining on-demand until reset (prefer included when available); **0** PixelLab from Client.
+
+### Phase 1C — Art gen (only when Jonathan stamps)
+
+- Batch **50** garment outlooks (`armor/robe/cloak/coat/tunic` × 10 looks) per `15`
+- Optional +1 `atelier_own_basic`
+- Burn **this month’s remaining** PixelLab only; hard stop; no gens on locked icons
+- Neg outlook assets + other owners = Later
+
+### Phase 2+ (park)
+
+- Unlockable player-owners (forge / voodoo / tech / moon / skill kits)
+- Full outlook matrix (~408) + neg looks
+- Encyclopedia, scars, special clients, IAP wiring
+
+---
+
+## Spend envelope (tools)
+
+| Line | Cap |
+|------|-----|
+| Cursor on-demand | **No add-on** until monthly reset; burn carefully if eng opens |
+| PixelLab | This-month remaining only; Phase-1C ask **≤50 (+1 atelier)** when stamped |
+| Grok | Quiet |
+
+## Sequence when Jonathan opens
+
+1. Choose **1A** (more docs) and/or **1B** (Client) — default recommend **1A stubs then 1B**.
+2. Harribel: watches if eng/gen opens.
+3. Design: only if 1A gaps.
+4. Client → Test smoke after catalog wired.
+5. Gen lane **only** after Jonathan stamps 1C.
