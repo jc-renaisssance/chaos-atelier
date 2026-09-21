@@ -1,14 +1,24 @@
 # Synergies — powers, negatives, outlook order
 
-Resolver input: **tag counts** + **construction id**. Output: `powers[]` (positive + negative) for the adventure sim + report, and **outlook_id** for art.
+Resolver input: **tag counts** + **construction id** + **craft rarity**. Output: `powers[]` (positive + negative) for the adventure sim + report, and **outlook_id** for art.
 
 ## Outlook rule (Jonathan lock)
 
 - **Every** synergy that should change look — **positive and negative** — has an `outlook_order` (integer).
-- Final look = synergy with the **highest** `outlook_order` among **all** fired outlook-bearing rows (negatives compete in the same ladder).
+- **Negatives sit above** their positive peers on the ladder so a live neg syn **wins the look** when both fire.
+- Final look = synergy with the **highest** `outlook_order` among all fired outlook-bearing rows.
 - If none → `plain` (default / construction base color).
-- A “bad” look can beat a “good” look when its order is higher (readable failures).
 - Gen matrix: `docs/15-outlook-gen-list.md`.
+
+## Rarity vs negative synergies (Jonathan lock)
+
+| Craft rarity | Negative synergies |
+|---|---|
+| Common / Uncommon | Resolve normally |
+| **Rare** | **Cannot** gain `syn_neg_*` — skip all negative rows |
+| **Legendary** (named uniques / legendary craft) | **Cannot** gain `syn_neg_*` — skip all negative rows |
+
+Rarity comes from material cost band / unique flag / construction stamp (Client schema TBD). Uniques in the table below are legendary-class.
 
 ## Positive tag-count powers
 
@@ -47,26 +57,26 @@ Thresholds are **minimum counts**. Draft: higher tiers **stack** with lower unle
 | `syn_solar_pure` | Solar ≥ 1 ∧ Pure ≥ 1 | Dawn Vestment | Bonus vs Occult / dark | 78 |
 | `syn_wild_earth` | Wild ≥ 1 ∧ Earth ≥ 1 | Greenmail | +DEF outdoors; −MOB in cities | 22 |
 
-## Negative synergies (bad tags matter — same outlook ladder)
+## Negative synergies (higher outlook than peers)
 
-Always stamp on harness dumps. Gameplay downside **and** competing look.
+Always stamp when they fire. **Skipped entirely** on Rare / Legendary crafts.
 
-| id | When | Name | Effect (draft) | Report hint | outlook_order |
-|---|---|---|---|---|---:|
-| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth worse; +noise | “Quiet died the moment metal moved.” | 38 |
-| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” | 34 |
-| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” | 33 |
-| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; chip on Soft triggers | “Cushion full of knives.” | 42 |
-| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” | 71 |
-| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Occult + Pure tier powers muted; −1 HP | “The weave argued with itself.” | 86 |
-| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; HP chip at start | “Comfort went up in smoke.” | 95 |
-| `syn_neg_metal_silk` | Metal ≥ 2 ∧ Silk ≥ 2 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” | 31 |
+Orders sit **above** the related positive look so the bad chrome wins.
 
-Example: Fire≥2 (90) + Soft≥1 → `syn_neg_fire_soft` (95) **wins the look** over Dragon Affinity — scorched “bad” chrome.
+| id | When | Name | Effect (draft) | Report hint | outlook_order | Beats (examples) |
+|---|---|---|---|---|---:|---|
+| `syn_neg_metal_silk` | Metal ≥ 2 ∧ Silk ≥ 2 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” | 36 | metal_2 (30), metal_3 (32), silk_2 (10) |
+| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” | 39 | silent_2 (35), metal_* |
+| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” | 41 | silent_2 (35), metal_* |
+| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth worse; +noise | “Quiet died the moment metal moved.” | 44 | silent_2 (35), metal_* |
+| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; chip on Soft triggers | “Cushion full of knives.” | 52 | soft_2 (12), sharp_2 (45), sticky_2 (40) |
+| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” | 82 | royal_2 (70), sticky_2 (40), masked_crown (72) |
+| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Occult + Pure tier powers muted; −1 HP | “The weave argued with itself.” | 92 | occult_2 (85), pure_2 (65), pale_hex (88) |
+| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; HP chip at start | “Comfort went up in smoke.” | 105 | fire_2 (90), fire_3 (100), soft_2 (12) |
 
-## Rare named gear
+## Rare named gear (legendary-class — **no neg syn**)
 
-Exact recipe match. Prefer few until tag counts prove the normal path. Named uniques set `outlook_order` **200** (override look).
+Exact recipe match. Prefer few until tag counts prove the normal path. `outlook_order` **200**. Resolver **skips all `syn_neg_*`** on these crafts.
 
 | id | Recipe | Name | Bonus | outlook_order |
 |---|---|---|---|---:|
@@ -80,14 +90,15 @@ Exact recipe match. Prefer few until tag counts prove the normal path. Named uni
 ## Resolver order
 
 1. Sum tag bag from all materials + construction + enchantment.
-2. Apply **all** matching positive `syn_*` rows (count + cross-tag).
-3. Apply **all** matching `syn_neg_*` rows (tag and/or construction).
-4. If a `uniq_*` matches, add its bonus / outlook override.
-5. **Outlook** = max `outlook_order` among **all** fired outlook-bearing rows (pos + neg + uniq); else `plain`.
-6. Emit powers + report lines + `outlook_id` for harness stamp.
+2. Determine **craft rarity** (common / uncommon / rare / legendary).
+3. Apply **all** matching positive `syn_*` rows (count + cross-tag).
+4. If rarity is **not** rare/legendary: apply **all** matching `syn_neg_*` rows. Else skip negatives.
+5. If a `uniq_*` matches, add its bonus / outlook override (and treat as legendary for step 4).
+6. **Outlook** = max `outlook_order` among fired outlook-bearing rows; else `plain`.
+7. Emit powers + report lines + `outlook_id` + `rarity` for harness stamp.
 
 ## Open for balance
 
 - Exact numeric bonuses — Client/Test after harness.
-- Whether Metal≥3 should auto-apply `syn_neg_metal_silent` even without Silent tag (draft: **no**).
+- How rarity is computed from multi-stack cost bands (draft: max material $ band, or unique flag).
 - Cap on simultaneous powers (draft: no cap; stamp all).

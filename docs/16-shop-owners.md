@@ -1,27 +1,33 @@
-# Shop owners (Balatro-style)
+# Player owners (clothier characters)
 
-Jonathan lock (2026-09-21): shops are **owned**. Different owners sell different **material families / pools**, or sell **skills only** (grind / play-hours). Each owner has a distinct **shop outlook** (art). Art gen + Client multi-owner wiring = **Later** except **one basic owner** in Phase-1.
+Jonathan lock (2026-09-21, corrected): an **owner is the player character** — the clothier you play — **not** a shop-encounter NPC.
+
+- Owner **material pool** = which material families **you** can access / stock in your atelier.
+- Owner **skills** = **player skills** (free reroll, min income +1, storage, etc.) — permanent or run-long kit for that clothier.
+- Each owner has a distinct **atelier / UI outlook** (art). Art gen + Client multi-owner = **Later** except **one basic owner** in Phase-1.
 
 ## Rules
 
-- At each shop visit the player meets **one** owner (chapter / unlock / random — TBD).
-- **Pool owners** stock materials from their family list (weights TBD).
-- **Skill owners** sell no mats (or a tiny junk stub); they sell **run skills** that stack for the chapter/run (rerolls, income floor, etc.).
-- Unlockable owners extend play hours without needing more Client loops.
-- Encyclopedia / scars stay separate from owner unlocks.
+- The run is played **as** one unlocked owner.
+- Pool owners (all current drafts) define starting deck filters + shop stock weights from **their** family list.
+- Skills are on the **player** (rerolls, income floor, hand size) — not a separate vendor visit.
+- Unlockable owners extend play hours / fantasy without needing more Client loop systems.
+- Shop UI still exists (buy/sell mats) but it is **your** atelier stock, gated by the active owner’s pool.
 
 ## Owner roster (draft)
 
-| id | Name | Kind | Material pool / skill | Shop outlook (art) | Phase |
-|---|---|---|---|---|---|
-| `own_basic` | Atelier Clerk | Pool | Starter commons: Cloth, Leather, Metal scrap, Stone shard, basic Silk | Clean wooden counter, warm lamp | **Phase-1** |
-| `own_forge` | Scale Merchant | Pool | Metal family heavy (iron → steel, chainlace); some Stone | Ember forge, sparks | Later |
-| `own_voodoo` | Bone & Leaf | Pool | Plants + animal skins (lizard, frog, dire fur, ivy, tar, occult-adjacent) | Dried herbs, jars, fetish masks | Later |
-| `own_tech` | Chassis Vendor | Pool | **Sci‑fi / high-tech** mats (see stub below) | Neon glass, clean chrome | Later |
-| `own_moon` | Night Loom | Pool | Lunar / Silent / Silk rare | Silver thread, moth lamps | Later |
-| `own_skill_reroll` | Deck Broker | **Skill** | Free **reroll** of shop offers **once per visit** (stacks TBD) | Card table, green felt | Later |
-| `own_skill_income` | Tithe Clerk | **Skill** | **Min income +1** gold on every client payout this chapter | Abacus, ledger | Later |
-| `own_skill_storage` | Pack Rat | **Skill** | +1 material hand / storage for the run | Overstuffed packs | Later |
+| id | Name | Fantasy | Material pool (player access) | Player skills (draft) | Atelier outlook (art) | Phase |
+|---|---|---|---|---|---|---|
+| `own_basic` | Atelier Clerk | Everyday clothier | Starter commons: Cloth, Leather, Metal scrap, Stone shard, basic Silk | none (baseline) | Clean wooden atelier, warm lamp | **Phase-1** |
+| `own_forge` | Scale Tailor | Forge-side armorer | Metal family heavy (iron → steel, chainlace); some Stone | — | Ember bench, sparks | Later |
+| `own_voodoo` | Bone & Leaf | Voodoo / fetish stitcher | Plants + animal skins (lizard, frog, dire fur, ivy, tar, occult-adjacent) | — | Dried herbs, jars, fetish masks | Later |
+| `own_tech` | Chassis Clothier | Sci‑fi / high-tech | Sci‑fi mats (see stubs below) | — | Neon glass, chrome | Later |
+| `own_moon` | Night Loom | Lunar silk | Lunar / Silent / Silk rare | — | Silver thread, moth lamps | Later |
+| `own_broker` | Deck Broker | Gambler clothier | Same as basic (or slight Soft/Royal lean) | **Free reroll** of atelier offers **once per shop visit** | Card-table atelier | Later |
+| `own_tithe` | Tithe Clerk | Ledger clothier | Same as basic | **Min income +1** gold on every client payout this chapter | Abacus, ledger | Later |
+| `own_packrat` | Pack Rat | Hoarder | Same as basic + junk commons | **+1 material hand / storage** for the run | Overstuffed packs | Later |
+
+Skill-leaning owners still have a pool (usually basic); their fantasy is the **player skill**, not a different shopkeeper.
 
 ## Sci‑fi / high-tech material stubs (Later — `own_tech` pool)
 
@@ -37,7 +43,7 @@ Docs-only placeholders; **not** in Phase-1 starter hand. Stats TBD when that own
 
 ## Voodoo / wild-skin stubs (Later — `own_voodoo` pool)
 
-Some already exist in `11`; owner weights them up and adds skins:
+Some already exist in `11`; this owner weights them up and adds skins:
 
 | id | Name | Tags (draft) | Notes |
 |---|---|---|---|
@@ -49,11 +55,12 @@ Some already exist in `11`; owner weights them up and adds skins:
 
 ## Phase-1 lock
 
-- Ship **`own_basic` only** — one shop outlook, one pool (commons from `11`).
-- No art gen for other owners; no Client owner-switch UI beyond a stub id if needed.
-- Skill owners and unlock trees = Later (play-hours / meta).
+- Ship **`own_basic` only** — one player clothier, one atelier outlook, commons pool from `11`.
+- No art gen for other owners; no Client owner-select beyond a stub id if needed.
+- Unlock trees / skill owners = Later (play-hours / meta).
 
 ## Harness / Client notes
 
-- Stamp `shop_owner_id` on shop visits when multi-owner lands.
-- Pool filter = owner’s allowed `mat_*` set (or family weights).
+- Stamp `player_owner_id` on runs / dumps (Phase-1 always `own_basic`).
+- Pool filter = active owner’s allowed `mat_*` set (or family weights).
+- Player skills modify shop/craft economy — not a second encounter type.
