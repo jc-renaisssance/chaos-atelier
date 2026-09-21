@@ -4,10 +4,10 @@ Resolver input: **tag counts** + **construction id**. Output: `powers[]` (positi
 
 ## Outlook rule (Jonathan lock)
 
-- Every synergy that should change **look** has an `outlook_order` (integer).
-- Negatives usually have **no** outlook (gameplay only) unless noted.
-- Final look = synergy with the **highest** `outlook_order` among fired outlook-bearing rows.
+- **Every** synergy that should change look — **positive and negative** — has an `outlook_order` (integer).
+- Final look = synergy with the **highest** `outlook_order` among **all** fired outlook-bearing rows (negatives compete in the same ladder).
 - If none → `plain` (default / construction base color).
+- A “bad” look can beat a “good” look when its order is higher (readable failures).
 - Gen matrix: `docs/15-outlook-gen-list.md`.
 
 ## Positive tag-count powers
@@ -40,29 +40,29 @@ Thresholds are **minimum counts**. Draft: higher tiers **stack** with lower unle
 
 | id | When | Power | Effect (draft) | outlook_order |
 |---|---|---|---|---:|
-| `syn_fire_frost_clash` | Fire ≥ 1 ∧ Frost ≥ 1 | Temper | +1 RES; −1 HP (steam) | — (no look; use higher of Fire/Frost if either ≥2) |
+| `syn_fire_frost_clash` | Fire ≥ 1 ∧ Frost ≥ 1 | Temper | +1 RES; −1 HP (steam) | 15 |
 | `syn_royal_silent` | Royal ≥ 1 ∧ Silent ≥ 1 | Masked Crown | +PRE on intrigue; fail-open if spotted | 72 |
 | `syn_sticky_sharp` | Sticky ≥ 1 ∧ Sharp ≥ 1 | Snaretooth | First ambush: bind + chip | 48 |
 | `syn_lunar_occult` | Lunar ≥ 1 ∧ Occult ≥ 1 | Pale Hex | Strong vs undead; Pure risk | 88 |
 | `syn_solar_pure` | Solar ≥ 1 ∧ Pure ≥ 1 | Dawn Vestment | Bonus vs Occult / dark | 78 |
 | `syn_wild_earth` | Wild ≥ 1 ∧ Earth ≥ 1 | Greenmail | +DEF outdoors; −MOB in cities | 22 |
 
-## Negative synergies (bad tags matter)
+## Negative synergies (bad tags matter — same outlook ladder)
 
-Always stamp on harness dumps. These are **powers** with downside — not silent fails.
+Always stamp on harness dumps. Gameplay downside **and** competing look.
 
-| id | When | Name | Effect (draft) | Report hint |
-|---|---|---|---|---|
-| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth checks auto-worse; +noise | “Quiet died the moment metal moved.” |
-| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” |
-| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” |
-| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; wearer takes chip on Soft triggers | “Cushion full of knives.” |
-| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” |
-| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Both Occult and Pure tier powers muted; −1 HP | “The weave argued with itself.” |
-| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; small HP chip at adventure start | “Comfort went up in smoke.” |
-| `syn_neg_metal_silk` | Metal ≥ 2 ∧ Silk ≥ 2 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” |
+| id | When | Name | Effect (draft) | Report hint | outlook_order |
+|---|---|---|---|---|---:|
+| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth worse; +noise | “Quiet died the moment metal moved.” | 38 |
+| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” | 34 |
+| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” | 33 |
+| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; chip on Soft triggers | “Cushion full of knives.” | 42 |
+| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” | 71 |
+| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Occult + Pure tier powers muted; −1 HP | “The weave argued with itself.” | 86 |
+| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; HP chip at start | “Comfort went up in smoke.” | 95 |
+| `syn_neg_metal_silk` | Metal ≥ 2 ∧ Silk ≥ 2 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” | 31 |
 
-Negatives have **no** `outlook_order` (look still follows highest positive outlook, or plain).
+Example: Fire≥2 (90) + Soft≥1 → `syn_neg_fire_soft` (95) **wins the look** over Dragon Affinity — scorched “bad” chrome.
 
 ## Rare named gear
 
@@ -83,11 +83,11 @@ Exact recipe match. Prefer few until tag counts prove the normal path. Named uni
 2. Apply **all** matching positive `syn_*` rows (count + cross-tag).
 3. Apply **all** matching `syn_neg_*` rows (tag and/or construction).
 4. If a `uniq_*` matches, add its bonus / outlook override.
-5. **Outlook** = max `outlook_order` among fired outlook-bearing rows; else `plain`.
+5. **Outlook** = max `outlook_order` among **all** fired outlook-bearing rows (pos + neg + uniq); else `plain`.
 6. Emit powers + report lines + `outlook_id` for harness stamp.
 
 ## Open for balance
 
 - Exact numeric bonuses — Client/Test after harness.
-- Whether Metal≥3 should auto-apply `syn_neg_metal_silent` even without Silent tag (draft: **no** — only when Silent present; cloak/hood construction rows cover garment clash).
+- Whether Metal≥3 should auto-apply `syn_neg_metal_silent` even without Silent tag (draft: **no**).
 - Cap on simultaneous powers (draft: no cap; stamp all).
