@@ -4,14 +4,18 @@
 - Mostly **adventurers** facing strong enemies / environments.
 - Rare **special clients** (weddings, Ghost Bride, etc.) as high-reward side content — **not** Phase-1 parallel work.
 
-## Bosses
-Powerful **monster clients** (e.g. Young Drake → Elder Wyrm → Dragon Emperor). Escalation ladder is Later after the core loop ships.
+## Chapter bosses (StS-style)
+- At **chapter start**, announce the **boss** (threat tags the player should build toward / against).
+- Player uses shop → craft/task → shop to reshape the **material deck** before the boss node.
+- Escalation ladder examples (flavor, Later polish): Young Drake → Elder Wyrm → Dragon Emperor.
+- Full boss roster / special-client matrices stay parked until core loop + dictionary prove out.
 
 ## Adventure report
 - Short, **deterministic** simulation.
-- Clear feedback on **which tags / stats mattered**.
+- Clear feedback on **which tags / stats / powers mattered** (including **negatives**).
 - Every build produces a result (including funny / interesting failures).
-- Pass look (stamped team spine): **overall adventure trend**, not every matrix cell non-cliff.
+- Stamp `outlook_id` used for the garment look.
+- Pass look: **overall adventure trend**, not every matrix cell non-cliff.
 
 ## Balance harness (intent)
-Headless **client × threat × build** dumps that stamp: outcome, which tags fired, why win/lose — before content piles up.
+Headless **client × threat × build** dumps: outcome, tags fired, powers (pos+neg), outlook — before content piles up.
