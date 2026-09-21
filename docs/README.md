@@ -11,3 +11,4 @@ Temporary name locked. Docs-first seed from the stamped project summary + team s
 | [04-progression](04-progression.md) | Shop, encyclopedia, scars |
 | [05-art](05-art.md) | AI-friendly art strategy |
 | [06-phases](06-phases.md) | Phase-1 scope + open questions |
+| [pm/phase-1-plan](pm/phase-1-plan.md) | Phase-1 scope + budget (team cuts consolidated) |
