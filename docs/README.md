@@ -11,4 +11,9 @@ Temporary name locked. Docs-first seed from the stamped project summary + team s
 | [04-progression](04-progression.md) | Shop, encyclopedia, scars |
 | [05-art](05-art.md) | AI-friendly art strategy |
 | [06-phases](06-phases.md) | Phase-1 scope + open questions |
-| [pm/phase-1-plan](pm/phase-1-plan.md) | Phase-1 scope + budget (team cuts consolidated) |
+| [10-catalog-overview](10-catalog-overview.md) | Stats axes + tag list + schema |
+| [11-materials](11-materials.md) | Materials dictionary |
+| [12-constructions](12-constructions.md) | Construction types |
+| [13-enchantments](13-enchantments.md) | Enchantments / runes |
+| [14-synergies](14-synergies.md) | Tag-count powers + rare named gear |
+| [pm/phase-1-plan](pm/phase-1-plan.md) | Phase-1 scope + budget |
