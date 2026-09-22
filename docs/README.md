@@ -22,4 +22,5 @@ Temporary name locked. Docs-first seed from the stamped project summary + team s
 | [18-rarity](18-rarity.md) | Craft rarity band rule |
 | [19-own-basic-starter](19-own-basic-starter.md) | Starter deck + shop weights |
 | [20-harness-stamp](20-harness-stamp.md) | Harness stamp fields (Test lock) |
+| [21-app-flow](21-app-flow.md) | Application flow pseudocode (Phase-1 review) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | Phase-1 scope + budget |
