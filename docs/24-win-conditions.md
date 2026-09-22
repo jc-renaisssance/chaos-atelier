@@ -1,47 +1,49 @@
 # Win conditions (Phase-1 lock)
 
-Team stamp (Jonathan ask + Aizen draft + Design/Client/Test/Finance +1, 2026-09-22).
+Team stamp + Jonathan reps/route/newspaper amend (2026-09-22).
 
-**One gate only** for mission clear. Skill ★ and damage-aid % feed `rating` — they are **not** a second win check.
-
-## Mission (client / event / boss sim row)
+**Mission clear gate (one only):** ★ / damage-aid feed `rating` only.
 
 ```
 cleared = (hp_remaining > 0) AND (rating ∈ {S, A, B, C})
-failed  = NOT cleared
 ```
+
+Clear floor **C** OK — pending Test tune.
+
+## Mission
 
 | Result | Rules |
 |---|---|
-| **Clear** | HP > 0 and rating ≥ **C** (i.e. S/A/B/C) |
-| **Fail** | HP ≤ 0 **or** rating **D/F** |
-| Always | Emit full mission result card; fail still gets **partial gold**; letters may still fire on specials |
-| Can’t craft | If `len(deck mats usable) < min_materials` (1) → **auto-fail**: `damage_aid_pct=0`, still full stamp row, **no soft-lock** |
+| **Clear** | HP > 0 and rating ∈ {S,A,B,C} → **+reps** by rating × difficulty (`25`) |
+| **Fail** | HP ≤ 0 or rating D/F → **−reps**; if HP ≤ 0 (adventurer died mid) → **large −reps** |
+| Always | Full result card; partial gold on fail; letters may fire |
+| Can’t craft | Auto-fail, `damage_aid_pct=0`, full stamp |
+| Mid-fail UI | Continue chapter; **newspaper** mid-fail headline (`26`) |
 
 ## Chapter
 
 | Event | Effect |
 |---|---|
-| Mid-mission fail | **Continue** — set `mission_failed`; chapter stays open; player is weaker into the boss (StS-style) |
-| Chapter clear | Chapter **boss** cleared (`cleared == true` on boss row) |
-| “2 mid-fails → chapter loss” | **Parked** (not Phase-1) |
+| Route | Player **picks** 3 mission nodes (StS-like) (`22`) |
+| After route | If `reps < reps_gate` → **`run_over`** (`reps_gate_miss`) — competitors / shop broken |
+| Boss offered | Only if reps gate met |
+| Boss clear | Chapter clear; newspaper chapter result |
+| Boss fail | Adventurer **died** → **`run_over`**, **no retry** |
 
 ## Run
 
 | Event | Effect |
 |---|---|
-| **Win** | Clear C1 → C2 → C3 bosses (one path through the 27) |
-| **Lose / `run_over`** | **Boss fail** (not cleared) — instant run-over |
-| Boss retry shop | **No** in Phase-1 |
-| Bankrupt | Covered by can’t-craft auto-fail; no separate soft-lock |
+| **Win** | Clear C1–C3 bosses (27 paths) |
+| **`run_over`** | Boss death **or** reps gate miss |
 
 ## Harness
 
-- Stamp `cleared: bool` **derived** from `hp_remaining` + `rating` (don’t invent a third gate).
-- Stamp `mission_failed` when mid-mission failed but chapter continues.
-- Stamp `run_over` when boss fail ends the run.
-- Pass look = overall clear **trend** vs announced boss (same spirit as DARE overall WR).
+- `cleared` derived from HP + rating only
+- `reps_*`, `node_difficulty`, `run_over_reason`
+- `newspaper_event` when paper prints
+- Pass look = overall trend vs announced boss + reps trajectory
 
 ## Pointers
 
-Mission card: `23` · Stamps: `20` · Flow: `21`/`22`
+`25` reps · `26` newspaper · `22` route · `23` report · `20` stamps

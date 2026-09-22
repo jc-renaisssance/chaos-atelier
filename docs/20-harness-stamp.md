@@ -1,62 +1,49 @@
 # Harness stamp fields (Phase-1 lock)
 
-Headless **mission × build** dumps. Assertable one row per craft→sim.
-
-## Required fields
+## Required fields (additions bolded for this amend)
 
 | Field | Type | Notes |
 |---|---|---|
 | `run_id` | string | |
-| `player_owner_id` | string | Phase-1 `own_basic` |
-| `player_skills` | string[] | Phase-1 `[]` |
-| `max_materials` | int | Default 2 |
-| `max_runes` | int | Default 1 |
-| `chapter_id` | int | 1..3 |
-| `boss_pool_id` | string | `c1` \| `c2` \| `c3` |
+| `player_owner_id` | string | `own_basic` |
+| `player_skills` | string[] | |
+| `max_materials` / `max_runes` | int | Default 2 / 1 |
+| `chapter_id` | int | |
+| `boss_pool_id` | string | |
 | `chapter_boss_id` | string | |
-| `phase` | enum | `shop` \| `craft_task` \| `boss` |
-| `mission_kind` | enum\|null | `client` \| `event` \| `boss` |
+| `phase` | enum | shop \| craft_task \| boss \| newspaper |
+| `mission_kind` | enum\|null | client \| event \| boss |
 | `threat_id` | string | |
-| `construction` | string\|null | null if can’t-craft auto-fail |
-| `material_ids` | string[] | |
-| `stack_counts` | object | |
-| `rune_ids` | string[] | |
-| `tag_counts` | object | |
-| `craft_rarity` | enum\|null | |
-| `powers_positive` | string[] | |
-| `powers_negative` | string[] | **[]** if rare/legendary |
-| `outlook_id` | string\|null | |
-| `outlook_order` | int\|null | |
-| `stats` | object\|null | |
-| `rating` | enum | **`S\|A\|B\|C\|D\|F`** |
-| `rating_score` | number\|null | Optional; not asserted |
-| `hp_remaining` | number | |
-| `damage_aid_pct` | number | 0 if can’t-craft |
-| `skill_effectiveness` | int | 1..5 |
-| `cleared` | bool | **Derived** from HP + rating (`24`) |
-| `mission_failed` | bool | Mid-fail continue flag |
-| `run_over` | bool | True on boss fail |
-| `outcome` | enum | win \| lose \| mixed |
-| `report_lines` | string[] | |
+| **`node_difficulty`** | int\|null | 1..3 on route nodes |
+| **`reps_before` / `reps_after` / `reps_delta`** | int | |
+| **`reps_gate`** | int | Chapter gate |
+| **`rounds_left`** | int | |
+| `construction` | string\|null | |
+| `material_ids` / `stack_counts` / `rune_ids` | | |
+| `tag_counts` / rarity / powers / outlook / stats | | |
+| `rating` | S\|A\|B\|C\|D\|F | |
+| `rating_score` | number\|null | Not asserted |
+| `hp_remaining` / `damage_aid_pct` / `skill_effectiveness` | | |
+| `cleared` | bool | Derived HP∧rating≥C |
+| `mission_failed` | bool | |
+| `run_over` | bool | |
+| **`run_over_reason`** | enum\|null | `boss_death` \| `reps_gate_miss` \| … |
+| **`newspaper_event`** | enum\|null | boss_announce \| mid_fail \| chapter_result \| run_over |
+| **`newspaper_headline_id`** | string\|null | |
 | `letter_id` | string\|null | |
-| `favor_tags_hit` | string[] | |
-| `punish_tags_hit` | string[] | |
-| `cant_craft` | bool | Auto-fail path |
+| `favor_tags_hit` / `punish_tags_hit` | | |
+| `cant_craft` | bool | |
 
 ## Asserts
 
-1. `player_owner_id == own_basic` in Phase-1.
-2. Rare/legendary → `powers_negative` empty.
-3. Neg outlook may win when negatives fire.
-4. Mats/runes vs `max_materials` / `max_runes` only (never legacy `material_slots`).
-5. `sum(stack_counts) == len(material_ids)` when crafted.
-6. `skill_effectiveness` ∈ 1..5.
-7. `chapter_boss_id` ∈ pool for `boss_pool_id`.
-8. `rating` ∈ {S,A,B,C,D,F}.
+1–8 as before (owner, neg skip, caps, stacks, ★, boss∈pool, rating enum).
 9. `cleared == (hp_remaining > 0 ∧ rating ∈ {S,A,B,C})`.
-10. Boss row with `cleared == false` → `run_over == true`.
-11. `cant_craft` → `damage_aid_pct == 0` and full row still emitted.
+10. Boss `cleared == false` → `run_over` ∧ `run_over_reason == boss_death`.
+11. `cant_craft` → `damage_aid_pct == 0`.
+12. After final route node, if `reps_after < reps_gate` → `run_over_reason == reps_gate_miss`.
+13. Mid fail with `hp_remaining <= 0` → `reps_delta` is the **large** death penalty path (`25`).
+14. Boss announce / mid-fail / chapter end rows may set `newspaper_event` non-null.
 
 ## Pointers
 
-`24` win-con · `23` mission · `22` chapter · `12b` caps · `14` synergies
+`24` · `25` · `26` · `22` · `23` · `12b` · `14`

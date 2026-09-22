@@ -1,164 +1,73 @@
 # Application flow (pseudocode) — Phase-1 `own_basic`
 
-**Status:** docs review (Jonathan 2026-09-22+). **No Client src until monthly Cursor reset.**
-
-Contract: `10`–`23`. Player = `own_basic` only.
+Docs review. **No Client src until monthly Cursor reset.**
 
 ```
 RUN
 └─ CHAPTER ×3
-   ├─ pick boss from chapter pool (17) → announce
+   ├─ newspaper: announce boss from pool (17, 26)
    ├─ shop
-   ├─ missions ×3 = client → event → client  (22)
-   │    each: shop → craft(2m1r) → mission report(+letter?) →
-   ├─ last shop
-   └─ boss fight → next chapter
+   ├─ route ×3: player picks node (diff 1–3) → shop → craft(2m1r) → mission
+   │     → ±reps (25) → newspaper if mid-fail
+   ├─ if reps < gate → run_over (competitors)
+   ├─ last shop → boss (fail = death, no retry)
+   └─ newspaper: chapter result
 ```
 
-**Constants:**
+Constants: `max_materials=2`, `max_runes=1`, route nodes=3, clear floor C, reps gates in `25`.
 
-```
-MISSIONS_BEFORE_BOSS = 3
-CHAPTER_MISSION_ORDER = [client, event, client]
-max_materials = 2 + skill_bonuses   # default 2
-max_runes     = 1 + skill_bonuses   # default 1
-```
-
----
-
-## 0. Run bootstrap
+## Bootstrap
 
 ```
 function start_run(seed):
   player.owner_id = "own_basic"
-  player.skills   = []
-  player.staff    = []
-  player.gold     = 12
-  player.deck     = starter_deck_own_basic()
-  player.constructions_unlocked = [tunic, cloak, armor, robe, coat]
+  player.reps = 0
   player.max_materials = 2
-  player.max_runes     = 1
-  chapter_index = 1
-  stamp_run_start(player, seed)
+  player.max_runes = 1
+  player.deck = starter_deck_own_basic()
+  ...
 ```
 
----
-
-## 1. Chapter start — boss from pool
+## Chapter
 
 ```
 function chapter_start(chapter_index, seed):
-  boss = pick_chapter_boss(chapter_index, seed)  # 17 — 1 of 3
-  ui.show_boss_announce(boss)
-  state.chapter_boss_id = boss.id
-  state.boss_pool_id    = f"c{chapter_index}"
+  boss = pick_chapter_boss(chapter_index, seed)
+  newspaper.show(boss_announce, boss)      # 26
+  state.reps_gate = REPS_GATE[chapter_index]
+  state.rounds_left = 3
   return boss
-```
 
----
-
-## 2. Atelier shop
-
-(unchanged spine — `19` weights; player atelier not NPC.)
-
----
-
-## 3. Craft — construction compulsory, default 2m1r
-
-```
-function craft_garment(player):
-  construction = ui.pick_construction(...)   # REQUIRED
-
-  materials = []
-  loop until len(materials) in 1..player.max_materials and ui.confirm:
-    mat = ui.pick_from_deck(player.deck)
-    player.deck.remove(mat)                  # CONSUME
-    materials.append(mat)
-
-  runes = []
-  loop until len(runes) in 0..player.max_runes and ui.confirm:
-    enc = ui.pick_rune_or_done(...)
-    if enc: player.consume_rune(enc); runes.append(enc)
-
-  return Craft(construction, materials, runes)  # Phase-1: treat runes[0] as single enc in resolver
-```
-
-Resolver / rarity / neg / outlook: same as before (`14`, `18`) — if multiple runes Later, bag-count all rune tags.
-
----
-
-## 4. Mission report
-
-```
-function run_mission(gear, threat) -> MissionResult:   # 23
-  sim = deterministic_sim(gear, threat)
-  result = build_mission_result(gear, threat, sim)
-  # rating, hp_remaining, damage_aid_pct, skill_effectiveness ★≤5
-  result.letter = maybe_letter(gear, result, threat.event_flags)
-  apply_rewards(player, payout(result))
-  return result
-```
-
----
-
-## 5. Chapter body + boss
-
-```
-function chapter_body(player, chapter_index, boss):
-  for kind in CHAPTER_MISSION_ORDER:       # client, event, client
-    atelier_shop(player, boss)
-    threat = pick_client_or_event(chapter_index, kind)  # 22
-    craft  = craft_garment(player)
-    gear   = resolve_craft(craft)
-    result = run_mission(gear, threat)
-    stamp_craft_run(..., phase="craft_task", mission=result)
-    ui.show_mission_result(result)         # card + optional letter
-  atelier_shop(player, boss)               # last shop
+function chapter_body(...):
+  while state.rounds_left > 0:
+    node = ui.pick_route_node(offers)      # StS — avoid hard if weak
+    atelier_shop(player)
+    if cant_craft(player):
+      result = auto_fail_mission()
+    else:
+      craft = craft_garment(player)        # consume deck
+      gear = resolve_craft(craft)
+      result = run_mission(gear, node.threat)
+    apply_reps(result, node.difficulty)
+    if not result.cleared:
+      newspaper.show(mid_fail, result)
+    stamp(...); ui.show_mission_result(result)
+    state.rounds_left -= 1
+  if player.reps < state.reps_gate:
+    newspaper.show(run_over_shop)
+    run_over("reps_gate_miss")
+    return
+  atelier_shop(player)
 
 function chapter_boss(player, boss):
-  craft  = craft_garment(player)
-  gear   = resolve_craft(craft)
-  result = run_mission(gear, threat=boss)
-  stamp_craft_run(..., phase="boss", mission=result)
-  ui.show_boss_result(result)
-  advance_or_end_run()
+  craft/gear/result = ...
+  if not result.cleared:
+    newspaper.show(run_over_death)
+    run_over("boss_death")                 # no retry
+  else:
+    newspaper.show(chapter_result_clear)
 ```
 
----
+## Review
 
-## 6. Main
-
-```
-function main():
-  start_run(seed)
-  while chapter_index <= 3:
-    boss = chapter_start(chapter_index, seed)
-    chapter_body(player, chapter_index, boss)
-    chapter_boss(player, boss)
-    chapter_index += 1
-  show_run_summary()  # path = 1 of 27 boss combos
-```
-
----
-
-## UI screens
-
-| Screen | Shows |
-|---|---|
-| Chapter announce | Boss from pool (name, tags, env) |
-| Atelier shop | Gold, deck, offers |
-| Craft | Construction required; up to 2 mats + 1 rune; deck consume |
-| Mission result | Rating · HP left · damage aid % · ★ skill · powers; letter if any |
-| Boss result | Same + chapter advance |
-
-Art: after this doc stamp → **1C armor outlook gens** first (Jonathan).
-
----
-
-## Review checklist
-
-| Role | Check |
-|---|---|
-| Design | Boss pools 3×3; 2m1r; mission card+letter; client/event order |
-| Test | Stamp mission fields + letter_id; rarity→neg; 27-path smoke later |
-| Client post-reset | Implement this + `22`/`23` |
+Design: diverse C1 · reps · route pick · newspaper. Test: stamps `20` asserts 9–14. Client post-reset: implement this + `22`–`26`.
