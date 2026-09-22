@@ -26,4 +26,5 @@ Temporary name locked. Docs-first (Jonathan locks through 2026-09-22).
 | [21-app-flow](21-app-flow.md) | Pseudocode flow |
 | [22-chapter-flow](22-chapter-flow.md) | Clients/events counts + pools |
 | [23-mission-report](23-mission-report.md) | Mission result + letter |
+| [24-win-conditions](24-win-conditions.md) | Clear / fail / run-over |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | Phase-1 plan |

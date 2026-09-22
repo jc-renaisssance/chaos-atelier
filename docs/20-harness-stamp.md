@@ -6,50 +6,57 @@ Headless **mission × build** dumps. Assertable one row per craft→sim.
 
 | Field | Type | Notes |
 |---|---|---|
-| `run_id` | string | Unique dump id |
+| `run_id` | string | |
 | `player_owner_id` | string | Phase-1 `own_basic` |
 | `player_skills` | string[] | Phase-1 `[]` |
-| `max_materials` | int | Default 2 — **assert mats against this** |
-| `max_runes` | int | Default 1 — **assert runes against this** |
+| `max_materials` | int | Default 2 |
+| `max_runes` | int | Default 1 |
 | `chapter_id` | int | 1..3 |
 | `boss_pool_id` | string | `c1` \| `c2` \| `c3` |
-| `chapter_boss_id` | string | Drawn boss |
+| `chapter_boss_id` | string | |
 | `phase` | enum | `shop` \| `craft_task` \| `boss` |
 | `mission_kind` | enum\|null | `client` \| `event` \| `boss` |
-| `threat_id` | string | client / event / boss id |
-| `construction` | string | `con_*` (required) |
-| `material_ids` | string[] | 1..max_materials |
-| `stack_counts` | object | mat_id → count |
-| `rune_ids` | string[] | 0..max_runes |
-| `tag_counts` | object | tag → int |
-| `craft_rarity` | enum | common..legendary |
+| `threat_id` | string | |
+| `construction` | string\|null | null if can’t-craft auto-fail |
+| `material_ids` | string[] | |
+| `stack_counts` | object | |
+| `rune_ids` | string[] | |
+| `tag_counts` | object | |
+| `craft_rarity` | enum\|null | |
 | `powers_positive` | string[] | |
 | `powers_negative` | string[] | **[]** if rare/legendary |
-| `outlook_id` | string | |
-| `outlook_order` | int | |
-| `stats` | object | HP ATK DEF RES MOB PRE |
-| `rating` | enum | **`S\|A\|B\|C\|D\|F` only** (primary) |
-| `rating_score` | number\|null | Optional 0..100 — not asserted |
+| `outlook_id` | string\|null | |
+| `outlook_order` | int\|null | |
+| `stats` | object\|null | |
+| `rating` | enum | **`S\|A\|B\|C\|D\|F`** |
+| `rating_score` | number\|null | Optional; not asserted |
 | `hp_remaining` | number | |
-| `damage_aid_pct` | number | 0..100 |
-| `skill_effectiveness` | int | 1..5 stars |
+| `damage_aid_pct` | number | 0 if can’t-craft |
+| `skill_effectiveness` | int | 1..5 |
+| `cleared` | bool | **Derived** from HP + rating (`24`) |
+| `mission_failed` | bool | Mid-fail continue flag |
+| `run_over` | bool | True on boss fail |
 | `outcome` | enum | win \| lose \| mixed |
 | `report_lines` | string[] | |
-| `letter_id` | string\|null | Adventurer letter if any |
+| `letter_id` | string\|null | |
 | `favor_tags_hit` | string[] | |
 | `punish_tags_hit` | string[] | |
+| `cant_craft` | bool | Auto-fail path |
 
 ## Asserts
 
 1. `player_owner_id == own_basic` in Phase-1.
 2. Rare/legendary → `powers_negative` empty.
-3. If negatives fire → outlook may be that higher order.
-4. `len(material_ids)` ∈ 1..`max_materials`; `len(rune_ids)` ∈ 0..`max_runes` — **never** vs legacy `material_slots`.
-5. `sum(stack_counts) == len(material_ids)`.
+3. Neg outlook may win when negatives fire.
+4. Mats/runes vs `max_materials` / `max_runes` only (never legacy `material_slots`).
+5. `sum(stack_counts) == len(material_ids)` when crafted.
 6. `skill_effectiveness` ∈ 1..5.
 7. `chapter_boss_id` ∈ pool for `boss_pool_id`.
-8. `rating` ∈ {`S`,`A`,`B`,`C`,`D`,`F`}.
+8. `rating` ∈ {S,A,B,C,D,F}.
+9. `cleared == (hp_remaining > 0 ∧ rating ∈ {S,A,B,C})`.
+10. Boss row with `cleared == false` → `run_over == true`.
+11. `cant_craft` → `damage_aid_pct == 0` and full row still emitted.
 
 ## Pointers
 
-`17` bosses · `22` chapter flow · `23` mission report · `12b` craft caps · `14` synergies
+`24` win-con · `23` mission · `22` chapter · `12b` caps · `14` synergies
