@@ -29,6 +29,8 @@ Jonathan lock (2026-09-21, corrected): an **owner is the player character** — 
 
 Skill-leaning owners still have a pool (usually basic); their fantasy is the **player skill**, not a different shopkeeper.
 
+**Phase-1 numbers:** starter deck + shop weights for `own_basic` → **[19-own-basic-starter](19-own-basic-starter.md)**.
+
 ## Sci‑fi / high-tech material stubs (Later — `own_tech` pool)
 
 Docs-only placeholders; **not** in Phase-1 starter hand. Stats TBD when that owner unlocks.
@@ -55,7 +57,7 @@ Some already exist in `11`; this owner weights them up and adds skins:
 
 ## Phase-1 lock
 
-- Ship **`own_basic` only** — one player clothier, one atelier outlook, commons pool from `11`.
+- Ship **`own_basic` only** — one player clothier, one atelier outlook, commons pool from `11` / `19`.
 - No art gen for other owners; no Client owner-select beyond a stub id if needed.
 - Unlock trees / skill owners = Later (play-hours / meta).
 

@@ -18,7 +18,7 @@ Resolver input: **tag counts** + **construction id** + **craft rarity**. Output:
 | **Rare** | **Cannot** gain `syn_neg_*` — skip all negative rows |
 | **Legendary** (named uniques / legendary craft) | **Cannot** gain `syn_neg_*` — skip all negative rows |
 
-Rarity comes from material cost band / unique flag / construction stamp (Client schema TBD). Uniques in the table below are legendary-class.
+**How rarity is computed:** locked algorithm in **[18-rarity](18-rarity.md)** (max material $, stack count, enchantment $, unique match). Uniques below are legendary-class.
 
 ## Positive tag-count powers
 
@@ -90,7 +90,7 @@ Exact recipe match. Prefer few until tag counts prove the normal path. `outlook_
 ## Resolver order
 
 1. Sum tag bag from all materials + construction + enchantment.
-2. Determine **craft rarity** (common / uncommon / rare / legendary).
+2. Determine **craft rarity** per **[18-rarity](18-rarity.md)**.
 3. Apply **all** matching positive `syn_*` rows (count + cross-tag).
 4. If rarity is **not** rare/legendary: apply **all** matching `syn_neg_*` rows. Else skip negatives.
 5. If a `uniq_*` matches, add its bonus / outlook override (and treat as legendary for step 4).
@@ -100,5 +100,4 @@ Exact recipe match. Prefer few until tag counts prove the normal path. `outlook_
 ## Open for balance
 
 - Exact numeric bonuses — Client/Test after harness.
-- How rarity is computed from multi-stack cost bands (draft: max material $ band, or unique flag).
 - Cap on simultaneous powers (draft: no cap; stamp all).
