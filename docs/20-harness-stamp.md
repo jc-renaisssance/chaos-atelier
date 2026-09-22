@@ -9,8 +9,8 @@ Headless **mission × build** dumps. Assertable one row per craft→sim.
 | `run_id` | string | Unique dump id |
 | `player_owner_id` | string | Phase-1 `own_basic` |
 | `player_skills` | string[] | Phase-1 `[]` |
-| `max_materials` | int | Default 2 |
-| `max_runes` | int | Default 1 |
+| `max_materials` | int | Default 2 — **assert mats against this** |
+| `max_runes` | int | Default 1 — **assert runes against this** |
 | `chapter_id` | int | 1..3 |
 | `boss_pool_id` | string | `c1` \| `c2` \| `c3` |
 | `chapter_boss_id` | string | Drawn boss |
@@ -28,7 +28,8 @@ Headless **mission × build** dumps. Assertable one row per craft→sim.
 | `outlook_id` | string | |
 | `outlook_order` | int | |
 | `stats` | object | HP ATK DEF RES MOB PRE |
-| `rating` | string\|number | Mission grade |
+| `rating` | enum | **`S\|A\|B\|C\|D\|F` only** (primary) |
+| `rating_score` | number\|null | Optional 0..100 — not asserted |
 | `hp_remaining` | number | |
 | `damage_aid_pct` | number | 0..100 |
 | `skill_effectiveness` | int | 1..5 stars |
@@ -43,10 +44,11 @@ Headless **mission × build** dumps. Assertable one row per craft→sim.
 1. `player_owner_id == own_basic` in Phase-1.
 2. Rare/legendary → `powers_negative` empty.
 3. If negatives fire → outlook may be that higher order.
-4. `len(material_ids)` ∈ 1..`max_materials`; `len(rune_ids)` ∈ 0..`max_runes`.
+4. `len(material_ids)` ∈ 1..`max_materials`; `len(rune_ids)` ∈ 0..`max_runes` — **never** vs legacy `material_slots`.
 5. `sum(stack_counts) == len(material_ids)`.
 6. `skill_effectiveness` ∈ 1..5.
 7. `chapter_boss_id` ∈ pool for `boss_pool_id`.
+8. `rating` ∈ {`S`,`A`,`B`,`C`,`D`,`F`}.
 
 ## Pointers
 

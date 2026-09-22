@@ -10,23 +10,24 @@ CHAPTER
   2. Atelier shop
   3. Mission nodes × MISSIONS_BEFORE_BOSS
        each node = CLIENT or EVENT from chapter pools
-       pattern: shop → craft → mission report → (shop)
+       pattern: shop → craft → mission report → (next)
   4. Last atelier shop
   5. Boss fight (announced boss)
 ```
 
-### Phase-1 counts (locked draft)
+### Phase-1 counts (locked)
 
 | Constant | Value | Notes |
 |---|---:|---|
 | Chapters per run | **3** | C1 → C2 → C3 |
 | Bosses per chapter pool | **3** | 27 run combinations |
-| `MISSIONS_BEFORE_BOSS` | **3** | Replaces loose “node budget” |
-| Of those 3 | **2 clients + 1 event** | Order: client, event, client (fixed for Phase-1 smoke) |
-| Shops | before first mission, between missions optional, **last shop before boss** | `21` |
+| `MISSIONS_BEFORE_BOSS` | **3** | |
+| Of those 3 | **2 clients + 1 event** | Order: client, event, client |
+| Shops | **Before each** of the 3 missions **+ last shop before boss** | Intended (heavy); not optional in Phase-1 |
 
 ```
 CHAPTER_MISSION_ORDER = [client, event, client]  # then last shop → boss
+# Shops: 1 + 3 (before each mission) + 1 last = 5 atelier visits per chapter
 ```
 
 ## Client pools (per chapter)
@@ -93,19 +94,18 @@ Events are non-client mission beats (road, omen, market twist). May set letter f
 function run_chapter_missions(player, chapter_index, boss):
   order = CHAPTER_MISSION_ORDER  # [client, event, client]
   for kind in order:
-    atelier_shop(player)               # or skip mid-shops if Design trims — Phase-1: shop before each
+    atelier_shop(player)               # REQUIRED before each mission (Phase-1)
     if kind == client:
       threat = pick(CLIENT_POOLS[chapter_index])
     else:
       threat = pick(EVENT_POOLS[chapter_index])
       apply_event_flags(threat)
-    craft = craft_garment(player)      # 2m1r default; consume deck
+    craft = craft_garment(player)      # caps = player.max_materials / max_runes
     gear  = resolve_craft(craft)
-    result = run_mission(gear, threat) # 23 mission report + maybe letter
+    result = run_mission(gear, threat) # 23 — rating S|A|B|C|D|F
     stamp(..., phase="craft_task")
     ui.show_mission_result(result)
-  atelier_shop(player)                 # last shop
-  # then boss
+  atelier_shop(player)                 # last shop before boss
 ```
 
 ## Cross-links
