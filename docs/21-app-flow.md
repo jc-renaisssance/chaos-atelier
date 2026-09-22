@@ -14,6 +14,12 @@ CHAPTER LOOP (×3 in Phase-1 vertical slice)
 └─ BOSS           → sim vs announced boss → chapter result
 ```
 
+**Phase-1 constants (Design stamp):**
+
+```
+CHAPTER_NODE_BUDGET = 3   # shop↔craft nodes per chapter, then last shop → boss
+```
+
 ---
 
 ## 0. Run bootstrap
@@ -46,7 +52,7 @@ function chapter_start(chapter_index):
     environment = boss.environment
   )
   state.chapter_boss_id = boss.id
-  state.nodes_remaining = CHAPTER_NODE_BUDGET   # TBD Design number; shop↔craft cycles
+  state.nodes_remaining = CHAPTER_NODE_BUDGET   # 3 shop↔craft nodes (Design)
   return boss
 ```
 
@@ -89,7 +95,7 @@ function atelier_shop(player, boss_context):
 
 ## 3. Craft (multi-stack) → resolve → adventure report
 
-### 3a. Build garment
+### 3a. Build garment (consumes deck)
 
 ```
 function craft_garment(player):
@@ -99,9 +105,14 @@ function craft_garment(player):
   materials = []
   loop until len(materials) in 1..slots_n and ui.confirm:
     mat = ui.pick_from_deck(player.deck)   # same mat id may repeat (stacks)
+    assert mat in player.deck
+    player.deck.remove(mat)                # CONSUME — spent mats leave the deck
     materials.append(mat)
 
   enchantment = ui.pick_enchantment_or_none(player)  # 0..1; 13
+  if enchantment != null:
+    assert enchantment in player.deck_or_enc_hand
+    player.deck_or_enc_hand.remove(enchantment)      # consume enc too if held
 
   return Craft(
     construction = construction,
@@ -211,16 +222,17 @@ function stamp_craft_run(run_id, player, craft, gear, threat, result, phase):
 
 ```
 function chapter_body(player, boss):
-  while state.nodes_remaining > 0:
+  while state.nodes_remaining > 0:         # starts at CHAPTER_NODE_BUDGET (3)
     atelier_shop(player, boss)
     threat = pick_side_client_or_task()    # optional mid-chapter clients
-    craft  = craft_garment(player)
+    craft  = craft_garment(player)         # consumes mats from deck
     gear   = resolve_craft(craft)
     result = run_adventure(gear, threat)
     stamp_craft_run(..., phase="craft_task")
     ui.show_report(result)
     state.nodes_remaining -= 1
-    # Design may force a final shop before boss — same atelier_shop()
+  # After 3 nodes: final shop → boss
+  atelier_shop(player, boss)
 ```
 
 ---
@@ -229,10 +241,9 @@ function chapter_body(player, boss):
 
 ```
 function chapter_boss(player, boss):
-  # May allow one last shop before fight (01 spine: shop → … → boss).
-  atelier_shop(player, boss)               # if Design stamps "last shop"
+  # Last shop already ran at end of chapter_body; optional extra shop if Design asks.
 
-  craft  = craft_garment(player)           # or pick from prepared loadout
+  craft  = craft_garment(player)           # consumes mats; or pick prepared loadout
   gear   = resolve_craft(craft)
   result = run_adventure(gear, threat=boss)
   stamp_craft_run(..., phase="boss")
@@ -268,7 +279,7 @@ function main():
 |---|---|
 | Chapter announce | Boss name, threat / favor / punish tags, environment |
 | Atelier shop | Gold, deck, 5 weighted offers, buy/sell/leave |
-| Craft | Construction picker, material slot fills (repeats OK), optional enc |
+| Craft | Construction picker, material slot fills (repeats OK), optional enc; **deck shrinks on confirm** |
 | Report | Outcome, which powers/tags fired, favor/punish hits, outlook id (text) |
 | Boss result | Same stamp + chapter advance |
 
@@ -289,7 +300,7 @@ Art: placeholders until **1C** (≤50 outlook gens when Jonathan stamps). Outloo
 
 | Role | Check |
 |---|---|
-| **Design** | Boss announce before spend; stacks; rarity→neg skip; neg outlook can win; `own_basic` pool |
+| **Design** | Boss announce before spend; stacks; rarity→neg skip; neg outlook can win; `own_basic` pool; **deck consume**; **CHAPTER_NODE_BUDGET=3** |
 | **Test** | Stamp fields match `20`; asserts 1–5 hold in this flow |
 | **PM** | One loop only; shop = player atelier not NPC |
 | **Client (post-reset)** | Implement this file as the vertical slice + headless harness |
