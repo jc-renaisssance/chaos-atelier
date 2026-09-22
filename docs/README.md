@@ -24,7 +24,7 @@ Docs-first (locks through 2026-09-22).
 | [19-own-basic-starter](19-own-basic-starter.md) | Starter |
 | [20-harness-stamp](20-harness-stamp.md) | Stamps |
 | [21-app-flow](21-app-flow.md) | Pseudocode |
-| [22-chapter-flow](22-chapter-flow.md) | StS route + pools |
+| [22-chapter-flow](22-chapter-flow.md) | **1-of-3 card lineup** / round |
 | [23-mission-report](23-mission-report.md) | Mission card + letter |
 | [24-win-conditions](24-win-conditions.md) | Clear / run-over |
 | [25-reps-meter](25-reps-meter.md) | Trust / reps gate |
