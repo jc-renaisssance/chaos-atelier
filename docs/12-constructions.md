@@ -1,25 +1,27 @@
 # Constructions dictionary
 
-Layer 2 — **Construction** (garment type). Mods apply on top of **all** slotted materials. Tags added once to the gear’s tag bag.
+Layer 2 — **Construction** (garment type). **Compulsory** on every craft. Mods apply on top of slotted materials. Tags added once to the gear’s tag bag.
 
-| id | Name | Slot fantasy | material_slots | HP | ATK | DEF | RES | MOB | PRE | Tags | Notes |
-|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---|
-| `con_robe` | Robe | Body, flowing | 2 | +1 | 0 | 0 | +1 | 0 | +1 | Silk | Mage default |
-| `con_armor` | Armor | Body, hard | **3** | +2 | 0 | +2 | 0 | −2 | 0 | Metal | Heavy soak — **3-stone stack home** |
-| `con_cloak` | Cloak | Outer | 2 | 0 | 0 | +1 | +1 | +1 | 0 | Silent | Travel / cover — Metal stacks **hurt** (see neg syn) |
-| `con_coat` | Coat | Outer, tailored | 2 | +1 | 0 | +1 | 0 | 0 | +1 | Royal | Street court |
-| `con_tunic` | Tunic | Body, light | 2 | 0 | +1 | 0 | 0 | +1 | 0 | Soft | Adventurer basic |
-| `con_boots` | Boots | Feet | 2 | 0 | 0 | +1 | 0 | +2 | 0 | Earth | Footing |
-| `con_gloves` | Gloves | Hands | 2 | 0 | +1 | 0 | +1 | 0 | 0 | Sharp | Grip / craft |
-| `con_hood` | Hood | Head | 1 | 0 | 0 | 0 | +1 | +1 | −1 | Silent | Conceals |
-| `con_crownveil` | Crownveil | Head, ceremony | 2 | 0 | 0 | 0 | +1 | −1 | +3 | Royal, Solar | Wedding / court |
-| `con_mantle` | Mantle | Shoulders | 2 | +1 | 0 | +1 | +1 | −1 | +1 | Royal | Command |
-| `con_wraps` | Wraps | Body, binding | 2 | +1 | 0 | 0 | 0 | +1 | 0 | Sticky | Compact |
-| `con_cape` | Cape | Outer, flourish | 2 | 0 | +1 | 0 | 0 | +1 | +1 | Silk | Drama |
+**Craft caps** (how many mats/runes): see **[12b-craft-slots](12b-craft-slots.md)** — default **2 materials + 1 rune**, raised by owner/staff skills. The old per-row slot counts are not the runtime budget.
+
+| id | Name | Slot fantasy | HP | ATK | DEF | RES | MOB | PRE | Tags | Notes |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|---|
+| `con_robe` | Robe | Body, flowing | +1 | 0 | 0 | +1 | 0 | +1 | Silk | Mage default |
+| `con_armor` | Armor | Body, hard | +2 | 0 | +2 | 0 | −2 | 0 | Metal | Heavy soak |
+| `con_cloak` | Cloak | Outer | 0 | 0 | +1 | +1 | +1 | 0 | Silent | Metal stacks hurt (neg syn) |
+| `con_coat` | Coat | Outer, tailored | +1 | 0 | +1 | 0 | 0 | +1 | Royal | Street court |
+| `con_tunic` | Tunic | Body, light | 0 | +1 | 0 | 0 | +1 | 0 | Soft | Adventurer basic |
+| `con_boots` | Boots | Feet | 0 | 0 | +1 | 0 | +2 | 0 | Earth | Footing |
+| `con_gloves` | Gloves | Hands | 0 | +1 | 0 | +1 | 0 | 0 | Sharp | Grip / craft |
+| `con_hood` | Hood | Head | 0 | 0 | 0 | +1 | +1 | −1 | Silent | Conceals |
+| `con_crownveil` | Crownveil | Head, ceremony | 0 | 0 | 0 | +1 | −1 | +3 | Royal, Solar | Wedding / court |
+| `con_mantle` | Mantle | Shoulders | +1 | 0 | +1 | +1 | −1 | +1 | Royal | Command |
+| `con_wraps` | Wraps | Body, binding | +1 | 0 | 0 | 0 | +1 | 0 | Sticky | Compact |
+| `con_cape` | Cape | Outer, flourish | 0 | +1 | 0 | 0 | +1 | +1 | Silk | Drama |
 
 ## Construction rules (Phase-1)
 
-- Exactly **one** construction per craft.
-- Fill **1..material_slots** material cards (same id allowed).
-- Slot conflicts (two body pieces) out of scope — Phase-1 = one garment per adventure.
-- Construction tags still apply once even if materials already share that tag (counts stack).
+- Exactly **one** construction per craft (compulsory).
+- Materials / runes count from **[12b](12b-craft-slots.md)** (default 2m1r).
+- Same material id may repeat within the mat budget.
+- Phase-1 garment focus for art: **armor** first when 1C opens.

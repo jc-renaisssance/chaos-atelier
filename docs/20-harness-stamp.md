@@ -1,49 +1,49 @@
 # Harness stamp fields (Phase-1 lock)
 
-1A lock for Test / Client headless **client × threat × build** dumps. Same job as DARE WR stamps: readable, assertable, one row per run.
-
-## Required fields (every dump)
+## Required fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `run_id` | string | Unique dump id |
-| `player_owner_id` | string | Phase-1 always `own_basic` |
-| `player_skills` | string[] | Phase-1 `[]` |
-| `chapter_id` | int | 1..3 |
-| `chapter_boss_id` | string | e.g. `boss_ash_drake` |
-| `phase` | enum | `shop` \| `craft_task` \| `boss` |
-| `construction` | string | `con_*` |
-| `material_ids` | string[] | Order = slot order; repeats allowed |
-| `stack_counts` | object | map `mat_id → count` |
-| `enchantment_id` | string\|null | `enc_*` or null |
-| `tag_counts` | object | map tag → int |
-| `craft_rarity` | enum | `common` \| `uncommon` \| `rare` \| `legendary` |
-| `powers_positive` | string[] | `syn_*` / `uniq_*` ids fired |
-| `powers_negative` | string[] | `syn_neg_*` fired; **must be []** if rarity ∈ {rare, legendary} |
-| `outlook_id` | string | Winner look id or `plain` |
-| `outlook_order` | int | Winner order (0 if plain) |
-| `stats` | object | `HP, ATK, DEF, RES, MOB, PRE` finals |
-| `threat_id` | string | Client or boss threat key |
-| `outcome` | enum | `win` \| `lose` \| `mixed` (draft) |
-| `report_lines` | string[] | Human hints that fired |
-| `favor_tags_hit` | string[] | Boss favor tags present on build |
-| `punish_tags_hit` | string[] | Boss punish tags present on build |
+| `run_id` | string | |
+| `player_owner_id` | string | `own_basic` |
+| `player_skills` | string[] | |
+| `max_materials` / `max_runes` | int | Default 2 / 1 |
+| `chapter_id` | int | |
+| `boss_pool_id` | string | |
+| `chapter_boss_id` | string | |
+| `phase` | enum | shop \| craft_task \| boss \| newspaper |
+| `mission_kind` | enum\|null | client \| event \| boss |
+| `threat_id` | string | |
+| `node_difficulty` | int\|null | 1..3 |
+| `reps_before` / `reps_after` / `reps_delta` | int | |
+| `reps_gate` | int | |
+| `rounds_left` | int | |
+| `construction` | string\|null | null if cant_craft |
+| `material_ids` / `stack_counts` / `rune_ids` | | |
+| `tag_counts` / rarity / powers / outlook / stats | | |
+| `rating` | S\|A\|B\|C\|D\|F | |
+| `rating_score` | number\|null | Not asserted |
+| `hp_remaining` / `damage_aid_pct` / `skill_effectiveness` | | |
+| `cleared` | bool | Derived |
+| `mission_failed` | bool | |
+| `run_over` | bool | |
+| `run_over_reason` | enum\|null | `boss_death` \| `reps_gate_miss` |
+| `newspaper_event` | enum\|null | |
+| `newspaper_headline_id` | string\|null | |
+| `letter_id` | string\|null | |
+| `favor_tags_hit` / `punish_tags_hit` | | |
+| `cant_craft` | bool | |
 
-## Asserts (Test)
+## Asserts
 
-1. `player_owner_id == own_basic` in Phase-1.
-2. If `craft_rarity` ∈ {rare, legendary} → `powers_negative` empty.
-3. If `powers_negative` non-empty → `outlook_order` equals max among fired outlook-bearing rows (neg may win).
-4. `sum(stack_counts values) == len(material_ids)`.
-5. `len(material_ids)` ∈ 1..`construction.material_slots`.
+1–8 as before (owner, neg skip, caps, stacks, ★, boss∈pool, rating enum).
+9. `cleared == (hp_remaining > 0 ∧ rating ∈ {S,A,B,C})`.
+10. Boss `cleared == false` → `run_over` ∧ `run_over_reason == boss_death`.
+11. `cant_craft` → `rating == F` ∧ `hp_remaining > 0` ∧ `damage_aid_pct == 0` ∧ `cleared == false` ∧ reps use **normal fail** Δ (not death).
+12. After final route node, if `reps_after < reps_gate` → `run_over_reason == reps_gate_miss`.
+13. Mid fail with `hp_remaining <= 0` ∧ not `cant_craft` → death-penalty `reps_delta`.
+14. Newspaper flags on announce / mid-fail / chapter end as applicable.
 
-## Pass look
+## Pointers
 
-Overall adventure **trend** vs the announced boss — not every matrix cell non-cliff. Smoke Mid/Mid only after Design stamps a lever.
-
-## Doc pointers
-
-- Boss stubs: `17-chapter-bosses.md`
-- Rarity: `18-rarity.md`
-- Starter / shop: `19-own-basic-starter.md`
-- Synergies / outlook: `14`, `15`
+`24` · `25` · `26` · `22` · `23` · `12b` · `14`
