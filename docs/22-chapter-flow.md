@@ -7,13 +7,24 @@ Jonathan lock (2026-09-22+): StS-like **route** — player **picks** mid mission
 ```
 CHAPTER
   1. Kingdom newspaper → announce boss (from chapter pool)
-  2. Atelier shop
-  3. Route map — pick MISSIONS_BEFORE_BOSS nodes (each: shop → craft → mission → newspaper if fail)
+  2. Opening atelier shop (once)
+  3. Route ×3:
+       player picks node → atelier shop → craft → mission report
+       (±reps; newspaper if mid-fail)
   4. Check reps >= reps_gate (25); else run_over (competitors)
   5. Last atelier shop
   6. Boss fight — fail = adventurer dead → run_over, no retry
   7. Newspaper chapter result edition
 ```
+
+### Phase-1 shop order (**locked — one sequence**)
+
+```
+after each route pick → shop → craft
+(+ last shop before boss)
+```
+
+Do **not** shop before the pick. Opening shop at chapter start is separate (step 2).
 
 ### Phase-1 counts
 
@@ -22,16 +33,12 @@ CHAPTER
 | Chapters | **3** | |
 | Bosses / chapter pool | **3** | 27 paths; C1 diversified (`17`) |
 | Route nodes before boss | **3** | Player **chooses** which node each time |
-| Offered choices per pick | **2–3** | From chapter client/event pools + difficulty | 
-| Shops | Before route, before each craft (or after pick), last before boss | Phase-1 keep shop before craft |
-
-Fixed `client→event→client` order is **replaced** by **player route picks**. Pools still supply what can appear on the map.
+| Offered choices per pick | **2–3** | From chapter pools + difficulty |
 
 ```
 function pick_route_node(chapter_index, reps, rounds_left):
   offers = roll_map_nodes(CLIENT_POOLS, EVENT_POOLS, difficulties={1,2,3})
-  # UI: StS-style — skip hard if reps/HP weak
-  return player.choose(offers)
+  return player.choose(offers)  # StS — skip hard if weak
 ```
 
 Each node has `difficulty` 1–3 for reps Δ (`25`).
@@ -91,20 +98,24 @@ Each node has `difficulty` 1–3 for reps Δ (`25`).
 | `evt_c3_contraband` | Contraband Sweep | Sticky/Silent punished | paper on fail |
 | `evt_c3_gala` | Gala Night | Solar/Royal | — |
 
-## Mission loop (pseudocode)
+## Mission loop (locked shop order)
 
 ```
 function run_chapter_route(player, chapter_index, boss):
+  atelier_shop(player)                   # opening shop
   rounds_left = 3
   while rounds_left > 0:
-    node = pick_route_node(...)          # player choice
-    atelier_shop(player)
-    craft = craft_garment(player)
-    gear  = resolve_craft(craft)
-    result = run_mission(gear, node.threat)
-    apply_reps_delta(result, node.difficulty)  # 25
+    node = pick_route_node(...)          # player choice FIRST
+    atelier_shop(player)                 # THEN shop → craft
+    if cant_craft(player):
+      result = cant_craft_fail_result()  # rating F, hp>0 — see 24/25
+    else:
+      craft = craft_garment(player)
+      gear  = resolve_craft(craft)
+      result = run_mission(gear, node.threat)
+    apply_reps_delta(result, node.difficulty)  # always, including cant_craft
     if not result.cleared:
-      newspaper.mid_fail(result)         # 26
+      newspaper.mid_fail(result)
     stamp(...)
     ui.show_mission_result(result)
     rounds_left -= 1
@@ -112,8 +123,7 @@ function run_chapter_route(player, chapter_index, boss):
     newspaper.shop_ruined()
     run_over(reason="reps_gate_miss")
     return
-  atelier_shop(player)
-  # boss…
+  atelier_shop(player)                   # last shop before boss
 ```
 
 ## Cross-links

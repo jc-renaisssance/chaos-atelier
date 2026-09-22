@@ -1,6 +1,6 @@
 # Harness stamp fields (Phase-1 lock)
 
-## Required fields (additions bolded for this amend)
+## Required fields
 
 | Field | Type | Notes |
 |---|---|---|
@@ -14,22 +14,22 @@
 | `phase` | enum | shop \| craft_task \| boss \| newspaper |
 | `mission_kind` | enum\|null | client \| event \| boss |
 | `threat_id` | string | |
-| **`node_difficulty`** | int\|null | 1..3 on route nodes |
-| **`reps_before` / `reps_after` / `reps_delta`** | int | |
-| **`reps_gate`** | int | Chapter gate |
-| **`rounds_left`** | int | |
-| `construction` | string\|null | |
+| `node_difficulty` | int\|null | 1..3 |
+| `reps_before` / `reps_after` / `reps_delta` | int | |
+| `reps_gate` | int | |
+| `rounds_left` | int | |
+| `construction` | string\|null | null if cant_craft |
 | `material_ids` / `stack_counts` / `rune_ids` | | |
 | `tag_counts` / rarity / powers / outlook / stats | | |
 | `rating` | S\|A\|B\|C\|D\|F | |
 | `rating_score` | number\|null | Not asserted |
 | `hp_remaining` / `damage_aid_pct` / `skill_effectiveness` | | |
-| `cleared` | bool | Derived HP∧rating≥C |
+| `cleared` | bool | Derived |
 | `mission_failed` | bool | |
 | `run_over` | bool | |
-| **`run_over_reason`** | enum\|null | `boss_death` \| `reps_gate_miss` \| … |
-| **`newspaper_event`** | enum\|null | boss_announce \| mid_fail \| chapter_result \| run_over |
-| **`newspaper_headline_id`** | string\|null | |
+| `run_over_reason` | enum\|null | `boss_death` \| `reps_gate_miss` |
+| `newspaper_event` | enum\|null | |
+| `newspaper_headline_id` | string\|null | |
 | `letter_id` | string\|null | |
 | `favor_tags_hit` / `punish_tags_hit` | | |
 | `cant_craft` | bool | |
@@ -39,10 +39,10 @@
 1–8 as before (owner, neg skip, caps, stacks, ★, boss∈pool, rating enum).
 9. `cleared == (hp_remaining > 0 ∧ rating ∈ {S,A,B,C})`.
 10. Boss `cleared == false` → `run_over` ∧ `run_over_reason == boss_death`.
-11. `cant_craft` → `damage_aid_pct == 0`.
+11. `cant_craft` → `rating == F` ∧ `hp_remaining > 0` ∧ `damage_aid_pct == 0` ∧ `cleared == false` ∧ reps use **normal fail** Δ (not death).
 12. After final route node, if `reps_after < reps_gate` → `run_over_reason == reps_gate_miss`.
-13. Mid fail with `hp_remaining <= 0` → `reps_delta` is the **large** death penalty path (`25`).
-14. Boss announce / mid-fail / chapter end rows may set `newspaper_event` non-null.
+13. Mid fail with `hp_remaining <= 0` ∧ not `cant_craft` → death-penalty `reps_delta`.
+14. Newspaper flags on announce / mid-fail / chapter end as applicable.
 
 ## Pointers
 

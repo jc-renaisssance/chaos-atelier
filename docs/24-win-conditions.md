@@ -17,7 +17,7 @@ Clear floor **C** OK — pending Test tune.
 | **Clear** | HP > 0 and rating ∈ {S,A,B,C} → **+reps** by rating × difficulty (`25`) |
 | **Fail** | HP ≤ 0 or rating D/F → **−reps**; if HP ≤ 0 (adventurer died mid) → **large −reps** |
 | Always | Full result card; partial gold on fail; letters may fire |
-| Can’t craft | Auto-fail, `damage_aid_pct=0`, full stamp |
+| **Can’t craft** | Auto-fail: `rating=F`, **`hp_remaining > 0`**, `damage_aid_pct=0`, `cant_craft=true` — **still** `apply_reps` as normal fail (−difficulty only, **not** death Δ) |
 | Mid-fail UI | Continue chapter; **newspaper** mid-fail headline (`26`) |
 
 ## Chapter
@@ -25,7 +25,8 @@ Clear floor **C** OK — pending Test tune.
 | Event | Effect |
 |---|---|
 | Route | Player **picks** 3 mission nodes (StS-like) (`22`) |
-| After route | If `reps < reps_gate` → **`run_over`** (`reps_gate_miss`) — competitors / shop broken |
+| Shop order | **pick → shop → craft** (+ last shop before boss) |
+| After route | If `reps < reps_gate` → **`run_over`** (`reps_gate_miss`) |
 | Boss offered | Only if reps gate met |
 | Boss clear | Chapter clear; newspaper chapter result |
 | Boss fail | Adventurer **died** → **`run_over`**, **no retry** |
