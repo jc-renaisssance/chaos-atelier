@@ -1,49 +1,36 @@
 # Harness stamp fields (Phase-1 lock)
 
-1A lock for Test / Client headless **client × threat × build** dumps. Same job as DARE WR stamps: readable, assertable, one row per run.
-
-## Required fields (every dump)
+## Required fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `run_id` | string | Unique dump id |
-| `player_owner_id` | string | Phase-1 always `own_basic` |
-| `player_skills` | string[] | Phase-1 `[]` |
-| `chapter_id` | int | 1..3 |
-| `chapter_boss_id` | string | e.g. `boss_ash_drake` |
-| `phase` | enum | `shop` \| `craft_task` \| `boss` |
-| `construction` | string | `con_*` |
-| `material_ids` | string[] | Order = slot order; repeats allowed |
-| `stack_counts` | object | map `mat_id → count` |
-| `enchantment_id` | string\|null | `enc_*` or null |
-| `tag_counts` | object | map tag → int |
-| `craft_rarity` | enum | `common` \| `uncommon` \| `rare` \| `legendary` |
-| `powers_positive` | string[] | `syn_*` / `uniq_*` ids fired |
-| `powers_negative` | string[] | `syn_neg_*` fired; **must be []** if rarity ∈ {rare, legendary} |
-| `outlook_id` | string | Winner look id or `plain` |
-| `outlook_order` | int | Winner order (0 if plain) |
-| `stats` | object | `HP, ATK, DEF, RES, MOB, PRE` finals |
-| `threat_id` | string | Client or boss threat key |
-| `outcome` | enum | `win` \| `lose` \| `mixed` (draft) |
-| `report_lines` | string[] | Human hints that fired |
-| `favor_tags_hit` | string[] | Boss favor tags present on build |
-| `punish_tags_hit` | string[] | Boss punish tags present on build |
+| `run_id` | string | |
+| `player_owner_id` | string | `own_basic` |
+| `max_materials` / `max_runes` | int | 2 / 1 default |
+| `chapter_id` / `boss_pool_id` / `chapter_boss_id` | | |
+| `phase` | enum | shop \| craft_task \| event \| boss \| newspaper |
+| `mission_kind` | enum\|null | `order` \| `event` \| `boss` |
+| `threat_id` | string | client or event id |
+| `lineup_card_ids` | string[3]\|null | The 3 offered that round |
+| `picked_card_id` | string\|null | The one chosen |
+| `card_difficulty` | int\|null | 1..3 |
+| `reps_before` / `reps_after` / `reps_delta` / `reps_gate` / `rounds_left` | int | |
+| craft / tags / rarity / powers / outlook / stats | | as before |
+| `rating` | S\|A\|B\|C\|D\|F | |
+| `hp_remaining` / `damage_aid_pct` / `skill_effectiveness` | | |
+| `cleared` / `mission_failed` / `run_over` / `run_over_reason` | | |
+| `newspaper_event` / `newspaper_headline_id` / `letter_id` | | |
+| `cant_craft` | bool | |
 
-## Asserts (Test)
+## Asserts
 
-1. `player_owner_id == own_basic` in Phase-1.
-2. If `craft_rarity` ∈ {rare, legendary} → `powers_negative` empty.
-3. If `powers_negative` non-empty → `outlook_order` equals max among fired outlook-bearing rows (neg may win).
-4. `sum(stack_counts values) == len(material_ids)`.
-5. `len(material_ids)` ∈ 1..`construction.material_slots`.
+1–10 as prior (owner, neg, caps, cleared derive, boss death → run_over).
+11. `cant_craft` → F ∧ hp>0 ∧ aid 0 ∧ normal fail reps Δ.
+12. After last round, `reps_after < reps_gate` → `reps_gate_miss`.
+13. Mid death (hp≤0, not cant_craft) → large −reps.
+14. Newspaper flags when applicable.
+15. Each mid round: `len(lineup_card_ids)==3` and `picked_card_id ∈ lineup`.
 
-## Pass look
+## Pointers
 
-Overall adventure **trend** vs the announced boss — not every matrix cell non-cliff. Smoke Mid/Mid only after Design stamps a lever.
-
-## Doc pointers
-
-- Boss stubs: `17-chapter-bosses.md`
-- Rarity: `18-rarity.md`
-- Starter / shop: `19-own-basic-starter.md`
-- Synergies / outlook: `14`, `15`
+`22` lineup · `24` · `25` · `26` · `23` · `12b` · `14`

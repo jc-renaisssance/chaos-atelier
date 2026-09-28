@@ -1,75 +1,47 @@
 # Catalog overview
 
-Status: **Design draft** (Jonathan 2026-09-21 — larger dictionary on paper; **amended** same day: Metal family, multi-stack materials, negative synergies, chapter boss reveal, outlook gen contract).
-
-Numbers are first-pass for balance harness; expect Mid/Mid smoke then revise one lever at a time.
+Status: Design draft + 1A/flow locks (Jonathan 2026-09-21 → 09-22).
 
 ## Schema (data-first)
 
 ```
 Craft =
-  1 Construction
-  + 1..N Materials   (N ≤ construction.material_slots; same mat may repeat)
-  + 0..1 Enchantment
+  1 Construction                         # compulsory
+  + 1..max_materials Materials           # default max=2; skills/staff raise
+  + 0..max_runes Enchantments            # default max=1
 
 Final gear:
-  stats  = Σ(Material.stats) + Construction.stat_mods + Enchantment.stats
-  tags   = bag-count(all Material tags ∪ Construction tags ∪ Enchantment tags)
-  powers = resolve(tag_counts, construction_id)   // positive + negative rows
-  outlook = highest outlook_order among fired synergies that have one
-            else plain/default
+  stats  = Σ(Material.stats) + Construction + Σ(Rune.stats)
+  tags   = bag-count(all layers)
+  rarity = compute_rarity(...)           # 18
+  powers = resolve(tag_counts, construction_id, rarity)  # 14 — neg skipped if rare/leg
+  outlook = highest outlook_order among fired rows (neg can win)
 ```
 
-One **resolver** reads tables in `docs/14-synergies.md`. No bespoke if/else for normal gear.
+See **[12b-craft-slots](12b-craft-slots.md)** for caps. One resolver — `14`.
 
-**Example:** Armor (`material_slots=3`) + Stonefiber ×3 → Earth≥3, Metal≥3 before enchantment.
+## Primary stats
 
-## Primary stats (linear, accountable)
-
-| Stat | Code | Meaning in adventure sim |
+| Stat | Code | Meaning |
 |---|---|---|
-| Hit Points soak | `HP` | How much punishment the garment can take before ruin |
-| Attack aid | `ATK` | Helps the wearer win offensive checks |
-| Defense | `DEF` | Physical soak / reduce wound checks |
-| Resist | `RES` | Elemental / magic / weather soak |
-| Mobility | `MOB` | Escape, chase, footing, first-move |
-| Presence | `PRE` | Social / royal / quest impression (rare clients) |
+| Hit Points soak | `HP` | Punishment before ruin |
+| Attack aid | `ATK` | Offensive checks / damage aid % |
+| Defense | `DEF` | Physical soak |
+| Resist | `RES` | Elemental / magic / weather |
+| Mobility | `MOB` | Escape / footing |
+| Presence | `PRE` | Social / royal |
 
-## Tag vocabulary (Phase-1 dictionary)
+## Tag vocabulary
 
-| Tag | Fantasy | Typical sources |
-|---|---|---|
-| Fire | Heat, dragon, forge | Ember silk, magma thread, fire runes |
-| Frost | Cold, ice, stillness | Frostwool, glacier hide |
-| Storm | Lightning, wind, sky | Storm linen, skybone |
-| Earth | Stone, weight, roots | Clayweave, stonefiber, stone shard |
-| Lunar | Night, omen, silver | Moonlace, silver moth |
-| Solar | Day, glory, gold | Suncloth, aureate foil |
-| Royal | Court, law, ceremony | Velvet crownweave, gilded trim |
-| Silent | Stealth, hush, shadow | Whisper gauze, dusk leather |
-| Sticky | Glue, bind, cling | Tar thread, resin silk |
-| Sharp | Cut, thorn, edge | Needlegrass, bladewool |
-| Soft | Comfort, heal, gentle | Downcloud, milkfleece |
-| Wild | Beast, untamed | Dire fur, ivy cord |
-| Occult | Forbidden, hex | Grave silk, null ink |
-| Pure | Cleanse, holy, clear | Altar linen, spring cotton |
-| Metal | Hard, clang, forge | Iron scrap, wirecloth, chainlace, steel plate |
-| Silk | Fine, flow, luxury | Base silk family |
+Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky · Sharp · Soft · Wild · Occult · Pure · Metal · Silk — details in materials / synergies docs.
 
-**Metal** is both a **tag** and a **material family** (see `docs/11-materials.md`). Stacking Metal mats is intentional for armor builds and for **negative** Silent/cloak clashes.
+## Run structure (pointer)
+
+- Boss pools 3×3 → 27 paths: `17`
+- Missions before boss: `22`
+- Mission report + letter: `23`
+- App pseudocode: `21`
 
 ## ID conventions
 
-- Materials: `mat_*`
-- Constructions: `con_*`
-- Enchantments: `enc_*`
-- Synergies: `syn_*` (prefix `syn_neg_` for negatives)
-- Named uniques: `uniq_*`
-- Outlook gens: `look_{construction}_{synergy_or_plain}`
-
-## Balance notes
-
-- Pass look = **overall adventure trend**, not every matrix cell non-cliff.
-- Stamp which tags/stats/powers fired (incl. negatives) on every harness dump.
-- New synergy mults need APPLYING confirm before dumps.
-- Outlook art = **highest outlook_order only** — see `docs/15-outlook-gen-list.md`.
+`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · `look_*`
