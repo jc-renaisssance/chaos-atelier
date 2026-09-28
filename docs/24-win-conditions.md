@@ -1,3 +1,5 @@
+> **Note (2026-09-28):** Phase-1 round counts / lineup wording below track the old 1-of-3 shell. Live chapter = [22-chapter-schedule](22-chapter-schedule.md) (`CHAPTER_ROUND_COUNT=8`). Win/loss outcomes still apply.
+
 # Win conditions (Phase-1 lock)
 
 **Mission clear gate (one only):**
@@ -21,7 +23,7 @@ Clear floor **C** — pending Test tune.
 
 | Event | Effect |
 |---|---|
-| Rounds | **3** lineups of **3 cards**; pick **1** each (order or event) — not a path map |
+| Rounds | **Live:** schedule board, ``CHAPTER_ROUND_COUNT=8`` ([22-schedule](22-chapter-schedule.md)). **Legacy:** 3 lineups of 3 cards / pick 1 — superseded. |
 | Order pick | shop → craft → report |
 | Event pick | resolve event (ends round) |
 | After rounds | `reps < reps_gate` → `run_over` (`reps_gate_miss`) |

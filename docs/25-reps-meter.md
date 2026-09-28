@@ -8,7 +8,7 @@ Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter h
 |---|---|
 | `reps` | Integer trust (start **0**; floor 0) |
 | `reps_gate` | Minimum before boss |
-| `rounds_left` | Card-lineup rounds remaining |
+| `rounds_left` | Schedule rounds remaining *(was card-lineup; live = [22-schedule](22-chapter-schedule.md))* |
 
 ### Phase-1 draft numbers (tune in Test)
 

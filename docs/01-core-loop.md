@@ -1,3 +1,4 @@
+> **Superseded (2026-09-28 Jonathan stamp):** short shop↔craft **node clock** / fixed node budget is replaced by the travelling atelier **schedule board** — see [22-chapter-schedule](22-chapter-schedule.md). Craft UX is stamina hand game — see [27-craft-mode-stamina](27-craft-mode-stamina.md). 1-of-3 card lineup is **not** live.
 # Core loop
 
 ## Chapter loop (StS-style — Jonathan lock)

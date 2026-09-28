@@ -20,31 +20,46 @@ Resolver input: **tag counts** + **construction id** + **craft rarity**. Output:
 
 **How rarity is computed:** locked algorithm in **[18-rarity](18-rarity.md)** (max material $, stack count, enchantment $, unique match). Uniques below are legendary-class.
 
+## Threshold policy (Jonathan stamp 2026-09-28 — stamina craft)
+
+Retuned for infinite monostack under stamina craft ([27](27-craft-mode-stamina.md)). Source stamp: [14-synergies-RETUNE](14-synergies-RETUNE.md). Outlook rule, rarity→neg skip, and resolver order **unchanged**.
+
+| Old | New | Notes |
+|---|---|---|
+| ≥2 | **≥3** | Readable first breakpoint under infinite stack |
+| ≥3 | **≥5** | Mid monostack |
+| (new) | **≥8 apex** | Fire / Metal / Earth only in Phase-1 |
+| After apex | soft return | Further copies feed rarity / weak diminishing — **no** new full power row |
+
+Cross-tag pair minimums stay **≥1 each** unless noted.
 ## Positive tag-count powers
 
-Thresholds are **minimum counts**. Draft: higher tiers **stack** with lower unless noted.
+Thresholds are **minimum counts** (retuned 2026-09-28). Draft: higher tiers **stack** with lower unless noted. Soft return: Fire/Metal/Earth count **> 8** → no additional `syn_*` row; excess tags still count for rarity / report flavor only.
 
 | id | When | Power | Effect (draft) | Report hint | outlook_order |
 |---|---|---|---|---|---:|
-| `syn_fire_2` | Fire ≥ 2 | Dragon Affinity | +ATK vs scaled / beast; ignore 1 Frost penalty | “Cloth drank the heat.” | 90 |
-| `syn_fire_3` | Fire ≥ 3 | Living Ember | First offensive: bonus; fail → 1 HP chip | “Seams smoking.” | 100 |
-| `syn_frost_2` | Frost ≥ 2 | Stillblood | +RES vs heat; −MOB ignored once | “Cold held.” | 50 |
-| `syn_storm_2` | Storm ≥ 2 | Sky Step | +MOB first-move; Shock vulnerability | “Static in the hem.” | 55 |
-| `syn_earth_2` | Earth ≥ 2 | Rooted | +DEF; no high-MOB escape same beat | “Feet like stone.” | 20 |
-| `syn_earth_3` | Earth ≥ 3 | Living Stone | +DEF again; MOB hard-capped low | “Moved like a cairn.” | 25 |
-| `syn_lunar_2` | Lunar ≥ 2 | Night Favor | Bonus in dark / omen; Solar punishes | “Silver answers.” | 80 |
-| `syn_solar_2` | Solar ≥ 2 | Day Favor | Bonus in open / glory; Lunar punishes | “Cloth caught the sun.” | 75 |
-| `syn_royal_2` | Royal ≥ 2 | Court Weight | +PRE; stealth harder | “They looked like authority.” | 70 |
-| `syn_silent_2` | Silent ≥ 2 | Hush | +stealth; PRE suffers | “Even footsteps faded.” | 35 |
-| `syn_sticky_2` | Sticky ≥ 2 | Bind | Enemy MOB suffers; wearer −MOB | “Everything clung.” | 40 |
-| `syn_sharp_2` | Sharp ≥ 2 | Thorns | Reflect chip on physical hit | “Edges bit back.” | 45 |
-| `syn_soft_2` | Soft ≥ 2 | Comfort | Ignore 1 panic; ATK softer | “Gentle as sleep.” | 12 |
-| `syn_wild_2` | Wild ≥ 2 | Beast-Blood | +ATK vs beasts; Royal may frown | “Something feral.” | 60 |
-| `syn_occult_2` | Occult ≥ 2 | Hexed Stitch | +RES vs holy-blind; Pure spikes | “The seams muttered.” | 85 |
-| `syn_pure_2` | Pure ≥ 2 | Cleanse | Ignore 1 Occult debuff; Occult muted | “Light in the weave.” | 65 |
-| `syn_metal_2` | Metal ≥ 2 | Iron Song | +DEF; Silent harder (noise) | “Rang like a bell.” | 30 |
-| `syn_metal_3` | Metal ≥ 3 | Full Plate Song | +DEF again; MOB −; Silent nearly impossible | “A walking forge.” | 32 |
-| `syn_silk_2` | Silk ≥ 2 | Flow | +MOB in social/grace beats | “Moved like water.” | 10 |
+| `syn_fire_3` | Fire ≥ 3 | Dragon Affinity | +ATK vs scaled / beast; ignore 1 Frost penalty | “Cloth drank the heat.” | 90 |
+| `syn_fire_5` | Fire ≥ 5 | Living Ember | First offensive: bonus; fail → 1 HP chip | “Seams smoking.” | 100 |
+| `syn_fire_8` | Fire ≥ 8 | Ash Crown *(apex)* | Once/fight ignore boss Fire-punish; new look | “They wore a kiln.” | 110 |
+| `syn_frost_3` | Frost ≥ 3 | Stillblood | +RES vs heat; −MOB ignored once | “Cold held.” | 50 |
+| `syn_storm_3` | Storm ≥ 3 | Sky Step | +MOB first-move; Shock vulnerability | “Static in the hem.” | 55 |
+| `syn_earth_3` | Earth ≥ 3 | Rooted | +DEF; no high-MOB escape same beat | “Feet like stone.” | 20 |
+| `syn_earth_5` | Earth ≥ 5 | Living Stone | +DEF again; MOB hard-capped low | “Moved like a cairn.” | 25 |
+| `syn_earth_8` | Earth ≥ 8 | Mountain Guest *(apex)* | First Break ignored; new look | “The road made room.” | 28 |
+| `syn_lunar_3` | Lunar ≥ 3 | Night Favor | Bonus in dark / omen; Solar punishes | “Silver answers.” | 80 |
+| `syn_solar_3` | Solar ≥ 3 | Day Favor | Bonus in open / glory; Lunar punishes | “Cloth caught the sun.” | 75 |
+| `syn_royal_3` | Royal ≥ 3 | Court Weight | +PRE; stealth harder | “They looked like authority.” | 70 |
+| `syn_silent_3` | Silent ≥ 3 | Hush | +stealth; PRE suffers | “Even footsteps faded.” | 35 |
+| `syn_sticky_3` | Sticky ≥ 3 | Bind | Enemy MOB suffers; wearer −MOB | “Everything clung.” | 40 |
+| `syn_sharp_3` | Sharp ≥ 3 | Thorns | Reflect chip on physical hit | “Edges bit back.” | 45 |
+| `syn_soft_3` | Soft ≥ 3 | Comfort | Ignore 1 panic; ATK softer | “Gentle as sleep.” | 12 |
+| `syn_wild_3` | Wild ≥ 3 | Beast-Blood | +ATK vs beasts; Royal may frown | “Something feral.” | 60 |
+| `syn_occult_3` | Occult ≥ 3 | Hexed Stitch | +RES vs holy-blind; Pure spikes | “The seams muttered.” | 85 |
+| `syn_pure_3` | Pure ≥ 3 | Cleanse | Ignore 1 Occult debuff; Occult muted | “Light in the weave.” | 65 |
+| `syn_metal_3` | Metal ≥ 3 | Iron Song | +DEF; Silent harder (noise) | “Rang like a bell.” | 30 |
+| `syn_metal_5` | Metal ≥ 5 | Full Plate Song | +DEF again; MOB −; Silent nearly impossible | “A walking forge.” | 32 |
+| `syn_metal_8` | Metal ≥ 8 | Bell Titan *(apex)* | +DEF spike; first Silent attempt auto-fail on foe; new look | “The wagon heard them coming.” | 34 |
+| `syn_silk_3` | Silk ≥ 3 | Flow | +MOB in social/grace beats | “Moved like water.” | 10 |
 
 ## Cross-tag positives
 
@@ -65,14 +80,14 @@ Orders sit **above** the related positive look so the bad chrome wins.
 
 | id | When | Name | Effect (draft) | Report hint | outlook_order | Beats (examples) |
 |---|---|---|---|---|---:|---|
-| `syn_neg_metal_silk` | Metal ≥ 2 ∧ Silk ≥ 2 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” | 36 | metal_2 (30), metal_3 (32), silk_2 (10) |
-| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” | 39 | silent_2 (35), metal_* |
-| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” | 41 | silent_2 (35), metal_* |
-| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth worse; +noise | “Quiet died the moment metal moved.” | 44 | silent_2 (35), metal_* |
-| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; chip on Soft triggers | “Cushion full of knives.” | 52 | soft_2 (12), sharp_2 (45), sticky_2 (40) |
-| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” | 82 | royal_2 (70), sticky_2 (40), masked_crown (72) |
-| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Occult + Pure tier powers muted; −1 HP | “The weave argued with itself.” | 92 | occult_2 (85), pure_2 (65), pale_hex (88) |
-| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; HP chip at start | “Comfort went up in smoke.” | 105 | fire_2 (90), fire_3 (100), soft_2 (12) |
+| `syn_neg_metal_silk` | Metal ≥ 3 ∧ Silk ≥ 3 | Ragged Mail | Silk Flow disabled; −PRE | “Luxury that screamed.” | 36 | metal_3 (30), metal_5 (32), silk_3 (10) |
+| `syn_neg_hood_metal` | `construction=con_hood` ∧ Metal ≥ 1 | Bucket Head | −PRE; Silent muted | “They heard the hood coming.” | 39 | silent_3 (35), metal_* |
+| `syn_neg_cloak_metal` | `construction=con_cloak` ∧ Metal ≥ 1 | Iron Mantle Fail | Cloak loses Silent benefit; −MOB; PRE odd | “A cloak that rang like a pot lid.” | 41 | silent_3 (35), metal_* |
+| `syn_neg_metal_silent` | Metal ≥ 1 ∧ Silent ≥ 1 | Clanging Hush | Silent powers **disabled**; Stealth worse; +noise | “Quiet died the moment metal moved.” | 44 | silent_3 (35), metal_* |
+| `syn_neg_soft_sharp` | Soft ≥ 1 ∧ Sharp ≥ 1 | Frayed Comfort | Soft heal muted; chip on Soft triggers | “Cushion full of knives.” | 52 | soft_3 (12), sharp_3 (45), sticky_3 (40) |
+| `syn_neg_sticky_royal` | Sticky ≥ 1 ∧ Royal ≥ 1 | Tar at Court | −PRE hard; Royal clients insulted | “Left fingerprints on the throne.” | 82 | royal_3 (70), sticky_3 (40), masked_crown (72) |
+| `syn_neg_occult_pure` | Occult ≥ 1 ∧ Pure ≥ 1 | Schism Stitch | Occult + Pure tier powers muted; −1 HP | “The weave argued with itself.” | 92 | occult_3 (85), pure_3 (65), pale_hex (88) |
+| `syn_neg_fire_soft` | Fire ≥ 1 ∧ Soft ≥ 1 | Scorched Down | Soft muted; HP chip at start | “Comfort went up in smoke.” | 105 | fire_3 (90), fire_5 (100), soft_3 (12) |
 
 ## Rare named gear (legendary-class — **no neg syn**)
 
@@ -85,7 +100,7 @@ Exact recipe match. Prefer few until tag counts prove the normal path. `outlook_
 | `uniq_vowthread_coat` | `mat_velvet_court` + `con_coat` + `enc_sigil_vow` | Vowthread Coat | Wedding / oath | 200 |
 | `uniq_tar_snare_wraps` | `mat_tar_thread`×2 + `con_wraps` + `enc_rune_bind` | Tar-Snare Wraps | Sticky focus | 200 |
 | `uniq_null_choir_robe` | `mat_null_ink_cloth` + `con_robe` + `enc_rune_hex` | Null Choir Robe | Occult RES spike | 200 |
-| `uniq_cairnplate` | `mat_stone_shard`×3 + `con_armor` | Cairnplate | Earth≥3 + Metal≥3 auto; Living Stone look | 200 |
+| `uniq_cairnplate` | `mat_stone_shard`×5 + `con_armor` | Cairnplate | Earth≥5 path + Metal≥3 auto; Living Stone look | 200 |
 
 ## Resolver order
 

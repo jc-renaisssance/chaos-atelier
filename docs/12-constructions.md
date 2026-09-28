@@ -1,8 +1,9 @@
+> **Superseded (2026-09-28):** live craft no longer picks construction from a hand/unlocked list or fills `2m1r` slots — construction is **order-fixed**; depth = stamina ([27-craft-mode-stamina](27-craft-mode-stamina.md)). Table below still defines garment stats/tags.
 # Constructions dictionary
 
 Layer 2 — **Construction** (garment type). **Compulsory** on every craft. Mods apply on top of slotted materials. Tags added once to the gear’s tag bag.
 
-**Craft caps** (how many mats/runes): see **[12b-craft-slots](12b-craft-slots.md)** — default **2 materials + 1 rune**, raised by owner/staff skills. The old per-row slot counts are not the runtime budget.
+**Craft caps:** legacy **[12b-craft-slots](12b-craft-slots.md)** (2m1r) is **superseded** by stamina craft ([27](27-craft-mode-stamina.md)). Garment rows below are stats/tags only.
 
 | id | Name | Slot fantasy | HP | ATK | DEF | RES | MOB | PRE | Tags | Notes |
 |---|---|---|---:|---:|---:|---:|---:|---:|---|---|
@@ -22,6 +23,6 @@ Layer 2 — **Construction** (garment type). **Compulsory** on every craft. Mods
 ## Construction rules (Phase-1)
 
 - Exactly **one** construction per craft (compulsory).
-- Materials / runes count from **[12b](12b-craft-slots.md)** (default 2m1r).
+- Materials / runes: **stamina plays** in live craft ([27](27-craft-mode-stamina.md)); legacy 12b 2m1r superseded.
 - Same material id may repeat within the mat budget.
 - Phase-1 garment focus for art: **armor** first when 1C opens.

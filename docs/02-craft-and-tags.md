@@ -1,3 +1,4 @@
+> **Superseded (2026-09-28 Jonathan stamp):** form-fill craft (pick construction + fill `material_slots` / default **2m1r**) is replaced by **stamina craft** — construction comes **from the order**; hand = materials + enchantments + owner skills. See [27-craft-mode-stamina](27-craft-mode-stamina.md). Synergy thresholds retuned in [14-synergies](14-synergies.md).
 # Craft layers + tag engine
 
 ## Materials as deck
@@ -7,7 +8,7 @@ Materials are **cards**. Limited hand / inventory. Multiples of the same card ma
 | Layer | Role | Doc |
 |---|---|---|
 | 1 — Material (1..N cards) | Stats + tags; families incl. **Metal** | [11-materials](11-materials.md) |
-| 2 — Construction | Garment type + `material_slots` | [12-constructions](12-constructions.md) |
+| 2 — Construction | Garment type *(order-fixed in live craft; `material_slots` legacy)* | [12-constructions](12-constructions.md) · [27](27-craft-mode-stamina.md) |
 | 3 — Enchantment / Rune | Extra tags / powers (0..1) | [13-enchantments](13-enchantments.md) |
 
 ## Tag + synergy engine (data-driven)
@@ -17,7 +18,7 @@ Materials are **cards**. Limited hand / inventory. Multiples of the same card ma
 - Player owners: [16-shop-owners](16-shop-owners.md)
 
 ## Rules (Phase-1)
-- One Construction + **1..material_slots** Materials + 0..1 Enchantment.
+- **Legacy Phase-1 slot rule:** One Construction + **1..material_slots** Materials + 0..1 Enchantment. **Live craft:** stamina plays / infinite monostack gated by stamina ([27](27-craft-mode-stamina.md)); construction from order.
 - Same material id may repeat.
 - Negatives stamp like positives **except** on rare/legendary crafts.
 - Unique named recipes are rare exceptions.

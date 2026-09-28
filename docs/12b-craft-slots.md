@@ -1,3 +1,4 @@
+> **Superseded (2026-09-28 Jonathan stamp):** default **2m1r** slot UI is replaced by stamina craft ([27-craft-mode-stamina](27-craft-mode-stamina.md)). Keep for historical harness asserts until Test retargets.
 # Craft slot caps
 
 Jonathan lock (2026-09-22):

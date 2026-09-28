@@ -1,3 +1,4 @@
+> **Superseded fields (2026-09-28):** `lineup_card_ids` / pick-1-of-3 asserts track the old chapter shell. Live chapter = schedule board ([22-chapter-schedule](22-chapter-schedule.md)); live craft = stamina ([27-craft-mode-stamina](27-craft-mode-stamina.md)). Retarget harness fields Later; `max_materials`/`max_runes` 2m1r defaults also superseded.
 # Harness stamp fields (Phase-1 lock)
 
 ## Required fields
@@ -33,4 +34,4 @@
 
 ## Pointers
 
-`22` lineup · `24` · `25` · `26` · `23` · `12b` · `14`
+`22-schedule` · `27-stamina` · `24` · `25` · `26` · `23-mission-report` · `14` (RETUNE merged) · legacy: `22-chapter-flow` / `12b`
