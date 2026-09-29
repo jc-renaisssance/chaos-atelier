@@ -33,3 +33,32 @@ Cursor cloud agent launch refused: **Cursor usage exhausted** (on-demand require
 - Default 2m1r as hard craft shape
 - PR #7 chapter shell assumptions (appointments/schedule replace card lineup)
 - Doc-id collision: provisional craft `23` → `27` so `23-mission-report` stays stable
+
+---
+
+# Jonathan stamp — 2026-09-29 (synergy tier extension)
+
+## Locked (docs only)
+
+1. **Most positive monostack tags** use **≥3 / ≥5 / ≥8** (extend beyond Fire·Metal·Earth).
+2. **Frost:** `syn_frost_5` mid + `syn_frost_8` apex; mid art `look_armor_frost_3` → `frost_5`; apex art Later.
+3. **Royal stamped armor = APEX** (`look_armor_royal` → `royal_8` / `syn_royal_8`), not low.
+4. **Silent / silk:** mid + apex syn rows added; art Later (stamped unnumbered assets map to low `_3` for now).
+5. **Cross-tags:** ≥1∧≥1 power + single outlook; no monostack tiers — reviewed in `14`.
+6. Docs only — no PixelLab, no game code this pass.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/14-synergies.md` | Tier table + frost mid/apex + royal apex lock + cross-tag review |
+| `docs/14-synergies-RETUNE.md` | Append 2026-09-29 extension note |
+| `docs/15-outlook-gen-list.md` | Replace stale 10-id list; remap legacy filenames; art gaps |
+| `docs/STAMP.md` | This note |
+
+## Art gaps (armor)
+
+- `frost_8` apex
+- `silent_5` / `silent_8`, `silk_5` / `silk_8`, `royal_3` / `royal_5`
+- storm / lunar / solar / sticky / sharp / soft / wild / occult / pure 3/5/8
+- Cross-tag outlook assets
