@@ -6,7 +6,7 @@
 | Craft engine | `02`, `10`–`14`, `18`, `27` |
 | Content catalogs | `11`, `12`, `13`, `17` (outlook ids in `15`) |
 | Player / meta | `04`, `16`, `19` |
-| Chapter / run flow | `03`, `21`, `22` (+ win-con / reps / newspaper if kept) |
+| Chapter / run flow | `03`, `21`, `22` (schedule), `23` mission-report, `24` win-con, `25` reps, `26` newspaper |
 | Art | `05`, `15` |
 | Phases / PM | `06`, `pm/*` |
 | Harness / Test | `20` |
