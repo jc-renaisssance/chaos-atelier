@@ -35,8 +35,11 @@ Cross-tag pair minimums stay **≥1 each** unless noted. Cross-tags are **power 
 
 **Locks (2026-09-29):**
 
-- **Royal:** stamped `look_armor_royal` = **APEX** royal (`syn_royal_8` / outlook `royal_8`), **not** low.
-- **Frost:** mid art exists as `look_armor_frost_3` → maps to mid (`syn_frost_5` / outlook `frost_5`); frost apex (`syn_frost_8` / `frost_8`) art **Later**.
+- **Royal:** stamped ladder `look_armor_royal_{3|5|8}` + optional `04-syn/look_armor_royal` alias = **APEX** maps to `syn_royal_8` / outlook `royal_8` (alias is not low).
+- **Frost:** mid art `look_armor_frost_3` → `frost_5`; freestanding frost apex `look_armor_frost_8` → `frost_8` — **stamped**.
+- **Armor monostack DONE (evening):** plain + metal/earth/fire/frost + silent/silk/royal ladders complete for traveler/atelier default. **Do not** plan more monostack armor gens for storm/lunar/solar/sticky/sharp/soft/wild/occult/pure.
+- **Other shop owner pool:** those non-default tags keep power rows here; armor outlook art parks under **other shop owner** (not traveler/atelier default) — see [15](15-outlook-gen-list.md).
+- **Next:** cross-tag positive + negative syn (art/docs as needed).
 
 ## Positive tag-count powers
 
@@ -152,4 +155,6 @@ Exact recipe match. Prefer few until tag counts prove the normal path. `outlook_
 
 - Exact numeric bonuses — Client/Test after harness.
 - Cap on simultaneous powers (draft: no cap; stamp all).
-- Art gaps: frost apex; silent/silk mid+apex; most non–Fire·Metal·Earth·Frost mid/apex; see [15](15-outlook-gen-list.md).
+- **Armor art (traveler/atelier default):** complete for plain + metal/earth/fire/frost + silent/silk/royal (`_3`/`_5`/`_8` stamped; metal/earth/fire/frost low+mid still legacy `*_2`/`*_3` filenames). See [15](15-outlook-gen-list.md).
+- **Next art/docs:** cross-tag positive + negative syn outlooks.
+- **Other owner pool (not default armor gens):** storm / lunar / solar / sticky / sharp / soft / wild / occult / pure.

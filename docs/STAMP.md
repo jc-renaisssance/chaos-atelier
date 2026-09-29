@@ -56,9 +56,32 @@ Cursor cloud agent launch refused: **Cursor usage exhausted** (on-demand require
 | `docs/15-outlook-gen-list.md` | Replace stale 10-id list; remap legacy filenames; art gaps |
 | `docs/STAMP.md` | This note |
 
-## Art gaps (armor)
+## Art gaps (armor) — superseded evening
 
-- `frost_8` apex
-- `silent_5` / `silent_8`, `silk_5` / `silk_8`, `royal_3` / `royal_5`
-- storm / lunar / solar / sticky / sharp / soft / wild / occult / pure 3/5/8
-- Cross-tag outlook assets
+Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped pack (see evening stamp below). Remaining: cross-tag + neg outlooks; other-owner-pool tags.
+
+---
+
+# Jonathan stamp — 2026-09-29 evening (armor pack complete + owner pool)
+
+## Locked
+
+1. **Armor image lineup DONE** for traveler / atelier default: stamped pack covers plain + metal/earth/fire/frost ladders + silent/silk/royal ladders + freestanding frost apex. **Do not** plan more monostack armor gens for storm / lunar / solar / sticky / sharp / soft / wild / occult / pure.
+2. **Tomorrow focus:** cross-tag positive syn + negative syn (art/docs as needed).
+3. **Other syn lines** (lunar, solar, storm, sticky, sharp, soft, wild, occult, pure, …) → **other shop owner pool** — not traveler/atelier default armor outlooks. Power rows stay in `14`; armor outlook gen parks under other owners ([15](15-outlook-gen-list.md)).
+4. **Stamped filenames:** silent/silk/royal use `_3` / `_5` / `_8`; metal/earth/fire/frost low+mid still legacy `*_2` / mid `*_3`; all apex `*_8` including frost. `04-syn/` may only have `look_armor_royal` alias (or empty).
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/14-synergies.md` | Locks + open: armor DONE, other-owner pool, next = cross-tag/neg |
+| `docs/14-synergies-RETUNE.md` | Note frost apex stamped; evening sync appendix |
+| `docs/15-outlook-gen-list.md` | Reflect stamped `_3`/`_5`/`_8`; complete default armor table; other-owner pool; next = cross/neg |
+| `docs/STAMP.md` | This note |
+| `armor-stamped-2026-09-29/` | Local stamped pack (untracked or local-only unless added) |
+
+## Next
+
+- Cross-tag positive + negative syn art/docs
+- Other shop owner armor outlooks when that shop work starts
