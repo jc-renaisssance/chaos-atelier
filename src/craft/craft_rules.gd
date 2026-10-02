@@ -1,7 +1,11 @@
 class_name CraftRules
 extends RefCounted
 ## Stamina session mutations (docs/27, docs/20 asserts 12–17).
-## No auto-refill. Dig costs 2 and refreshes hand from stock. Construction is not a card.
+## StS hand cycle (#19): play leaves the hand → discard. Dig dumps remaining
+## hand to discard, then draws. Mid-draw shortfall shuffles discard into draw.
+## Cards stay in the run deck via reshuffle — not in hand after play.
+## Consumable (Later / not in the stamp type enum) burns instead of discarding.
+## No auto-refill. Construction is not a card.
 
 static func opening_draw(
 	session: CraftStaminaSession,
@@ -10,14 +14,25 @@ static func opening_draw(
 ) -> void:
 	if session == null or stock == null:
 		return
-	session.hand = stock.draw_up_to(session.hand_size, rng)
+	session.hand.clear()
+	session.discard_pile.clear()
+	session.draw_pile = stock.take_all()
+	_shuffle_pile(session.draw_pile, rng)
+	draw_up_to_hand(session, rng)
 
 
-static func return_hand_copies(session: CraftStaminaSession, stock: WagonStock) -> void:
+static func return_run_deck(session: CraftStaminaSession, stock: WagonStock) -> void:
 	if session == null or stock == null:
 		return
 	for card in session.hand:
-		stock.add_copy(card)
+		stock.add(card)
+	for card in session.draw_pile:
+		stock.add(card)
+	for card in session.discard_pile:
+		stock.add(card)
+	session.hand.clear()
+	session.draw_pile.clear()
+	session.discard_pile.clear()
 
 
 static func can_play(session: CraftStaminaSession, hand_index: int, next_mat_free: bool) -> bool:
@@ -29,13 +44,22 @@ static func can_play(session: CraftStaminaSession, hand_index: int, next_mat_fre
 	return cost <= session.stamina_remaining
 
 
-static func can_dig(session: CraftStaminaSession, stock: WagonStock) -> bool:
+static func can_dig(session: CraftStaminaSession, _stock: WagonStock = null) -> bool:
 	if session == null or session.is_finished():
 		return false
 	if session.stamina_remaining < session.dig_refresh_cost:
 		return false
-	var stock_n := stock.count() if stock != null else 0
-	return stock_n + session.hand.size() > 0
+	return session.run_deck_count() > 0
+
+
+static func burns_on_play(type: GameEnums.HandCardType) -> bool:
+	## Consumable (Later, distinct type, not in the stamp enum) burns.
+	## Materials / runes / skills leave the hand → discard. Materials never burn.
+	return (
+		type != GameEnums.HandCardType.MATERIAL
+		and type != GameEnums.HandCardType.RUNE
+		and type != GameEnums.HandCardType.SKILL
+	)
 
 
 static func play(
@@ -48,6 +72,9 @@ static func play(
 	var card: HandCard = session.hand[hand_index]
 	var cost := CraftCatalog.play_cost(card, next_mat_free)
 	session.hand.remove_at(hand_index)
+	var burned := burns_on_play(card.type)
+	if not burned:
+		session.discard_pile.append(card)
 	_spend(session, cost)
 	var played := PlayedCard.new()
 	played.id = card.id
@@ -60,25 +87,51 @@ static func play(
 	elif card.type == GameEnums.HandCardType.SKILL and card.id == "sk_next_mat_free":
 		flag = true
 	_maybe_stamina_zero(session)
-	return {"ok": true, "next_mat_free": flag, "played": played}
+	return {"ok": true, "next_mat_free": flag, "played": played, "burned": burned}
 
 
 static func dig(
 	session: CraftStaminaSession,
-	stock: WagonStock,
+	_stock: WagonStock,
 	rng: RandomNumberGenerator
 ) -> Dictionary:
-	if not can_dig(session, stock):
+	if not can_dig(session):
 		return {"ok": false}
-	## Refresh: leftover hand returns to stock, then draw up to hand_size. No auto-refill otherwise.
+	## Refresh: leftover hand drops to discard, then draw up to hand_size.
+	## Mid-draw shortfall shuffles discard into draw. No auto-refill otherwise.
 	for card in session.hand:
-		stock.add(card)
+		session.discard_pile.append(card)
 	session.hand.clear()
 	_spend(session, session.dig_refresh_cost)
 	session.dig_count += 1
-	session.hand = stock.draw_up_to(session.hand_size, rng)
+	draw_up_to_hand(session, rng)
 	_maybe_stamina_zero(session)
 	return {"ok": true, "dig_count": session.dig_count}
+
+
+static func draw_up_to_hand(session: CraftStaminaSession, rng: RandomNumberGenerator) -> void:
+	if session == null:
+		return
+	while session.hand.size() < session.hand_size:
+		if session.draw_pile.is_empty():
+			if not reshuffle_discard_into_draw(session, rng):
+				break
+		if session.draw_pile.is_empty():
+			break
+		session.hand.append(session.draw_pile.pop_back())
+
+
+static func reshuffle_discard_into_draw(
+	session: CraftStaminaSession,
+	rng: RandomNumberGenerator
+) -> bool:
+	if session == null or session.discard_pile.is_empty():
+		return false
+	for card in session.discard_pile:
+		session.draw_pile.append(card)
+	session.discard_pile.clear()
+	_shuffle_pile(session.draw_pile, rng)
+	return true
 
 
 static func early_finish(session: CraftStaminaSession) -> bool:
@@ -102,3 +155,13 @@ static func _maybe_stamina_zero(session: CraftStaminaSession) -> void:
 	if session.stamina_remaining == 0 and session.finish_reason == GameEnums.FinishReason.NONE:
 		session.early_finish = false
 		session.finish_reason = GameEnums.FinishReason.STAMINA_0
+
+
+static func _shuffle_pile(cards: Array[HandCard], rng: RandomNumberGenerator) -> void:
+	if rng == null or cards.size() < 2:
+		return
+	for i in range(cards.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var tmp: HandCard = cards[i]
+		cards[i] = cards[j]
+		cards[j] = tmp

@@ -44,8 +44,9 @@ Each round: player picks **one** primary action (Phase-1). Later: dual actions v
 ## Boss
 
 - Announced at chapter start (favor / punish / environment from `17`).
-- After round budget, final prep window → boss craft / loadout → boss sim.
-- Boss fail (adventurer dead / hard loss): **`run_over`**, no retry (Phase-1 hardcore).
+- After round budget, final prep window → **craft for the boss-client** → that **client** fights the boss. Sim uses **that client's gear**. Player is not the fighter (`03`, `17`).
+- Boss fail (boss-client / adventurer dead / hard loss): **`run_over`**, no retry (Phase-1 hardcore).
+- Boss-client roster / UI widgets = **Later**. Do not invent catalog this stamp.
 
 ## Explicit non-goals
 

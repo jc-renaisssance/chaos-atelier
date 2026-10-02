@@ -25,7 +25,7 @@ const MAT_PLAY_COST_COMMON := 1
 const MAT_PLAY_COST_UNCOMMON := 2
 const MAT_PLAY_COST_RARE := 3
 const ENC_PLAY_COST := 2
-const HAND_AUTO_REFILL := false ## dig refreshes from inventory; empty hand is legal
+const HAND_AUTO_REFILL := false ## dig dumps hand → discard then draws; empty hand is legal
 
 ## docs/14 — retuned thresholds. Gen-list outlook ids stay _2/_3 through 1C.
 const SYN_THRESHOLD_TIER_1 := 3 ## old ≥2

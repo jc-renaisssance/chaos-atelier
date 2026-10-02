@@ -19,6 +19,8 @@ var _stam_bar: ProgressBar
 var _piece_title: Label
 var _piece_body: Label
 var _played: HFlowContainer
+var _current_body: Label
+var _potential_body: Label
 var _hand: HBoxContainer
 var _stock: Label
 var _dig_btn: Button
@@ -52,9 +54,16 @@ func _build() -> void:
 	margin.add_theme_constant_override("margin_bottom", 16)
 	add_child(margin)
 
+	var page := ScrollContainer.new()
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	page.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(page)
+
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 10)
-	margin.add_child(root)
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.add_child(root)
 
 	_title = _label("CRAFT  ·  stamina hand  ·  construction from the order", 24, GOLD)
 	root.add_child(_title)
@@ -98,7 +107,32 @@ func _build() -> void:
 	_played.add_theme_constant_override("v_separation", 8)
 	piece_box.add_child(_played)
 
-	root.add_child(_caption("HAND  ·  materials + enchantments + owner skills  ·  no auto-refill"))
+	root.add_child(_caption("READOUT  ·  Current stats  ·  Potential outlook (locked if not unlocked)"))
+	var readout := HBoxContainer.new()
+	readout.add_theme_constant_override("separation", 8)
+	root.add_child(readout)
+	var current_panel := _panel()
+	current_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	readout.add_child(current_panel)
+	var current_box := VBoxContainer.new()
+	current_box.add_theme_constant_override("separation", 4)
+	current_panel.add_child(current_box)
+	current_box.add_child(_label("CURRENT  ·  piece in progress", 12, GOLD))
+	_current_body = _label("", 13, INK)
+	_current_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	current_box.add_child(_current_body)
+	var potential_panel := _panel()
+	potential_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	readout.add_child(potential_panel)
+	var potential_box := VBoxContainer.new()
+	potential_box.add_theme_constant_override("separation", 4)
+	potential_panel.add_child(potential_box)
+	potential_box.add_child(_label("POTENTIAL  ·  outlook / item", 12, GOLD))
+	_potential_body = _label("", 13, INK)
+	_potential_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	potential_box.add_child(_potential_body)
+
+	root.add_child(_caption("HAND  ·  play leaves → discard  ·  materials + enchantments + owner skills  ·  no auto-refill"))
 	var hand_panel := _panel()
 	hand_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(hand_panel)
@@ -190,13 +224,14 @@ func _refresh() -> void:
 	var con_name := CraftCatalog.construction_name(session.construction_id)
 	_title.text = "CRAFT  ·  %s  ·  own_basic" % order.order_id
 	_meta.text = (
-		"Piece %d / %d   ·   %s   ·   %s   ·   stock %d   ·   next-mat-free %s   ·   pieces sewn %d / %d"
+		"Piece %d / %d   ·   %s   ·   %s   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d"
 		% [
 			session.piece_index,
 			session.piece_count,
 			con_name,
 			GameEnums.mission_kind_wire(order.mission_kind),
-			AtelierSession.stock.count() if AtelierSession.stock != null else 0,
+			session.draw_pile.size(),
+			session.discard_pile.size(),
 			"yes" if AtelierSession.next_mat_free else "no",
 			AtelierSession.board.crafts_done if AtelierSession.board != null else 0,
 			GameConstants.CRAFTS_MAX,
@@ -219,7 +254,7 @@ func _refresh() -> void:
 	var stats := CraftCatalog.construction_stats(session.construction_id)
 	_piece_title.text = "Sewing %s  ·  construction_ids from the order, not a pick" % con_name
 	_piece_body.text = (
-		"Tags %s   ·   stats HP %+d  ATK %+d  DEF %+d  RES %+d  MOB %+d  PRE %+d   ·   infinite monostack (stamina + stock gate)"
+		"Tags %s   ·   stats HP %+d  ATK %+d  DEF %+d  RES %+d  MOB %+d  PRE %+d   ·   infinite monostack (stamina + discard→reshuffle)"
 		% [
 			", ".join(tags) if tags.size() > 0 else "—",
 			int(stats.get("HP", 0)),
@@ -232,9 +267,10 @@ func _refresh() -> void:
 	)
 	_rebuild_played(session)
 	_rebuild_hand(session)
+	_refresh_readout(session)
 	_stock.text = (
-		"Wagon stock %d remaining. Empty hand is legal. Dig rummages leftover + stock; played cards stay sewn."
-		% (AtelierSession.stock.count() if AtelierSession.stock != null else 0)
+		"Draw %d  ·  discard %d  ·  run deck %d. Play leaves the hand → discard. Dig dumps remaining hand, then draws (reshuffle if short). Empty hand is legal."
+		% [session.draw_pile.size(), session.discard_pile.size(), session.run_deck_count()]
 	)
 	var busy := session.is_finished() or AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
@@ -275,14 +311,16 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
 		var tags := CraftCatalog.tags_of(card.id, card.type)
 		var blurb := ", ".join(tags) if tags.size() > 0 else CraftCatalog.skill_blurb(card.id)
+		var fate := "burns" if CraftRules.burns_on_play(card.type) else "to discard"
 		var btn := Button.new()
-		btn.text = "%s\n%s · cost %d\n%s" % [
+		btn.text = "%s\n%s · cost %d · %s\n%s" % [
 			CraftCatalog.display_name(card.id, card.type),
 			GameEnums.hand_card_type_wire(card.type),
 			cost,
+			fate,
 			blurb,
 		]
-		btn.custom_minimum_size = Vector2(148, 96)
+		btn.custom_minimum_size = Vector2(148, 110)
 		btn.disabled = locked or not CraftRules.can_play(session, i, AtelierSession.next_mat_free)
 		btn.pressed.connect(_on_play.bind(i))
 		_hand.add_child(btn)
@@ -300,6 +338,15 @@ func _chip(text: String) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", sb)
 	panel.add_child(_label(text, 12, INK))
 	return panel
+
+
+func _refresh_readout(session: CraftStaminaSession) -> void:
+	var preview := CraftReadout.preview(session)
+	_current_body.text = CraftReadout.current_line(preview)
+	var unlocked := AtelierSession.unlocked_outlooks
+	var open := CraftReadout.potential_unlocked(preview, unlocked)
+	_potential_body.text = CraftReadout.potential_label(preview, unlocked)
+	_potential_body.add_theme_color_override("font_color", INK if open else MUTED)
 
 
 func _refresh_result(session: CraftStaminaSession) -> void:

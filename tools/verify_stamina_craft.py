@@ -47,6 +47,7 @@ def check_source_symbols(blob: str) -> None:
         "class_name CraftTable",
         "class_name CraftRules",
         "class_name CraftResolver",
+        "class_name CraftReadout",
         "class_name CraftCatalog",
         "class_name WagonStock",
         "func play_hand",
@@ -54,6 +55,16 @@ def check_source_symbols(blob: str) -> None:
         "func finish_early",
         "func count_finished_piece",
         "func apply_piece_session",
+        "func burns_on_play",
+        "func reshuffle_discard_into_draw",
+        "func draw_up_to_hand",
+        "func return_run_deck",
+        "draw_pile",
+        "discard_pile",
+        "unlocked_outlooks",
+        "LOCKED_LABEL",
+        "CURRENT",
+        "POTENTIAL",
         "DIG_REFRESH_COST",
         "STAMINA_START",
         "sk_next_mat_free",
@@ -78,6 +89,30 @@ def check_source_symbols(blob: str) -> None:
             fail(f"superseded token present: {token}")
     if "construction picker" not in blob.lower() and "not a hand card" not in blob:
         fail("UI/source should say construction is not a hand card")
+    enums = (SRC / "data" / "game_enums.gd").read_text(encoding="utf-8")
+    if re.search(r"enum HandCardType\s*\{[^}]*CONSUMABLE", enums, re.S):
+        fail("consumable is Later — do not add it to the stamp type enum")
+    rules = (SRC / "craft" / "craft_rules.gd").read_text(encoding="utf-8")
+    if "session.hand.remove_at(hand_index)" not in rules:
+        fail("play must remove the card from hand (StS: play leaves the hand)")
+    if re.search(
+        r"if burns_on_play\(card\.type\):\s*\n\s*session\.hand\.remove_at",
+        rules,
+    ):
+        fail("materials must also leave the hand — do not gate remove_at on burns_on_play")
+    if "session.discard_pile.append(card)" not in rules:
+        fail("played cards must go to discard unless they burn")
+    if "reshuffle_discard_into_draw" not in rules:
+        fail("mid-draw shortfall must shuffle discard into draw")
+    if "return_hand_copies" in rules:
+        fail("durable-in-hand return_hand_copies must be reversed")
+    readout = (SRC / "ui" / "craft" / "craft_table.gd").read_text(encoding="utf-8")
+    if "CraftReadout.preview" not in readout or "_refresh_readout" not in readout:
+        fail("craft table must live-refresh Current / Potential from CraftReadout")
+    if "CURRENT" not in readout or "POTENTIAL" not in readout:
+        fail("Stamp 2 Current / Potential panel must remain")
+    if "durable · stays" in readout or "Materials are durable" in readout:
+        fail("UI must not claim materials stay in hand after play")
 
 
 def check_gd_balance() -> None:
@@ -110,6 +145,7 @@ CATALOG = {
     "mat_iron_scrap": {"dollar": 1, "type": "material", "tags": ["Metal"], "stats": {"HP": 1, "DEF": 1}},
     "mat_stone_shard": {"dollar": 2, "type": "material", "tags": ["Earth", "Metal"], "stats": {"HP": 2, "DEF": 2}},
     "sk_next_mat_free": {"dollar": 0, "type": "skill", "tags": [], "stats": {}},
+    "oil_round": {"dollar": 1, "type": "consumable", "tags": [], "stats": {}},
 }
 CONS = {
     "con_armor": {"tags": ["Metal"]},
@@ -131,6 +167,8 @@ class Session:
         self.dig_refresh_cost = DIG_COST
         self.dig_count = 0
         self.hand: list[str] = []
+        self.draw_pile: list[str] = []
+        self.discard_pile: list[str] = []
         self.cards_played: list[dict] = []
         self.early_finish = False
         self.finish_reason = None
@@ -142,6 +180,8 @@ class Session:
             return SKILL_COST[card_id]
         if row["type"] == "rune":
             return ENC_COST
+        if row["type"] == "consumable":
+            return 1
         if self.next_mat_free:
             return 0
         return MAT_COST[row["dollar"]]
@@ -152,6 +192,8 @@ class Session:
         cost = self.play_cost(card_id)
         assert cost <= self.stamina_remaining
         kind = CATALOG[card_id]["type"]
+        if not burns_on_play(kind):
+            self.discard_pile.append(card_id)
         if kind == "material" and self.next_mat_free:
             self.next_mat_free = False
         self.stamina_remaining -= cost
@@ -162,18 +204,36 @@ class Session:
         if self.stamina_remaining == 0:
             self.finish_reason = "stamina_0"
 
-    def dig(self, stock: list[str]) -> None:
+    def reshuffle_discard_into_draw(self) -> bool:
+        if not self.discard_pile:
+            return False
+        self.draw_pile.extend(self.discard_pile)
+        self.discard_pile.clear()
+        return True
+
+    def draw_up_to_hand(self) -> None:
+        while len(self.hand) < HAND_SIZE:
+            if not self.draw_pile:
+                if not self.reshuffle_discard_into_draw():
+                    break
+            if not self.draw_pile:
+                break
+            self.hand.append(self.draw_pile.pop())
+
+    def dig(self) -> None:
         assert self.finish_reason is None
         assert self.stamina_remaining >= DIG_COST
-        stock.extend(self.hand)
+        self.discard_pile.extend(self.hand)
         self.hand.clear()
         self.stamina_remaining -= DIG_COST
         self.stamina_spent += DIG_COST
         self.dig_count += 1
-        while len(self.hand) < HAND_SIZE and stock:
-            self.hand.append(stock.pop())
+        self.draw_up_to_hand()
         if self.stamina_remaining == 0:
             self.finish_reason = "stamina_0"
+
+    def run_deck(self) -> list[str]:
+        return list(self.hand) + list(self.draw_pile) + list(self.discard_pile)
 
     def finish_early(self) -> None:
         assert self.finish_reason is None
@@ -181,11 +241,20 @@ class Session:
         self.finish_reason = "early_finish"
 
 
-def draw(stock: list[str], n: int) -> list[str]:
-    out: list[str] = []
-    while len(out) < n and stock:
-        out.append(stock.pop())
-    return out
+def burns_on_play(kind: str) -> bool:
+    ## Consumable (Later) burns. Materials / runes / skills go to discard.
+    return kind == "consumable"
+
+
+def potential_label(outlook_id: str, unlocked: set[str]) -> str:
+    if outlook_id == "plain" or outlook_id in unlocked:
+        return "plain" if outlook_id == "plain" else outlook_id
+    return "locked"
+
+
+def current_stats_line(session: Session) -> str:
+    bag = tag_counts(session)
+    return "tags " + ",".join(f"{k}x{bag[k]}" for k in sorted(bag))
 
 
 def tag_counts(session: Session) -> dict[str, int]:
@@ -201,7 +270,7 @@ def tag_counts(session: Session) -> dict[str, int]:
 
 
 def run_spec() -> None:
-    stock = [
+    deck = [
         "mat_hemp_plain",
         "mat_hemp_plain",
         "mat_silk_pale",
@@ -217,19 +286,41 @@ def run_spec() -> None:
 
     # Piece 1 of 2 (armor + gloves)
     s1 = Session("con_armor", 1, 2)
-    s1.hand = draw(stock, HAND_SIZE)
+    s1.draw_pile = list(deck)
+    s1.draw_up_to_hand()
     if len(s1.hand) != HAND_SIZE:
-        fail("opening draw should fill hand_size from stock")
+        fail("opening draw should fill hand_size from draw pile")
     if s1.stamina_remaining != 12:
         fail("stamina_start should be 12")
+    leftover_draw = list(s1.draw_pile)
+    if len(leftover_draw) != len(deck) - HAND_SIZE:
+        fail("opening draw must leave remainder on the draw pile")
 
-    # play first hemp (cost 1)
+    # play first hemp (cost 1) — leaves hand → discard; stays in run deck
     hemp_i = s1.hand.index("mat_hemp_plain")
+    hemp_in_hand = s1.hand.count("mat_hemp_plain")
+    deck_before = s1.run_deck()
     s1.play(hemp_i)
     if s1.stamina_remaining != 11 or s1.stamina_spent != 1:
         fail(f"hemp play should spend 1, got rem={s1.stamina_remaining} spent={s1.stamina_spent}")
+    if s1.hand.count("mat_hemp_plain") != hemp_in_hand - 1:
+        fail("material play must leave the hand (StS cycle, not durable-in-hand)")
+    if "mat_hemp_plain" not in s1.discard_pile:
+        fail("played material must go to discard")
+    if sorted(s1.run_deck()) != sorted(deck_before):
+        fail("play must keep the card in the run deck (discard), not delete it")
+    if leftover_draw != s1.draw_pile:
+        fail("material play must not pull from the draw pile")
     if any(c["id"].startswith("con_") for c in s1.cards_played):
         fail("construction cards are illegal in cards_played")
+    if current_stats_line(s1).find("Soft") < 0:
+        fail("Current readout must include tags from materials played so far")
+    if potential_label("syn_metal_3", {"plain"}) != "locked":
+        fail("Potential must hide an unlocked-unknown outlook as locked")
+    if potential_label("plain", {"plain"}) != "plain":
+        fail("plain outlook is always unlocked")
+    if potential_label("syn_metal_3", {"plain", "syn_metal_3"}) != "syn_metal_3":
+        fail("Potential shows outlook identity only after unlock")
 
     # silk costs 2
     if "mat_silk_pale" in s1.hand:
@@ -237,27 +328,39 @@ def run_spec() -> None:
         last = s1.cards_played[-1]
         if last["cost"] != 2:
             fail(f"silk play cost should be 2, got {last['cost']}")
+        if "mat_silk_pale" in s1.hand:
+            fail("silk must leave the hand after play")
 
     # skill then free mat
     if "sk_next_mat_free" in s1.hand:
         s1.play(s1.hand.index("sk_next_mat_free"))
         if s1.cards_played[-1]["type"] != "skill":
             fail("skill type must be skill")
+        if "sk_next_mat_free" in s1.hand:
+            fail("skill must leave the hand → discard")
+        if "sk_next_mat_free" not in s1.discard_pile:
+            fail("played skill must go to discard")
         if "mat_hemp_plain" in s1.hand:
             s1.play(s1.hand.index("mat_hemp_plain"))
             if s1.cards_played[-1]["cost"] != 0:
                 fail("next mat after sk_next_mat_free must cost 0")
 
-    empty_before = len(s1.hand)
-    s1.dig(stock)
+    remaining_before_dig = list(s1.hand)
+    discarded_before_dig = list(s1.discard_pile)
+    s1.dig()
     if s1.dig_count != 1:
         fail("dig_count should increment")
     if s1.stamina_spent < 1 + DIG_COST:
         fail("stamina_spent must include dig cost")
     if len(s1.hand) > HAND_SIZE:
         fail("hand must not exceed hand_size after dig")
-    if empty_before == 0 and not s1.hand and not stock:
-        fail("empty hand is legal; dig from empty stock+hand should have been gated")
+    for card_id in remaining_before_dig:
+        if card_id in s1.hand and s1.hand.count(card_id) > (
+            leftover_draw + discarded_before_dig + remaining_before_dig
+        ).count(card_id):
+            fail("dig must dump remaining hand to discard before drawing")
+    if remaining_before_dig and all(c in s1.hand for c in remaining_before_dig) and not leftover_draw:
+        fail("dig must dump remaining hand to discard, then draw a new hand")
 
     s1.finish_early()
     if s1.finish_reason != "early_finish" or not s1.early_finish:
@@ -272,14 +375,13 @@ def run_spec() -> None:
     if bag.get("Metal", 0) < 1:
         fail("tag tally must include order construction tags (armor=Metal)")
 
-    # Piece 2
+    # Piece 2 — leftover run deck becomes the next piece's piles
     s2 = Session("con_gloves", 2, 2)
-    leftover = list(s1.hand)
-    stock.extend(leftover)
-    s2.hand = draw(stock, HAND_SIZE)
+    s2.draw_pile = s1.run_deck()
+    s2.draw_up_to_hand()
     s2.stamina_remaining = 2
     s2.stamina_spent = 0
-    s2.dig(stock)
+    s2.dig()
     if s2.finish_reason != "stamina_0" or s2.early_finish:
         fail("dig that spends last 2 stamina must finish as stamina_0")
     if s2.stamina_remaining != 0:
@@ -308,6 +410,54 @@ def run_spec() -> None:
     if MAT_COST[4] != 3:
         fail("rare mat play cost must be 3")
 
+    # Same id via copies or after reshuffle — not by replaying one in-hand card
+    s5 = Session("con_armor", 1, 1)
+    s5.hand = ["mat_iron_scrap", "mat_iron_scrap", "sk_next_mat_free", "oil_round"]
+    s5.play(0)
+    if "mat_iron_scrap" not in s5.discard_pile:
+        fail("played material must sit in discard")
+    s5.play(0)
+    if [c["id"] for c in s5.cards_played] != ["mat_iron_scrap", "mat_iron_scrap"]:
+        fail("same material id may stack via copies (each play leaves the hand)")
+    if "mat_iron_scrap" in s5.hand:
+        fail("cannot replay one in-hand card — it already left")
+    if s5.discard_pile.count("mat_iron_scrap") != 2:
+        fail("both iron copies must be in discard")
+    s5.play(0)
+    if "sk_next_mat_free" in s5.hand:
+        fail("skill leaves the hand")
+    if "sk_next_mat_free" not in s5.discard_pile:
+        fail("skill goes to discard")
+    if "oil_round" not in s5.hand:
+        fail("consumable should still be in hand before its play")
+    s5.play(s5.hand.index("oil_round"))
+    if "oil_round" in s5.hand:
+        fail("consumable burns on use when that type exists")
+    if "oil_round" in s5.discard_pile:
+        fail("consumable burns — it does not go to discard")
+    if not burns_on_play("consumable") or burns_on_play("material"):
+        fail("burn path: consumable burns; material never burns")
+
+    # Mid-draw reshuffle: empty draw, dump + reshuffle discard, continue
+    s6 = Session("con_tunic", 1, 1)
+    s6.hand = ["mat_hemp_plain", "mat_silk_pale"]
+    s6.draw_pile = []
+    s6.discard_pile = ["mat_iron_scrap", "mat_stone_shard", "mat_hemp_plain"]
+    s6.play(0)
+    s6.dig()
+    if s6.dig_count != 1:
+        fail("reshuffle dig should increment dig_count")
+    if s6.draw_pile and len(s6.hand) < HAND_SIZE:
+        fail("draw should continue after reshuffle until hand_size or empty")
+    if len(s6.hand) != 5:
+        fail(f"reshuffle mid-draw should refill to 5, got {len(s6.hand)}")
+    if s6.discard_pile:
+        fail("after full redraw from reshuffled discard, discard should be empty")
+    if "mat_silk_pale" not in s6.hand:
+        fail("dumped leftover hand must cycle back via reshuffle")
+    if "mat_hemp_plain" not in s6.hand:
+        fail("played hemp must cycle discard → draw → hand")
+
 
 def main() -> int:
     blob = src_text()
@@ -321,7 +471,7 @@ def main() -> int:
             print(" -", item)
         return 1
     print("OK stamina craft source + spec (docs/27, docs/20)")
-    print("Godot 4.7 project features set; editor was not opened.")
+    print("StS hand cycle + Current/Potential readout checked. Godot editor was not opened.")
     return 0
 
 

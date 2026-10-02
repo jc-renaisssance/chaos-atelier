@@ -2,7 +2,7 @@
 # Craft layers + tag engine
 
 ## Materials as deck
-Materials are **cards**. Limited hand / inventory. Multiples of the same card may be spent into one craft (e.g. Armor + Stone ×3). Between beats, atelier shop → craft/task → shop reshapes the deck toward the **announced chapter boss**. Active **player owner** gates which families you can stock.
+Materials are **deck cards**. Limited hand. Multiples of the same id may be **played** into one craft (e.g. Armor + Stone ×3) via copies or after discard→reshuffle — play costs **stamina** and the card **leaves the hand** → discard ([27](27-craft-mode-stamina.md)). Cards stay in the run deck by cycling, not by sitting in hand after play (**supersedes durable-in-hand, #17**). Between beats, atelier shop → craft/task → shop reshapes the deck toward the **announced chapter boss**. Active **player owner** gates which families you can stock. Round-generated **consumables** (Later, distinct type) burn on use; materials do not.
 
 ## Three layers
 | Layer | Role | Doc |

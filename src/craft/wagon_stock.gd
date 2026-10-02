@@ -1,6 +1,8 @@
 class_name WagonStock
 extends RefCounted
-## Remaining wagon inventory. Dig draws from here; played cards leave (docs/27).
+## Atelier inventory between beats (docs/27). During a piece the run deck is
+## session hand + draw + discard. Shop sell / explicit loss still change stock.
+## Play leaves the hand → discard; persist via reshuffle, not in-hand.
 
 var cards: Array[HandCard] = []
 
@@ -28,6 +30,14 @@ func add_copy(card: HandCard) -> void:
 	if card == null:
 		return
 	cards.append(HandCard.make(card.id, card.type))
+
+
+func take_all() -> Array[HandCard]:
+	var out: Array[HandCard] = []
+	for card in cards:
+		out.append(card)
+	cards.clear()
+	return out
 
 
 func shuffle(rng: RandomNumberGenerator) -> void:

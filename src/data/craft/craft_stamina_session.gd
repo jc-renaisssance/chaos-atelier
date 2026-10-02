@@ -12,6 +12,8 @@ extends Resource
 @export var stamina_spent: int = 0
 @export var hand_size: int = GameConstants.HAND_SIZE
 @export var hand: Array[HandCard] = [] ## mats + runes + skills; no auto-refill
+@export var draw_pile: Array[HandCard] = [] ## run deck remainder this piece (docs/27)
+@export var discard_pile: Array[HandCard] = [] ## play + dig dump; reshuffles into draw
 @export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
 @export var dig_count: int = 0
 @export var cards_played: Array[PlayedCard] = []
@@ -34,11 +36,17 @@ func apply_order(order: ClientOrder, piece_index_: int) -> void:
 	early_finish = false
 	finish_reason = GameEnums.FinishReason.NONE
 	hand.clear()
+	draw_pile.clear()
+	discard_pile.clear()
 	cards_played.clear()
 
 
 func is_finished() -> bool:
 	return finish_reason != GameEnums.FinishReason.NONE
+
+
+func run_deck_count() -> int:
+	return hand.size() + draw_pile.size() + discard_pile.size()
 
 
 func to_session_dict() -> Dictionary:
@@ -48,6 +56,12 @@ func to_session_dict() -> Dictionary:
 	var hand_rows: Array = []
 	for card in hand:
 		hand_rows.append(card.to_dict())
+	var draw_rows: Array = []
+	for card in draw_pile:
+		draw_rows.append(card.to_dict())
+	var discard_rows: Array = []
+	for card in discard_pile:
+		discard_rows.append(card.to_dict())
 	return {
 		"piece_index": piece_index,
 		"piece_count": piece_count,
@@ -56,6 +70,8 @@ func to_session_dict() -> Dictionary:
 		"stamina_spent": stamina_spent,
 		"hand_size": hand_size,
 		"hand": hand_rows,
+		"draw_pile": draw_rows,
+		"discard_pile": discard_rows,
 		"dig_refresh_cost": dig_refresh_cost,
 		"dig_count": dig_count,
 		"cards_played": played,
@@ -89,6 +105,10 @@ func schema_errors() -> PackedStringArray:
 	if hand.size() > hand_size:
 		errs.append("hand size %d exceeds hand_size %d" % [hand.size(), hand_size])
 	for card in hand:
+		errs.append_array(card.schema_errors())
+	for card in draw_pile:
+		errs.append_array(card.schema_errors())
+	for card in discard_pile:
 		errs.append_array(card.schema_errors())
 	for card in cards_played:
 		errs.append_array(card.schema_errors())
