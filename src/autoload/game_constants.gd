@@ -39,7 +39,10 @@ const SYN_APEX_TAGS := ["Fire", "Metal", "Earth"]
 const NULL_INT := -1
 const NULL_FLOAT := -1.0
 
-## docs/17 — three chapter pools kept. Schema ids only; no boss loop.
+## docs/19 + 17 — own_basic starter tags. C2/C3 de-favor these in boss favor/punish rows.
+const OWN_BASIC_STARTER_TAGS := ["Soft", "Earth", "Metal", "Wild", "Silk", "Pure"]
+
+## docs/17 — three chapter pools kept. Shared boss-client jobs live in BossClientCatalog (28).
 const BOSS_POOL_IDS := {
 	1: "pool_c1_outer_holdings",
 	2: "pool_c2_mire_chapel",

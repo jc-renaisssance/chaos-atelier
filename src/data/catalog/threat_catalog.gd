@@ -1,6 +1,10 @@
 class_name ThreatCatalog
 extends RefCounted
-## Client / boss favor-punish bags (docs/17, 22-chapter-flow). Not a 1-of-3 lineup.
+## Client / boss favor-punish bags (docs/17, 28). Not a 1-of-3 lineup.
+## C2/C3 de-favor own_basic starter tags (docs/19). C1 may stay approachable.
+
+## Soft / Earth / Metal staples on own_basic mats (docs/19). C2/C3 punish these.
+const OWN_BASIC_STARTER_TAGS := ["Soft", "Earth", "Metal", "Wild", "Silk", "Pure"]
 
 const CLIENTS := {
 	"cli_c1_ember_scout": {
@@ -165,38 +169,38 @@ const BOSSES := {
 	"boss_mire_bride": {
 		"name": "Mire Bride",
 		"threat_tags": ["Occult", "Sticky", "Lunar"],
-		"favor_tags": ["Silent", "Occult", "Wild", "Sticky"],
-		"punish_tags": ["Pure", "Solar"],
+		"favor_tags": ["Silent", "Occult", "Lunar", "Sticky"],
+		"punish_tags": ["Soft", "Pure", "Silk"],
 	},
 	"boss_bog_king": {
 		"name": "Bog King",
-		"threat_tags": ["Earth", "Sticky", "Wild"],
-		"favor_tags": ["Earth", "Sticky", "Wild"],
-		"punish_tags": ["Royal", "Solar"],
+		"threat_tags": ["Sticky", "Wild", "Earth"],
+		"favor_tags": ["Frost", "Occult", "Storm", "Silent"],
+		"punish_tags": ["Soft", "Earth", "Metal", "Wild"],
 	},
 	"boss_pale_choir": {
 		"name": "Pale Choir",
-		"threat_tags": ["Lunar", "Occult", "Soft"],
-		"favor_tags": ["Lunar", "Soft", "Occult"],
-		"punish_tags": ["Sharp", "Metal"],
+		"threat_tags": ["Lunar", "Occult", "Storm"],
+		"favor_tags": ["Lunar", "Occult", "Silent", "Frost"],
+		"punish_tags": ["Soft", "Metal", "Silk"],
 	},
 	"boss_gilded_warden": {
 		"name": "Gilded Warden",
-		"threat_tags": ["Royal", "Metal", "Solar"],
-		"favor_tags": ["Royal", "Metal", "Pure", "Solar"],
-		"punish_tags": ["Silent", "Sticky"],
+		"threat_tags": ["Royal", "Solar", "Sharp"],
+		"favor_tags": ["Royal", "Solar", "Fire", "Sharp"],
+		"punish_tags": ["Soft", "Earth", "Wild", "Metal"],
 	},
 	"boss_ivory_judge": {
 		"name": "Ivory Judge",
-		"threat_tags": ["Royal", "Pure", "Metal"],
-		"favor_tags": ["Pure", "Royal", "Metal"],
-		"punish_tags": ["Occult", "Sticky"],
+		"threat_tags": ["Royal", "Lunar", "Silent"],
+		"favor_tags": ["Royal", "Lunar", "Silent", "Occult"],
+		"punish_tags": ["Soft", "Metal", "Pure", "Silk"],
 	},
 	"boss_sunspear_captain": {
 		"name": "Sunspear Captain",
-		"threat_tags": ["Solar", "Sharp", "Metal"],
-		"favor_tags": ["Solar", "Sharp", "Metal", "Royal"],
-		"punish_tags": ["Silent", "Soft"],
+		"threat_tags": ["Solar", "Sharp", "Fire"],
+		"favor_tags": ["Solar", "Sharp", "Fire", "Royal"],
+		"punish_tags": ["Soft", "Silk", "Pure", "Earth"],
 	},
 }
 

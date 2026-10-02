@@ -279,25 +279,61 @@ static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 		"resolve_class": "boss",
 		"round_action": null,
 		"mission_kind": "boss",
-		"title": "Final prep — face %s" % title,
+		"title": "Final prep — sew for a fighter vs %s" % title,
 		"body": (
 			"Eight rounds resolved. Appointments never claimed 7–8. "
-			+ "Face the announced boss. Fail (adventurer dead / hard loss) = run_over, no retry (docs/24)."
+			+ "Draw one adventurer from the shared job pool (docs/28), independent of the announced boss. "
+			+ "Sew that job's listed constructions. That adventurer fights %s. "
+			% title
+			+ "Player is the clothier. Fail (adventurer dead / hard loss) = run_over, no retry (docs/24)."
 		),
-		"stub": "boss_encounter",
+		"stub": "boss_client_draw",
 		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
 	}
 
 
-static func build_boss_result(board: ChapterSchedule, mission: Dictionary, run_over: bool) -> Dictionary:
+static func build_boss_client_draw(board: ChapterSchedule, job: Dictionary) -> Dictionary:
+	var boss_title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
+	var job_id := String(job.get("job_id", ""))
+	var display := String(job.get("display", job_id))
+	var cons: Array = job.get("construction_ids", [])
+	return {
+		"resolve_class": "boss",
+		"round_action": null,
+		"mission_kind": "boss",
+		"title": "Boss-client — %s vs %s" % [display, boss_title],
+		"body": (
+			"Shared-pool draw (docs/28): %s / %s / %s. "
+			% [job_id, String(job.get("boss_client_id", "")), String(job.get("order_id", ""))]
+			+ "Order constructions: %s. Requirement tags: %s. "
+			% [", ".join(PackedStringArray(cons)), ", ".join(PackedStringArray(job.get("requirement_tags", [])))]
+			+ "Independent of chapter_boss_id=%s. Enter stamina craft (N=2, 12×2)."
+			% (board.chapter_boss_id if board != null else "")
+		),
+		"stub": "craft",
+		"order_id": String(job.get("order_id", "")),
+		"boss_client_id": String(job.get("boss_client_id", "")),
+		"boss_job_id": job_id,
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.CRAFT),
+	}
+
+
+static func build_boss_result(
+	board: ChapterSchedule,
+	mission: Dictionary,
+	run_over: bool,
+	boss_job_id: String = "",
+	boss_client_id: String = ""
+) -> Dictionary:
 	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
+	var fighter := BossClientCatalog.display_name(boss_job_id) if boss_job_id != "" else "Adventurer"
 	var rating = mission.get("rating", GameEnums.Rating.NONE)
 	var cleared := bool(mission.get("cleared", false))
 	var hp := float(mission.get("hp_remaining", 0.0))
 	var lines: PackedStringArray = PackedStringArray()
 	lines.append(
-		"Boss result vs %s: rating %s · cleared %s · hp %s."
-		% [title, GameEnums.rating_wire(rating), str(cleared), _hp_text(hp)]
+		"%s (%s) vs %s: rating %s · cleared %s · hp %s."
+		% [fighter, boss_client_id, title, GameEnums.rating_wire(rating), str(cleared), _hp_text(hp)]
 	)
 	if run_over:
 		lines.append("run_over · boss_death — no retry (docs/24). Newspaper chrome hd_run_over.")
@@ -314,6 +350,8 @@ static func build_boss_result(board: ChapterSchedule, mission: Dictionary, run_o
 		"cleared": cleared,
 		"run_over": run_over,
 		"rating": GameEnums.rating_wire(rating),
+		"boss_client_id": boss_client_id,
+		"boss_job_id": boss_job_id,
 	}
 
 

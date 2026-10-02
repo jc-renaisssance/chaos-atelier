@@ -64,13 +64,20 @@ def check_source_symbols(blob: str) -> None:
         "func resolve_order",
         "func grade_piece",
         "func stamp_preview",
+        "func pick_boss_client",
+        "class_name BossClientCatalog",
         "HEADLINE_BOSS_ANNOUNCE",
         "own_basic",
         "docs/23",
         "docs/24",
         "docs/20",
+        "docs/28",
         "boss_death",
         "reps_gate_miss",
+        "boss_client_id",
+        "boss_job_id",
+        "adv_knight",
+        "job_knight",
     ]
     for token in need:
         if token not in blob:
@@ -232,12 +239,20 @@ def run_spec() -> None:
     if sewn["cleared"] != (sewn["hp"] > 0 and rating_clears(sewn["rating"])):
         fail("cleared derivation broken")
 
+    # C2/C3 starter-tag de-favor: more punish hits (Soft/Earth/Metal…) lower hp vs boss.
+    c2_staples = grade(8, 3, 0, 3, 0, 1, 0, 3, 3, True, False)
+    c2_fit = grade(8, 3, 2, 0, 0, 1, 0, 3, 3, True, False)
+    if c2_staples["hp"] >= c2_fit["hp"]:
+        fail("C2/C3 starter-tag punish should leave less soak than a non-starter fit")
+
     stamp_fields = [
         "run_id",
         "player_owner_id",
         "chapter_id",
         "chapter_boss_id",
         "boss_pool_id",
+        "boss_client_id",
+        "boss_job_id",
         "CHAPTER_ROUND_COUNT",
         "round_index",
         "rounds_left",
