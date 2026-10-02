@@ -1,6 +1,8 @@
 class_name WagonStock
 extends RefCounted
-## Remaining wagon inventory. Dig draws from here; played cards leave (docs/27).
+## Remaining wagon inventory. Dig draws from here (docs/27).
+## Materials are durable — play does not remove them from hand or stock.
+## Shop sell / explicit loss still change stock. Consumables (Later) burn on use.
 
 var cards: Array[HandCard] = []
 

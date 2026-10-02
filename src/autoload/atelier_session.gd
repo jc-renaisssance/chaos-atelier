@@ -47,6 +47,8 @@ var run_over_reason: GameEnums.RunOverReason = GameEnums.RunOverReason.NONE
 var last_newspaper_event: GameEnums.NewspaperEvent = GameEnums.NewspaperEvent.NONE
 var last_headline_id: String = ""
 var last_letter_id: String = ""
+## Fashion encyclopedia is Later (docs/04). Phase-1 unlock set for Potential readout (docs/27).
+var unlocked_outlooks: PackedStringArray = PackedStringArray(["plain"])
 
 
 func _ready() -> void:
@@ -77,6 +79,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	last_newspaper_event = GameEnums.NewspaperEvent.NONE
 	last_headline_id = ""
 	last_letter_id = ""
+	unlocked_outlooks = PackedStringArray(["plain"])
 	chapter_piece_results.clear()
 	_reset_craft_state()
 	stock = WagonStock.new()
@@ -236,7 +239,10 @@ func play_hand(hand_index: int) -> bool:
 	if craft_session.is_finished():
 		_resolve_current_piece()
 	else:
-		last_note = "Played into the piece. Hand does not refill — dig to rummage the wagon."
+		last_note = (
+			"Played into the piece. Materials stay (stamina only). "
+			+ "Hand does not refill — dig to rummage the wagon."
+		)
 		craft_changed.emit()
 	return true
 
@@ -275,6 +281,7 @@ func _resolve_current_piece() -> void:
 	result["crafts_done"] = board.crafts_done
 	last_piece_result = result
 	piece_results.append(result)
+	_unlock_outlook(String(result.get("outlook_id", "plain")))
 	if counted:
 		chapter_piece_results.append(result)
 	last_stamp = _make_craft_stamp(result)
@@ -489,6 +496,19 @@ func stamp_preview() -> Dictionary:
 		return {}
 	## Full docs/20 dump — Test smoke pairs against this, not a subset.
 	return last_stamp.to_dict()
+
+
+func is_outlook_unlocked(outlook_id: String) -> bool:
+	return CraftReadout.is_outlook_unlocked(outlook_id, unlocked_outlooks)
+
+
+func _unlock_outlook(outlook_id: String) -> void:
+	var id := outlook_id
+	if id.is_empty():
+		id = "plain"
+	if id in unlocked_outlooks:
+		return
+	unlocked_outlooks.append(id)
 
 
 func _apply_run_meta(stamp: HarnessStamp) -> void:

@@ -1,6 +1,8 @@
 class_name CraftRules
 extends RefCounted
 ## Stamina session mutations (docs/27, docs/20 asserts 12–17).
+## Materials are durable: play spends stamina only — card stays in hand / stock.
+## Consumable is Later / not in the stamp type enum; if that type is added it burns.
 ## No auto-refill. Dig costs 2 and refreshes hand from stock. Construction is not a card.
 
 static func opening_draw(
@@ -38,6 +40,12 @@ static func can_dig(session: CraftStaminaSession, stock: WagonStock) -> bool:
 	return stock_n + session.hand.size() > 0
 
 
+static func burns_on_play(type: GameEnums.HandCardType) -> bool:
+	## Law (docs/11, 27, 20): materials never burn. Consumable (Later, distinct type)
+	## burns when/if that type exists. Runes and skills leave the hand (not durable).
+	return type != GameEnums.HandCardType.MATERIAL
+
+
 static func play(
 	session: CraftStaminaSession,
 	hand_index: int,
@@ -47,7 +55,8 @@ static func play(
 		return {"ok": false, "next_mat_free": next_mat_free}
 	var card: HandCard = session.hand[hand_index]
 	var cost := CraftCatalog.play_cost(card, next_mat_free)
-	session.hand.remove_at(hand_index)
+	if burns_on_play(card.type):
+		session.hand.remove_at(hand_index)
 	_spend(session, cost)
 	var played := PlayedCard.new()
 	played.id = card.id
@@ -60,7 +69,7 @@ static func play(
 	elif card.type == GameEnums.HandCardType.SKILL and card.id == "sk_next_mat_free":
 		flag = true
 	_maybe_stamina_zero(session)
-	return {"ok": true, "next_mat_free": flag, "played": played}
+	return {"ok": true, "next_mat_free": flag, "played": played, "burned": burns_on_play(card.type)}
 
 
 static func dig(
