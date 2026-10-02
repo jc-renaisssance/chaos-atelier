@@ -65,3 +65,5 @@ Player may sell owned mats for **⌊$ / 2⌋** gold (min 1 if $ ≥ 2, else 0 fo
 ## Harness note
 
 Stamp `starter_deck_hash` or explicit `material_ids` at run start; shop rolls may be seeded for Mid/Mid smoke.
+
+Starter tags on these mats: **Soft, Earth, Metal, Wild, Silk, Pure**. C1 bosses may still be approachable on those staples. **C2 / C3 de-favor them** — punish Soft / Earth / Metal / Wild / Silk / Pure and/or favor tags outside this set (`17`). Do not rewrite this deck for that law.

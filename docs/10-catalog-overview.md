@@ -38,10 +38,11 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 ## Run structure (pointer)
 
 - Boss pools 3×3 → 27 paths: `17`
+- Shared boss-client / job pool: `28`
 - Missions before boss: `22`
 - Mission report + letter: `23`
 - App pseudocode: `21`
 
 ## ID conventions
 
-`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · `look_*`
+`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*`

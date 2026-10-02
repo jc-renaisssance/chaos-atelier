@@ -149,3 +149,38 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 
 - Phase-1 sequential multi-piece (`27` old: own stamina pool per piece; resolve N before starting N+1)
 - `20` old: multi-piece = N sessions; `stamina_start == 12` per piece; `cards_played` without zone target
+
+---
+
+# Jonathan stamp — 2026-10-02 (shared boss-client pool + chapter boss rewrite)
+
+## Locked (docs only)
+
+1. **Boss pool stays** — 3 bosses × 3 chapters → 27 paths. One boss drawn per chapter, announced via newspaper (`17`, `26`).
+2. **Shared adventurer / boss-client pool** — **not** a fixed client per boss. One pool for all bosses / chapters, organized by **job title**. Catalog: `28`.
+3. At the **boss beat**, seeded draw from that pool — **independent** of which boss was announced. That adventurer’s **order constructions** (`con_*`) + requirement tags are the craft brief; that adventurer **fights** the announced boss.
+4. Every job lists **order constructions** with concrete `con_*` from `12` (e.g. knight → `con_armor` + `con_gloves` / gauntlet). Multi-piece ≤4. Requirement tags stay.
+5. **Rewrite C1–C3 bosses** as big chapter threats (ids kept). **C2 / C3 de-favor** `own_basic` starter tags (Soft, Earth, Metal, Wild, Silk, Pure). C1 may still be approachable on those staples.
+6. Scrap Duelist / mid-chapter appointments stay **`appt_*`**. They are **not** the boss-client. Do not pin Scrap Duelist to reserved rounds or the boss beat.
+7. Harness: `boss_client_id` (`adv_*`), `boss_job_id` (`job_*`), `order_id` / `construction_ids` from the pool. Finish-only / multi-piece / StS craft **unchanged**.
+8. Portraits / UI / Client / Godot = **Later**. Docs only.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/28-boss-client-pool.md` | **Add** — shared pool law, 8 jobs, per-job order constructions |
+| `docs/17-chapter-bosses.md` | Rewrite threats; replace roster-Later with shared pool + starter-tag law |
+| `docs/03-clients-and-adventure.md` | Pointer to `28` |
+| `docs/22-chapter-schedule.md` | Boss beat = shared-pool draw + order constructions; appointments ≠ boss-client |
+| `docs/20-harness-stamp.md` | `boss_client_id` / `boss_job_id` / order-from-pool |
+| `docs/19-own-basic-starter.md` | One-liner: C2/C3 de-favor starter tags |
+| `docs/01-core-loop.md` · `27` · `26` · `10` | Pointers |
+| `docs/README.md` · `00-doc-categories.md` | Index `28` |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Boss-client **roster Later / do not invent catalog** (`17` / `20` / `22` / `STAMP` 2026-10-02 morning)
+- Fixed-client-per-boss reading of the boss beat
+- Scrap Duelist (or any appointment) as the boss-client

@@ -34,6 +34,8 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `chapter_id` | int | 1..3 |
 | `chapter_boss_id` | string | Announced at chapter start (`17`) |
 | `boss_pool_id` | string | Pool the boss was drawn from |
+| `boss_client_id` | string\|null | `adv_*` from the shared job pool (`28`). Required on `mission_kind=boss`; null otherwise |
+| `boss_job_id` | string\|null | matching `job_*` title (`28`). Required on `mission_kind=boss`; null otherwise |
 
 ### Schedule board
 
@@ -51,14 +53,14 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 **Lock:** `crafts_done_this_chapter` / `crafts_max=4` counts **pieces** (each construction in a multi-piece order), not whole orders. Example: armor + gloves = 2 of 4. Multi-piece still increments **per piece** after the **one** Finish — not +1 per order.
 
-`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `round_action` on `phase=schedule`. Travel events are `round_action=wagon_event`. Boss beat: craft **for the boss-client** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **client** fights, not the player (`17`).
+`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `round_action` on `phase=schedule`. Travel events are `round_action=wagon_event`. Boss beat: draw from the **shared job pool** (`28`), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`).
 
 ### Mission (when `phase=craft` or `phase=boss`)
 
 | Field | Type | Notes |
 |---|---|---|
 | `mission_kind` | enum\|null | `order` \| `event` \| `boss` \| `prep` — null on pure schedule / newspaper stamps |
-| `order_id` | string\|null | Client / appointment / walk-in / prep / **boss-client** order |
+| `order_id` | string\|null | Client / appointment / walk-in / prep / **boss-client** order (`ord_*` from `28` on the boss beat) |
 | `threat_id` | string\|null | Client or event or boss threat key |
 | `construction_ids` | string[] | Order-fixed list (`con_*`); **not** player-picked |
 | `construction_id` | string\|null | Current piece = `construction_ids[piece_index-1]` |
@@ -66,7 +68,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 Prep (`mission_kind=prep`) still runs the resolver on finish; mission-sim fields may be null (ready-rack, no live client). Walk-in / appointment enter craft as `order`. Wagon event that does not enter craft stays `phase=schedule` with session fields null.
 
-**Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `order_id` = the **boss-client's order**; `threat_id` = announced `chapter_boss_id`; `construction_ids` from that order. Sim uses **that client's gear**. Boss-client roster / ids = **Later** — do not invent catalog this stamp. No extra Client UI widgets this stamp.
+**Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `boss_client_id` = `adv_*` drawn from the **shared job pool** (`28`); `boss_job_id` = matching `job_*`; `order_id` = that job’s `ord_*`; `construction_ids` = that job’s **order constructions** (listed `con_*`, in sequence — e.g. knight = `con_armor`, `con_gloves`); `threat_id` = announced `chapter_boss_id`. Draw is **independent** of which boss was announced. Sim uses **that client's gear**. `boss_client_id` is **never** an `appt_*` (Scrap Duelist and other appointments stay on the schedule board). Finish-only / multi-piece / StS craft **unchanged**. Portraits / extra Client UI widgets = **Later**.
 
 ### Stamina craft session (when `phase=craft`)
 
@@ -167,6 +169,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 20. Mid death (`hp_remaining ≤ 0`, not `cant_craft`) → large −reps (`−3 * card_difficulty` per `25`).
 21. Always `apply_reps` after an order mission (including `cant_craft`).
 22. Newspaper fields set when the beat applies (`26`): chapter start → `boss_announce`; mid fail → `mid_fail`; chapter end / run over as listed.
+23. On `mission_kind=boss`: `boss_client_id` is an `adv_*` from [28](28-boss-client-pool.md); `boss_job_id` matches that row; `construction_ids` equals that job’s **order constructions** (listed `con_*`, in sequence); `threat_id == chapter_boss_id`; `boss_client_id` is never an `appt_*`. Draw is independent of `chapter_boss_id`.
 
 ## Superseded
 
@@ -192,6 +195,6 @@ Overall adventure **trend** vs the announced boss — not every matrix cell non-
 
 ## Pointers
 
-- Live: [22-chapter-schedule](22-chapter-schedule.md) · [27-craft-mode-stamina](27-craft-mode-stamina.md)
+- Live: [22-chapter-schedule](22-chapter-schedule.md) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [17-chapter-bosses](17-chapter-bosses.md)
 - Resolver / report: [23-mission-report](23-mission-report.md) · [24-win-conditions](24-win-conditions.md) · [25-reps-meter](25-reps-meter.md) · [26-newspaper](26-newspaper.md) · [14-synergies](14-synergies.md) (RETUNE merged)
 - Legacy (not live): [22-chapter-flow](22-chapter-flow.md) · [12b-craft-slots](12b-craft-slots.md)
