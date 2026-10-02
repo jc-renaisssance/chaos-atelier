@@ -1,6 +1,6 @@
 # Materials dictionary
 
-Layer 1 — **Material**. Cards in the deck. A craft may spend **multiple** material cards into one construction (see `material_slots` on constructions).
+Layer 1 — **Material**. **Durable** cards in the deck. A craft may play **multiple** materials into one construction — play spends **stamina only**; the card stays in hand / stock ([27](27-craft-mode-stamina.md)). `material_slots` is legacy slot-fill.
 
 Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare · **5** forbidden.
 
@@ -80,10 +80,10 @@ Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare �
 
 ## Multi-stack rules
 
-- Materials are **cards**. You may spend several into one craft up to the construction’s `material_slots`.
+- Materials are **durable cards**. Play several into one craft (stamina only; no hard slot cap in live craft — `material_slots` is legacy).
 - **Same id may repeat** (Armor + Stone Shard ×3 is valid).
 - Stats and tags **sum / bag-count** — three Stone Shards = Earth×3 and Metal×3 from materials alone.
-- Deck removes spent cards until shop / rewards return them.
+- Play does **not** remove the card from hand or stock. Shop sell / explicit loss still change stock. Round-generated **consumables** (Later, distinct type — [27](27-craft-mode-stamina.md)) **burn** on use; do not treat materials as burn cards.
 
 ## Draft shop rules
 
