@@ -1,6 +1,10 @@
 extends Node
 ## Live travelling-atelier session. Schedule board only (docs/22). No craft loop.
 
+signal board_changed
+signal resolve_started(payload: Dictionary)
+signal chapter_finished
+
 ## docs/22 −reps on decline; docs/25 gate numbers still track the old 3-round shell.
 const DECLINE_REPS_STUB := -1
 
@@ -16,10 +20,6 @@ var resolve_open: bool = false
 var declined_this_round: bool = false
 var reps: int = GameConstants.REPS_START
 var last_note: String = ""
-
-signal board_changed
-signal resolve_started(payload: Dictionary)
-signal chapter_finished
 
 
 func _ready() -> void:
