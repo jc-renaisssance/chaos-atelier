@@ -21,7 +21,7 @@ Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
 | [14-synergies-RETUNE](14-synergies-RETUNE.md) | Stamp source for threshold retune (applied into `14`) |
 | [15-outlook-gen-list](15-outlook-gen-list.md) | Outlook gens |
 | [16-shop-owners](16-shop-owners.md) | Owners |
-| [17-chapter-bosses](17-chapter-bosses.md) | Boss pools (C1 diverse) |
+| [17-chapter-bosses](17-chapter-bosses.md) | Boss pools (C1 diverse; C2/C3 de-favor starter tags) |
 | [18-rarity](18-rarity.md) | Rarity |
 | [19-own-basic-starter](19-own-basic-starter.md) | Starter |
 | [20-harness-stamp](20-harness-stamp.md) | Stamps — schedule + stamina assert list (Szayelaporro / 1B) |
@@ -33,5 +33,6 @@ Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
 | [25-reps-meter](25-reps-meter.md) | Trust / reps gate |
 | [26-newspaper](26-newspaper.md) | Kingdom newspaper |
 | [27-craft-mode-stamina](27-craft-mode-stamina.md) | **Live craft UX** — stamina hand game |
+| [28-boss-client-pool](28-boss-client-pool.md) | **Shared boss-client pool** — job titles + order constructions |
 | [STAMP](STAMP.md) | Jonathan 2026-09-28 drop |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | Plan |

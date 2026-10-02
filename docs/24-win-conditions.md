@@ -35,4 +35,4 @@ Win = clear C1–C3 bosses. `run_over` = boss death or reps gate miss.
 
 ## Pointers
 
-`25` reps · `26` newspaper · `22` round picks · `23` report · `20` stamps
+`25` reps · `26` newspaper · `22` round picks · `23` report · `20` stamps · `17` bosses · `28` boss-client pool

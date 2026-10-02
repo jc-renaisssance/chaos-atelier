@@ -8,7 +8,7 @@ The newspaper is how the kingdom hears about your shop — not a separate meta s
 
 | Moment | Newspaper beat |
 |---|---|
-| **Chapter start** | Boss **announcement** (drawn from chapter pool) — front page threat |
+| **Chapter start** | Boss **announcement** (drawn from chapter pool) — front page threat. Does **not** announce the boss-client; that draw is at the boss beat (`28`) |
 | **Mid-mission fail** | Scandal / flop **headline** (rating D/F or death) |
 | **Mid-mission clear S/A** | Optional praise blurb (Later; Phase-1 can skip) |
 | **Chapter end** | Chapter **result** — boss clear, reps gate miss, or boss death |
