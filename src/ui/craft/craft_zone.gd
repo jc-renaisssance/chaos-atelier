@@ -29,6 +29,7 @@ func _ready() -> void:
 	if _title != null:
 		return
 	var box := VBoxContainer.new()
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_theme_constant_override("separation", 6)
 	add_child(box)
 	_title = _label("Zone", 13, GOLD)
