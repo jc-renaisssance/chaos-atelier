@@ -28,6 +28,16 @@ Jonathan lock (2026-09-22): each chapter has a **boss pool** of 3. At chapter st
 | `boss_ivory_judge` | Ivory Judge | Royal, Pure, Metal | Occult, Sticky | Pure, Royal, Metal | Hearing hall |
 | `boss_sunspear_captain` | Sunspear Captain | Solar, Sharp, Metal | Silent, Soft | Solar, Sharp, Metal, Royal | Parade yard |
 
+## Boss-client (Jonathan 2026-10-02)
+
+There is a **client responsible for the boss event**. The player crafts **for that client**. The **client fights** the announced boss — the player is the clothier, not the fighter.
+
+- Craft order targets the **boss-client**; constructions come from that order (`27`).
+- Boss sim (`20` `mission_kind=boss`) uses **that client's gear**.
+- Boss-client roster / portraits / UI widgets = **Later**. Do not invent catalog ids this stamp.
+
+Harness: `chapter_boss_id` + boss-client via `order_id` on the boss beat (`20`).
+
 ## Draw + announce
 
 ```
