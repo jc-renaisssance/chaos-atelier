@@ -47,6 +47,7 @@ def check_source_symbols(blob: str) -> None:
         "class_name CraftTable",
         "class_name CraftRules",
         "class_name CraftResolver",
+        "class_name CraftReadout",
         "class_name CraftCatalog",
         "class_name WagonStock",
         "func play_hand",
@@ -54,6 +55,11 @@ def check_source_symbols(blob: str) -> None:
         "func finish_early",
         "func count_finished_piece",
         "func apply_piece_session",
+        "func burns_on_play",
+        "unlocked_outlooks",
+        "LOCKED_LABEL",
+        "CURRENT",
+        "POTENTIAL",
         "DIG_REFRESH_COST",
         "STAMINA_START",
         "sk_next_mat_free",
@@ -78,6 +84,15 @@ def check_source_symbols(blob: str) -> None:
             fail(f"superseded token present: {token}")
     if "construction picker" not in blob.lower() and "not a hand card" not in blob:
         fail("UI/source should say construction is not a hand card")
+    enums = (SRC / "data" / "game_enums.gd").read_text(encoding="utf-8")
+    if re.search(r"enum HandCardType\s*\{[^}]*CONSUMABLE", enums, re.S):
+        fail("consumable is Later — do not add it to the stamp type enum")
+    rules = (SRC / "craft" / "craft_rules.gd").read_text(encoding="utf-8")
+    if "if burns_on_play(card.type):" not in rules:
+        fail("play must keep materials; only burns_on_play types leave the hand")
+    readout = (SRC / "ui" / "craft" / "craft_table.gd").read_text(encoding="utf-8")
+    if "CraftReadout.preview" not in readout or "_refresh_readout" not in readout:
+        fail("craft table must live-refresh Current / Potential from CraftReadout")
 
 
 def check_gd_balance() -> None:
@@ -110,6 +125,7 @@ CATALOG = {
     "mat_iron_scrap": {"dollar": 1, "type": "material", "tags": ["Metal"], "stats": {"HP": 1, "DEF": 1}},
     "mat_stone_shard": {"dollar": 2, "type": "material", "tags": ["Earth", "Metal"], "stats": {"HP": 2, "DEF": 2}},
     "sk_next_mat_free": {"dollar": 0, "type": "skill", "tags": [], "stats": {}},
+    "oil_round": {"dollar": 1, "type": "consumable", "tags": [], "stats": {}},
 }
 CONS = {
     "con_armor": {"tags": ["Metal"]},
@@ -142,16 +158,20 @@ class Session:
             return SKILL_COST[card_id]
         if row["type"] == "rune":
             return ENC_COST
+        if row["type"] == "consumable":
+            return 1
         if self.next_mat_free:
             return 0
         return MAT_COST[row["dollar"]]
 
     def play(self, index: int) -> None:
         assert self.finish_reason is None
-        card_id = self.hand.pop(index)
+        card_id = self.hand[index]
         cost = self.play_cost(card_id)
         assert cost <= self.stamina_remaining
         kind = CATALOG[card_id]["type"]
+        if burns_on_play(kind):
+            self.hand.pop(index)
         if kind == "material" and self.next_mat_free:
             self.next_mat_free = False
         self.stamina_remaining -= cost
@@ -179,6 +199,22 @@ class Session:
         assert self.finish_reason is None
         self.early_finish = True
         self.finish_reason = "early_finish"
+
+
+def burns_on_play(kind: str) -> bool:
+    ## Materials are durable. Consumable (Later) burns if/when that type exists.
+    return kind != "material"
+
+
+def potential_label(outlook_id: str, unlocked: set[str]) -> str:
+    if outlook_id == "plain" or outlook_id in unlocked:
+        return "plain" if outlook_id == "plain" else outlook_id
+    return "locked"
+
+
+def current_stats_line(session: Session) -> str:
+    bag = tag_counts(session)
+    return "tags " + ",".join(f"{k}x{bag[k]}" for k in sorted(bag))
 
 
 def draw(stock: list[str], n: int) -> list[str]:
@@ -223,13 +259,27 @@ def run_spec() -> None:
     if s1.stamina_remaining != 12:
         fail("stamina_start should be 12")
 
-    # play first hemp (cost 1)
+    # play first hemp (cost 1) — durable: card stays, stock unchanged
+    stock_before = list(stock)
     hemp_i = s1.hand.index("mat_hemp_plain")
+    hemp_copies = s1.hand.count("mat_hemp_plain")
     s1.play(hemp_i)
     if s1.stamina_remaining != 11 or s1.stamina_spent != 1:
         fail(f"hemp play should spend 1, got rem={s1.stamina_remaining} spent={s1.stamina_spent}")
+    if s1.hand.count("mat_hemp_plain") != hemp_copies:
+        fail("material play must leave the card in hand (durable, stamina only)")
+    if stock != stock_before:
+        fail("material play must not decrement stock / inventory")
     if any(c["id"].startswith("con_") for c in s1.cards_played):
         fail("construction cards are illegal in cards_played")
+    if current_stats_line(s1).find("Soft") < 0:
+        fail("Current readout must include tags from materials played so far")
+    if potential_label("syn_metal_3", {"plain"}) != "locked":
+        fail("Potential must hide an unlocked-unknown outlook as locked")
+    if potential_label("plain", {"plain"}) != "plain":
+        fail("plain outlook is always unlocked")
+    if potential_label("syn_metal_3", {"plain", "syn_metal_3"}) != "syn_metal_3":
+        fail("Potential shows outlook identity only after unlock")
 
     # silk costs 2
     if "mat_silk_pale" in s1.hand:
@@ -308,6 +358,26 @@ def run_spec() -> None:
     if MAT_COST[4] != 3:
         fail("rare mat play cost must be 3")
 
+    # Durable monostack + skill/consumable burn path (consumable type is Later / not in stamp enum)
+    s5 = Session("con_armor", 1, 1)
+    s5.hand = ["mat_iron_scrap", "sk_next_mat_free", "oil_round"]
+    s5.play(0)
+    s5.play(0)
+    if [c["id"] for c in s5.cards_played] != ["mat_iron_scrap", "mat_iron_scrap"]:
+        fail("same durable material may be played again (stamina only)")
+    if s5.hand[0] != "mat_iron_scrap":
+        fail("replayed material must still be in hand")
+    s5.play(1)
+    if "sk_next_mat_free" in s5.hand:
+        fail("skill leaves the hand (not durable stock)")
+    if "oil_round" not in s5.hand:
+        fail("consumable should still be in hand before its play")
+    s5.play(s5.hand.index("oil_round"))
+    if "oil_round" in s5.hand:
+        fail("consumable burns on use when that type exists")
+    if not burns_on_play("consumable") or burns_on_play("material"):
+        fail("burn path: consumable burns; material never burns")
+
 
 def main() -> int:
     blob = src_text()
@@ -321,7 +391,7 @@ def main() -> int:
             print(" -", item)
         return 1
     print("OK stamina craft source + spec (docs/27, docs/20)")
-    print("Godot 4.7 project features set; editor was not opened.")
+    print("Durable materials + Current/Potential readout checked. Godot editor was not opened.")
     return 0
 
 

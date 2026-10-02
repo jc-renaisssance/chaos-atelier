@@ -28,6 +28,7 @@ enum MissionKind {
 }
 
 ## Hand / cards_played only. Construction is order-fixed — never a card type.
+## Consumable is Later (round-generated, burns on use) — not in this stamp enum.
 enum HandCardType {
 	MATERIAL,
 	RUNE,
