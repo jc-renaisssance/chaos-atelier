@@ -7,7 +7,8 @@ extends RefCounted
 ## Consumable (Later / not in the stamp type enum) burns instead of discarding.
 ## No auto-refill. Construction is not a card.
 ## Stamina 0 ≠ finish (docs/20 assert 14): play / dig never auto-craft.
-## Only Finish (player click) ends the piece — finish_reason: player_finish.
+## Only Finish (player click) ends the session — finish_reason: player_finish.
+## A play must target a zone (docs/27). Dig is session-wide.
 
 static func opening_draw(
 	session: CraftStaminaSession,
@@ -37,10 +38,18 @@ static func return_run_deck(session: CraftStaminaSession, stock: WagonStock) -> 
 	session.discard_pile.clear()
 
 
-static func can_play(session: CraftStaminaSession, hand_index: int, next_mat_free: bool) -> bool:
+static func can_play(
+	session: CraftStaminaSession,
+	hand_index: int,
+	next_mat_free: bool,
+	zone_index: int = 0
+) -> bool:
 	if session == null or session.is_finished():
 		return false
 	if hand_index < 0 or hand_index >= session.hand.size():
+		return false
+	var target := zone_index if zone_index > 0 else session.selected_zone_index
+	if not session.is_legal_zone(target):
 		return false
 	var cost := CraftCatalog.play_cost(session.hand[hand_index], next_mat_free)
 	return cost <= session.stamina_remaining
@@ -67,9 +76,13 @@ static func burns_on_play(type: GameEnums.HandCardType) -> bool:
 static func play(
 	session: CraftStaminaSession,
 	hand_index: int,
-	next_mat_free: bool
+	next_mat_free: bool,
+	zone_index: int = 0
 ) -> Dictionary:
-	if not can_play(session, hand_index, next_mat_free):
+	if session == null:
+		return {"ok": false, "next_mat_free": next_mat_free}
+	var target := zone_index if zone_index > 0 else session.selected_zone_index
+	if not can_play(session, hand_index, next_mat_free, target):
 		return {"ok": false, "next_mat_free": next_mat_free}
 	var card: HandCard = session.hand[hand_index]
 	var cost := CraftCatalog.play_cost(card, next_mat_free)
@@ -78,10 +91,13 @@ static func play(
 	if not burned:
 		session.discard_pile.append(card)
 	_spend(session, cost)
+	session.focus_zone(target)
 	var played := PlayedCard.new()
 	played.id = card.id
 	played.type = card.type
 	played.cost = cost
+	played.zone_index = target
+	played.construction_id = session.construction_id_for_zone(target)
 	session.cards_played.append(played)
 	var flag := next_mat_free
 	if card.type == GameEnums.HandCardType.MATERIAL and next_mat_free:

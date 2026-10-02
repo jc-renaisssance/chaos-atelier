@@ -195,6 +195,7 @@ func to_dict() -> Dictionary:
 	else:
 		dump["piece_index"] = null
 		dump["piece_count"] = null
+		dump["zone_count"] = null
 		dump["stamina_start"] = null
 		dump["stamina_remaining"] = null
 		dump["stamina_spent"] = null

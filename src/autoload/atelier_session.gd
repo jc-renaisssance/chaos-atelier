@@ -30,11 +30,11 @@ var stock: WagonStock = WagonStock.new()
 var craft_order: ClientOrder
 var craft_session: CraftStaminaSession
 var craft_open: bool = false
-var awaiting_next_piece: bool = false
 var order_craft_done: bool = false
 var next_mat_free: bool = false
 var last_piece_result: Dictionary = {}
 var piece_results: Array = []
+var piece_stamps: Array = []
 var chapter_piece_results: Array = []
 var last_mission: Dictionary = {}
 
@@ -108,11 +108,11 @@ func _reset_craft_state() -> void:
 	craft_order = null
 	craft_session = null
 	craft_open = false
-	awaiting_next_piece = false
 	order_craft_done = false
 	next_mat_free = false
 	last_piece_result = {}
 	piece_results.clear()
+	piece_stamps.clear()
 
 
 func legal_actions() -> Array[GameEnums.RoundAction]:
@@ -193,64 +193,88 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 func _begin_craft(order: ClientOrder) -> bool:
 	if order == null or order.piece_count() < 1:
 		return false
+	if order.piece_count() > GameConstants.ZONE_COUNT_MAX:
+		last_note = "Order lists more than 4 constructions — Later / split. No fifth zone."
+		return false
 	if board == null or not board.can_open_piece():
 		_emit_cant_craft(order)
 		return false
 	craft_order = order
 	pending_order = order
 	piece_results.clear()
+	piece_stamps.clear()
 	last_piece_result = {}
-	awaiting_next_piece = false
 	order_craft_done = false
 	next_mat_free = false
 	craft_open = true
 	resolve_open = false
-	_open_piece(1)
+	_open_session()
 	craft_started.emit()
 	board_changed.emit()
 	return true
 
 
-func _open_piece(piece_index: int) -> void:
+func _open_session() -> void:
 	next_mat_free = false
-	awaiting_next_piece = false
-	craft_session = craft_order.open_piece_session(piece_index)
+	craft_session = craft_order.open_session()
 	CraftRules.opening_draw(craft_session, stock, rng)
 	last_stamp = _make_craft_stamp()
+	var names: PackedStringArray = PackedStringArray()
+	for con_id in craft_session.construction_ids:
+		names.append(CraftCatalog.construction_name(con_id))
 	last_note = (
-		"Sewing piece %d / %d — %s (order-fixed, not a hand card)."
+		"One session · %d zone(s) · stamina %d (12×%d). Listed: %s. Play must target a zone."
 		% [
-			craft_session.piece_index,
+			craft_session.zone_count,
+			craft_session.stamina_start,
 			craft_session.piece_count,
-			CraftCatalog.construction_name(craft_session.construction_id),
+			", ".join(names),
 		]
 	)
 	craft_changed.emit()
 
 
-func play_hand(hand_index: int) -> bool:
-	if not craft_open or craft_session == null or awaiting_next_piece or order_craft_done:
+func select_zone(zone_index: int) -> bool:
+	if not craft_open or craft_session == null or order_craft_done:
 		return false
-	var out := CraftRules.play(craft_session, hand_index, next_mat_free)
+	if not craft_session.focus_zone(zone_index):
+		return false
+	last_stamp = _make_craft_stamp()
+	last_note = (
+		"Selected zone %d — %s. 1–5 plays into this zone. Drag also targets a zone."
+		% [zone_index, CraftCatalog.construction_name(craft_session.construction_id)]
+	)
+	craft_changed.emit()
+	return true
+
+
+func play_hand(hand_index: int, zone_index: int = 0) -> bool:
+	if not craft_open or craft_session == null or order_craft_done:
+		return false
+	var target := zone_index if zone_index > 0 else craft_session.selected_zone_index
+	if not craft_session.is_legal_zone(target):
+		return false
+	var out := CraftRules.play(craft_session, hand_index, next_mat_free, target)
 	if not bool(out.get("ok", false)):
 		return false
 	next_mat_free = bool(out.get("next_mat_free", false))
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
-		_resolve_current_piece()
+		_resolve_session()
 	else:
 		last_note = (
-			"Played into the piece — card left the hand to discard. "
+			"Played into zone %d — card left the hand to discard. "
+			% target
 			+ "Hand does not refill — dig dumps remaining cards, then draws. "
-			+ "Stamina 0 keeps the piece open until Finish."
+			+ "Stamina 0 keeps the session open until Finish."
 		)
 		craft_changed.emit()
 	return true
 
 
 func dig() -> bool:
-	if not craft_open or craft_session == null or awaiting_next_piece or order_craft_done:
+	if not craft_open or craft_session == null or order_craft_done:
 		return false
 	var out := CraftRules.dig(craft_session, stock, rng)
 	if not bool(out.get("ok", false)):
@@ -258,10 +282,10 @@ func dig() -> bool:
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
-		_resolve_current_piece()
+		_resolve_session()
 	else:
 		last_note = (
-			"Dug (−%d). Remaining hand to discard; drew a new hand (reshuffle if draw was short). Stamina 0 keeps the piece open until Finish."
+			"Dug (−%d, session-wide). Remaining hand to discard; drew a new hand (reshuffle if draw was short). Stamina 0 keeps the session open until Finish."
 			% GameConstants.DIG_REFRESH_COST
 		)
 		craft_changed.emit()
@@ -270,62 +294,53 @@ func dig() -> bool:
 
 func finish_early() -> bool:
 	## Explicit Finish — the only Phase-1 legal craft end (player_finish).
-	if not craft_open or craft_session == null or awaiting_next_piece or order_craft_done:
+	## One click ends the whole session and resolves listed pieces in order.
+	if not craft_open or craft_session == null or order_craft_done:
 		return false
 	if not CraftRules.early_finish(craft_session):
 		return false
-	last_stamp = _make_craft_stamp()
-	_resolve_current_piece()
+	_resolve_session()
 	return true
 
 
-func _resolve_current_piece() -> void:
+func _resolve_session() -> void:
 	CraftRules.return_run_deck(craft_session, stock)
-	var craft := CraftResolver.resolve(craft_session, craft_session.construction_id)
-	var result := MissionResolver.grade_piece(craft, craft_order)
-	var counted := board.count_finished_piece()
-	result["crafts_counted"] = counted
-	result["crafts_done"] = board.crafts_done
-	last_piece_result = result
-	piece_results.append(result)
-	_unlock_outlook(String(result.get("outlook_id", "plain")))
-	if counted:
-		chapter_piece_results.append(result)
-	last_stamp = _make_craft_stamp(result)
-	var more := (
-		craft_session.piece_index < craft_session.piece_count
-		and board.can_open_piece()
+	piece_results.clear()
+	piece_stamps.clear()
+	var keep_zone := craft_session.selected_zone_index
+	var n := craft_session.zone_count
+	for i in range(1, n + 1):
+		craft_session.focus_zone(i)
+		var craft := CraftResolver.resolve(craft_session, craft_session.construction_id, i)
+		var result := MissionResolver.grade_piece(craft, craft_order)
+		var counted := board.count_finished_piece()
+		result["crafts_counted"] = counted
+		result["crafts_done"] = board.crafts_done
+		result["piece_index"] = i
+		result["zone_index"] = i
+		result["construction_id"] = craft_session.construction_id
+		last_piece_result = result
+		piece_results.append(result)
+		_unlock_outlook(String(result.get("outlook_id", "plain")))
+		if counted:
+			chapter_piece_results.append(result)
+		var stamp := _make_craft_stamp(result)
+		piece_stamps.append(stamp.to_dict())
+		last_stamp = stamp
+		piece_finished.emit(result)
+	if craft_session.is_legal_zone(keep_zone):
+		craft_session.focus_zone(keep_zone)
+	order_craft_done = true
+	last_note = (
+		"Session finished (player_finish). %d piece(s) stamped in listed order. crafts_done=%d / %d."
+		% [piece_results.size(), board.crafts_done, board.crafts_max]
 	)
-	if more:
-		awaiting_next_piece = true
-		last_note = (
-			"Piece %d finished (%s). rating %s · cleared %s. crafts_done=%d / %d (pieces, not orders)."
-			% [
-				craft_session.piece_index,
-				GameEnums.finish_reason_wire(craft_session.finish_reason),
-				GameEnums.rating_wire(result.get("rating", GameEnums.Rating.NONE)),
-				str(bool(result.get("cleared", false))),
-				board.crafts_done,
-				board.crafts_max,
-			]
-		)
-	else:
-		awaiting_next_piece = false
-		order_craft_done = true
-		last_note = (
-			"Order sewn. %d piece(s). crafts_done=%d / %d. Mission result next."
-			% [piece_results.size(), board.crafts_done, board.crafts_max]
-		)
-	piece_finished.emit(result)
 	craft_changed.emit()
 	board_changed.emit()
 
 
 func continue_after_piece() -> void:
 	if not craft_open:
-		return
-	if awaiting_next_piece and craft_session != null and craft_order != null:
-		_open_piece(craft_session.piece_index + 1)
 		return
 	if order_craft_done:
 		_return_to_schedule()
@@ -343,7 +358,6 @@ func _return_to_schedule() -> void:
 			last_headline_id = GameConstants.HEADLINE_MID_FAIL
 	last_resolve = ScheduleRules.build_mission_return(craft_order, mission, piece_results)
 	craft_open = false
-	awaiting_next_piece = false
 	order_craft_done = false
 	craft_session = null
 	resolve_open = true

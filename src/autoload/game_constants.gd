@@ -17,10 +17,11 @@ const APPOINTMENT_PIN_ROUND_MIN := 1
 const APPOINTMENT_PIN_ROUND_MAX := 6 ## last 2 rounds (7–8) cannot take pins
 const PRIMARY_ACTIONS_PER_ROUND := 1
 
-## docs/27 — stamina craft (replaces 2m1r). Per-piece session knobs.
-const STAMINA_START := 12
+## docs/27 — stamina craft (replaces 2m1r). One session pool: start = 12 * N.
+const STAMINA_START := 12 ## per-piece base; session stamina_start = 12 * piece_count
+const ZONE_COUNT_MAX := 4 ## unused zones hidden if N < 4; N > 4 = Later / split
 const HAND_SIZE := 5
-const DIG_REFRESH_COST := 2
+const DIG_REFRESH_COST := 2 ## session-wide, not × N
 const MAT_PLAY_COST_COMMON := 1
 const MAT_PLAY_COST_UNCOMMON := 2
 const MAT_PLAY_COST_RARE := 3
@@ -88,6 +89,14 @@ static func is_reserved_final_round(round_index: int) -> bool:
 
 static func is_schedule_round(round_index: int) -> bool:
 	return round_index >= 1 and round_index <= CHAPTER_ROUND_COUNT
+
+
+static func session_stamina_start(piece_count: int) -> int:
+	return STAMINA_START * maxi(1, piece_count)
+
+
+static func is_legal_zone_count(zone_count: int) -> bool:
+	return zone_count >= 1 and zone_count <= ZONE_COUNT_MAX
 
 
 static func material_play_cost(rarity: GameEnums.CraftRarity) -> int:
