@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CraftPlayCosts" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/data/craft/craft_play_costs.gd" id="1_costs"]
+
+[resource]
+script = ExtResource("1_costs")
+stamina_start = 12
+hand_size = 5
+dig_refresh_cost = 2
+common_mat = 1
+uncommon_mat = 2
+rare_mat = 3
+enchantment = 2
+auto_refill = false

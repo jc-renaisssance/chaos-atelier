@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SynergyThresholds" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/data/synergy/synergy_thresholds.gd" id="1_syn"]
+
+[resource]
+script = ExtResource("1_syn")
+tier_1 = 3
+tier_2 = 5
+apex = 8
+apex_tags = PackedStringArray("Fire", "Metal", "Earth")
+cross_tag_min = 1
