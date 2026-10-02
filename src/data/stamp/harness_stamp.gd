@@ -119,7 +119,15 @@ func apply_resolver(result: Dictionary) -> void:
 	cleared = bool(result.get("cleared", false))
 	mission_failed = bool(result.get("mission_failed", false))
 	outcome = result.get("outcome", GameEnums.Outcome.NONE)
+	favor_tags_hit = PackedStringArray(result.get("favor_tags_hit", PackedStringArray()))
+	punish_tags_hit = PackedStringArray(result.get("punish_tags_hit", PackedStringArray()))
 	cant_craft = bool(result.get("cant_craft", false))
+	if result.has("letter_id"):
+		letter_id = String(result.get("letter_id", ""))
+	if result.has("run_over"):
+		run_over = bool(result.get("run_over", false))
+	if result.has("run_over_reason"):
+		run_over_reason = result.get("run_over_reason", GameEnums.RunOverReason.NONE)
 
 
 func _null_int(value: int) -> Variant:
@@ -268,4 +276,15 @@ func schema_errors() -> PackedStringArray:
 		var expect_clear := hp_ok and GameEnums.rating_clears(rating)
 		if cleared != expect_clear and hp_remaining != GameConstants.NULL_FLOAT:
 			errs.append("cleared != (hp_remaining > 0 ∧ rating ∈ S,A,B,C)")
+	if cant_craft:
+		if rating != GameEnums.Rating.F:
+			errs.append("cant_craft must be rating F")
+		if hp_remaining <= 0.0:
+			errs.append("cant_craft must keep hp_remaining > 0")
+		if damage_aid_pct != 0 and damage_aid_pct != GameConstants.NULL_INT:
+			errs.append("cant_craft must have damage_aid_pct 0")
+		if cleared:
+			errs.append("cant_craft must not clear")
+	if run_over and run_over_reason == GameEnums.RunOverReason.NONE:
+		errs.append("run_over without run_over_reason")
 	return errs

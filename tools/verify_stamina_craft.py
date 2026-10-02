@@ -35,6 +35,11 @@ def check_project_godot() -> None:
         fail("project.godot still mentions 4.3")
     if "config_version=5" not in text:
         fail("project.godot config_version=5 (file format) missing")
+    blob = src_text()
+    if re.search(r"^class_name GameConstants\b", blob, re.M):
+        fail("class_name GameConstants hides the autoload singleton in Godot 4.7")
+    if re.search(r"Color\.html\s*\(", blob):
+        fail("Color.html(...) is not a constant expression in Godot 4.7")
 
 
 def check_source_symbols(blob: str) -> None:

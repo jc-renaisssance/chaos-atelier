@@ -172,53 +172,153 @@ static func build_resolve(
 	}
 
 
-static func build_craft_return(order: ClientOrder, piece_results: Array) -> Dictionary:
+static func build_mission_return(order: ClientOrder, mission: Dictionary, piece_results: Array) -> Dictionary:
 	var cons := PackedStringArray()
 	if order != null:
 		cons = order.construction_ids
 	var lines: PackedStringArray = PackedStringArray()
+	var kind := GameEnums.mission_kind_wire(order.mission_kind) if order != null else null
+	var rating = mission.get("rating", GameEnums.Rating.NONE)
+	var cleared := bool(mission.get("cleared", false))
+	var hp := float(mission.get("hp_remaining", 0.0))
+	var aid := int(mission.get("damage_aid_pct", 0))
+	var stars := int(mission.get("skill_effectiveness", 1))
 	lines.append(
-		"Stamina craft finished. crafts_done counts pieces (docs/20): %d piece stamp(s)."
+		"Mission result (docs/23, 24): rating %s · cleared %s · hp %s · aid %d%% · ★%d."
+		% [GameEnums.rating_wire(rating), str(cleared), _hp_text(hp), aid, stars]
+	)
+	lines.append(
+		"Gate: cleared = (hp > 0) ∧ rating ∈ {S,A,B,C}. %d piece stamp(s); crafts_done counts pieces."
 		% piece_results.size()
 	)
+	if bool(mission.get("cant_craft", false)):
+		lines.append("cant_craft — F, hp>0, aid 0. Normal fail reps, not death Δ.")
+	elif not cleared:
+		if hp <= 0.0:
+			lines.append("Mid death — large −reps. Chapter continues (newspaper mid_fail chrome).")
+		else:
+			lines.append("Mid-fail — chapter continues. Newspaper mid_fail chrome (copy Later).")
+	if kind == "prep":
+		lines.append("Prep rack — resolver ran; no live client. Reps not applied.")
 	var i := 0
 	for result in piece_results:
 		i += 1
 		var rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
-		var rating = result.get("rating", GameEnums.Rating.NONE)
+		var piece_rating = result.get("rating", GameEnums.Rating.NONE)
 		var outlook := String(result.get("outlook_id", "plain"))
 		lines.append(
-			"Piece %d · rarity %s · rating %s · look %s · mission stub (no full sim)."
-			% [i, GameEnums.craft_rarity_wire(rarity), GameEnums.rating_wire(rating), outlook]
+			"Piece %d · rarity %s · rating %s · look %s."
+			% [i, GameEnums.craft_rarity_wire(rarity), GameEnums.rating_wire(piece_rating), outlook]
 		)
 	return {
 		"resolve_class": RESOLVE_ORDER,
 		"round_action": null,
-		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
-		"title": "Craft closed",
+		"mission_kind": kind,
+		"title": "Mission — %s" % GameEnums.rating_wire(rating),
 		"body": "\n".join(lines),
-		"stub": "craft_done",
+		"stub": "",
 		"order_id": order.order_id if order != null else "",
 		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
 		"construction_ids": Array(cons),
 		"piece_count": piece_results.size(),
+		"cleared": cleared,
+		"rating": GameEnums.rating_wire(rating),
 	}
 
 
-static func build_cant_craft(order: ClientOrder) -> Dictionary:
+static func build_cant_craft(order: ClientOrder, mission: Dictionary = {}) -> Dictionary:
+	var rating = mission.get("rating", GameEnums.Rating.F)
+	var hp := float(mission.get("hp_remaining", 1.0))
 	return {
 		"resolve_class": RESOLVE_ORDER,
 		"round_action": null,
 		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
-		"title": "cant_craft",
+		"title": "cant_craft — F",
 		"body": (
 			"Could not open a legal craft session (crafts_done already at crafts_max=4). "
-			+ "No stamina session. crafts_done does not increment. Mission stub rating F."
+			+ "No stamina session. crafts_done does not increment. "
+			+ "rating %s · hp %s · aid 0 · cleared false (docs/24)."
+			% [GameEnums.rating_wire(rating), _hp_text(hp)]
 		),
-		"stub": "cant_craft",
+		"stub": "",
 		"order_id": order.order_id if order != null else "",
 		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.CRAFT),
+		"cleared": false,
+		"cant_craft": true,
+		"rating": "F",
 	}
+
+
+static func build_boss_announce(board: ChapterSchedule) -> Dictionary:
+	var boss_id := board.chapter_boss_id if board != null else ""
+	var title := ScheduleCatalog.boss_title(boss_id)
+	var tags := ", ".join(ThreatCatalog.threat_tags(boss_id))
+	var favors := ", ".join(ThreatCatalog.favor_tags(boss_id))
+	var punishes := ", ".join(ThreatCatalog.punish_tags(boss_id))
+	return {
+		"resolve_class": "newspaper",
+		"round_action": null,
+		"mission_kind": null,
+		"title": "Kingdom newspaper — %s" % title,
+		"body": (
+			"Boss announced before spend (docs/17, 26). %s  ·  pool %s.\n"
+			% [title, board.boss_pool_id if board != null else ""]
+			+ "Threat %s. Favors %s. Punishes %s.\n" % [tags, favors, punishes]
+			+ "Headline id %s (copy Later). Dismiss into the schedule board."
+			% GameConstants.HEADLINE_BOSS_ANNOUNCE
+		),
+		"stub": "newspaper_chrome",
+		"newspaper_event": "boss_announce",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.NEWSPAPER),
+	}
+
+
+static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
+	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
+	return {
+		"resolve_class": "boss",
+		"round_action": null,
+		"mission_kind": "boss",
+		"title": "Final prep — face %s" % title,
+		"body": (
+			"Eight rounds resolved. Appointments never claimed 7–8. "
+			+ "Face the announced boss. Fail (adventurer dead / hard loss) = run_over, no retry (docs/24)."
+		),
+		"stub": "boss_encounter",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
+	}
+
+
+static func build_boss_result(board: ChapterSchedule, mission: Dictionary, run_over: bool) -> Dictionary:
+	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
+	var rating = mission.get("rating", GameEnums.Rating.NONE)
+	var cleared := bool(mission.get("cleared", false))
+	var hp := float(mission.get("hp_remaining", 0.0))
+	var lines: PackedStringArray = PackedStringArray()
+	lines.append(
+		"Boss result vs %s: rating %s · cleared %s · hp %s."
+		% [title, GameEnums.rating_wire(rating), str(cleared), _hp_text(hp)]
+	)
+	if run_over:
+		lines.append("run_over · boss_death — no retry (docs/24). Newspaper chrome hd_run_over.")
+	else:
+		lines.append("Chapter boss cleared. Newspaper chrome hd_chapter_result (copy Later).")
+	return {
+		"resolve_class": "boss",
+		"round_action": null,
+		"mission_kind": "boss",
+		"title": ("Run over — %s" % title) if run_over else ("Boss clear — %s" % title),
+		"body": "\n".join(lines),
+		"stub": "boss_encounter",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.BOSS),
+		"cleared": cleared,
+		"run_over": run_over,
+		"rating": GameEnums.rating_wire(rating),
+	}
+
+
+static func _hp_text(hp: float) -> String:
+	return "%.2f" % hp
 
 
 static func _synthetic_pin(order: ClientOrder) -> AppointmentPin:

@@ -1,6 +1,6 @@
 ; Engine configuration file.
-; Chaos Atelier — Client 1B stamina craft + schedule board.
-; Live spine: docs/27-craft-mode-stamina.md, docs/22-chapter-schedule.md, docs/20-harness-stamp.md.
+; Chaos Atelier — Client 1B own_basic loop (schedule + stamina + mission).
+; Live spine: docs/22, docs/27, docs/20, docs/23, docs/24.
 ; Target editor: Godot 4.7 (Jonathan). Scripts are normal Godot 4 GDScript.
 
 config_version=5
@@ -8,7 +8,7 @@ config_version=5
 [application]
 
 config/name="Chaos Atelier"
-config/description="Travelling atelier — stamina craft (Client 1B)"
+config/description="Travelling atelier — own_basic chapter loop (Client 1B)"
 run/main_scene="res://src/ui/schedule/schedule_board.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"

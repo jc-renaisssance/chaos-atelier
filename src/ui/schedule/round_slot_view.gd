@@ -51,31 +51,31 @@ func bind(
 	var reserved := slot.is_reserved_final()
 	var done := slot.round_action != GameEnums.RoundAction.NONE
 	_index.text = "R%d" % slot.round_index
-	var ink := Color.html("#e8d5b0")
-	var muted := Color.html("#b5a48a")
+	var ink := Color(0.91, 0.835, 0.69)
+	var muted := Color(0.71, 0.643, 0.541)
 	if is_current:
-		_style.bg_color = Color.html("#3a2c18")
-		_style.border_color = Color.html("#c9a227")
+		_style.bg_color = Color(0.227, 0.173, 0.094)
+		_style.border_color = Color(0.788, 0.635, 0.153)
 		_badge.text = "TODAY"
-		_badge.add_theme_color_override("font_color", Color.html("#c9a227"))
+		_badge.add_theme_color_override("font_color", Color(0.788, 0.635, 0.153))
 	elif done:
-		_style.bg_color = Color.html("#241c16")
-		_style.border_color = Color.html("#6a5840")
+		_style.bg_color = Color(0.141, 0.11, 0.086)
+		_style.border_color = Color(0.416, 0.345, 0.251)
 		_badge.text = "DONE"
 		_badge.add_theme_color_override("font_color", muted)
 	elif reserved:
-		_style.bg_color = Color.html("#1c1816")
-		_style.border_color = Color.html("#4a3f38")
+		_style.bg_color = Color(0.11, 0.094, 0.086)
+		_style.border_color = Color(0.29, 0.247, 0.22)
 		_badge.text = "RESERVED"
 		_badge.add_theme_color_override("font_color", muted)
 	elif pin != null:
-		_style.bg_color = Color.html("#2a1a18")
-		_style.border_color = Color.html("#8b3a3a")
+		_style.bg_color = Color(0.165, 0.102, 0.094)
+		_style.border_color = Color(0.545, 0.227, 0.227)
 		_badge.text = "PINNED"
-		_badge.add_theme_color_override("font_color", Color.html("#d47a6a"))
+		_badge.add_theme_color_override("font_color", Color(0.831, 0.478, 0.416))
 	else:
-		_style.bg_color = Color.html("#221c18")
-		_style.border_color = Color.html("#3d342c")
+		_style.bg_color = Color(0.133, 0.11, 0.094)
+		_style.border_color = Color(0.239, 0.204, 0.173)
 		_badge.text = "OPEN"
 		_badge.add_theme_color_override("font_color", muted)
 	_index.add_theme_color_override("font_color", ink)
