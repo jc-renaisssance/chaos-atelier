@@ -12,7 +12,7 @@ The atelier rides a **horse-car / wagon** (or other transport). The shop moves w
 |---|---|---|
 | Chapters per run | 3 | Unchanged |
 | `CHAPTER_ROUND_COUNT` | **8** | Allowed band 6–10; 8 is the stamp |
-| Crafts max per chapter | **4** garments | More rounds ≠ more forced crafts |
+| Crafts max per chapter | **4** garments | More rounds ≠ more forced crafts. Cap is **pieces** (garment pieces), same meaning as [`20`](20-harness-stamp.md) — not whole orders. |
 | Boss telegraph | Chapter start | Boss announced before spend |
 | Final rounds | Last **2** | Reserved: travel / final prep / boss — appointments cannot claim these |
 

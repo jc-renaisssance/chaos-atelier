@@ -48,6 +48,8 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `crafts_max` | int | Always **4** |
 | `phase` | enum | `schedule` \| `craft` \| `boss` \| `newspaper` |
 
+**Lock:** `crafts_done_this_chapter` / `crafts_max=4` counts **pieces** (each construction in a multi-piece order), not whole orders. Example: armor + gloves = 2 of 4.
+
 `phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `round_action` on `phase=schedule`. Travel events are `round_action=wagon_event`. Boss craft may use `phase=craft` + `mission_kind=boss`, then `phase=boss` for the sim.
 
 ### Mission (when `phase=craft` or `phase=boss`)
