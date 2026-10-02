@@ -63,3 +63,25 @@ Rarity skip on rare/legendary unchanged.
 ## Soft return after apex
 
 If Fire/Metal/Earth count **> 8**: no additional `syn_*` row; excess tags still count for rarity / report flavor only.
+
+## 2026-09-29 tier extension (applied into `14`)
+
+Jonathan ask 2026-09-29 — **applied** into [`docs/14-synergies.md`](14-synergies.md) + [`docs/15-outlook-gen-list.md`](15-outlook-gen-list.md):
+
+1. **Frost mid + apex:** `syn_frost_5` (Rime Veins) + `syn_frost_8` (Glacier Crown). Mid art = `look_armor_frost_3` → outlook `frost_5`. Apex art now **stamped** as `look_armor_frost_8` (2026-09-29 evening pack).
+2. **Most positive tags** now have **≥3 / ≥5 / ≥8** monostack rows (silent, silk, royal, storm, lunar, solar, sticky, sharp, soft, wild, occult, pure) — not Fire·Metal·Earth only.
+3. **Royal stamped = apex:** `look_armor_royal` → `royal_8` / `syn_royal_8` (Throne Mail), **not** low.
+4. Cross-tags remain ≥1∧≥1 **power + single outlook** (no monostack tiers) — reviewed in-doc in `14`.
+5. Soft return after apex now applies to **any** tag with an apex row (count > 8).
+
+This RETUNE file stays the 2026-09-28 stamina-threshold stamp source; live syn table is `14`.
+
+
+## 2026-09-29 evening — armor pack complete + owner pool (docs sync)
+
+Jonathan decisions applied into [`docs/14-synergies.md`](14-synergies.md) + [`docs/15-outlook-gen-list.md`](15-outlook-gen-list.md) + [`docs/STAMP.md`](STAMP.md):
+
+1. Traveler/atelier **armor monostack art DONE** (plain + metal/earth/fire/frost + silent/silk/royal ladders; frost apex freestanding). No more monostack gens for storm/lunar/solar/etc. on default armor.
+2. Those other syn lines → **other shop owner pool** for armor outlooks.
+3. **Next:** cross-tag positive + negative syn.
+4. Stamped filenames: silent/silk/royal use `_3`/`_5`/`_8`; `04-syn/` may only hold `look_armor_royal` alias (or empty).
