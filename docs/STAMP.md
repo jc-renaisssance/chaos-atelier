@@ -85,3 +85,9 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 
 - Cross-tag positive + negative syn art/docs
 - Other shop owner armor outlooks when that shop work starts
+
+---
+
+# Jonathan stamp — 2026-10-02 (cross-tag positive armor)
+
+`armor-cross-tag-locked-2026-10-02/` — locked Storm / Beastbloom / Snaretooth / Masked Crown / Dawn Vestment / Pale Hex (`_3` / `_5` / `_8`).
