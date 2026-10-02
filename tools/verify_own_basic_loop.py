@@ -50,6 +50,8 @@ def check_godot_47_hotfix(blob: str) -> None:
         fail("Color.html(...) remains in src — 4.7 rejects it as a const expression")
     if re.search(r"const\s+\w+\s*:?=?\s*Color\.html", blob):
         fail("const … Color.html is not a constant expression in Godot 4.7")
+    if re.search(r":=\s*[^\n]*\belse\s+null\b", blob):
+        fail(":= … else null infers Variant — Godot 4.7.2 warning-as-error (use an explicit type)")
 
 
 def check_source_symbols(blob: str) -> None:
@@ -286,7 +288,7 @@ def main() -> int:
         return 1
     print("OK own_basic loop source + spec (docs/20, 23, 24)")
     print("Godot 4.7 project features set; editor was not opened.")
-    print("Hotfix: no class_name GameConstants; no Color.html.")
+    print("Hotfix: no class_name GameConstants; no Color.html; no := … else null.")
     return 0
 
 
