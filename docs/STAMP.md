@@ -122,3 +122,30 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 # Jonathan stamp — 2026-10-02 (cross-tag positive armor)
 
 `armor-cross-tag-locked-2026-10-02/` — locked Storm / Beastbloom / Snaretooth / Masked Crown / Dawn Vestment / Pale Hex (`_3` / `_5` / `_8`).
+
+---
+
+# Jonathan stamp — 2026-10-02 (multi-piece craft UI)
+
+## Locked (docs only)
+
+1. Multi-item order → craft **all pieces in one session** with **higher initial stamina**. **Supersedes** sequential per-piece stamina pools (piece N then N+1 sessions).
+2. **Dedicated craft UI** (not schedule): **lower** = hand + actions (cards display here); **upper left** = client order detail; **upper right** = up to **4** drop zones (unused if N < 4).
+3. **Input:** drag into a zone when N > 1; **1–5** = hand slots; **D** = dig (StS dig still applies). Play **must** target a zone.
+4. Keep: StS play→discard / dig dump / reshuffle; Finish-only (stamina 0 ≠ finish); Current/Potential for the **selected zone**.
+5. **Draft knobs** (Jonathan may retune): stamina start **`12 * N`**; dig cost **2**; max zones **4**; N > 4 = Later / split. One Finish → resolve listed pieces in order (N stamps, one session). Empty zone at Finish = existing empty-piece path — hold if undefined; do not invent a harsh fail.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/27-craft-mode-stamina.md` | Dedicated UI + parallel multi-piece; supersedes sequential |
+| `docs/20-harness-stamp.md` | `zone_count`; `stamina_start = 12 * N`; `cards_played` zone/piece id; Finish = session end |
+| `docs/12-constructions.md` | One construction per **piece**; parallel session pointer |
+| `docs/22-chapter-schedule.md` | Enter craft **once** per order |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Phase-1 sequential multi-piece (`27` old: own stamina pool per piece; resolve N before starting N+1)
+- `20` old: multi-piece = N sessions; `stamina_start == 12` per piece; `cards_played` without zone target

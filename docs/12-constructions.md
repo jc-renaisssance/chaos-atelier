@@ -22,7 +22,8 @@ Layer 2 — **Construction** (garment type). **Compulsory** on every craft. Mods
 
 ## Construction rules (Phase-1)
 
-- Exactly **one** construction per craft (compulsory).
+- Exactly **one** construction per **piece** (compulsory).
+- Multi-construction orders: **one** parallel craft session, N zones ([27](27-craft-mode-stamina.md)). **Supersedes** sequential per-piece sessions.
 - Materials / runes: **stamina plays** in live craft ([27](27-craft-mode-stamina.md)); legacy 12b 2m1r superseded.
 - Same material id may repeat within the mat budget.
 - Phase-1 garment focus for art: **armor** first when 1C opens.
