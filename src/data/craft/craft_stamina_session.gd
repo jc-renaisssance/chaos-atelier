@@ -33,6 +33,8 @@ func apply_order(order: ClientOrder, piece_index_: int) -> void:
 	dig_count = 0
 	early_finish = false
 	finish_reason = GameEnums.FinishReason.NONE
+	hand.clear()
+	cards_played.clear()
 
 
 func is_finished() -> bool:

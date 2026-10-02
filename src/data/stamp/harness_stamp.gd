@@ -96,10 +96,30 @@ func apply_piece_session(order: ClientOrder, piece_session: CraftStaminaSession)
 	order_id = order.order_id
 	threat_id = order.threat_id
 	construction_ids = order.construction_ids.duplicate()
-	construction_id = piece_session.construction_id
+	construction_id = piece_session.construction_id if piece_session != null else ""
 	card_difficulty = order.card_difficulty
 	session = piece_session
 	phase = GameEnums.StampPhase.CRAFT
+
+
+func apply_resolver(result: Dictionary) -> void:
+	tag_counts = Dictionary(result.get("tag_counts", {})).duplicate()
+	craft_rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
+	powers_positive = PackedStringArray(result.get("powers_positive", PackedStringArray()))
+	powers_negative = PackedStringArray(result.get("powers_negative", PackedStringArray()))
+	outlook_id = String(result.get("outlook_id", "plain"))
+	outlook_order = int(result.get("outlook_order", 0))
+	stats = result.get("stats", GearStats.new())
+	if stats == null:
+		stats = GearStats.new()
+	rating = result.get("rating", GameEnums.Rating.NONE)
+	hp_remaining = float(result.get("hp_remaining", GameConstants.NULL_FLOAT))
+	damage_aid_pct = int(result.get("damage_aid_pct", GameConstants.NULL_INT))
+	skill_effectiveness = int(result.get("skill_effectiveness", GameConstants.NULL_INT))
+	cleared = bool(result.get("cleared", false))
+	mission_failed = bool(result.get("mission_failed", false))
+	outcome = result.get("outcome", GameEnums.Outcome.NONE)
+	cant_craft = bool(result.get("cant_craft", false))
 
 
 func _null_int(value: int) -> Variant:

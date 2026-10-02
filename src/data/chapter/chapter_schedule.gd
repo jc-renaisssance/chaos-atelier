@@ -115,6 +115,18 @@ func set_primary_action(action: GameEnums.RoundAction, order_id_: String = "") -
 	return true
 
 
+## Lock: crafts_done counts finished pieces, not whole orders (docs/20).
+func count_finished_piece() -> bool:
+	if crafts_done >= crafts_max:
+		return false
+	crafts_done += 1
+	return true
+
+
+func can_open_piece() -> bool:
+	return crafts_done < crafts_max
+
+
 func advance_round() -> bool:
 	if not GameConstants.is_schedule_round(round_index):
 		return false
