@@ -236,12 +236,14 @@ func play_hand(hand_index: int) -> bool:
 		return false
 	next_mat_free = bool(out.get("next_mat_free", false))
 	last_stamp = _make_craft_stamp()
+	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
 		_resolve_current_piece()
 	else:
 		last_note = (
 			"Played into the piece — card left the hand to discard. "
-			+ "Hand does not refill — dig dumps remaining cards, then draws."
+			+ "Hand does not refill — dig dumps remaining cards, then draws. "
+			+ "Stamina 0 keeps the piece open until Finish."
 		)
 		craft_changed.emit()
 	return true
@@ -254,11 +256,12 @@ func dig() -> bool:
 	if not bool(out.get("ok", false)):
 		return false
 	last_stamp = _make_craft_stamp()
+	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
 		_resolve_current_piece()
 	else:
 		last_note = (
-			"Dug (−%d). Remaining hand to discard; drew a new hand (reshuffle if draw was short)."
+			"Dug (−%d). Remaining hand to discard; drew a new hand (reshuffle if draw was short). Stamina 0 keeps the piece open until Finish."
 			% GameConstants.DIG_REFRESH_COST
 		)
 		craft_changed.emit()
@@ -266,6 +269,7 @@ func dig() -> bool:
 
 
 func finish_early() -> bool:
+	## Explicit Finish — the only Phase-1 legal craft end (player_finish).
 	if not craft_open or craft_session == null or awaiting_next_piece or order_craft_done:
 		return false
 	if not CraftRules.early_finish(craft_session):

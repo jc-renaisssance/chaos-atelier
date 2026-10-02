@@ -74,7 +74,7 @@ func _build() -> void:
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_note)
 
-	root.add_child(_caption("STAMINA  ·  start 12  ·  ends at 0 or early finish"))
+	root.add_child(_caption("STAMINA  ·  start 12  ·  0 stays open  ·  Finish crafts"))
 	var stam_panel := _panel()
 	root.add_child(stam_panel)
 	var stam_box := VBoxContainer.new()
@@ -149,7 +149,7 @@ func _build() -> void:
 	hand_box.add_child(btns)
 	_dig_btn = _btn("Dig / refresh (−2 stamina)", _on_dig)
 	btns.add_child(_dig_btn)
-	_finish_btn = _btn("Early finish", _on_finish)
+	_finish_btn = _btn("Finish", _on_finish)
 	btns.add_child(_finish_btn)
 	_continue_btn = _btn("Continue", _on_continue)
 	btns.add_child(_continue_btn)
@@ -157,7 +157,7 @@ func _build() -> void:
 	root.add_child(_caption("RESOLVER  ·  tag tally  ·  mission result (23/24)"))
 	var res := _panel()
 	root.add_child(res)
-	_result = _label("Play cards into the piece, or finish empty.", 13, INK)
+	_result = _label("Play cards into the piece. Only Finish crafts — stamina 0 stays open.", 13, INK)
 	_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	res.add_child(_result)
 
@@ -303,7 +303,7 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 	for child in _hand.get_children():
 		child.queue_free()
 	if session.hand.is_empty():
-		_hand.add_child(_label("Hand empty — dig (2 stamina) or early finish.", 14, MUTED))
+		_hand.add_child(_label("Hand empty — dig (2 stamina) or Finish.", 14, MUTED))
 		return
 	var locked := session.is_finished() or AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
 	for i in range(session.hand.size()):

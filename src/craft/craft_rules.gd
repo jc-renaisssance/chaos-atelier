@@ -6,6 +6,8 @@ extends RefCounted
 ## Cards stay in the run deck via reshuffle — not in hand after play.
 ## Consumable (Later / not in the stamp type enum) burns instead of discarding.
 ## No auto-refill. Construction is not a card.
+## Stamina 0 ≠ finish (docs/20 assert 14): play / dig never auto-craft.
+## Only Finish (player click) ends the piece — finish_reason: player_finish.
 
 static func opening_draw(
 	session: CraftStaminaSession,
@@ -86,7 +88,6 @@ static func play(
 		flag = false
 	elif card.type == GameEnums.HandCardType.SKILL and card.id == "sk_next_mat_free":
 		flag = true
-	_maybe_stamina_zero(session)
 	return {"ok": true, "next_mat_free": flag, "played": played, "burned": burned}
 
 
@@ -105,7 +106,6 @@ static func dig(
 	_spend(session, session.dig_refresh_cost)
 	session.dig_count += 1
 	draw_up_to_hand(session, rng)
-	_maybe_stamina_zero(session)
 	return {"ok": true, "dig_count": session.dig_count}
 
 
@@ -135,26 +135,18 @@ static func reshuffle_discard_into_draw(
 
 
 static func early_finish(session: CraftStaminaSession) -> bool:
+	## Finish button — the only Phase-1 legal end (docs/20 assert 14).
+	## stamina_remaining == 0 does not change this path.
 	if session == null or session.is_finished():
 		return false
-	if session.stamina_remaining == 0:
-		session.finish_reason = GameEnums.FinishReason.STAMINA_0
-		session.early_finish = false
-		return true
 	session.early_finish = true
-	session.finish_reason = GameEnums.FinishReason.EARLY_FINISH
+	session.finish_reason = GameEnums.FinishReason.PLAYER_FINISH
 	return true
 
 
 static func _spend(session: CraftStaminaSession, amount: int) -> void:
 	session.stamina_remaining = maxi(0, session.stamina_remaining - amount)
 	session.stamina_spent += amount
-
-
-static func _maybe_stamina_zero(session: CraftStaminaSession) -> void:
-	if session.stamina_remaining == 0 and session.finish_reason == GameEnums.FinishReason.NONE:
-		session.early_finish = false
-		session.finish_reason = GameEnums.FinishReason.STAMINA_0
 
 
 static func _shuffle_pile(cards: Array[HandCard], rng: RandomNumberGenerator) -> void:

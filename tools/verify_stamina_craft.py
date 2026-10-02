@@ -69,6 +69,8 @@ def check_source_symbols(blob: str) -> None:
         "STAMINA_START",
         "sk_next_mat_free",
         "own_basic",
+        "PLAYER_FINISH",
+        "player_finish",
         "docs/27",
         "docs/20",
     ]
@@ -113,6 +115,16 @@ def check_source_symbols(blob: str) -> None:
         fail("Stamp 2 Current / Potential panel must remain")
     if "durable · stays" in readout or "Materials are durable" in readout:
         fail("UI must not claim materials stay in hand after play")
+    if "_maybe_stamina_zero" in rules:
+        fail("play/dig must not auto-finish on stamina 0 — remove _maybe_stamina_zero")
+    if re.search(r"finish_reason\s*=\s*GameEnums\.FinishReason\.STAMINA_0", rules):
+        fail("craft_rules must not set finish_reason stamina_0 (superseded auto-craft)")
+    if "FinishReason.PLAYER_FINISH" not in rules:
+        fail("Finish click must set finish_reason player_finish")
+    if '"Finish"' not in readout and "Finish" not in readout:
+        fail("craft table must expose a Finish button")
+    if "Early finish" in readout:
+        fail("Finish is the only button — do not label it Early finish")
 
 
 def check_gd_balance() -> None:
@@ -201,8 +213,7 @@ class Session:
         self.cards_played.append({"id": card_id, "type": kind, "cost": cost})
         if kind == "skill" and card_id == "sk_next_mat_free":
             self.next_mat_free = True
-        if self.stamina_remaining == 0:
-            self.finish_reason = "stamina_0"
+        ## Stamina 0 ≠ finish. Piece stays open until Finish.
 
     def reshuffle_discard_into_draw(self) -> bool:
         if not self.discard_pile:
@@ -229,8 +240,7 @@ class Session:
         self.stamina_spent += DIG_COST
         self.dig_count += 1
         self.draw_up_to_hand()
-        if self.stamina_remaining == 0:
-            self.finish_reason = "stamina_0"
+        ## Stamina 0 ≠ finish. Dig that spends the last stamina leaves the piece open.
 
     def run_deck(self) -> list[str]:
         return list(self.hand) + list(self.draw_pile) + list(self.discard_pile)
@@ -238,7 +248,7 @@ class Session:
     def finish_early(self) -> None:
         assert self.finish_reason is None
         self.early_finish = True
-        self.finish_reason = "early_finish"
+        self.finish_reason = "player_finish"
 
 
 def burns_on_play(kind: str) -> bool:
@@ -363,10 +373,10 @@ def run_spec() -> None:
         fail("dig must dump remaining hand to discard, then draw a new hand")
 
     s1.finish_early()
-    if s1.finish_reason != "early_finish" or not s1.early_finish:
-        fail("early finish must set finish_reason=early_finish")
-    if s1.stamina_remaining == 0:
-        fail("early_finish must not also be stamina_0")
+    if s1.finish_reason != "player_finish" or not s1.early_finish:
+        fail("Finish must set finish_reason=player_finish (early_finish agrees)")
+    if s1.finish_reason == "stamina_0":
+        fail("Finish must not emit finish_reason stamina_0")
     crafts_done += 1
     if crafts_done != 1:
         fail("crafts_done increments per piece, not per order")
@@ -381,23 +391,40 @@ def run_spec() -> None:
     s2.draw_up_to_hand()
     s2.stamina_remaining = 2
     s2.stamina_spent = 0
+    deck_at_zero = s2.run_deck()
     s2.dig()
-    if s2.finish_reason != "stamina_0" or s2.early_finish:
-        fail("dig that spends last 2 stamina must finish as stamina_0")
+    if s2.finish_reason is not None:
+        fail("dig that spends last 2 stamina must not auto-finish")
     if s2.stamina_remaining != 0:
-        fail("stamina_0 requires remaining == 0")
+        fail("last-2 dig should leave stamina_remaining == 0")
+    if s2.early_finish:
+        fail("stamina 0 must not set early_finish")
+    if not s2.run_deck():
+        fail("cards must stay in the StS piles when stamina hits 0")
+    if sorted(s2.run_deck()) != sorted(deck_at_zero):
+        fail("stamina 0 must not drop cards from the run deck")
+    if crafts_done != 1:
+        fail("stamina 0 must not increment crafts_done (piece still open)")
+    s2.finish_early()
+    if s2.finish_reason != "player_finish" or not s2.early_finish:
+        fail("Finish at stamina 0 must set player_finish")
     crafts_done += 1
     if crafts_done != 2:
         fail("multi-piece order is 2 of crafts_max=4")
     if crafts_done > crafts_max:
         fail("crafts_done exceeded crafts_max")
 
-    # stamina 0 vs early_finish exclusive
+    # stamina 0 is state — piece stays open until Finish
     s3 = Session("con_tunic", 1, 1)
+    s3.hand = ["mat_hemp_plain"]
     s3.stamina_remaining = 0
-    s3.finish_reason = "stamina_0"
-    if s3.early_finish and s3.finish_reason == "stamina_0":
-        fail("cannot be both early_finish and stamina_0")
+    if s3.finish_reason is not None:
+        fail("stamina_remaining == 0 with no Finish must stay open")
+    s3.finish_early()
+    if s3.finish_reason != "player_finish":
+        fail("explicit Finish at 0 stamina must be player_finish")
+    if "mat_hemp_plain" not in s3.hand:
+        fail("Finish is what ends the piece — cards stay until then")
 
     # cloak + metal should be able to fire a neg on common
     s4 = Session("con_cloak", 1, 1)
@@ -471,7 +498,8 @@ def main() -> int:
             print(" -", item)
         return 1
     print("OK stamina craft source + spec (docs/27, docs/20)")
-    print("StS hand cycle + Current/Potential readout checked. Godot editor was not opened.")
+    print("Finish-only craft (player_finish). Stamina 0 stays open. StS + Current/Potential kept.")
+    print("Godot editor was not opened.")
     return 0
 
 

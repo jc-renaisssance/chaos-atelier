@@ -37,8 +37,9 @@ enum HandCardType {
 
 enum FinishReason {
 	NONE,
-	STAMINA_0,
-	EARLY_FINISH,
+	STAMINA_0, ## superseded as craft-end — state flag only, not auto-craft
+	EARLY_FINISH, ## superseded as a distinct path — Finish is player_finish
+	PLAYER_FINISH,
 }
 
 enum CraftRarity {
@@ -112,6 +113,7 @@ const HAND_CARD_TYPE_WIRE := {
 const FINISH_REASON_WIRE := {
 	FinishReason.STAMINA_0: "stamina_0",
 	FinishReason.EARLY_FINISH: "early_finish",
+	FinishReason.PLAYER_FINISH: "player_finish",
 }
 
 const CRAFT_RARITY_WIRE := {
