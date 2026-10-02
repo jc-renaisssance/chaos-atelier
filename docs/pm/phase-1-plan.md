@@ -36,7 +36,7 @@ See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [R
 
 - [x] Boss pools, rarity, `own_basic` starter, harness stamp fields
 - [x] Schedule + stamina craft stamped
-- [ ] Optional: harness asserts retargeted off 2m1r / 1-of-3 → schedule + stamina (`20`)
+- [x] Optional: harness asserts retargeted off 2m1r / 1-of-3 → schedule + stamina (`20`)
 - [ ] Optional: trim dictionary only if Jonathan asks
 
 **Budget:** ~$0 Cursor on-demand (human / connector docs). No gens.
