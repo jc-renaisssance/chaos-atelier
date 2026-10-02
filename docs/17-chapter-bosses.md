@@ -38,11 +38,11 @@ The chapel does not want hemp, scrap, or clean silk. Starter Soft / Earth / Meta
 | id | Name | Threat tags | Punishes | Favors | Environment |
 |---|---|---|---|---|---|
 | `boss_mire_bride` | Mire Bride | Occult, Sticky, Lunar | Soft, Pure, Silk | Silent, Occult, Lunar, Sticky | Drowned chapel — aisle under peat, wedding still in session |
-| `boss_bog_king` | Bog King | Sticky, Wild, Earth | Soft, Earth, Metal | Frost, Occult, Storm, Silent | Root throne — peat crown; swallows scrap and stone |
+| `boss_bog_king` | Bog King | Sticky, Wild, Earth | Soft, Earth, Metal, Wild | Frost, Occult, Storm, Silent | Root throne — peat crown; swallows scrap and stone |
 | `boss_pale_choir` | Pale Choir | Lunar, Occult, Storm | Soft, Metal, Silk | Lunar, Occult, Silent, Frost | Bone gallery — stacked ribs, hymn with no language |
 
 - **Mire Bride** — drowned wedding that never ended. Clean cloth and pale silk are offerings; silent / occult / lunar / sticky walk the aisle.
-- **Bog King** — root throne that claims grounded work. Soft, earth, and metal become more bog. Frost, occult, storm, silent cut a path.
+- **Bog King** — root throne that claims grounded work. Soft, earth, metal, and wild become more bog. Frost, occult, storm, silent cut a path.
 - **Pale Choir** — bone gallery that sings cloth to rags and finds you by clang. Lunar / occult / silent / frost; not soft, metal, or silk.
 
 ### Chapter 3 — Marble Court
