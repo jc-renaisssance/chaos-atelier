@@ -13,6 +13,7 @@ const BORDER := Color(0.239, 0.204, 0.173)
 var hand_index: int = 0
 var _locked: bool = true
 var _press_pos: Vector2 = Vector2.ZERO
+var _dragged: bool = false
 var _caption: Label
 var _name: Label
 var _meta: Label
@@ -72,6 +73,7 @@ func _apply_style() -> void:
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	if _locked:
 		return null
+	_dragged = true
 	var preview := _label(_name.text, 13, INK)
 	set_drag_preview(preview)
 	return {"kind": "craft_hand", "hand_index": hand_index}
@@ -86,7 +88,8 @@ func _on_gui(event: InputEvent) -> void:
 			return
 		if mouse.pressed:
 			_press_pos = mouse.position
-		elif _press_pos.distance_to(mouse.position) < 8.0:
+			_dragged = false
+		elif not _dragged and _press_pos.distance_to(mouse.position) < 8.0:
 			slot_played.emit(hand_index)
 
 
