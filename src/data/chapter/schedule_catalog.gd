@@ -266,6 +266,10 @@ static func walk_in_title(order: ClientOrder) -> String:
 static func order_title(order: ClientOrder) -> String:
 	if order == null:
 		return ""
+	if order.mission_kind == GameEnums.MissionKind.BOSS:
+		if order.boss_job_id != "":
+			return BossClientCatalog.display_name(order.boss_job_id)
+		return "Boss-client"
 	if order.mission_kind == GameEnums.MissionKind.PREP:
 		return "Prep craft"
 	for chapter_id in APPOINTMENTS.keys():

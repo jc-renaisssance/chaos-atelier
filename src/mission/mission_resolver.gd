@@ -121,6 +121,9 @@ static func attach(
 	if kind == GameEnums.MissionKind.PREP:
 		## Ready-rack: still grade the garment. No live client pressure (docs/20).
 		threat_id = ""
+	## Favor / punish come from the announced boss row (docs/17). C2/C3 rows de-favor
+	## own_basic starter tags (Soft, Earth, Metal, Wild, Silk, Pure). Job requirement
+	## tags (docs/28) are a separate order-taste axis — not this bag.
 	var favor := _hits(bag, ThreatCatalog.favor_tags(threat_id)) if threat_id != "" else PackedStringArray()
 	var punish := _hits(bag, ThreatCatalog.punish_tags(threat_id)) if threat_id != "" else PackedStringArray()
 	var negatives: PackedStringArray = PackedStringArray(out.get("powers_negative", PackedStringArray()))

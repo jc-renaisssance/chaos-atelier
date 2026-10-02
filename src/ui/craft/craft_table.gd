@@ -273,13 +273,15 @@ func _refresh() -> void:
 	for i in range(session.construction_ids.size()):
 		var con_id := session.construction_ids[i]
 		listed.append("%d %s" % [i + 1, CraftCatalog.construction_name(con_id)])
+	var taste := ", ".join(order.requirement_tags) if order.requirement_tags.size() > 0 else "—"
 	_order_body.text = (
-		"Order %s   ·   threat %s   ·   difficulty %s   ·   listed %s   ·   zones %d / %d   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d   ·   construction from the order, not a hand card"
+		"Order %s   ·   threat %s   ·   difficulty %s   ·   listed %s   ·   want %s   ·   zones %d / %d   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d   ·   construction from the order, not a hand card"
 		% [
 			order.order_id,
 			threat,
 			str(order.card_difficulty) if order.card_difficulty != GameConstants.NULL_INT else "—",
 			", ".join(listed),
+			taste,
 			session.zone_count,
 			GameConstants.ZONE_COUNT_MAX,
 			session.draw_pile.size(),
@@ -313,7 +315,10 @@ func _refresh() -> void:
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
 	_finish_btn.disabled = busy
 	_continue_btn.visible = AtelierSession.order_craft_done
-	_continue_btn.text = "Return to schedule"
+	if order.mission_kind == GameEnums.MissionKind.BOSS:
+		_continue_btn.text = "Resolve the fight"
+	else:
+		_continue_btn.text = "Return to schedule"
 	_refresh_result(session)
 	_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 

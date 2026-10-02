@@ -135,7 +135,7 @@ func _build() -> void:
 	root.add_child(demo)
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("own_basic loop: newspaper → schedule → craft → mission → boss stub. Shop / reps-gate numbers Later.", 12, MUTED)
+	var hint := _label("own_basic loop: newspaper (boss) → schedule → craft → boss-client sew → fight. Shop / portraits Later.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	demo.add_child(hint)
@@ -243,8 +243,8 @@ func _rebuild_actions() -> void:
 		_continue_btn.text = "Run over" if AtelierSession.run_over else "Close the chapter"
 		return
 	if AtelierSession.awaiting_boss:
-		_today_title.text = "Schedule finished. Face the announced boss."
-		_continue_btn.text = "Face the boss"
+		_today_title.text = "Schedule finished. Draw a shared-pool adventurer and sew that job vs the announced boss."
+		_continue_btn.text = "Draw the fighter"
 		return
 	if AtelierSession.chapter_over or AtelierSession.run_over:
 		_today_title.text = "Chapter closed." if not AtelierSession.run_over else "Run over — no retry."
@@ -283,7 +283,7 @@ func _refresh_resolve() -> void:
 			_resolve_body.text = (
 				"Order path: appointment, walk-in, prep craft → stamina craft → mission result (docs/23, 24). "
 				+ "Event path: wagon event, wagon shop, rest / dig → stay phase=schedule. "
-				+ "After round 8: boss stub. Mid-fail continues; boss fail = run_over."
+				+ "After round 8: shared-pool boss-client sew, then that adventurer fights. Mid-fail continues; boss fail = run_over."
 			)
 		return
 	var payload: Dictionary = AtelierSession.last_resolve

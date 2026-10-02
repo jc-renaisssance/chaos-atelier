@@ -8,6 +8,8 @@ extends Resource
 @export var chapter_id: int = 1
 @export var chapter_boss_id: String = ""
 @export var boss_pool_id: String = ""
+@export var boss_client_id: String = "" ## adv_* on mission_kind=boss; dump null otherwise
+@export var boss_job_id: String = "" ## job_* on mission_kind=boss; dump null otherwise
 
 @export_group("Schedule board")
 @export var CHAPTER_ROUND_COUNT: int = GameConstants.CHAPTER_ROUND_COUNT
@@ -100,6 +102,12 @@ func apply_piece_session(order: ClientOrder, piece_session: CraftStaminaSession)
 	card_difficulty = order.card_difficulty
 	session = piece_session
 	phase = GameEnums.StampPhase.CRAFT
+	if order.mission_kind == GameEnums.MissionKind.BOSS:
+		boss_client_id = order.boss_client_id
+		boss_job_id = order.boss_job_id
+	else:
+		boss_client_id = ""
+		boss_job_id = ""
 
 
 func apply_resolver(result: Dictionary) -> void:
@@ -142,6 +150,22 @@ func _null_str(value: String) -> Variant:
 	return null if value.is_empty() else value
 
 
+func _is_boss_mission() -> bool:
+	return emit_mission() and mission_kind == GameEnums.MissionKind.BOSS
+
+
+func _boss_client_wire() -> Variant:
+	if not _is_boss_mission():
+		return null
+	return _null_str(boss_client_id)
+
+
+func _boss_job_wire() -> Variant:
+	if not _is_boss_mission():
+		return null
+	return _null_str(boss_job_id)
+
+
 func _pin_rows() -> Array:
 	var rows: Array = []
 	for pin in appointment_pins:
@@ -156,6 +180,8 @@ func to_dict() -> Dictionary:
 		"chapter_id": chapter_id,
 		"chapter_boss_id": chapter_boss_id,
 		"boss_pool_id": boss_pool_id,
+		"boss_client_id": _boss_client_wire(),
+		"boss_job_id": _boss_job_wire(),
 		"CHAPTER_ROUND_COUNT": CHAPTER_ROUND_COUNT,
 		"round_index": _null_int(round_index),
 		"rounds_left": rounds_left,
@@ -288,4 +314,18 @@ func schema_errors() -> PackedStringArray:
 			errs.append("cant_craft must not clear")
 	if run_over and run_over_reason == GameEnums.RunOverReason.NONE:
 		errs.append("run_over without run_over_reason")
+	if mission_kind == GameEnums.MissionKind.BOSS:
+		if BossClientCatalog.is_appointment_id(boss_client_id):
+			errs.append("boss_client_id must never be appt_*")
+		if not BossClientCatalog.is_adv_id(boss_client_id):
+			errs.append("mission_kind=boss requires boss_client_id adv_* from the shared pool")
+		if not BossClientCatalog.has_job(boss_job_id):
+			errs.append("mission_kind=boss requires boss_job_id from the shared pool")
+		var job := BossClientCatalog.row(boss_job_id)
+		if not job.is_empty() and String(job.get("boss_client_id", "")) != boss_client_id:
+			errs.append("boss_job_id does not match boss_client_id")
+		if not BossClientCatalog.constructions_match(boss_job_id, construction_ids):
+			errs.append("construction_ids must equal that job's listed con_*")
+		if threat_id != chapter_boss_id or chapter_boss_id.is_empty():
+			errs.append("mission_kind=boss threat_id must equal chapter_boss_id")
 	return errs

@@ -41,6 +41,8 @@ var last_mission: Dictionary = {}
 var newspaper_open: bool = false
 var awaiting_boss: bool = false
 var boss_open: bool = false
+var boss_client_id: String = ""
+var boss_job_id: String = ""
 var chapter_over: bool = false
 var run_over: bool = false
 var run_over_reason: GameEnums.RunOverReason = GameEnums.RunOverReason.NONE
@@ -73,6 +75,8 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	newspaper_open = false
 	awaiting_boss = false
 	boss_open = false
+	boss_client_id = ""
+	boss_job_id = ""
 	chapter_over = false
 	run_over = false
 	run_over_reason = GameEnums.RunOverReason.NONE
@@ -190,13 +194,18 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 	return true
 
 
+func _is_boss_order(order: ClientOrder) -> bool:
+	return order != null and order.mission_kind == GameEnums.MissionKind.BOSS
+
+
 func _begin_craft(order: ClientOrder) -> bool:
 	if order == null or order.piece_count() < 1:
 		return false
 	if order.piece_count() > GameConstants.ZONE_COUNT_MAX:
 		last_note = "Order lists more than 4 constructions — Later / split. No fifth zone."
 		return false
-	if board == null or not board.can_open_piece():
+	## Boss-client sew is the boss beat — not one of the 4 chapter pieces (docs/20, 28).
+	if not _is_boss_order(order) and (board == null or not board.can_open_piece()):
 		_emit_cant_craft(order)
 		return false
 	craft_order = order
@@ -313,7 +322,9 @@ func _resolve_session() -> void:
 		craft_session.focus_zone(i)
 		var craft := CraftResolver.resolve(craft_session, craft_session.construction_id, i)
 		var result := MissionResolver.grade_piece(craft, craft_order)
-		var counted := board.count_finished_piece()
+		var counted := false
+		if not _is_boss_order(craft_order):
+			counted = board.count_finished_piece()
 		result["crafts_counted"] = counted
 		result["crafts_done"] = board.crafts_done
 		result["piece_index"] = i
@@ -347,6 +358,9 @@ func continue_after_piece() -> void:
 
 
 func _return_to_schedule() -> void:
+	if _is_boss_order(craft_order):
+		_run_boss()
+		return
 	var mission := MissionResolver.resolve_order(piece_results, craft_order)
 	last_mission = mission
 	last_letter_id = String(mission.get("letter_id", ""))
@@ -415,7 +429,7 @@ func acknowledge_resolve() -> void:
 		board_changed.emit()
 		return
 	if awaiting_boss:
-		_run_boss()
+		_begin_boss_client_craft()
 		return
 	if chapter_over or run_over:
 		return
@@ -446,7 +460,7 @@ func acknowledge_resolve() -> void:
 			awaiting_boss = true
 			resolve_open = true
 			last_resolve = ScheduleRules.build_awaiting_boss(board)
-			last_note = "Schedule complete. Face the announced boss."
+			last_note = "Schedule complete. Boss beat: draw a shared-pool adventurer, then sew that job's constructions."
 			last_stamp = _make_schedule_stamp()
 			resolve_started.emit(last_resolve)
 	else:
@@ -461,10 +475,39 @@ func _reps_gate_miss() -> bool:
 	return reps < GameConstants.REPS_GATE_STUB
 
 
+func _begin_boss_client_craft() -> void:
+	## Boss beat (docs/28): seeded shared-pool draw, independent of chapter_boss_id.
+	awaiting_boss = false
+	var job := BossClientCatalog.pick_boss_client(chapter_seed)
+	boss_client_id = String(job.get("boss_client_id", ""))
+	boss_job_id = String(job.get("job_id", ""))
+	var boss_id := board.chapter_boss_id if board != null else ""
+	var order := BossClientCatalog.make_order(job, boss_id)
+	last_resolve = ScheduleRules.build_boss_client_draw(board, job)
+	if _begin_craft(order):
+		last_note = (
+			"Boss beat — %s (%s) sews %s vs %s. Player is the clothier."
+			% [
+				BossClientCatalog.display_name(boss_job_id),
+				boss_client_id,
+				", ".join(Array(order.construction_ids)),
+				ScheduleCatalog.boss_title(boss_id),
+			]
+		)
+		craft_changed.emit()
+		return
+	piece_results.clear()
+	_run_boss()
+
+
 func _run_boss() -> void:
 	awaiting_boss = false
 	boss_open = true
-	var mission := MissionResolver.resolve_boss(chapter_piece_results, board.chapter_boss_id)
+	craft_open = false
+	order_craft_done = false
+	craft_session = null
+	## Sim uses this adventurer's gear (the boss-client sew), not mid-chapter pieces.
+	var mission := MissionResolver.resolve_boss(piece_results, board.chapter_boss_id if board != null else "")
 	last_mission = mission
 	last_letter_id = String(mission.get("letter_id", ""))
 	var cleared := bool(mission.get("cleared", false))
@@ -478,12 +521,13 @@ func _run_boss() -> void:
 		last_headline_id = GameConstants.HEADLINE_CHAPTER_RESULT
 	mission["run_over"] = run_over
 	mission["run_over_reason"] = run_over_reason
-	last_resolve = ScheduleRules.build_boss_result(board, mission, run_over)
+	last_resolve = ScheduleRules.build_boss_result(board, mission, run_over, boss_job_id, boss_client_id)
 	last_stamp = _make_boss_stamp(mission)
 	last_note = (
-		"Boss %s · rating %s · cleared %s · run_over %s."
+		"Boss %s vs %s · rating %s · cleared %s · run_over %s."
 		% [
-			ScheduleCatalog.boss_title(board.chapter_boss_id),
+			BossClientCatalog.display_name(boss_job_id),
+			ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "",
 			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
 			str(cleared),
 			str(run_over),
@@ -610,11 +654,19 @@ func _make_boss_stamp(result: Dictionary) -> HarnessStamp:
 	var stamp := _base_stamp()
 	stamp.phase = GameEnums.StampPhase.BOSS
 	stamp.mission_kind = GameEnums.MissionKind.BOSS
-	stamp.order_id = ""
+	stamp.boss_client_id = boss_client_id
+	stamp.boss_job_id = boss_job_id
+	if craft_order != null:
+		stamp.order_id = craft_order.order_id
+		stamp.construction_ids = craft_order.construction_ids.duplicate()
+		stamp.card_difficulty = craft_order.card_difficulty
+	else:
+		var job := BossClientCatalog.row(boss_job_id)
+		stamp.order_id = String(job.get("order_id", ""))
+		stamp.construction_ids = BossClientCatalog.construction_ids(boss_job_id)
+		stamp.card_difficulty = 3
 	stamp.threat_id = board.chapter_boss_id if board != null else ""
-	stamp.construction_ids = PackedStringArray()
 	stamp.construction_id = ""
-	stamp.card_difficulty = 3
 	stamp.session = null
 	stamp.apply_resolver(result)
 	stamp.run_over = run_over
