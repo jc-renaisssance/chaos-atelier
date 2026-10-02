@@ -31,13 +31,24 @@ static func make_empty(chapter_id_: int = 1) -> ChapterSchedule:
 	return board
 
 
+func slot_at(round_i: int) -> ScheduleRound:
+	for slot in rounds:
+		if slot.round_index == round_i:
+			return slot
+	return null
+
+
+func pin_at(round_i: int) -> AppointmentPin:
+	for pin in appointment_pins:
+		if pin.pinned_round == round_i:
+			return pin
+	return null
+
+
 func current_round() -> ScheduleRound:
 	if not GameConstants.is_schedule_round(round_index):
 		return null
-	for slot in rounds:
-		if slot.round_index == round_index:
-			return slot
-	return null
+	return slot_at(round_index)
 
 
 func current_round_action() -> GameEnums.RoundAction:
@@ -45,6 +56,96 @@ func current_round_action() -> GameEnums.RoundAction:
 	if slot == null:
 		return GameEnums.RoundAction.NONE
 	return slot.round_action
+
+
+func current_pin() -> AppointmentPin:
+	if not GameConstants.is_schedule_round(round_index):
+		return null
+	return pin_at(round_index)
+
+
+func resolved_count() -> int:
+	var n := 0
+	for slot in rounds:
+		if slot.round_action != GameEnums.RoundAction.NONE:
+			n += 1
+	return n
+
+
+func sync_rounds_left() -> void:
+	rounds_left = GameConstants.CHAPTER_ROUND_COUNT - resolved_count()
+
+
+func is_current_resolved() -> bool:
+	var slot := current_round()
+	return slot != null and slot.round_action != GameEnums.RoundAction.NONE
+
+
+func is_schedule_complete() -> bool:
+	return resolved_count() >= GameConstants.CHAPTER_ROUND_COUNT
+
+
+func begin_live(boss_id: String, pool_id: String, pins: Array[AppointmentPin]) -> void:
+	chapter_boss_id = boss_id
+	boss_pool_id = pool_id
+	appointment_pins = pins
+	appt_decline_used = false
+	crafts_done = 0
+	crafts_max = GameConstants.CRAFTS_MAX
+	player_owner_id = GameConstants.PHASE1_OWNER_ID
+	round_index = 1
+	for slot in rounds:
+		slot.round_action = GameEnums.RoundAction.NONE
+		slot.order_id = ""
+	sync_rounds_left()
+
+
+## Phase-1: exactly one primary action per round (docs/22, docs/20).
+func set_primary_action(action: GameEnums.RoundAction, order_id_: String = "") -> bool:
+	if action == GameEnums.RoundAction.NONE:
+		return false
+	var slot := current_round()
+	if slot == null or slot.round_action != GameEnums.RoundAction.NONE:
+		return false
+	if slot.is_reserved_final() and action == GameEnums.RoundAction.APPOINTMENT:
+		return false
+	slot.round_action = action
+	slot.order_id = order_id_
+	sync_rounds_left()
+	return true
+
+
+func advance_round() -> bool:
+	if not GameConstants.is_schedule_round(round_index):
+		return false
+	if round_index >= GameConstants.CHAPTER_ROUND_COUNT:
+		return false
+	round_index += 1
+	return true
+
+
+func to_dict() -> Dictionary:
+	var pin_rows: Array = []
+	for pin in appointment_pins:
+		pin_rows.append(pin.to_dict())
+	var round_rows: Array = []
+	for slot in rounds:
+		round_rows.append(slot.to_dict())
+	return {
+		"player_owner_id": player_owner_id,
+		"chapter_id": chapter_id,
+		"chapter_boss_id": chapter_boss_id,
+		"boss_pool_id": boss_pool_id,
+		"CHAPTER_ROUND_COUNT": GameConstants.CHAPTER_ROUND_COUNT,
+		"round_index": null if round_index == GameConstants.NULL_INT else round_index,
+		"rounds_left": rounds_left,
+		"round_action": GameEnums.round_action_wire(current_round_action()),
+		"appointment_pins": pin_rows,
+		"rounds": round_rows,
+		"appt_decline_used": appt_decline_used,
+		"crafts_done": crafts_done,
+		"crafts_max": crafts_max,
+	}
 
 
 func schema_errors() -> PackedStringArray:
@@ -60,8 +161,16 @@ func schema_errors() -> PackedStringArray:
 	var pin_n := appointment_pins.size()
 	if pin_n < GameConstants.APPOINTMENT_PIN_MIN or pin_n > GameConstants.APPOINTMENT_PIN_MAX:
 		errs.append("appointment_pins length %d not in 2..4" % pin_n)
+	var seen_pin_rounds := {}
+	var seen_pin_ids := {}
 	for pin in appointment_pins:
 		errs.append_array(pin.schema_errors())
+		if seen_pin_rounds.has(pin.pinned_round):
+			errs.append("duplicate appointment pin on round %d" % pin.pinned_round)
+		seen_pin_rounds[pin.pinned_round] = true
+		if seen_pin_ids.has(pin.appointment_id):
+			errs.append("duplicate appointment_id %s" % pin.appointment_id)
+		seen_pin_ids[pin.appointment_id] = true
 	for slot in rounds:
 		errs.append_array(slot.schema_errors())
 	if crafts_max != GameConstants.CRAFTS_MAX:

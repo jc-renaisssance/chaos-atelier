@@ -1,20 +1,28 @@
 ; Engine configuration file.
-; Chaos Atelier — Client 1B schema slice (no UI / loop).
-; Live spine: docs/22-chapter-schedule.md, docs/27-craft-mode-stamina.md,
-; docs/20-harness-stamp.md, docs/14-synergies.md.
+; Chaos Atelier — Client 1B schedule board slice.
+; Live spine: docs/22-chapter-schedule.md, docs/20-harness-stamp.md.
+; Schema from PR #10. Craft / shop / boss UI are later slices.
 
 config_version=5
 
 [application]
 
 config/name="Chaos Atelier"
-config/description="Travelling atelier — Godot data schema (Client 1B)"
+config/description="Travelling atelier — schedule board (Client 1B)"
+run/main_scene="res://src/ui/schedule/schedule_board.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 GameConstants="*res://src/autoload/game_constants.gd"
+AtelierSession="*res://src/autoload/atelier_session.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
 
 [rendering]
 
