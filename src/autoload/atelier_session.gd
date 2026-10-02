@@ -1,5 +1,6 @@
 extends Node
-## Live travelling-atelier session. Schedule board (docs/22) + stamina craft (docs/27).
+## Live travelling-atelier session. Schedule (22) + stamina craft (27) + mission (23/24).
+## Autoload singleton is already named AtelierSession — do not add class_name.
 
 signal board_changed
 signal resolve_started(payload: Dictionary)
@@ -34,6 +35,18 @@ var order_craft_done: bool = false
 var next_mat_free: bool = false
 var last_piece_result: Dictionary = {}
 var piece_results: Array = []
+var chapter_piece_results: Array = []
+var last_mission: Dictionary = {}
+
+var newspaper_open: bool = false
+var awaiting_boss: bool = false
+var boss_open: bool = false
+var chapter_over: bool = false
+var run_over: bool = false
+var run_over_reason: GameEnums.RunOverReason = GameEnums.RunOverReason.NONE
+var last_newspaper_event: GameEnums.NewspaperEvent = GameEnums.NewspaperEvent.NONE
+var last_headline_id: String = ""
+var last_letter_id: String = ""
 
 
 func _ready() -> void:
@@ -51,9 +64,20 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	last_note = ""
 	last_resolve = {}
 	last_event = {}
+	last_mission = {}
 	pending_order = null
 	resolve_open = false
 	declined_this_round = false
+	newspaper_open = false
+	awaiting_boss = false
+	boss_open = false
+	chapter_over = false
+	run_over = false
+	run_over_reason = GameEnums.RunOverReason.NONE
+	last_newspaper_event = GameEnums.NewspaperEvent.NONE
+	last_headline_id = ""
+	last_letter_id = ""
+	chapter_piece_results.clear()
 	_reset_craft_state()
 	stock = WagonStock.new()
 	stock.fill_starter()
@@ -62,12 +86,18 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	var boss_id := ScheduleRules.roll_boss(chapter_id, rng)
 	var pool_id := String(GameConstants.BOSS_POOL_IDS.get(chapter_id, ""))
 	board.begin_live(boss_id, pool_id, pins)
-	last_stamp = _make_schedule_stamp()
+	newspaper_open = true
+	resolve_open = true
+	last_newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
+	last_headline_id = GameConstants.HEADLINE_BOSS_ANNOUNCE
+	last_resolve = ScheduleRules.build_boss_announce(board)
+	last_stamp = _make_newspaper_stamp()
 	var errs := board.schema_errors()
 	if not errs.is_empty():
 		last_note = "schema: " + ", ".join(errs)
 	else:
-		last_note = "Boss announced at chapter start. Pins are 2–4 elite telegraphs on rounds 1–6."
+		last_note = "Kingdom newspaper — boss announced before spend. Pins are 2–4 elite telegraphs on rounds 1–6."
+	resolve_started.emit(last_resolve)
 	board_changed.emit()
 
 
@@ -83,13 +113,15 @@ func _reset_craft_state() -> void:
 
 
 func legal_actions() -> Array[GameEnums.RoundAction]:
-	if craft_open:
+	if craft_open or newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return []
 	return ScheduleRules.legal_actions(board, declined_this_round)
 
 
 func can_decline() -> bool:
 	if board == null or resolve_open or craft_open or board.appt_decline_used:
+		return false
+	if newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return false
 	return board.current_pin() != null and not board.is_current_resolved()
 
@@ -107,6 +139,8 @@ func decline_appointment() -> bool:
 
 func pick_action(action: GameEnums.RoundAction) -> bool:
 	if board == null or resolve_open or craft_open:
+		return false
+	if newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return false
 	if not ScheduleRules.is_legal(board, action, declined_this_round):
 		return false
@@ -234,12 +268,15 @@ func finish_early() -> bool:
 
 func _resolve_current_piece() -> void:
 	CraftRules.return_hand_copies(craft_session, stock)
-	var result := CraftResolver.resolve(craft_session, craft_session.construction_id)
+	var craft := CraftResolver.resolve(craft_session, craft_session.construction_id)
+	var result := MissionResolver.grade_piece(craft, craft_order)
 	var counted := board.count_finished_piece()
 	result["crafts_counted"] = counted
 	result["crafts_done"] = board.crafts_done
 	last_piece_result = result
 	piece_results.append(result)
+	if counted:
+		chapter_piece_results.append(result)
 	last_stamp = _make_craft_stamp(result)
 	var more := (
 		craft_session.piece_index < craft_session.piece_count
@@ -248,10 +285,12 @@ func _resolve_current_piece() -> void:
 	if more:
 		awaiting_next_piece = true
 		last_note = (
-			"Piece %d finished (%s). crafts_done=%d / %d (pieces, not orders). Sew the next construction."
+			"Piece %d finished (%s). rating %s · cleared %s. crafts_done=%d / %d (pieces, not orders)."
 			% [
 				craft_session.piece_index,
 				GameEnums.finish_reason_wire(craft_session.finish_reason),
+				GameEnums.rating_wire(result.get("rating", GameEnums.Rating.NONE)),
+				str(bool(result.get("cleared", false))),
 				board.crafts_done,
 				board.crafts_max,
 			]
@@ -260,7 +299,7 @@ func _resolve_current_piece() -> void:
 		awaiting_next_piece = false
 		order_craft_done = true
 		last_note = (
-			"Order sewn. %d piece(s). crafts_done=%d / %d. Return to the schedule."
+			"Order sewn. %d piece(s). crafts_done=%d / %d. Mission result next."
 			% [piece_results.size(), board.crafts_done, board.crafts_max]
 		)
 	piece_finished.emit(result)
@@ -279,41 +318,161 @@ func continue_after_piece() -> void:
 
 
 func _return_to_schedule() -> void:
-	last_resolve = ScheduleRules.build_craft_return(craft_order, piece_results)
+	var mission := MissionResolver.resolve_order(piece_results, craft_order)
+	last_mission = mission
+	last_letter_id = String(mission.get("letter_id", ""))
+	var apply_order_reps := craft_order != null and craft_order.mission_kind == GameEnums.MissionKind.ORDER
+	if apply_order_reps:
+		_apply_reps(mission, craft_order.card_difficulty)
+		if not bool(mission.get("cleared", false)):
+			last_newspaper_event = GameEnums.NewspaperEvent.MID_FAIL
+			last_headline_id = GameConstants.HEADLINE_MID_FAIL
+	last_resolve = ScheduleRules.build_mission_return(craft_order, mission, piece_results)
 	craft_open = false
 	awaiting_next_piece = false
 	order_craft_done = false
 	craft_session = null
 	resolve_open = true
-	last_stamp = _make_schedule_stamp()
-	last_note = "Craft closed. Continue to the next schedule round."
+	last_stamp = _make_mission_return_stamp(mission)
+	last_note = (
+		"Mission %s · cleared %s · hp %.2f. Continue to the next schedule round."
+		% [
+			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
+			str(bool(mission.get("cleared", false))),
+			float(mission.get("hp_remaining", 0.0)),
+		]
+	)
 	craft_order_finished.emit()
 	resolve_started.emit(last_resolve)
 	board_changed.emit()
 
 
 func _emit_cant_craft(order: ClientOrder) -> void:
-	var result := CraftResolver.cant_craft_result()
+	var result := MissionResolver.cant_craft_result()
 	last_piece_result = result
+	last_mission = result
+	last_letter_id = ""
+	if order != null and order.mission_kind == GameEnums.MissionKind.ORDER:
+		_apply_reps(result, order.card_difficulty)
+	last_newspaper_event = GameEnums.NewspaperEvent.MID_FAIL
+	last_headline_id = GameConstants.HEADLINE_MID_FAIL
 	last_stamp = _make_cant_craft_stamp(order, result)
-	last_resolve = ScheduleRules.build_cant_craft(order)
-	last_note = "cant_craft — crafts_max pieces already sewn this chapter. No session, crafts_done unchanged."
+	last_resolve = ScheduleRules.build_cant_craft(order, result)
+	last_note = "cant_craft — F, hp>0, aid 0. crafts_done unchanged. Mid-fail continues."
 	resolve_open = true
 
 
 func acknowledge_resolve() -> void:
 	if not resolve_open or craft_open:
 		return
+	if newspaper_open:
+		newspaper_open = false
+		resolve_open = false
+		last_newspaper_event = GameEnums.NewspaperEvent.NONE
+		last_headline_id = ""
+		last_resolve = {}
+		last_note = "Round %d — pick one action." % board.round_index
+		last_stamp = _make_schedule_stamp()
+		board_changed.emit()
+		return
+	if boss_open:
+		resolve_open = false
+		chapter_over = true
+		if run_over:
+			last_note = "Run over (%s). No retry." % GameEnums.run_over_reason_wire(run_over_reason)
+		else:
+			last_note = "Chapter clear. Next chapter is a demo cycle."
+			chapter_finished.emit()
+		last_stamp = _make_end_stamp()
+		board_changed.emit()
+		return
+	if awaiting_boss:
+		_run_boss()
+		return
+	if chapter_over or run_over:
+		return
 	resolve_open = false
 	declined_this_round = false
 	pending_order = null
+	last_newspaper_event = GameEnums.NewspaperEvent.NONE
+	last_headline_id = ""
 	if not board.advance_round():
-		last_note = "Schedule complete. Final prep / boss is the next slice (not this PR)."
-		chapter_finished.emit()
+		if _reps_gate_miss():
+			run_over = true
+			run_over_reason = GameEnums.RunOverReason.REPS_GATE_MISS
+			last_newspaper_event = GameEnums.NewspaperEvent.RUN_OVER
+			last_headline_id = GameConstants.HEADLINE_RUN_OVER
+			resolve_open = true
+			chapter_over = true
+			last_resolve = {
+				"resolve_class": "newspaper",
+				"title": "Run over — reps gate",
+				"body": "reps_after < reps_gate (stub gate %d). run_over_reason=reps_gate_miss." % GameConstants.REPS_GATE_STUB,
+				"stub": "newspaper_chrome",
+				"phase": "newspaper",
+			}
+			last_note = "Run over — reps_gate_miss. Gate numbers Later; stub gate is 0."
+			last_stamp = _make_end_stamp()
+			resolve_started.emit(last_resolve)
+		else:
+			awaiting_boss = true
+			resolve_open = true
+			last_resolve = ScheduleRules.build_awaiting_boss(board)
+			last_note = "Schedule complete. Face the announced boss."
+			last_stamp = _make_schedule_stamp()
+			resolve_started.emit(last_resolve)
 	else:
+		last_resolve = {}
 		last_note = "Round %d — pick one action." % board.round_index
-	last_stamp = _make_schedule_stamp()
+		last_stamp = _make_schedule_stamp()
 	board_changed.emit()
+
+
+func _reps_gate_miss() -> bool:
+	## docs/20 assert 19. Gate numbers Later — stub 0 never trips a started-at-0 run.
+	return reps < GameConstants.REPS_GATE_STUB
+
+
+func _run_boss() -> void:
+	awaiting_boss = false
+	boss_open = true
+	var mission := MissionResolver.resolve_boss(chapter_piece_results, board.chapter_boss_id)
+	last_mission = mission
+	last_letter_id = String(mission.get("letter_id", ""))
+	var cleared := bool(mission.get("cleared", false))
+	if not cleared:
+		run_over = true
+		run_over_reason = GameEnums.RunOverReason.BOSS_DEATH
+		last_newspaper_event = GameEnums.NewspaperEvent.RUN_OVER
+		last_headline_id = GameConstants.HEADLINE_RUN_OVER
+	else:
+		last_newspaper_event = GameEnums.NewspaperEvent.CHAPTER_RESULT
+		last_headline_id = GameConstants.HEADLINE_CHAPTER_RESULT
+	mission["run_over"] = run_over
+	mission["run_over_reason"] = run_over_reason
+	last_resolve = ScheduleRules.build_boss_result(board, mission, run_over)
+	last_stamp = _make_boss_stamp(mission)
+	last_note = (
+		"Boss %s · rating %s · cleared %s · run_over %s."
+		% [
+			ScheduleCatalog.boss_title(board.chapter_boss_id),
+			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
+			str(cleared),
+			str(run_over),
+		]
+	)
+	resolve_open = true
+	resolve_started.emit(last_resolve)
+	board_changed.emit()
+
+
+func _apply_reps(result: Dictionary, card_difficulty: int) -> void:
+	var applied := RepsRules.apply(reps, result, card_difficulty)
+	reps = int(applied.get("reps_after", reps))
+	result["reps_before"] = applied["reps_before"]
+	result["reps_after"] = applied["reps_after"]
+	result["reps_delta"] = applied["reps_delta"]
+	result["reps_gate"] = applied["reps_gate"]
 
 
 func cycle_demo_chapter() -> void:
@@ -328,48 +487,20 @@ func cycle_demo_chapter() -> void:
 func stamp_preview() -> Dictionary:
 	if last_stamp == null:
 		return {}
-	var dump := last_stamp.to_dict()
-	var preview := {
-		"run_id": dump.get("run_id"),
-		"player_owner_id": dump.get("player_owner_id"),
-		"chapter_id": dump.get("chapter_id"),
-		"chapter_boss_id": dump.get("chapter_boss_id"),
-		"boss_pool_id": dump.get("boss_pool_id"),
-		"CHAPTER_ROUND_COUNT": dump.get("CHAPTER_ROUND_COUNT"),
-		"round_index": dump.get("round_index"),
-		"rounds_left": dump.get("rounds_left"),
-		"round_action": dump.get("round_action"),
-		"appointment_pins": dump.get("appointment_pins"),
-		"appt_decline_used": dump.get("appt_decline_used"),
-		"crafts_done_this_chapter": dump.get("crafts_done_this_chapter"),
-		"crafts_max": dump.get("crafts_max"),
-		"phase": dump.get("phase"),
-		"mission_kind": dump.get("mission_kind"),
-		"order_id": dump.get("order_id"),
-		"construction_ids": dump.get("construction_ids"),
-		"construction_id": dump.get("construction_id"),
-		"piece_index": dump.get("piece_index"),
-		"piece_count": dump.get("piece_count"),
-		"stamina_start": dump.get("stamina_start"),
-		"stamina_remaining": dump.get("stamina_remaining"),
-		"stamina_spent": dump.get("stamina_spent"),
-		"hand_size": dump.get("hand_size"),
-		"dig_refresh_cost": dump.get("dig_refresh_cost"),
-		"dig_count": dump.get("dig_count"),
-		"cards_played": dump.get("cards_played"),
-		"early_finish": dump.get("early_finish"),
-		"finish_reason": dump.get("finish_reason"),
-		"tag_counts": dump.get("tag_counts"),
-		"craft_rarity": dump.get("craft_rarity"),
-		"powers_positive": dump.get("powers_positive"),
-		"powers_negative": dump.get("powers_negative"),
-		"outlook_id": dump.get("outlook_id"),
-		"outlook_order": dump.get("outlook_order"),
-		"rating": dump.get("rating"),
-		"cleared": dump.get("cleared"),
-		"cant_craft": dump.get("cant_craft"),
-	}
-	return preview
+	## Full docs/20 dump — Test smoke pairs against this, not a subset.
+	return last_stamp.to_dict()
+
+
+func _apply_run_meta(stamp: HarnessStamp) -> void:
+	stamp.reps_before = int(last_mission.get("reps_before", reps)) if last_mission.has("reps_before") else reps
+	stamp.reps_after = int(last_mission.get("reps_after", reps)) if last_mission.has("reps_after") else reps
+	stamp.reps_delta = int(last_mission.get("reps_delta", 0)) if last_mission.has("reps_delta") else (stamp.reps_after - stamp.reps_before)
+	stamp.reps_gate = GameConstants.REPS_GATE_STUB
+	stamp.run_over = run_over
+	stamp.run_over_reason = run_over_reason
+	stamp.newspaper_event = last_newspaper_event
+	stamp.newspaper_headline_id = last_headline_id
+	stamp.letter_id = last_letter_id
 
 
 func _base_stamp() -> HarnessStamp:
@@ -377,13 +508,23 @@ func _base_stamp() -> HarnessStamp:
 	stamp.run_id = run_id
 	if board != null:
 		stamp.apply_schedule(board)
-	stamp.reps_before = reps
-	stamp.reps_after = reps
+	_apply_run_meta(stamp)
 	return stamp
 
 
 func _make_schedule_stamp() -> HarnessStamp:
 	return _base_stamp()
+
+
+func _make_newspaper_stamp() -> HarnessStamp:
+	var stamp := _base_stamp()
+	stamp.phase = GameEnums.StampPhase.NEWSPAPER
+	stamp.round_index = GameConstants.NULL_INT
+	stamp.round_action = GameEnums.RoundAction.NONE
+	stamp.session = null
+	stamp.newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
+	stamp.newspaper_headline_id = GameConstants.HEADLINE_BOSS_ANNOUNCE
+	return stamp
 
 
 func _make_craft_stamp(result: Dictionary = {}) -> HarnessStamp:
@@ -392,6 +533,20 @@ func _make_craft_stamp(result: Dictionary = {}) -> HarnessStamp:
 		stamp.apply_piece_session(craft_order, craft_session)
 	if not result.is_empty():
 		stamp.apply_resolver(result)
+	return stamp
+
+
+func _make_mission_return_stamp(mission: Dictionary) -> HarnessStamp:
+	var stamp := _base_stamp()
+	if craft_order != null:
+		stamp.mission_kind = craft_order.mission_kind
+		stamp.order_id = craft_order.order_id
+		stamp.threat_id = craft_order.threat_id
+		stamp.construction_ids = craft_order.construction_ids.duplicate()
+		stamp.card_difficulty = craft_order.card_difficulty
+	stamp.phase = GameEnums.StampPhase.CRAFT
+	stamp.session = null
+	stamp.apply_resolver(mission)
 	return stamp
 
 
@@ -407,4 +562,34 @@ func _make_cant_craft_stamp(order: ClientOrder, result: Dictionary) -> HarnessSt
 	stamp.session = null
 	stamp.cant_craft = true
 	stamp.apply_resolver(result)
+	return stamp
+
+
+func _make_boss_stamp(result: Dictionary) -> HarnessStamp:
+	var stamp := _base_stamp()
+	stamp.phase = GameEnums.StampPhase.BOSS
+	stamp.mission_kind = GameEnums.MissionKind.BOSS
+	stamp.order_id = ""
+	stamp.threat_id = board.chapter_boss_id if board != null else ""
+	stamp.construction_ids = PackedStringArray()
+	stamp.construction_id = ""
+	stamp.card_difficulty = 3
+	stamp.session = null
+	stamp.apply_resolver(result)
+	stamp.run_over = run_over
+	stamp.run_over_reason = run_over_reason
+	return stamp
+
+
+func _make_end_stamp() -> HarnessStamp:
+	var stamp := _base_stamp()
+	if run_over:
+		stamp.phase = GameEnums.StampPhase.NEWSPAPER
+		stamp.newspaper_event = GameEnums.NewspaperEvent.RUN_OVER
+		stamp.newspaper_headline_id = GameConstants.HEADLINE_RUN_OVER
+	else:
+		stamp.phase = GameEnums.StampPhase.NEWSPAPER
+		stamp.newspaper_event = GameEnums.NewspaperEvent.CHAPTER_RESULT
+		stamp.newspaper_headline_id = GameConstants.HEADLINE_CHAPTER_RESULT
+	stamp.session = null
 	return stamp

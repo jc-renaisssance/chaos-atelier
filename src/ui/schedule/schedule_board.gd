@@ -1,11 +1,13 @@
 extends Control
 ## Travelling-atelier schedule board (docs/22). Order actions overlay stamina craft (docs/27).
 
-const INK := Color.html("#e8d5b0")
-const MUTED := Color.html("#b5a48a")
-const GOLD := Color.html("#c9a227")
-const WOOD := Color.html("#1a1410")
-const PANEL := Color.html("#2a2118")
+## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const INK := Color(0.91, 0.835, 0.69)
+const MUTED := Color(0.71, 0.643, 0.541)
+const GOLD := Color(0.788, 0.635, 0.153)
+const WOOD := Color(0.102, 0.078, 0.063)
+const PANEL := Color(0.165, 0.129, 0.094)
+const BORDER := Color(0.239, 0.204, 0.173)
 
 var _title: Label
 var _meta: Label
@@ -95,7 +97,7 @@ func _build() -> void:
 	_continue_btn = _btn("Continue", _on_continue)
 	today_row.add_child(_continue_btn)
 
-	root.add_child(_caption("RESOLVE  ·  order vs event  ·  no lineup cards"))
+	root.add_child(_caption("RESOLVE  ·  mission (23/24)  ·  no lineup cards"))
 	var resolve := _panel()
 	root.add_child(resolve)
 	var resolve_box := VBoxContainer.new()
@@ -112,7 +114,7 @@ func _build() -> void:
 	_resolve_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	resolve_box.add_child(_resolve_body)
 
-	root.add_child(_caption("STAMP  ·  docs/20 schedule + stamina  ·  crafts_done counts pieces"))
+	root.add_child(_caption("STAMP  ·  docs/20 full dump  ·  crafts_done counts pieces"))
 	var stamp_panel := _panel()
 	stamp_panel.custom_minimum_size.y = 96
 	root.add_child(stamp_panel)
@@ -131,7 +133,7 @@ func _build() -> void:
 	root.add_child(demo)
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("Schedule + stamina craft. Shop / boss / newspaper stay later slices.", 12, MUTED)
+	var hint := _label("own_basic loop: newspaper → schedule → craft → mission → boss stub. Shop / reps-gate numbers Later.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	demo.add_child(hint)
@@ -159,7 +161,7 @@ func _panel() -> PanelContainer:
 	sb.bg_color = PANEL
 	sb.set_corner_radius_all(8)
 	sb.set_border_width_all(1)
-	sb.border_color = Color.html("#3d342c")
+	sb.border_color = BORDER
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
 	sb.content_margin_top = 10
@@ -186,17 +188,19 @@ func _redraw() -> void:
 	var boss := ScheduleCatalog.boss_title(board.chapter_boss_id)
 	_title.text = "CHAOS ATELIER  ·  travelling wagon  ·  %s" % board.player_owner_id
 	_meta.text = (
-		"Chapter %d / %d   ·   boss %s (%s)   ·   round %s / %d   ·   %d left   ·   pieces %d / %d   ·   decline %s   ·   seed %d"
+		"Chapter %d / %d   ·   boss %s (%s)   ·   round %s / %d   ·   %d left   ·   pieces %d / %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
 		% [
 			board.chapter_id,
 			GameConstants.CHAPTERS_PER_RUN,
 			boss,
 			board.boss_pool_id,
-			"—" if board.round_index == GameConstants.NULL_INT else str(board.round_index),
+			"—" if AtelierSession.newspaper_open else str(board.round_index),
 			GameConstants.CHAPTER_ROUND_COUNT,
 			board.rounds_left,
 			board.crafts_done,
 			board.crafts_max,
+			AtelierSession.reps,
+			GameConstants.REPS_GATE_STUB,
 			"used" if board.appt_decline_used else "open (once / chapter)",
 			AtelierSession.chapter_seed,
 		]
@@ -220,14 +224,27 @@ func _rebuild_actions() -> void:
 	var legal: Array[GameEnums.RoundAction] = AtelierSession.legal_actions()
 	_decline_btn.visible = AtelierSession.can_decline()
 	_decline_btn.disabled = not AtelierSession.can_decline()
-	_continue_btn.visible = AtelierSession.resolve_open or (board != null and board.is_schedule_complete())
+	_continue_btn.visible = AtelierSession.resolve_open or AtelierSession.chapter_over or AtelierSession.run_over
 	_continue_btn.disabled = not AtelierSession.resolve_open
-	if board != null and board.is_schedule_complete() and not AtelierSession.resolve_open:
-		_today_title.text = "Chapter schedule finished. Final prep / boss is not this slice."
-		_continue_btn.text = "Schedule complete"
+	if AtelierSession.newspaper_open:
+		_today_title.text = "Kingdom newspaper — boss announced. Dismiss into the schedule."
+		_continue_btn.text = "Open the schedule"
+		return
+	if AtelierSession.boss_open:
+		_today_title.text = "Boss encounter resolved."
+		_continue_btn.text = "Run over" if AtelierSession.run_over else "Close the chapter"
+		return
+	if AtelierSession.awaiting_boss:
+		_today_title.text = "Schedule finished. Face the announced boss."
+		_continue_btn.text = "Face the boss"
+		return
+	if AtelierSession.chapter_over or AtelierSession.run_over:
+		_today_title.text = "Chapter closed." if not AtelierSession.run_over else "Run over — no retry."
+		_continue_btn.text = "Chapter closed"
+		_continue_btn.disabled = true
 		return
 	if AtelierSession.resolve_open:
-		_today_title.text = "Action locked. Continue to the next round."
+		_today_title.text = "Action locked. Continue after the mission / event result."
 		_continue_btn.text = "Continue"
 		return
 	var pin := board.current_pin() if board != null else null
@@ -250,14 +267,15 @@ func _rebuild_actions() -> void:
 
 func _refresh_resolve() -> void:
 	if AtelierSession.last_resolve.is_empty() and not AtelierSession.resolve_open:
-		if AtelierSession.board != null and AtelierSession.board.is_schedule_complete():
-			_resolve_title.text = "Board complete"
-			_resolve_body.text = "Eight rounds resolved. No lineup. Boss / mission report / win-con stay later."
+		if AtelierSession.chapter_over or AtelierSession.run_over:
+			_resolve_title.text = "Run over" if AtelierSession.run_over else "Chapter closed"
+			_resolve_body.text = AtelierSession.last_note
 		else:
 			_resolve_title.text = "Waiting for a pick."
 			_resolve_body.text = (
-				"Order path: appointment, walk-in, prep craft → stamina craft (docs/27). "
-				+ "Event path: wagon event, wagon shop, rest / dig → resolve here, stay phase=schedule."
+				"Order path: appointment, walk-in, prep craft → stamina craft → mission result (docs/23, 24). "
+				+ "Event path: wagon event, wagon shop, rest / dig → stay phase=schedule. "
+				+ "After round 8: boss stub. Mid-fail continues; boss fail = run_over."
 			)
 		return
 	var payload: Dictionary = AtelierSession.last_resolve

@@ -1,7 +1,6 @@
 class_name CraftResolver
 extends RefCounted
-## Tag tally + rarity + synergy rows + stub mission (docs/14, 18, 20).
-## Full mission sim / newspaper / reps gates are out of scope.
+## Tag tally + rarity + synergy rows (docs/14, 18, 20). Mission grade is MissionResolver.
 
 const POSITIVE_TAG_ROWS := [
 	{"id": "syn_fire_3", "tag": "Fire", "tier": 1, "outlook_order": 90},
@@ -185,14 +184,6 @@ static func resolve(session: CraftStaminaSession, construction_id: String) -> Di
 				continue
 			stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
 	var played_n := session.cards_played.size() if session != null else 0
-	var rating := _stub_rating(rarity, played_n)
-	var hp_left := 1.0
-	var dmg := clampi(stats.ATK * 12, 0, 100)
-	var stars := 3
-	if played_n == 0:
-		dmg = 0
-		stars = 2
-	var cleared := hp_left > 0.0 and GameEnums.rating_clears(rating)
 	return {
 		"tag_counts": bag,
 		"craft_rarity": rarity,
@@ -201,47 +192,11 @@ static func resolve(session: CraftStaminaSession, construction_id: String) -> Di
 		"outlook_id": outlook_id,
 		"outlook_order": outlook_order,
 		"stats": stats,
-		"rating": rating,
-		"hp_remaining": hp_left,
-		"damage_aid_pct": dmg,
-		"skill_effectiveness": stars,
-		"cleared": cleared,
-		"mission_failed": not cleared,
-		"outcome": GameEnums.Outcome.WIN if cleared else GameEnums.Outcome.MIXED,
 		"unique_id": uniq,
-		"mission_stub": true,
+		"cards_played_n": played_n,
+		"mission_stub": false,
 	}
 
 
 static func cant_craft_result() -> Dictionary:
-	return {
-		"tag_counts": {},
-		"craft_rarity": GameEnums.CraftRarity.NONE,
-		"powers_positive": PackedStringArray(),
-		"powers_negative": PackedStringArray(),
-		"outlook_id": "plain",
-		"outlook_order": 0,
-		"stats": GearStats.new(),
-		"rating": GameEnums.Rating.F,
-		"hp_remaining": 1.0,
-		"damage_aid_pct": 0,
-		"skill_effectiveness": 1,
-		"cleared": false,
-		"mission_failed": true,
-		"outcome": GameEnums.Outcome.LOSE,
-		"unique_id": "",
-		"mission_stub": true,
-		"cant_craft": true,
-	}
-
-
-static func _stub_rating(rarity: GameEnums.CraftRarity, played_n: int) -> GameEnums.Rating:
-	if played_n == 0:
-		return GameEnums.Rating.D
-	match rarity:
-		GameEnums.CraftRarity.LEGENDARY:
-			return GameEnums.Rating.A
-		GameEnums.CraftRarity.RARE:
-			return GameEnums.Rating.B
-		_:
-			return GameEnums.Rating.C
+	return MissionResolver.cant_craft_result()

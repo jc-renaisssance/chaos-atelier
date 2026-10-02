@@ -1,6 +1,7 @@
-class_name GameConstants
 extends Node
 ## Phase-1 bible numbers. Docs 22 / 27 / 20 / 14. Not a resolver or loop.
+## Autoload singleton is already named GameConstants — do not add class_name
+## (Godot 4.7 hides the autoload behind the named class and fails to compile).
 
 const SCHEMA_SLICE := "1B"
 const PHASE1_OWNER_ID := "own_basic"
@@ -59,8 +60,19 @@ const OWNER_SKILL_DRAFT_COSTS := {
 	"sk_steady_hand": 1,
 }
 
-## docs/25 gate numbers still track the old 3-round shell — not locked here.
+## docs/25 algorithm is live; C1=8 / C2=14 / C3=20 still track the old 3-round shell.
 const REPS_START := 0
+const REPS_GATE_STUB := 0
+
+## Newspaper / letter chrome ids (docs/26, 23). Copy tables Later; ids stable for harness.
+const HEADLINE_BOSS_ANNOUNCE := "hd_boss_announce"
+const HEADLINE_MID_FAIL := "hd_mid_fail"
+const HEADLINE_CHAPTER_RESULT := "hd_chapter_result"
+const HEADLINE_RUN_OVER := "hd_run_over"
+const LETTER_NEG_COMPLAINT := "let_neg_complaint"
+const LETTER_RARE_IMPRESSED := "let_rare_impressed"
+const LETTER_LEG_AWE := "let_leg_awe"
+const LETTER_BOSS_VICTORY := "let_boss_victory"
 
 
 static func is_appointment_pin_round(round_index: int) -> bool:

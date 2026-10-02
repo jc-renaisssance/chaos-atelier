@@ -2,11 +2,14 @@ class_name CraftTable
 extends Control
 ## Stamina craft table (docs/27). Construction from the order. No lineup / 2m1r / picker.
 
-const INK := Color.html("#e8d5b0")
-const MUTED := Color.html("#b5a48a")
-const GOLD := Color.html("#c9a227")
-const WOOD := Color.html("#1a1410")
-const PANEL := Color.html("#2a2118")
+## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const INK := Color(0.91, 0.835, 0.69)
+const MUTED := Color(0.71, 0.643, 0.541)
+const GOLD := Color(0.788, 0.635, 0.153)
+const WOOD := Color(0.102, 0.078, 0.063)
+const PANEL := Color(0.165, 0.129, 0.094)
+const BORDER := Color(0.239, 0.204, 0.173)
+const CHIP := Color(0.227, 0.173, 0.094)
 
 var _title: Label
 var _meta: Label
@@ -117,7 +120,7 @@ func _build() -> void:
 	_continue_btn = _btn("Continue", _on_continue)
 	btns.add_child(_continue_btn)
 
-	root.add_child(_caption("RESOLVER  ·  tag tally  ·  mission sim stub"))
+	root.add_child(_caption("RESOLVER  ·  tag tally  ·  mission result (23/24)"))
 	var res := _panel()
 	root.add_child(res)
 	_result = _label("Play cards into the piece, or finish empty.", 13, INK)
@@ -157,7 +160,7 @@ func _panel() -> PanelContainer:
 	sb.bg_color = PANEL
 	sb.set_corner_radius_all(8)
 	sb.set_border_width_all(1)
-	sb.border_color = Color.html("#3d342c")
+	sb.border_color = BORDER
 	sb.content_margin_left = 12
 	sb.content_margin_right = 12
 	sb.content_margin_top = 10
@@ -288,7 +291,7 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 func _chip(text: String) -> PanelContainer:
 	var panel := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color.html("#3a2c18")
+	sb.bg_color = CHIP
 	sb.set_corner_radius_all(6)
 	sb.content_margin_left = 8
 	sb.content_margin_right = 8
@@ -301,20 +304,26 @@ func _chip(text: String) -> PanelContainer:
 
 func _refresh_result(session: CraftStaminaSession) -> void:
 	if AtelierSession.last_piece_result.is_empty() or not session.is_finished():
-		_result.text = "Mission / boss sim is stubbed. Tag tally + rarity + synergies stamp on finish."
+		_result.text = "Finish the piece to stamp tags, rarity, synergies, and a real mission grade (docs/23)."
 		return
 	var result: Dictionary = AtelierSession.last_piece_result
 	_result.text = (
-		"Finish %s   ·   rarity %s   ·   look %s (%d)   ·   rating %s (stub)   ·   tags %s   ·   +%s   ·   −%s"
+		"Finish %s   ·   rarity %s   ·   look %s (%d)   ·   rating %s   ·   cleared %s   ·   hp %.2f   ·   aid %d%%   ·   ★%d   ·   tags %s   ·   +%s   ·   −%s   ·   favor %s   ·   punish %s"
 		% [
 			GameEnums.finish_reason_wire(session.finish_reason),
 			GameEnums.craft_rarity_wire(result.get("craft_rarity", GameEnums.CraftRarity.NONE)),
 			String(result.get("outlook_id", "plain")),
 			int(result.get("outlook_order", 0)),
 			GameEnums.rating_wire(result.get("rating", GameEnums.Rating.NONE)),
+			str(bool(result.get("cleared", false))),
+			float(result.get("hp_remaining", 0.0)),
+			int(result.get("damage_aid_pct", 0)),
+			int(result.get("skill_effectiveness", 1)),
 			str(result.get("tag_counts", {})),
 			str(result.get("powers_positive", [])),
 			str(result.get("powers_negative", [])),
+			str(result.get("favor_tags_hit", [])),
+			str(result.get("punish_tags_hit", [])),
 		]
 	)
 
