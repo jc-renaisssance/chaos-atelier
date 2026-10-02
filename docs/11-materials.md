@@ -1,6 +1,6 @@
 # Materials dictionary
 
-Layer 1 — **Material**. **Durable** cards in the deck. A craft may play **multiple** materials into one construction — play spends **stamina only**; the card stays in hand / stock ([27](27-craft-mode-stamina.md)). `material_slots` is legacy slot-fill.
+Layer 1 — **Material**. Deck cards. A craft may play **multiple** materials into one construction — play costs **stamina** and the card **leaves the hand** → discard ([27](27-craft-mode-stamina.md)). Cards stay in the run deck via discard→reshuffle, not in hand after play. `material_slots` is legacy slot-fill.
 
 Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare · **5** forbidden.
 
@@ -80,10 +80,10 @@ Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare �
 
 ## Multi-stack rules
 
-- Materials are **durable cards**. Play several into one craft (stamina only; no hard slot cap in live craft — `material_slots` is legacy).
-- **Same id may repeat** (Armor + Stone Shard ×3 is valid).
+- Play several into one craft (stamina cost + leave hand → discard; no hard slot cap in live craft — `material_slots` is legacy).
+- **Same id may repeat** (Armor + Stone Shard ×3 is valid) via copies or after discard→reshuffle — not by replaying one in-hand card.
 - Stats and tags **sum / bag-count** — three Stone Shards = Earth×3 and Metal×3 from materials alone.
-- Play does **not** remove the card from hand or stock. Shop sell / explicit loss still change stock. Round-generated **consumables** (Later, distinct type — [27](27-craft-mode-stamina.md)) **burn** on use; do not treat materials as burn cards.
+- Play **removes the card from hand** into discard (unless a special card says otherwise). Cards remain in the atelier via reshuffle. Shop sell / explicit loss still change stock. Round-generated **consumables** (Later, distinct type — [27](27-craft-mode-stamina.md)) **burn** on use; do not treat materials as burn cards. **Supersedes durable-in-hand (#17).**
 
 ## Draft shop rules
 
