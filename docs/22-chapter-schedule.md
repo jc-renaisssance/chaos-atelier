@@ -37,7 +37,7 @@ Each round: player picks **one** primary action (Phase-1). Later: dual actions v
 
 - At chapter start, reveal **2–4** named appointments pinned to future rounds (like StS elites visible ahead).
 - Optional mid-chapter refresh may add 0–1 more (Later).
-- On the pinned round, taking the appointment **enters craft mode** for that order.
+- On the pinned round, taking the appointment **enters craft mode once** for that order. Multi-piece = **one** parallel session ([27](27-craft-mode-stamina.md)) — **not** N sequential sessions. `crafts_done` still counts **pieces**.
 - **Decline / reschedule:** Later (rep cost). Phase-1: decline allowed once per chapter at −reps.
 - **Show up unready** (no matching prep / empty deck): worse payout, fail-leaning mission result, normal fail reps (not death unless sim says so).
 

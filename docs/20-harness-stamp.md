@@ -4,7 +4,7 @@
 
 > **Not live — do not assert.** `lineup_card_ids`, `picked_card_id`, and `max_materials` / `max_runes` (2m1r) track the superseded 1-of-3 / slot-fill shell. They are **not** Required. See [Superseded](#superseded).
 
-Headless **client × threat × build** dumps — same job as the 1A row: readable, assertable. Multi-piece order = **N sessions, one stamp each**.
+Headless **client × threat × build** dumps — same job as the 1A row: readable, assertable. Multi-piece order = **one session**, **N stamps at Finish** (one per piece). **Supersedes** sequential N sessions.
 
 ## Constants (Phase-1 draft)
 
@@ -15,9 +15,10 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | Appointment pins | **2–4** | At chapter start; not on last 2 rounds |
 | Reserved rounds | last **2** | No appointments (rounds 7–8) |
 | Primary actions / round | **1** | Phase-1 |
-| `stamina_start` | **12** | Per piece |
+| `stamina_start` | **12 × N** | Session pool; N = `piece_count` (draft) |
+| `zone_count_max` | **4** | Unused zones empty if N < 4; N > 4 = Later |
 | `hand_size` | **5** | No auto-refill |
-| `dig_refresh_cost` | **2** | Stamina |
+| `dig_refresh_cost` | **2** | Stamina (not × N) |
 | Common / uncommon / rare mat cost | 1 / 2 / 3 | Play cost |
 | Enchantment play cost | **2** | |
 | Phase-1 owner | `own_basic` | |
@@ -48,7 +49,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `crafts_max` | int | Always **4** |
 | `phase` | enum | `schedule` \| `craft` \| `boss` \| `newspaper` |
 
-**Lock:** `crafts_done_this_chapter` / `crafts_max=4` counts **pieces** (each construction in a multi-piece order), not whole orders. Example: armor + gloves = 2 of 4.
+**Lock:** `crafts_done_this_chapter` / `crafts_max=4` counts **pieces** (each construction in a multi-piece order), not whole orders. Example: armor + gloves = 2 of 4. Multi-piece still increments **per piece** after the **one** Finish — not +1 per order.
 
 `phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `round_action` on `phase=schedule`. Travel events are `round_action=wagon_event`. Boss beat: craft **for the boss-client** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **client** fights, not the player (`17`).
 
@@ -71,29 +72,32 @@ Prep (`mission_kind=prep`) still runs the resolver on finish; mission-sim fields
 
 | Field | Type | Notes |
 |---|---|---|
-| `piece_index` | int | 1-based; this stamp's piece |
-| `piece_count` | int | `len(construction_ids)` — N pieces → N stamps |
-| `stamina_start` | int | Phase-1 draft **12** per piece |
-| `stamina_remaining` | int | ≥ 0 at stamp |
-| `stamina_spent` | int | Plays + digs (after modifiers) |
+| `piece_index` | int | 1-based; this stamp's piece (`construction_ids[piece_index-1]`) |
+| `piece_count` | int | `len(construction_ids)` — N pieces → **N stamps, one session** |
+| `zone_count` | int | Live drop zones this session. Phase-1: **`== piece_count`**, ∈ 1..4 |
+| `stamina_start` | int | Phase-1 draft **`12 * piece_count`** — **session** pool, not per piece |
+| `stamina_remaining` | int | ≥ 0 at stamp — **session** value (shared); repeated on each piece stamp |
+| `stamina_spent` | int | Plays + digs (after modifiers) — **session** value |
 | `hand_size` | int | Phase-1 draft **5** |
-| `dig_refresh_cost` | int | Phase-1 draft **2** |
-| `dig_count` | int | Refresh / dig calls this piece |
-| `cards_played` | object[] | `{ id, type, cost }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers. Play of any type **leaves the hand** → discard (unless a special card says otherwise) |
+| `dig_refresh_cost` | int | Phase-1 draft **2** (not × N) |
+| `dig_count` | int | Refresh / dig calls this **session** |
+| `cards_played` | object[] | `{ id, type, cost, zone_index, construction_id }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers; `zone_index` 1-based ∈ 1..`zone_count`; `construction_id` = `construction_ids[zone_index-1]`. Play of any type **leaves the hand** → discard (unless a special card says otherwise). Stamp may list the **session** plays or this piece's bag only; Test filters by `zone_index` for the bag |
 | `early_finish` | bool | **Superseded as a distinct end.** If emitted: player clicked Finish (same as `player_finish`). Not “stop before empty.” |
-| `finish_reason` | enum | **`player_finish` only** — Finish button. Phase-1 legal end. |
+| `finish_reason` | enum | **`player_finish` only** — one Finish ends the **session**. Every piece stamp from that Finish uses `player_finish`. |
 
 Null the session block when not in craft (schedule shop / event / rest, newspaper). `cant_craft` stamps have no legal session — see asserts.
 
-Skills in `cards_played` are owner skills (manipulate the session, then leave). They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft).
+Skills in `cards_played` are owner skills (manipulate the session, then leave). They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft). Phase-1: skill plays still carry `zone_index` / `construction_id` (target bag). Skills that hit every zone = Later.
 
-**Finish only (supersedes stamina_0 auto-finish):** piece ends when the player clicks **Finish** — `finish_reason == player_finish`. `stamina_remaining == 0` / `stamina_0` is **state**, not end. Cards stay; resolver waits. `finish_reason: stamina_0` and “empty stamina auto-crafts” are **superseded**. Prefer `player_finish` over `early_finish` — Finish is the only button, whether stamina is 0 or not. **0-cost cards** / further owner abilities at 0 stamina = **Later** (`27`) — do not invent catalog or assert them.
+**Finish only (supersedes stamina_0 auto-finish):** session ends when the player clicks **Finish** — `finish_reason == player_finish`. **One Finish** resolves every zone in listed order and emits **one stamp per piece**. `stamina_remaining == 0` / `stamina_0` is **state**, not end. Cards stay; resolver waits. `finish_reason: stamina_0` and “empty stamina auto-crafts” are **superseded**. Prefer `player_finish` over `early_finish` — Finish is the only button, whether stamina is 0 or not. **0-cost cards** / further owner abilities at 0 stamina = **Later** (`27`) — do not invent catalog or assert them.
+
+**Parallel multi-piece (supersedes sequential N sessions):** one shared stamina pool (`stamina_start == 12 * N`). Do **not** emit a stamp mid-session when piece N is “done” and then start N+1 with a fresh 12. Empty zone at Finish = construction-only bag for that stamp — **not** `cant_craft`. Do not invent a harsh empty-piece fail.
 
 **Hand cycle (supersedes durable-in-hand, #17):** play any card → it **leaves the hand** → **discard** (unless a special card says otherwise). Refresh / dig: remaining hand drops to discard, then draw up to `hand_size` from the **draw** pile; if draw is short mid-draw, **shuffle discard into draw** and continue. Cards remain in the **run deck** via reshuffle — not deleted from the atelier, and **not** “stay in hand after play.” Stamina still costs on play. Hand / draw / discard pile arrays are Design law in [27](27-craft-mode-stamina.md) — not extra Required dump fields unless Test later stamps them.
 
 Round-generated **consumable** cards (Later; distinct type, **not** in this enum) **burn** on use when stamped. Do not emit a fake consumable field.
 
-**Live item readout** (Design UX in [27](27-craft-mode-stamina.md)): Current stats + Potential outlook (locked / hidden if outlook not unlocked). Not a Phase-1 dump assert — no extra stamp fields. Unchanged from stamp 2.
+**Live item readout** (Design UX in [27](27-craft-mode-stamina.md)): Current stats + Potential outlook for the **selected / active zone** (locked / hidden if outlook not unlocked). Not a Phase-1 dump assert — no extra stamp fields. Per-zone simultaneous readout = Later.
 
 ### Resolver outputs (craft finish / mission / boss)
 
@@ -150,11 +154,11 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 ### Stamina craft
 
 12. `construction_id` / `construction_ids` come from the **order**, not a player construction pick. No construction cards in `cards_played`.
-13. `cards_played[].type` ∈ {`material`, `rune`, `skill`} only. Play of any type **leaves the hand** → discard (unless a special card says otherwise). The card stays in the run deck via discard→reshuffle — not deleted from the atelier. Consumable type is Later — do not assert a field that is not in the enum.
-14. Piece ends iff the player clicks **Finish** — `finish_reason == player_finish`. `stamina_remaining == 0` does **not** end the piece or run the resolver. `finish_reason: stamina_0` is **superseded** (must not mean auto-craft). Empty hand / empty stamina is legal until Finish. If `early_finish` is still emitted, it must agree with `player_finish` (Finish click) — not a second path.
-15. Each dig spends `dig_refresh_cost` stamina. `stamina_spent` includes play costs + `dig_count * dig_refresh_cost` (after skill modifiers). Hand does **not** auto-refill. On dig: remaining hand cards drop to discard, then draw up to `hand_size` from the draw pile; if draw is short mid-draw, shuffle discard into draw and continue. Empty hand is legal until a dig or finish.
-16. `piece_count` ≥ 1; multi-piece orders emit **one stamp per piece** (`piece_index` 1..`piece_count`). Resolve piece N before starting N+1.
-17. Phase-1 draft knobs on the session: `stamina_start == 12`, `hand_size == 5`, `dig_refresh_cost == 2` unless a skill this piece changed a cost.
+13. `cards_played[].type` ∈ {`material`, `rune`, `skill`} only. Each play has `zone_index` ∈ 1..`zone_count` and `construction_id == construction_ids[zone_index-1]`. Play of any type **leaves the hand** → discard (unless a special card says otherwise). The card stays in the run deck via discard→reshuffle — not deleted from the atelier. Consumable type is Later — do not assert a field that is not in the enum.
+14. Session ends iff the player clicks **Finish** — `finish_reason == player_finish` on **every** piece stamp from that Finish. `stamina_remaining == 0` does **not** end the session or run the resolver. `finish_reason: stamina_0` is **superseded** (must not mean auto-craft). Empty hand / empty stamina is legal until Finish. If `early_finish` is still emitted, it must agree with `player_finish` (Finish click) — not a second path.
+15. Each dig spends `dig_refresh_cost` stamina. `stamina_spent` includes play costs + `dig_count * dig_refresh_cost` (after skill modifiers). Hand does **not** auto-refill. On dig: remaining hand cards drop to discard, then draw up to `hand_size` from the draw pile; if draw is short mid-draw, shuffle discard into draw and continue. Empty hand is legal until a dig or finish. Dig is **session-wide** (not per zone).
+16. `piece_count` ≥ 1; `zone_count == piece_count`; `zone_count` ∈ 1..4. Multi-piece = **one session**. Finish emits **one stamp per piece** (`piece_index` 1..`piece_count`) in **listed sequence**. Do **not** start a new session / new stamina pool per piece. `cards_played` entries carry `zone_index` + `construction_id`. N > 4 = Later — do not assert a fifth zone.
+17. Phase-1 draft knobs on the session: `stamina_start == 12 * piece_count`, `hand_size == 5`, `dig_refresh_cost == 2` unless a skill this session changed a cost.
 
 ### cant_craft / reps / newspaper (prior intent kept)
 
@@ -175,8 +179,10 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 | Assert: `len(materials)` ∈ 1..`max_materials` / `construction.material_slots` | Stamina + order-fixed construction replace slot caps |
 | `phase` ∈ {`shop`, `craft_task`} | Wagon shop is a schedule action; craft is stamina |
 | Assert: `material` play does not decrement inventory / stock | Durable-in-hand (#17) — superseded: play → discard; persist via reshuffle ([27](27-craft-mode-stamina.md)) |
-| `finish_reason: stamina_0` as craft-end / auto-resolver | **Stamina 0 ≠ finish** — piece stays open; only Finish crafts ([27](27-craft-mode-stamina.md)) |
+| `finish_reason: stamina_0` as craft-end / auto-resolver | **Stamina 0 ≠ finish** — session stays open; only Finish crafts ([27](27-craft-mode-stamina.md)) |
 | `early_finish` as a distinct end path vs `stamina_0` | Finish is the only legal Phase-1 end (`player_finish`) |
+| Multi-piece = N sessions / `stamina_start == 12` per piece / resolve N then start N+1 | **One session**, `stamina_start == 12 * N`, one Finish → N stamps ([27](27-craft-mode-stamina.md)) |
+| `cards_played` as `{ id, type, cost }` with no zone | Plays **must** target a zone: `{ id, type, cost, zone_index, construction_id }` |
 
 Do **not** emit these as Required. History only.
 
