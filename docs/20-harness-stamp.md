@@ -77,13 +77,17 @@ Prep (`mission_kind=prep`) still runs the resolver on finish; mission-sim fields
 | `hand_size` | int | Phase-1 draft **5** |
 | `dig_refresh_cost` | int | Phase-1 draft **2** |
 | `dig_count` | int | Refresh / dig calls this piece |
-| `cards_played` | object[] | `{ id, type, cost }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers |
+| `cards_played` | object[] | `{ id, type, cost }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers. A `material` play does **not** remove that card from inventory / stock — stamina only |
 | `early_finish` | bool | Player chose stop |
 | `finish_reason` | enum | `stamina_0` \| `early_finish` |
 
 Null the session block when not in craft (schedule shop / event / rest, newspaper). `cant_craft` stamps have no legal session — see asserts.
 
 Skills in `cards_played` are owner skills (manipulate the session, then leave). They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft).
+
+**Durable materials:** a `material` row in `cards_played` does **not** remove that card from inventory / stock — only stamina changes. Round-generated **consumable** cards (Later; distinct type, **not** in this enum) **burn** on use when stamped. Do not emit a fake consumable field.
+
+**Live item readout** (Design UX in [27](27-craft-mode-stamina.md)): Current stats + Potential outlook (locked / hidden if outlook not unlocked). Not a Phase-1 dump assert — no extra stamp fields.
 
 ### Resolver outputs (craft finish / mission / boss)
 
@@ -140,7 +144,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 ### Stamina craft
 
 12. `construction_id` / `construction_ids` come from the **order**, not a player construction pick. No construction cards in `cards_played`.
-13. `cards_played[].type` ∈ {`material`, `rune`, `skill`} only.
+13. `cards_played[].type` ∈ {`material`, `rune`, `skill`} only. Playing `type=material` does **not** decrement inventory / stock. Consumable type is Later — do not assert a field that is not in the enum.
 14. Piece ends iff `stamina_remaining == 0` or `early_finish` — `finish_reason` is `stamina_0` or `early_finish` accordingly (not both).
 15. Each dig spends `dig_refresh_cost` stamina. `stamina_spent` includes play costs + `dig_count * dig_refresh_cost` (after skill modifiers). Hand does **not** auto-refill; empty hand is legal until a dig or finish.
 16. `piece_count` ≥ 1; multi-piece orders emit **one stamp per piece** (`piece_index` 1..`piece_count`). Resolve piece N before starting N+1.

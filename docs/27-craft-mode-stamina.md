@@ -2,6 +2,8 @@
 
 **Status:** Design stamped. **Doc id: `27`** (renamed from provisional `23` to avoid collision with `23-mission-report.md`). Supersedes form-fill craft (pick construction + fill `material_slots` / default 2m1r) as the live craft UX.
 
+**Jonathan 2026-10-02 (UI test) / Design (Grimmjow) + Aizen:** materials are **durable**; round-generated **consumables** burn; craft UI requires **Current** + **Potential** readout.
+
 ## Entering craft mode
 
 Player takes an **order** (appointment / walk-in) or **prep craft** on the schedule → enter craft mode.
@@ -17,15 +19,19 @@ Player takes an **order** (appointment / walk-in) or **prep craft** on the sched
 
 | Type | Role |
 |---|---|
-| **Material** | Stats + tags; same id may stack across plays |
+| **Material** | **Durable.** Stats + tags; same id may stack across plays. Play spends **stamina only** — card stays in hand / stock |
 | **Enchantment / rune** | Extra tags / powers |
 | **Owner skill** | Player/owner skill — **not** an equipment power |
+| **Consumable** | **Later.** Round-generated that round; **burns** on use. Distinct from `material` — not in Phase-1 `cards_played` type enum; no fake field |
+
+**Law:** Materials are **durable cards**. Playing a material in craft mode spends **stamina only** — the material is **not** consumed or removed from hand or stock. Round-generated **consumable** cards (generated that round) are a **separate type** and **do** burn on use. Do not treat `material` as a burn type.
 
 Skills manipulate the craft session (costs, converts, doubles, digs), then leave. They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft).
 
 ## Stamina
 
 - Each play costs **stamina** (card-defined cost ≥ 0 after modifiers).
+- A **material** play changes stamina only. That card stays in hand / stock (durable). A **consumable** play (Later, distinct type) burns the card.
 - Craft for the current piece ends when:
   1. **Stamina hits 0**, or
   2. Player chooses **early finish**
@@ -36,6 +42,15 @@ Skills manipulate the craft session (costs, converts, doubles, digs), then leave
 - Hand does **not** refill automatically when empty.
 - Player spends stamina to **refresh / dig inventory** (fiction: rummage the wagon stock) even if every hand card was already played.
 - Refresh cost: Phase-1 draft **2 stamina** (tunable). Draws up to hand size from remaining deck/stock per owner rules.
+
+## Live item readout (required UI)
+
+Craft session shows two readouts for the **current piece** (Design lock — Ulquiorra implements after merge; not a Client widget spec):
+
+1. **Current** — live stats for the piece in progress (sum / bag from materials + runes played so far this piece).
+2. **Potential** — predicted outlook / item identity when that outlook is **unlocked**; if not unlocked, show locked / hidden (no spoiler of the outlook art or name beyond “locked”).
+
+Phase-1: Design UX only. Not a harness dump assert unless Test later stamps fields in [20](20-harness-stamp.md).
 
 ## Infinite monostack (intentional)
 
@@ -81,4 +96,4 @@ After finish: bag tags from played materials + order construction + played runes
 | Rare mat play cost | 3 |
 | Enchantment play cost | 2 |
 
-**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = N sessions, one harness stamp each.
+**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = N sessions, one harness stamp each. Materials durable (stamina only). Consumables (Later) burn. Live readout = Current + Potential (locked if outlook not unlocked).
