@@ -13,7 +13,7 @@ var _note: Label
 var _timeline: HBoxContainer
 var _slots: Array[RoundSlotView] = []
 var _today_title: Label
-var _actions: HBoxContainer
+var _actions: HFlowContainer
 var _resolve_title: Label
 var _resolve_body: Label
 var _stamp: Label
@@ -79,8 +79,9 @@ func _build() -> void:
 	today.add_child(today_box)
 	_today_title = _label("Pick one action.", 16, INK)
 	today_box.add_child(_today_title)
-	_actions = HBoxContainer.new()
-	_actions.add_theme_constant_override("separation", 8)
+	_actions = HFlowContainer.new()
+	_actions.add_theme_constant_override("h_separation", 8)
+	_actions.add_theme_constant_override("v_separation", 8)
 	today_box.add_child(_actions)
 	var today_row := HBoxContainer.new()
 	today_row.add_theme_constant_override("separation", 8)

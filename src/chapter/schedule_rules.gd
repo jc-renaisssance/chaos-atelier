@@ -105,14 +105,6 @@ static func roll_pins(chapter_id: int, rng: RandomNumberGenerator) -> Array[Appo
 	return pins
 
 
-static func roll_chapter(chapter_id: int, rng: RandomNumberGenerator) -> Dictionary:
-	return {
-		"boss_id": roll_boss(chapter_id, rng),
-		"pool_id": String(GameConstants.BOSS_POOL_IDS.get(chapter_id, "")),
-		"pins": roll_pins(chapter_id, rng),
-	}
-
-
 static func build_resolve(
 	action: GameEnums.RoundAction,
 	order: ClientOrder,
