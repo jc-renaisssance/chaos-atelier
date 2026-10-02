@@ -116,3 +116,9 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 - Craft ends on stamina empty or early finish (`STAMP` 2026-09-28 §7)
 - `finish_reason: stamina_0` as auto-craft / resolver trigger
 - Player-as-fighter reading of the chapter boss beat
+
+---
+
+# Jonathan stamp — 2026-10-02 (cross-tag positive armor)
+
+`armor-cross-tag-locked-2026-10-02/` — locked Storm / Beastbloom / Snaretooth / Masked Crown / Dawn Vestment / Pale Hex (`_3` / `_5` / `_8`).
