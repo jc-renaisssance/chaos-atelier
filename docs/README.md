@@ -24,7 +24,7 @@ Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
 | [17-chapter-bosses](17-chapter-bosses.md) | Boss pools (C1 diverse) |
 | [18-rarity](18-rarity.md) | Rarity |
 | [19-own-basic-starter](19-own-basic-starter.md) | Starter |
-| [20-harness-stamp](20-harness-stamp.md) | Stamps *(lineup asserts → schedule)* |
+| [20-harness-stamp](20-harness-stamp.md) | Stamps — schedule + stamina assert list (Szayelaporro / 1B) |
 | [21-app-flow](21-app-flow.md) | Pseudocode *(1-of-3 superseded → [22-schedule](22-chapter-schedule.md))* |
 | [22-chapter-schedule](22-chapter-schedule.md) | **Live chapter spine** — travelling atelier schedule board |
 | [22-chapter-flow](22-chapter-flow.md) | **Superseded** — old 1-of-3 card lineup / round (kept for history) |
