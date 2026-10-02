@@ -247,7 +247,7 @@ func _rebuild_actions() -> void:
 		_today_title.text = "Action locked. Continue after the mission / event result."
 		_continue_btn.text = "Continue"
 		return
-	var pin := board.current_pin() if board != null else null
+	var pin: AppointmentPin = board.current_pin() if board != null else null
 	if pin != null and not AtelierSession.declined_this_round:
 		_today_title.text = (
 			"Pinned appointment: %s. Take it, or decline once this chapter (−reps) and pick another action."

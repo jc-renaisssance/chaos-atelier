@@ -177,7 +177,7 @@ static func build_mission_return(order: ClientOrder, mission: Dictionary, piece_
 	if order != null:
 		cons = order.construction_ids
 	var lines: PackedStringArray = PackedStringArray()
-	var kind := GameEnums.mission_kind_wire(order.mission_kind) if order != null else null
+	var kind: Variant = GameEnums.mission_kind_wire(order.mission_kind) if order != null else null
 	var rating = mission.get("rating", GameEnums.Rating.NONE)
 	var cleared := bool(mission.get("cleared", false))
 	var hp := float(mission.get("hp_remaining", 0.0))
