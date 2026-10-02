@@ -1,6 +1,7 @@
 class_name CraftStaminaSession
 extends Resource
 ## One piece's stamina session. Multi-piece orders open N of these (docs/27 / docs/20).
+## Stamina 0 is state, not a finish. Only Finish sets finish_reason: player_finish.
 
 @export var order_id: String = ""
 @export var construction_ids: PackedStringArray = PackedStringArray() ## order-fixed
@@ -112,13 +113,13 @@ func schema_errors() -> PackedStringArray:
 		errs.append_array(card.schema_errors())
 	for card in cards_played:
 		errs.append_array(card.schema_errors())
-	var stamina_zero := stamina_remaining == 0
-	if early_finish and stamina_zero:
-		errs.append("finish cannot be both early_finish and stamina_0")
-	if finish_reason == GameEnums.FinishReason.STAMINA_0 and not stamina_zero:
-		errs.append("finish_reason stamina_0 but stamina_remaining != 0")
-	if finish_reason == GameEnums.FinishReason.EARLY_FINISH and not early_finish:
-		errs.append("finish_reason early_finish but early_finish is false")
-	if finish_reason == GameEnums.FinishReason.EARLY_FINISH and stamina_zero:
-		errs.append("early_finish must not also be stamina_0")
+	## Stamina 0 is session state, not a craft-end. Piece may stay open.
+	if finish_reason == GameEnums.FinishReason.STAMINA_0:
+		errs.append("finish_reason stamina_0 is superseded — only player_finish crafts")
+	if finish_reason == GameEnums.FinishReason.EARLY_FINISH:
+		errs.append("finish_reason early_finish is superseded — use player_finish")
+	if finish_reason == GameEnums.FinishReason.PLAYER_FINISH and not early_finish:
+		errs.append("player_finish must agree with early_finish (Finish click)")
+	if early_finish and finish_reason != GameEnums.FinishReason.PLAYER_FINISH:
+		errs.append("early_finish must agree with player_finish")
 	return errs
