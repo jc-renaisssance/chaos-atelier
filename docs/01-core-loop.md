@@ -7,7 +7,7 @@
 2. **Atelier shop** (you are the **owner / clothier** — Phase-1 = `own_basic`) → reshape material deck (buy / sell) using **your** pool; player skills (Later owners) like free reroll / income floor apply here.
 3. **Craft & task** — clients / side tasks; craft gear toward the announced boss.
 4. **Shop** again (repeat shop → craft/task → shop) until the chapter clock / node count ends.
-5. **Boss fight** with the prepared deck + crafted gear.
+5. **Boss:** craft for the **boss-client**; that client fights with the crafted gear (player is not the fighter — `17`).
 6. Next chapter (harder boss announced at its start).
 
 Goal: adjust the deck knowing the boss (StS-style). Different **player owners** (Later) change your material access and skills (Balatro-style character fantasy).

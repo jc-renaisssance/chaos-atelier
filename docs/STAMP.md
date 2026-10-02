@@ -85,3 +85,34 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 
 - Cross-tag positive + negative syn art/docs
 - Other shop owner armor outlooks when that shop work starts
+
+---
+
+# Jonathan stamp — 2026-10-02 (stamina 0 ≠ finish + boss-client)
+
+## Locked (docs only)
+
+1. **Stamina 0 ≠ finish.** Piece **stays open**. Cards do **not** disappear / auto-resolve. Only **Finish** crafts and runs the resolver.
+2. **Supersedes** `27` / `20` auto-finish on `stamina_0` / `finish_reason: stamina_0` as the craft-end trigger. If `stamina_0` remains, it is a **session state flag** (`stamina_remaining == 0`) — **not** auto-craft.
+3. Phase-1 `finish_reason` = **`player_finish`** (Finish button only). `early_finish` is not a second path.
+4. StS cycle (play→discard, dig dump, reshuffle) + Current/Potential readout **unchanged**.
+5. **0-cost cards** and further owner abilities at 0 stamina = **Later**. Do not invent catalog.
+6. **Boss-client:** a client is responsible for the boss event. Player crafts **for that client**; the **client fights** the boss. Sim uses that client's gear. Roster / UI widgets Later.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/27-craft-mode-stamina.md` | Stamina 0 ≠ finish; Finish-only; supersedes auto-finish |
+| `docs/20-harness-stamp.md` | `finish_reason: player_finish`; assert 14; boss-client mission lock |
+| `docs/17-chapter-bosses.md` | Boss-client Design lock |
+| `docs/22-chapter-schedule.md` | Boss beat = craft for boss-client |
+| `docs/03-clients-and-adventure.md` | Pointer |
+| `docs/01-core-loop.md` | Boss beat: craft for boss-client |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Craft ends on stamina empty or early finish (`STAMP` 2026-09-28 §7)
+- `finish_reason: stamina_0` as auto-craft / resolver trigger
+- Player-as-fighter reading of the chapter boss beat
