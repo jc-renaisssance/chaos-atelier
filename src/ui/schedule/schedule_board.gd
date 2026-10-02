@@ -1,5 +1,5 @@
 extends Control
-## Placeholder travelling-atelier schedule board (docs/22). No lineup / path map / craft.
+## Travelling-atelier schedule board (docs/22). Order actions overlay stamina craft (docs/27).
 
 const INK := Color.html("#e8d5b0")
 const MUTED := Color.html("#b5a48a")
@@ -19,6 +19,7 @@ var _resolve_body: Label
 var _stamp: Label
 var _continue_btn: Button
 var _decline_btn: Button
+var _craft_table: CraftTable
 
 
 func _ready() -> void:
@@ -27,6 +28,9 @@ func _ready() -> void:
 	AtelierSession.board_changed.connect(_redraw)
 	AtelierSession.resolve_started.connect(_on_resolve)
 	AtelierSession.chapter_finished.connect(_redraw)
+	AtelierSession.craft_started.connect(_redraw)
+	AtelierSession.craft_changed.connect(_redraw)
+	AtelierSession.craft_order_finished.connect(_redraw)
 	_redraw()
 
 
@@ -100,7 +104,7 @@ func _build() -> void:
 	_resolve_title = _label("Waiting for a pick.", 16, GOLD)
 	resolve_box.add_child(_resolve_title)
 	_resolve_body = _label(
-		"Appointment / walk-in / prep craft → order path (craft stub). "
+		"Appointment / walk-in / prep craft → stamina craft (order-fixed construction). "
 		+ "Wagon event / shop / rest → event path (stays on the board).",
 		14,
 		INK
@@ -108,7 +112,7 @@ func _build() -> void:
 	_resolve_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	resolve_box.add_child(_resolve_body)
 
-	root.add_child(_caption("STAMP  ·  docs/20 schedule fields  ·  schema from PR #10"))
+	root.add_child(_caption("STAMP  ·  docs/20 schedule + stamina  ·  crafts_done counts pieces"))
 	var stamp_panel := _panel()
 	stamp_panel.custom_minimum_size.y = 96
 	root.add_child(stamp_panel)
@@ -127,10 +131,14 @@ func _build() -> void:
 	root.add_child(demo)
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("Placeholder chrome. Craft / shop / boss / newspaper are later slices.", 12, MUTED)
+	var hint := _label("Schedule + stamina craft. Shop / boss / newspaper stay later slices.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	demo.add_child(hint)
+
+	_craft_table = CraftTable.new()
+	_craft_table.visible = false
+	add_child(_craft_table)
 
 
 func _caption(text: String) -> Label:
@@ -168,6 +176,10 @@ func _btn(text: String, cb: Callable) -> Button:
 
 
 func _redraw() -> void:
+	if _craft_table != null:
+		_craft_table.visible = AtelierSession.craft_open
+		if AtelierSession.craft_open:
+			_craft_table.refresh()
 	var board: ChapterSchedule = AtelierSession.board
 	if board == null:
 		return
@@ -215,7 +227,7 @@ func _rebuild_actions() -> void:
 		_continue_btn.text = "Schedule complete"
 		return
 	if AtelierSession.resolve_open:
-		_today_title.text = "Action locked. Continue to the next round (craft / shop stub only)."
+		_today_title.text = "Action locked. Continue to the next round."
 		_continue_btn.text = "Continue"
 		return
 	var pin := board.current_pin() if board != null else null
@@ -244,7 +256,7 @@ func _refresh_resolve() -> void:
 		else:
 			_resolve_title.text = "Waiting for a pick."
 			_resolve_body.text = (
-				"Order path: appointment, walk-in, prep craft → stub into craft (not built). "
+				"Order path: appointment, walk-in, prep craft → stamina craft (docs/27). "
 				+ "Event path: wagon event, wagon shop, rest / dig → resolve here, stay phase=schedule."
 			)
 		return

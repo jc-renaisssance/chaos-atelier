@@ -2,7 +2,7 @@ class_name ScheduleRules
 extends RefCounted
 ## Travelling-atelier board rules (docs/22, docs/20). No 1-of-3 lineup.
 
-## Order-class actions enter stamina craft (next PR). Event-class stays on schedule.
+## Order-class actions enter stamina craft (docs/27). Event-class stays on schedule.
 const RESOLVE_ORDER := "order"
 const RESOLVE_EVENT := "event"
 
@@ -123,8 +123,8 @@ static func build_resolve(
 				if not who.is_empty():
 					title = "Appointment — %s" % who
 			body = (
-				"Order path — would enter stamina craft for this pinned client (next PR). "
-				+ "Pieces stay order-fixed; this slice does not increment crafts_done."
+				"Order path — enter stamina craft for this pinned client. "
+				+ "Construction is order-fixed; each piece is one session / one stamp / one crafts_done."
 			)
 			if order != null:
 				body += " order_id=%s constructions=%s" % [order.order_id, str(Array(order.construction_ids))]
@@ -134,14 +134,15 @@ static func build_resolve(
 			if order != null:
 				title = "Walk-in — %s" % ScheduleCatalog.walk_in_title(order)
 			body = (
-				"Order path — a client appeared this round. Would enter stamina craft (next PR)."
+				"Order path — a client appeared this round. Enter stamina craft. "
+				+ "Pieces stay order-fixed."
 			)
 		GameEnums.RoundAction.PREP_CRAFT:
 			stub = "craft"
 			title = "Prep craft"
 			body = (
 				"Order path — craft without a live client into the ready rack (mission_kind=prep). "
-				+ "Stamina UI is the next PR."
+				+ "Same stamina session as a live order."
 			)
 		GameEnums.RoundAction.WAGON_SHOP:
 			stub = "shop"
@@ -168,6 +169,55 @@ static func build_resolve(
 		"order_id": order.order_id if order != null else "",
 		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
 		"event_id": String(event_row.get("id", "")),
+	}
+
+
+static func build_craft_return(order: ClientOrder, piece_results: Array) -> Dictionary:
+	var cons := PackedStringArray()
+	if order != null:
+		cons = order.construction_ids
+	var lines: PackedStringArray = PackedStringArray()
+	lines.append(
+		"Stamina craft finished. crafts_done counts pieces (docs/20): %d piece stamp(s)."
+		% piece_results.size()
+	)
+	var i := 0
+	for result in piece_results:
+		i += 1
+		var rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
+		var rating = result.get("rating", GameEnums.Rating.NONE)
+		var outlook := String(result.get("outlook_id", "plain"))
+		lines.append(
+			"Piece %d · rarity %s · rating %s · look %s · mission stub (no full sim)."
+			% [i, GameEnums.craft_rarity_wire(rarity), GameEnums.rating_wire(rating), outlook]
+		)
+	return {
+		"resolve_class": RESOLVE_ORDER,
+		"round_action": null,
+		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
+		"title": "Craft closed",
+		"body": "\n".join(lines),
+		"stub": "craft_done",
+		"order_id": order.order_id if order != null else "",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
+		"construction_ids": Array(cons),
+		"piece_count": piece_results.size(),
+	}
+
+
+static func build_cant_craft(order: ClientOrder) -> Dictionary:
+	return {
+		"resolve_class": RESOLVE_ORDER,
+		"round_action": null,
+		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
+		"title": "cant_craft",
+		"body": (
+			"Could not open a legal craft session (crafts_done already at crafts_max=4). "
+			+ "No stamina session. crafts_done does not increment. Mission stub rating F."
+		),
+		"stub": "cant_craft",
+		"order_id": order.order_id if order != null else "",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.CRAFT),
 	}
 
 

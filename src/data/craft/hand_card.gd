@@ -6,6 +6,13 @@ extends Resource
 @export var type: GameEnums.HandCardType = GameEnums.HandCardType.MATERIAL
 
 
+static func make(id_: String, type_: GameEnums.HandCardType) -> HandCard:
+	var card := HandCard.new()
+	card.id = id_
+	card.type = type_
+	return card
+
+
 func to_dict() -> Dictionary:
 	return {
 		"id": id,
