@@ -1,5 +1,5 @@
 extends Control
-## Travelling-atelier schedule board (docs/22). Order actions overlay stamina craft (docs/27).
+## Travelling-atelier schedule board (docs/22). Craft is a dedicated screen (docs/27).
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -21,6 +21,7 @@ var _resolve_body: Label
 var _stamp: Label
 var _continue_btn: Button
 var _decline_btn: Button
+var _schedule_root: Control
 var _craft_table: CraftTable
 
 
@@ -50,6 +51,7 @@ func _build() -> void:
 	margin.add_theme_constant_override("margin_top", 16)
 	margin.add_theme_constant_override("margin_bottom", 16)
 	add_child(margin)
+	_schedule_root = margin
 
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 12)
@@ -140,6 +142,7 @@ func _build() -> void:
 
 	_craft_table = CraftTable.new()
 	_craft_table.visible = false
+	_craft_table.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_craft_table)
 
 
@@ -178,10 +181,15 @@ func _btn(text: String, cb: Callable) -> Button:
 
 
 func _redraw() -> void:
+	var in_craft := AtelierSession.craft_open
+	if _schedule_root != null:
+		_schedule_root.visible = not in_craft
 	if _craft_table != null:
-		_craft_table.visible = AtelierSession.craft_open
-		if AtelierSession.craft_open:
+		_craft_table.visible = in_craft
+		if in_craft:
 			_craft_table.refresh()
+	if in_craft:
+		return
 	var board: ChapterSchedule = AtelierSession.board
 	if board == null:
 		return

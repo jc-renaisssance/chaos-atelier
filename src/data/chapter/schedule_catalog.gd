@@ -263,6 +263,25 @@ static func walk_in_title(order: ClientOrder) -> String:
 	return "Walk-in"
 
 
+static func order_title(order: ClientOrder) -> String:
+	if order == null:
+		return ""
+	if order.mission_kind == GameEnums.MissionKind.PREP:
+		return "Prep craft"
+	for chapter_id in APPOINTMENTS.keys():
+		for row in APPOINTMENTS[chapter_id]:
+			if String(row.get("order_id", "")) == order.order_id:
+				return String(row.get("title", order.order_id))
+			if String(row.get("threat_id", "")) == order.threat_id and not order.threat_id.is_empty():
+				return String(row.get("title", order.order_id))
+	var walk := walk_in_title(order)
+	if walk != "Walk-in":
+		return walk
+	if not order.threat_id.is_empty():
+		return ThreatCatalog.display_name(order.threat_id)
+	return order.order_id
+
+
 static func make_prep(round_index: int) -> ClientOrder:
 	var order := ClientOrder.new()
 	order.order_id = "ord_prep_r%d" % round_index

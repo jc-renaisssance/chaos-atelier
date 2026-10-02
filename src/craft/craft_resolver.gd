@@ -58,12 +58,27 @@ static func _tier_min(tier: int) -> int:
 			return GameConstants.SYN_THRESHOLD_TIER_1
 
 
-static func tag_counts(session: CraftStaminaSession, construction_id: String) -> Dictionary:
+static func zone_cards(session: CraftStaminaSession, zone_index: int) -> Array[PlayedCard]:
+	var out: Array[PlayedCard] = []
+	if session == null:
+		return out
+	if zone_index <= 0:
+		for card in session.cards_played:
+			out.append(card)
+		return out
+	return session.cards_for_zone(zone_index)
+
+
+static func tag_counts(
+	session: CraftStaminaSession,
+	construction_id: String,
+	zone_index: int = 0
+) -> Dictionary:
 	var bag := {}
 	_add_tags(bag, CraftCatalog.construction_tags(construction_id))
 	if session == null:
 		return bag
-	for card in session.cards_played:
+	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.SKILL:
 			continue
 		_add_tags(bag, CraftCatalog.tags_of(card.id, card.type))
@@ -79,12 +94,16 @@ static func _count(bag: Dictionary, tag: String) -> int:
 	return int(bag.get(tag, 0))
 
 
-static func unique_match(session: CraftStaminaSession, construction_id: String) -> String:
+static func unique_match(
+	session: CraftStaminaSession,
+	construction_id: String,
+	zone_index: int = 0
+) -> String:
 	if session == null:
 		return ""
 	var mats := {}
 	var runes: PackedStringArray = PackedStringArray()
-	for card in session.cards_played:
+	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.MATERIAL:
 			mats[card.id] = int(mats.get(card.id, 0)) + 1
 		elif card.type == GameEnums.HandCardType.RUNE:
@@ -104,7 +123,11 @@ static func unique_match(session: CraftStaminaSession, construction_id: String) 
 	return ""
 
 
-static func craft_rarity(session: CraftStaminaSession, uniq_id: String) -> GameEnums.CraftRarity:
+static func craft_rarity(
+	session: CraftStaminaSession,
+	uniq_id: String,
+	zone_index: int = 0
+) -> GameEnums.CraftRarity:
 	if uniq_id != "":
 		return GameEnums.CraftRarity.LEGENDARY
 	if session == null:
@@ -112,7 +135,7 @@ static func craft_rarity(session: CraftStaminaSession, uniq_id: String) -> GameE
 	var max_mat := 0
 	var stack_n := 0
 	var enc_cost := 0
-	for card in session.cards_played:
+	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.MATERIAL:
 			stack_n += 1
 			max_mat = maxi(max_mat, CraftCatalog.shop_dollar(card.id, card.type))
@@ -127,10 +150,14 @@ static func craft_rarity(session: CraftStaminaSession, uniq_id: String) -> GameE
 	return GameEnums.CraftRarity.COMMON
 
 
-static func resolve(session: CraftStaminaSession, construction_id: String) -> Dictionary:
-	var bag := tag_counts(session, construction_id)
-	var uniq := unique_match(session, construction_id)
-	var rarity := craft_rarity(session, uniq)
+static func resolve(
+	session: CraftStaminaSession,
+	construction_id: String,
+	zone_index: int = 0
+) -> Dictionary:
+	var bag := tag_counts(session, construction_id, zone_index)
+	var uniq := unique_match(session, construction_id, zone_index)
+	var rarity := craft_rarity(session, uniq, zone_index)
 	var positives: PackedStringArray = PackedStringArray()
 	var negatives: PackedStringArray = PackedStringArray()
 	var outlook_id := "plain"
@@ -178,12 +205,12 @@ static func resolve(session: CraftStaminaSession, construction_id: String) -> Di
 		outlook_order = 200
 	var stats := GearStats.new()
 	stats.add_bag(CraftCatalog.construction_stats(construction_id))
-	if session != null:
-		for card in session.cards_played:
-			if card.type == GameEnums.HandCardType.SKILL:
-				continue
-			stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
-	var played_n := session.cards_played.size() if session != null else 0
+	var zone_played := zone_cards(session, zone_index)
+	for card in zone_played:
+		if card.type == GameEnums.HandCardType.SKILL:
+			continue
+		stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
+	var played_n := zone_played.size()
 	return {
 		"tag_counts": bag,
 		"craft_rarity": rarity,

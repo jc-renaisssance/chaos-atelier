@@ -5,7 +5,7 @@ extends RefCounted
 const LOCKED_LABEL := "locked"
 
 
-static func preview(session: CraftStaminaSession) -> Dictionary:
+static func preview(session: CraftStaminaSession, zone_index: int = 0) -> Dictionary:
 	if session == null:
 		return {
 			"tag_counts": {},
@@ -16,7 +16,13 @@ static func preview(session: CraftStaminaSession) -> Dictionary:
 			"outlook_order": 0,
 			"stats": GearStats.new(),
 		}
-	return CraftResolver.resolve(session, session.construction_id)
+	var target := zone_index if zone_index > 0 else session.selected_zone_index
+	if not session.is_legal_zone(target):
+		target = 1
+	var con_id := session.construction_id_for_zone(target)
+	if con_id.is_empty():
+		con_id = session.construction_id
+	return CraftResolver.resolve(session, con_id, target)
 
 
 static func current_stats(preview: Dictionary) -> GearStats:

@@ -1,6 +1,7 @@
 class_name CraftTable
 extends Control
-## Stamina craft table (docs/27). Construction from the order. No lineup / 2m1r / picker.
+## Dedicated stamina craft screen (docs/27). Not the schedule board.
+## Lower: hand + actions. Upper left: order detail. Upper right: ≤4 drop zones.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -9,18 +10,16 @@ const GOLD := Color(0.788, 0.635, 0.153)
 const WOOD := Color(0.102, 0.078, 0.063)
 const PANEL := Color(0.165, 0.129, 0.094)
 const BORDER := Color(0.239, 0.204, 0.173)
-const CHIP := Color(0.227, 0.173, 0.094)
 
 var _title: Label
-var _meta: Label
 var _note: Label
+var _order_title: Label
+var _order_body: Label
 var _stam_label: Label
 var _stam_bar: ProgressBar
-var _piece_title: Label
-var _piece_body: Label
-var _played: HFlowContainer
 var _current_body: Label
 var _potential_body: Label
+var _zones: Array[CraftZone] = []
 var _hand: HBoxContainer
 var _stock: Label
 var _dig_btn: Button
@@ -32,7 +31,9 @@ var _stamp: Label
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build()
+	set_process_input(true)
 	AtelierSession.craft_started.connect(_refresh)
 	AtelierSession.craft_changed.connect(_refresh)
 	AtelierSession.piece_finished.connect(_on_piece)
@@ -48,76 +49,67 @@ func _build() -> void:
 
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 20)
-	margin.add_theme_constant_override("margin_right", 20)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
+	margin.add_theme_constant_override("margin_left", 16)
+	margin.add_theme_constant_override("margin_right", 16)
+	margin.add_theme_constant_override("margin_top", 12)
+	margin.add_theme_constant_override("margin_bottom", 12)
 	add_child(margin)
 
-	var page := ScrollContainer.new()
-	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	page.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	page.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(page)
-
 	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 10)
+	root.add_theme_constant_override("separation", 8)
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	page.add_child(root)
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	margin.add_child(root)
 
-	_title = _label("CRAFT  ·  stamina hand  ·  construction from the order", 24, GOLD)
+	_title = _label("CRAFT  ·  dedicated table  ·  one session", 22, GOLD)
 	root.add_child(_title)
-	_meta = _label("", 14, INK)
-	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	root.add_child(_meta)
-	_note = _label("", 13, MUTED)
+	_note = _label("", 12, MUTED)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_note)
 
-	root.add_child(_caption("STAMINA  ·  start 12  ·  0 stays open  ·  Finish crafts"))
-	var stam_panel := _panel()
-	root.add_child(stam_panel)
-	var stam_box := VBoxContainer.new()
-	stam_box.add_theme_constant_override("separation", 6)
-	stam_panel.add_child(stam_box)
-	_stam_label = _label("12 / 12", 16, INK)
-	stam_box.add_child(_stam_label)
+	var upper := HBoxContainer.new()
+	upper.add_theme_constant_override("separation", 10)
+	upper.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	upper.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(upper)
+
+	var left := _panel()
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_stretch_ratio = 0.9
+	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	upper.add_child(left)
+	var left_box := VBoxContainer.new()
+	left_box.add_theme_constant_override("separation", 6)
+	left.add_child(left_box)
+	left_box.add_child(_caption("UPPER LEFT  ·  client order detail"))
+	_order_title = _label("No order", 16, GOLD)
+	left_box.add_child(_order_title)
+	_order_body = _label("", 13, INK)
+	_order_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_order_body)
+	left_box.add_child(_caption("STAMINA  ·  12 × N  ·  0 stays open  ·  Finish crafts"))
+	_stam_label = _label("12 / 12", 15, INK)
+	left_box.add_child(_stam_label)
 	_stam_bar = ProgressBar.new()
 	_stam_bar.min_value = 0
 	_stam_bar.max_value = GameConstants.STAMINA_START
 	_stam_bar.value = GameConstants.STAMINA_START
 	_stam_bar.show_percentage = false
-	_stam_bar.custom_minimum_size = Vector2(0, 18)
+	_stam_bar.custom_minimum_size = Vector2(0, 16)
 	_stam_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	stam_box.add_child(_stam_bar)
-
-	root.add_child(_caption("PIECE  ·  order-fixed  ·  not a hand card  ·  no construction picker"))
-	var piece := _panel()
-	root.add_child(piece)
-	var piece_box := VBoxContainer.new()
-	piece_box.add_theme_constant_override("separation", 6)
-	piece.add_child(piece_box)
-	_piece_title = _label("No piece", 16, GOLD)
-	piece_box.add_child(_piece_title)
-	_piece_body = _label("", 13, INK)
-	_piece_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	piece_box.add_child(_piece_body)
-	_played = HFlowContainer.new()
-	_played.add_theme_constant_override("h_separation", 8)
-	_played.add_theme_constant_override("v_separation", 8)
-	piece_box.add_child(_played)
-
-	root.add_child(_caption("READOUT  ·  Current stats  ·  Potential outlook (locked if not unlocked)"))
+	left_box.add_child(_stam_bar)
+	left_box.add_child(_caption("READOUT  ·  selected zone  ·  CURRENT  ·  POTENTIAL"))
 	var readout := HBoxContainer.new()
 	readout.add_theme_constant_override("separation", 8)
-	root.add_child(readout)
+	readout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left_box.add_child(readout)
 	var current_panel := _panel()
 	current_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	readout.add_child(current_panel)
 	var current_box := VBoxContainer.new()
 	current_box.add_theme_constant_override("separation", 4)
 	current_panel.add_child(current_box)
-	current_box.add_child(_label("CURRENT  ·  piece in progress", 12, GOLD))
+	current_box.add_child(_label("CURRENT  ·  selected zone", 12, GOLD))
 	_current_body = _label("", 13, INK)
 	_current_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	current_box.add_child(_current_body)
@@ -132,52 +124,74 @@ func _build() -> void:
 	_potential_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	potential_box.add_child(_potential_body)
 
-	root.add_child(_caption("HAND  ·  play leaves → discard  ·  materials + enchantments + owner skills  ·  no auto-refill"))
-	var hand_panel := _panel()
-	hand_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(hand_panel)
-	var hand_box := VBoxContainer.new()
-	hand_box.add_theme_constant_override("separation", 8)
-	hand_panel.add_child(hand_box)
+	var right := _panel()
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.size_flags_stretch_ratio = 1.1
+	right.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	upper.add_child(right)
+	var right_box := VBoxContainer.new()
+	right_box.add_theme_constant_override("separation", 6)
+	right.add_child(right_box)
+	right_box.add_child(_caption("UPPER RIGHT  ·  craft drop zones  ·  unused hidden if N < 4"))
+	var zone_row := HBoxContainer.new()
+	zone_row.add_theme_constant_override("separation", 8)
+	zone_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	zone_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_box.add_child(zone_row)
+	_zones.clear()
+	for i in range(GameConstants.ZONE_COUNT_MAX):
+		var zone := CraftZone.new()
+		zone.zone_index = i + 1
+		zone.zone_selected.connect(_on_zone_selected)
+		zone.card_dropped.connect(_on_card_dropped)
+		zone_row.add_child(zone)
+		_zones.append(zone)
+
+	var lower := _panel()
+	lower.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(lower)
+	var lower_box := VBoxContainer.new()
+	lower_box.add_theme_constant_override("separation", 8)
+	lower.add_child(lower_box)
+	lower_box.add_child(_caption("LOWER  ·  hand slots 1–5  ·  Dig (D)  ·  Finish  ·  cards display here"))
 	_hand = HBoxContainer.new()
 	_hand.add_theme_constant_override("separation", 8)
-	hand_box.add_child(_hand)
+	lower_box.add_child(_hand)
 	_stock = _label("", 12, MUTED)
-	hand_box.add_child(_stock)
+	lower_box.add_child(_stock)
 	var btns := HBoxContainer.new()
 	btns.add_theme_constant_override("separation", 8)
-	hand_box.add_child(btns)
-	_dig_btn = _btn("Dig / refresh (−2 stamina)", _on_dig)
+	lower_box.add_child(btns)
+	_dig_btn = _btn("Dig (D)  ·  −2 stamina", _on_dig)
 	btns.add_child(_dig_btn)
 	_finish_btn = _btn("Finish", _on_finish)
 	btns.add_child(_finish_btn)
-	_continue_btn = _btn("Continue", _on_continue)
+	_continue_btn = _btn("Return to schedule", _on_continue)
 	btns.add_child(_continue_btn)
 
-	root.add_child(_caption("RESOLVER  ·  tag tally  ·  mission result (23/24)"))
+	root.add_child(_caption("RESOLVER  ·  one Finish → N stamps  ·  docs/20"))
 	var res := _panel()
 	root.add_child(res)
-	_result = _label("Play cards into the piece. Only Finish crafts — stamina 0 stays open.", 13, INK)
+	_result = _label("Play into a zone. Only Finish crafts — stamina 0 stays open.", 13, INK)
 	_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	res.add_child(_result)
 
-	root.add_child(_caption("STAMP  ·  docs/20 stamina session  ·  crafts_done counts pieces"))
 	var stamp_panel := _panel()
-	stamp_panel.custom_minimum_size.y = 88
+	stamp_panel.custom_minimum_size.y = 64
 	root.add_child(stamp_panel)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.custom_minimum_size.y = 72
+	scroll.custom_minimum_size.y = 56
 	stamp_panel.add_child(scroll)
-	_stamp = _label("{}", 12, MUTED)
+	_stamp = _label("{}", 11, MUTED)
 	_stamp.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_stamp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_stamp)
 
 
 func _caption(text: String) -> Label:
-	return _label(text, 12, GOLD)
+	return _label(text, 11, GOLD)
 
 
 func _label(text: String, size: int, color: Color) -> Label:
@@ -195,10 +209,10 @@ func _panel() -> PanelContainer:
 	sb.set_corner_radius_all(8)
 	sb.set_border_width_all(1)
 	sb.border_color = BORDER
-	sb.content_margin_left = 12
-	sb.content_margin_right = 12
-	sb.content_margin_top = 10
-	sb.content_margin_bottom = 10
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 8
+	sb.content_margin_bottom = 8
 	panel.add_theme_stylebox_override("panel", sb)
 	return panel
 
@@ -214,22 +228,60 @@ func refresh() -> void:
 	_refresh()
 
 
+func _input(event: InputEvent) -> void:
+	if not visible or not AtelierSession.craft_open:
+		return
+	if event is InputEventKey:
+		var key := event as InputEventKey
+		if not key.pressed or key.echo:
+			return
+		match key.keycode:
+			KEY_1, KEY_KP_1:
+				_play_slot(0)
+				get_viewport().set_input_as_handled()
+			KEY_2, KEY_KP_2:
+				_play_slot(1)
+				get_viewport().set_input_as_handled()
+			KEY_3, KEY_KP_3:
+				_play_slot(2)
+				get_viewport().set_input_as_handled()
+			KEY_4, KEY_KP_4:
+				_play_slot(3)
+				get_viewport().set_input_as_handled()
+			KEY_5, KEY_KP_5:
+				_play_slot(4)
+				get_viewport().set_input_as_handled()
+			KEY_D:
+				_on_dig()
+				get_viewport().set_input_as_handled()
+
+
 func _refresh() -> void:
 	var session: CraftStaminaSession = AtelierSession.craft_session
 	var order: ClientOrder = AtelierSession.craft_order
 	if session == null or order == null:
-		_title.text = "CRAFT  ·  stamina hand"
-		_meta.text = "No session."
+		_title.text = "CRAFT  ·  dedicated table"
+		_order_title.text = "No session."
+		_order_body.text = "Leave the schedule board to sew an order here."
 		return
-	var con_name := CraftCatalog.construction_name(session.construction_id)
-	_title.text = "CRAFT  ·  %s  ·  own_basic" % order.order_id
-	_meta.text = (
-		"Piece %d / %d   ·   %s   ·   %s   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d"
+	var who := ScheduleCatalog.order_title(order)
+	var threat := ThreatCatalog.display_name(order.threat_id) if not order.threat_id.is_empty() else "—"
+	_title.text = "CRAFT  ·  %s  ·  own_basic  ·  one session" % order.order_id
+	_note.text = AtelierSession.last_note
+	_order_title.text = "%s  ·  %s" % [who, GameEnums.mission_kind_wire(order.mission_kind)]
+	var listed: PackedStringArray = PackedStringArray()
+	for i in range(session.construction_ids.size()):
+		var con_id := session.construction_ids[i]
+		listed.append("%d %s" % [i + 1, CraftCatalog.construction_name(con_id)])
+	_order_body.text = (
+		"Order %s   ·   threat %s   ·   difficulty %s   ·   listed %s   ·   zones %d / %d   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d   ·   construction from the order, not a hand card"
 		% [
-			session.piece_index,
-			session.piece_count,
-			con_name,
-			GameEnums.mission_kind_wire(order.mission_kind),
+			order.order_id,
+			threat,
+			str(order.card_difficulty) if order.card_difficulty != GameConstants.NULL_INT else "—",
+			", ".join(listed),
+			session.zone_count,
+			GameConstants.ZONE_COUNT_MAX,
 			session.draw_pile.size(),
 			session.discard_pile.size(),
 			"yes" if AtelierSession.next_mat_free else "no",
@@ -237,12 +289,12 @@ func _refresh() -> void:
 			GameConstants.CRAFTS_MAX,
 		]
 	)
-	_note.text = AtelierSession.last_note
 	_stam_label.text = (
-		"Stamina %d / %d   ·   spent %d   ·   digs %d   ·   dig costs %d"
+		"Stamina %d / %d   ·   12 × %d   ·   spent %d   ·   digs %d   ·   dig costs %d (not × N)"
 		% [
 			session.stamina_remaining,
 			session.stamina_start,
+			session.piece_count,
 			session.stamina_spent,
 			session.dig_count,
 			session.dig_refresh_cost,
@@ -250,98 +302,64 @@ func _refresh() -> void:
 	)
 	_stam_bar.max_value = session.stamina_start
 	_stam_bar.value = session.stamina_remaining
-	var tags := CraftCatalog.construction_tags(session.construction_id)
-	var stats := CraftCatalog.construction_stats(session.construction_id)
-	_piece_title.text = "Sewing %s  ·  construction_ids from the order, not a pick" % con_name
-	_piece_body.text = (
-		"Tags %s   ·   stats HP %+d  ATK %+d  DEF %+d  RES %+d  MOB %+d  PRE %+d   ·   infinite monostack (stamina + discard→reshuffle)"
-		% [
-			", ".join(tags) if tags.size() > 0 else "—",
-			int(stats.get("HP", 0)),
-			int(stats.get("ATK", 0)),
-			int(stats.get("DEF", 0)),
-			int(stats.get("RES", 0)),
-			int(stats.get("MOB", 0)),
-			int(stats.get("PRE", 0)),
-		]
-	)
-	_rebuild_played(session)
+	_rebuild_zones(session)
 	_rebuild_hand(session)
 	_refresh_readout(session)
 	_stock.text = (
-		"Draw %d  ·  discard %d  ·  run deck %d. Play leaves the hand → discard. Dig dumps remaining hand, then draws (reshuffle if short). Empty hand is legal."
+		"Draw %d  ·  discard %d  ·  run deck %d. Play leaves the hand → discard into the target zone. Dig (D) dumps remaining hand, then draws (reshuffle if short). Empty hand is legal."
 		% [session.draw_pile.size(), session.discard_pile.size(), session.run_deck_count()]
 	)
-	var busy := session.is_finished() or AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
+	var busy := session.is_finished() or AtelierSession.order_craft_done
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
 	_finish_btn.disabled = busy
-	_continue_btn.visible = AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
-	if AtelierSession.awaiting_next_piece:
-		_continue_btn.text = "Sew next piece"
-	elif AtelierSession.order_craft_done:
-		_continue_btn.text = "Return to schedule"
+	_continue_btn.visible = AtelierSession.order_craft_done
+	_continue_btn.text = "Return to schedule"
 	_refresh_result(session)
 	_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 
 
-func _rebuild_played(session: CraftStaminaSession) -> void:
-	for child in _played.get_children():
-		child.queue_free()
-	if session.cards_played.is_empty():
-		_played.add_child(_label("Nothing sewn yet.", 13, MUTED))
-		return
-	for card in session.cards_played:
-		var text := "%s  ·  %s  ·  −%d" % [
-			CraftCatalog.display_name(card.id, card.type),
-			GameEnums.hand_card_type_wire(card.type),
-			card.cost,
-		]
-		_played.add_child(_chip(text))
+func _rebuild_zones(session: CraftStaminaSession) -> void:
+	var locked := session.is_finished() or AtelierSession.order_craft_done
+	for i in range(_zones.size()):
+		var zone: CraftZone = _zones[i]
+		var zone_index := i + 1
+		if zone_index > session.zone_count:
+			zone.visible = false
+			continue
+		zone.visible = true
+		zone.bind(
+			zone_index,
+			session.construction_id_for_zone(zone_index),
+			session.selected_zone_index == zone_index,
+			session.cards_for_zone(zone_index),
+			locked
+		)
 
 
 func _rebuild_hand(session: CraftStaminaSession) -> void:
 	for child in _hand.get_children():
 		child.queue_free()
 	if session.hand.is_empty():
-		_hand.add_child(_label("Hand empty — dig (2 stamina) or Finish.", 14, MUTED))
+		_hand.add_child(_label("Hand empty — Dig (D) or Finish.", 14, MUTED))
 		return
-	var locked := session.is_finished() or AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
+	var locked := session.is_finished() or AtelierSession.order_craft_done
 	for i in range(session.hand.size()):
 		var card: HandCard = session.hand[i]
 		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
-		var tags := CraftCatalog.tags_of(card.id, card.type)
-		var blurb := ", ".join(tags) if tags.size() > 0 else CraftCatalog.skill_blurb(card.id)
-		var fate := "burns" if CraftRules.burns_on_play(card.type) else "to discard"
-		var btn := Button.new()
-		btn.text = "%s\n%s · cost %d · %s\n%s" % [
-			CraftCatalog.display_name(card.id, card.type),
-			GameEnums.hand_card_type_wire(card.type),
+		var slot := CraftHandSlot.new()
+		_hand.add_child(slot)
+		slot.bind(
+			i,
+			card,
 			cost,
-			fate,
-			blurb,
-		]
-		btn.custom_minimum_size = Vector2(148, 110)
-		btn.disabled = locked or not CraftRules.can_play(session, i, AtelierSession.next_mat_free)
-		btn.pressed.connect(_on_play.bind(i))
-		_hand.add_child(btn)
-
-
-func _chip(text: String) -> PanelContainer:
-	var panel := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = CHIP
-	sb.set_corner_radius_all(6)
-	sb.content_margin_left = 8
-	sb.content_margin_right = 8
-	sb.content_margin_top = 6
-	sb.content_margin_bottom = 6
-	panel.add_theme_stylebox_override("panel", sb)
-	panel.add_child(_label(text, 12, INK))
-	return panel
+			locked,
+			CraftRules.can_play(session, i, AtelierSession.next_mat_free, session.selected_zone_index)
+		)
+		slot.slot_played.connect(_on_play)
 
 
 func _refresh_readout(session: CraftStaminaSession) -> void:
-	var preview := CraftReadout.preview(session)
+	var preview := CraftReadout.preview(session, session.selected_zone_index)
 	_current_body.text = CraftReadout.current_line(preview)
 	var unlocked := AtelierSession.unlocked_outlooks
 	var open := CraftReadout.potential_unlocked(preview, unlocked)
@@ -350,27 +368,29 @@ func _refresh_readout(session: CraftStaminaSession) -> void:
 
 
 func _refresh_result(session: CraftStaminaSession) -> void:
-	if AtelierSession.last_piece_result.is_empty() or not session.is_finished():
-		_result.text = "Finish the piece to stamp tags, rarity, synergies, and a real mission grade (docs/23)."
+	if AtelierSession.piece_results.is_empty() or not session.is_finished():
+		_result.text = "One Finish ends the session and stamps each zone in listed order (docs/20, 23). Empty zones use the construction-only bag."
 		return
-	var result: Dictionary = AtelierSession.last_piece_result
+	var bits: PackedStringArray = PackedStringArray()
+	for result in AtelierSession.piece_results:
+		var row: Dictionary = result
+		bits.append(
+			"z%d %s · %s · %s · %s"
+			% [
+				int(row.get("zone_index", 0)),
+				CraftCatalog.construction_name(String(row.get("construction_id", ""))),
+				GameEnums.craft_rarity_wire(row.get("craft_rarity", GameEnums.CraftRarity.NONE)),
+				String(row.get("outlook_id", "plain")),
+				GameEnums.rating_wire(row.get("rating", GameEnums.Rating.NONE)),
+			]
+		)
 	_result.text = (
-		"Finish %s   ·   rarity %s   ·   look %s (%d)   ·   rating %s   ·   cleared %s   ·   hp %.2f   ·   aid %d%%   ·   ★%d   ·   tags %s   ·   +%s   ·   −%s   ·   favor %s   ·   punish %s"
+		"Finish %s   ·   %s   ·   crafts_done %d / %d"
 		% [
 			GameEnums.finish_reason_wire(session.finish_reason),
-			GameEnums.craft_rarity_wire(result.get("craft_rarity", GameEnums.CraftRarity.NONE)),
-			String(result.get("outlook_id", "plain")),
-			int(result.get("outlook_order", 0)),
-			GameEnums.rating_wire(result.get("rating", GameEnums.Rating.NONE)),
-			str(bool(result.get("cleared", false))),
-			float(result.get("hp_remaining", 0.0)),
-			int(result.get("damage_aid_pct", 0)),
-			int(result.get("skill_effectiveness", 1)),
-			str(result.get("tag_counts", {})),
-			str(result.get("powers_positive", [])),
-			str(result.get("powers_negative", [])),
-			str(result.get("favor_tags_hit", [])),
-			str(result.get("punish_tags_hit", [])),
+			"  |  ".join(bits),
+			AtelierSession.board.crafts_done if AtelierSession.board != null else 0,
+			GameConstants.CRAFTS_MAX,
 		]
 	)
 
@@ -379,8 +399,22 @@ func _on_piece(_result: Dictionary) -> void:
 	_refresh()
 
 
+func _play_slot(index: int) -> void:
+	if AtelierSession.order_craft_done:
+		return
+	AtelierSession.play_hand(index)
+
+
 func _on_play(index: int) -> void:
 	AtelierSession.play_hand(index)
+
+
+func _on_zone_selected(zone_index: int) -> void:
+	AtelierSession.select_zone(zone_index)
+
+
+func _on_card_dropped(hand_index: int, zone_index: int) -> void:
+	AtelierSession.play_hand(hand_index, zone_index)
 
 
 func _on_dig() -> void:

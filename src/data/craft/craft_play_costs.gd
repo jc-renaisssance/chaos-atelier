@@ -1,8 +1,9 @@
 class_name CraftPlayCosts
 extends Resource
-## Per-piece stamina knobs + play costs (docs/27). Infinite monostack — no max_materials / max_runes.
+## Session knobs + play costs (docs/27). stamina_start here is the per-piece base (12).
+## Live session pool is 12 * N. Infinite monostack — no max_materials / max_runes.
 
-@export var stamina_start: int = 12
+@export var stamina_start: int = 12 ## per-piece base; session uses 12 * piece_count
 @export var hand_size: int = 5
 @export var dig_refresh_cost: int = 2
 @export var common_mat: int = 1

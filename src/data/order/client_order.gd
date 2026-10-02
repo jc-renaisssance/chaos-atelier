@@ -1,6 +1,6 @@
 class_name ClientOrder
 extends Resource
-## Order-fixed construction list. Multi-piece = N stamina sessions, 1 stamp each (docs/27).
+## Order-fixed construction list. Multi-piece = one parallel session, N zones (docs/27).
 
 @export var order_id: String = ""
 @export var threat_id: String = ""
@@ -19,9 +19,9 @@ func piece_construction_id(piece_index: int) -> String:
 	return construction_ids[piece_index - 1]
 
 
-func open_piece_session(piece_index: int) -> CraftStaminaSession:
+func open_session() -> CraftStaminaSession:
 	var session := CraftStaminaSession.new()
-	session.apply_order(self, piece_index)
+	session.apply_order(self)
 	return session
 
 
@@ -31,6 +31,8 @@ func schema_errors() -> PackedStringArray:
 		errs.append("order_id empty")
 	if construction_ids.is_empty():
 		errs.append("construction_ids empty — order must fix at least one piece")
+	if construction_ids.size() > GameConstants.ZONE_COUNT_MAX:
+		errs.append("construction_ids length %d > max zones %d (Later / split)" % [construction_ids.size(), GameConstants.ZONE_COUNT_MAX])
 	for con_id in construction_ids:
 		if not String(con_id).begins_with("con_"):
 			errs.append("construction id '%s' is not con_*" % con_id)
