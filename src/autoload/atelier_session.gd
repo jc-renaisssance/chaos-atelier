@@ -240,8 +240,8 @@ func play_hand(hand_index: int) -> bool:
 		_resolve_current_piece()
 	else:
 		last_note = (
-			"Played into the piece. Materials stay (stamina only). "
-			+ "Hand does not refill — dig to rummage the wagon."
+			"Played into the piece — card left the hand to discard. "
+			+ "Hand does not refill — dig dumps remaining cards, then draws."
 		)
 		craft_changed.emit()
 	return true
@@ -257,7 +257,10 @@ func dig() -> bool:
 	if craft_session.is_finished():
 		_resolve_current_piece()
 	else:
-		last_note = "Dug the wagon stock (−%d stamina). Hand refreshed; no auto-refill." % GameConstants.DIG_REFRESH_COST
+		last_note = (
+			"Dug (−%d). Remaining hand to discard; drew a new hand (reshuffle if draw was short)."
+			% GameConstants.DIG_REFRESH_COST
+		)
 		craft_changed.emit()
 	return true
 
@@ -273,7 +276,7 @@ func finish_early() -> bool:
 
 
 func _resolve_current_piece() -> void:
-	CraftRules.return_hand_copies(craft_session, stock)
+	CraftRules.return_run_deck(craft_session, stock)
 	var craft := CraftResolver.resolve(craft_session, craft_session.construction_id)
 	var result := MissionResolver.grade_piece(craft, craft_order)
 	var counted := board.count_finished_piece()

@@ -132,7 +132,7 @@ func _build() -> void:
 	_potential_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	potential_box.add_child(_potential_body)
 
-	root.add_child(_caption("HAND  ·  materials + enchantments + owner skills  ·  no auto-refill"))
+	root.add_child(_caption("HAND  ·  play leaves → discard  ·  materials + enchantments + owner skills  ·  no auto-refill"))
 	var hand_panel := _panel()
 	hand_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(hand_panel)
@@ -224,13 +224,14 @@ func _refresh() -> void:
 	var con_name := CraftCatalog.construction_name(session.construction_id)
 	_title.text = "CRAFT  ·  %s  ·  own_basic" % order.order_id
 	_meta.text = (
-		"Piece %d / %d   ·   %s   ·   %s   ·   stock %d   ·   next-mat-free %s   ·   pieces sewn %d / %d"
+		"Piece %d / %d   ·   %s   ·   %s   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d"
 		% [
 			session.piece_index,
 			session.piece_count,
 			con_name,
 			GameEnums.mission_kind_wire(order.mission_kind),
-			AtelierSession.stock.count() if AtelierSession.stock != null else 0,
+			session.draw_pile.size(),
+			session.discard_pile.size(),
 			"yes" if AtelierSession.next_mat_free else "no",
 			AtelierSession.board.crafts_done if AtelierSession.board != null else 0,
 			GameConstants.CRAFTS_MAX,
@@ -253,7 +254,7 @@ func _refresh() -> void:
 	var stats := CraftCatalog.construction_stats(session.construction_id)
 	_piece_title.text = "Sewing %s  ·  construction_ids from the order, not a pick" % con_name
 	_piece_body.text = (
-		"Tags %s   ·   stats HP %+d  ATK %+d  DEF %+d  RES %+d  MOB %+d  PRE %+d   ·   infinite monostack (stamina + stock gate)"
+		"Tags %s   ·   stats HP %+d  ATK %+d  DEF %+d  RES %+d  MOB %+d  PRE %+d   ·   infinite monostack (stamina + discard→reshuffle)"
 		% [
 			", ".join(tags) if tags.size() > 0 else "—",
 			int(stats.get("HP", 0)),
@@ -268,8 +269,8 @@ func _refresh() -> void:
 	_rebuild_hand(session)
 	_refresh_readout(session)
 	_stock.text = (
-		"Wagon stock %d remaining. Materials are durable — play spends stamina only; the card stays. Empty hand is legal. Dig rummages leftover + stock."
-		% (AtelierSession.stock.count() if AtelierSession.stock != null else 0)
+		"Draw %d  ·  discard %d  ·  run deck %d. Play leaves the hand → discard. Dig dumps remaining hand, then draws (reshuffle if short). Empty hand is legal."
+		% [session.draw_pile.size(), session.discard_pile.size(), session.run_deck_count()]
 	)
 	var busy := session.is_finished() or AtelierSession.awaiting_next_piece or AtelierSession.order_craft_done
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
@@ -310,13 +311,13 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
 		var tags := CraftCatalog.tags_of(card.id, card.type)
 		var blurb := ", ".join(tags) if tags.size() > 0 else CraftCatalog.skill_blurb(card.id)
-		var stay := "durable · stays" if not CraftRules.burns_on_play(card.type) else "leaves on play"
+		var fate := "burns" if CraftRules.burns_on_play(card.type) else "to discard"
 		var btn := Button.new()
 		btn.text = "%s\n%s · cost %d · %s\n%s" % [
 			CraftCatalog.display_name(card.id, card.type),
 			GameEnums.hand_card_type_wire(card.type),
 			cost,
-			stay,
+			fate,
 			blurb,
 		]
 		btn.custom_minimum_size = Vector2(148, 110)
