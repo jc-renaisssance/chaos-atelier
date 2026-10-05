@@ -216,3 +216,25 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 - 2026-09-28 PM framing: hold Client until Cursor monthly reset; Phase-1A/1B/1C as the live plan
 - Calling shop / walk-in / appointment / boss-pool people “clients”
 - “0 PixelLab from Client” / “no Cursor add-on until monthly reset” as the live spend envelope
+
+---
+
+# Grimmjow stamp — 2026-10-05 (M1 adventurer catalog + interactive-order 1–3)
+
+## Locked (docs only)
+
+1. **M1 people:** 4 jobs (Knight, Mage, Blade Dancer, Lagoon) × 3 named `adv_*` = 12. Other `28` jobs = Later / M2. Job-stubs (`adv_knight`, …) stay as aliases.
+2. **Stats** = existing `HP / ATK / DEF / RES / MOB / PRE` (knobs). Exactly one `ask_*` per person (**new** prefix; not `sk_*`).
+3. **Draw:** boss beat still `28` (independent of boss). M1 pool = 4 jobs, then one of that job’s 3.
+4. **Unlock (slice 2):** key = outlook + tier, not item / `con_*`. Apex also unlocks lower tiers of that outlook. Counts on piece **Finish** with threshold met. Abandon does not count. Order win/lose does not matter. **Meta / profile** `unlocked_builds: {outlook_id, tier}[]` — cross-run, never resets on death. Fresh profile empty → planner is `?`.
+5. Slices 1–3 text-first, ugly-Client, no art. Slice 4 Later (one paragraph).
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/29-adventurer-catalog.md` | **Add** — 12 people, draw, harness |
+| `docs/30-interactive-order.md` | **Add** — slices 1–3 + unlock save |
+| `docs/28-boss-client-pool.md` | Pointer to `29` |
+| `docs/README.md` · `00-doc-categories.md` · `10-catalog-overview.md` | Index + `ask_*` |
+| `docs/STAMP.md` | This note |
