@@ -383,7 +383,7 @@ Reuse `20` / `28`. **No** new person field.
 
 On `mission_kind=boss`, assert `23` from `20` **plus**: `boss_client_id` is one of the 12 (or a job-default alias); `boss_job_id` matches that person’s job; `construction_ids` still equals the **job** list (not a per-person invention).
 
-Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field — it is meta. Log keys live in [30](30-interactive-order.md) slice 2.
+Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field — it is meta (Dex Builds tab). Log keys live in [30](30-interactive-order.md) slice 2 and [31-dex](31-dex.md).
 
 ---
 
@@ -407,6 +407,7 @@ No portraits, no poster art, no posture sheets this stamp. Names + job + stats +
 ## Pointers
 
 - Interactive-order slices 1–3: [30-interactive-order](30-interactive-order.md)
+- Dex: [31-dex](31-dex.md)
 - Job pool / constructions: [28-boss-client-pool](28-boss-client-pool.md)
 - Bosses / starter-tag law: [17-chapter-bosses](17-chapter-bosses.md)
 - Synergy tiers / cross-tags / neg: [14-synergies](14-synergies.md)

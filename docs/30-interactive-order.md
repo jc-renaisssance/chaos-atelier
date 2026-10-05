@@ -6,7 +6,7 @@
 
 Slices **1–3** are Design-then-Client (this stamp). Slice **4** is **Later** — one paragraph, no detail.
 
-Numbers below are **test knobs** unless a row says lock.
+Numbers below are **test knobs** unless a row says lock. **Cross-run `unlocked_builds` is LOCKED** (Jonathan 2026-10-05). Dex: [31-dex](31-dex.md).
 
 ---
 
@@ -71,7 +71,7 @@ On the boss beat, the panel is the drawn named `adv_*`; they still fight the **a
 
 Under the panel, the player plans a **synergy target** for this order. Example: click **Metal** twice = **mid** Metal build (`14` thresholds ≥3 / ≥5 / ≥8 = low / mid / apex).
 
-The planner lists **unlocked** builds. Locked / unknown show as **`?`**. This is the **one new save system** for M1.
+The planner lists **unlocked** builds. Locked / unknown show as **`?`**. Builds data **is** `unlocked_builds` — the Dex Builds tab ([31-dex](31-dex.md)) **reads** the same field. Do not keep a second list.
 
 ### Unlock key (lock)
 
@@ -104,14 +104,14 @@ unlocked_builds: { outlook_id: string, tier: "low" | "mid" | "apex" | "cross" }[
 
 | Rule | Law |
 |---|---|
-| Where | **Meta / profile save** — not run state |
-| Across runs | **Persists.** Stamped default = **cross-run** |
+| Where | **Meta / profile save** — not run state. Same layer as the Dex (`31`) |
+| Across runs | **LOCKED** (Jonathan 2026-10-05). Cross-run. Confirmed — not an open question |
 | Reset | **Never** on run end, `run_over`, `boss_death`, or new run |
 | Fresh profile | `unlocked_builds == []` — planner shows **only `?`** |
 | Write time | After each piece stamp from a Finish (N pieces → N chances) |
 | Dedup | Union. Re-finishing an already-owned key is a no-op (still log “not new”) |
 
-This is **not** a `20` Required run-identity field. Test still **logs** it (below). Do not invent a second unlock list.
+This is **not** a `20` Required run-identity field. Test still **logs** it (below). Do not invent a second unlock list. Dex Crafts / Adventurers / Enemies are sibling fields on this same save (`31`) — they are **not** a copy of `unlocked_builds`.
 
 ### Planner UX (ugly)
 
@@ -126,10 +126,10 @@ Planned target is **intent** for the estimate (slice 3). It does **not** change 
 
 ### Client needs
 
-- Persist `unlocked_builds` on the **profile / meta save** (the one new save system). Empty array on new profile.
-- On each piece Finish: if threshold met, union the key(s); if apex, also union low + mid of that outlook.
-- Do **not** write on abandon. Do **not** clear on run end / death.
-- Render unlocked rows; render `?` for locked (see UX). Click-to-tier for tags the player can see.
+- Persist `unlocked_builds` on the **profile / meta save** (Dex layer, `31`). Empty array on new profile.
+- On each piece Finish: if threshold met, union the key(s); if apex, also union low + mid of that outlook. Also write `dex_crafts` (`31`) — do **not** duplicate Builds into another builds array.
+- Do **not** write on abandon. Do **not** clear on run end / death. **LOCKED** cross-run.
+- Render unlocked rows from `unlocked_builds`; render `?` for locked (see UX). Click-to-tier for tags the player can see.
 - No outlook art required — text labels are the M1 surface (extends `27` Potential “locked if not unlocked”).
 
 ### Test logs
@@ -143,7 +143,7 @@ On **every Finish** (each piece stamp):
 | `planned_build` | `{ outlook_id, tier }` the player had selected, or null |
 | `finish_reason` | Must be `player_finish` (`20`) |
 
-**Cross-run persist assertion:** start a second run on the same profile → `unlocked_builds` equals the previous profile snapshot (not `[]`, not run-local). Death / `run_over` between runs must not wipe it. Fresh profile (no prior Finish) → `unlocked_builds == []` and planner is all `?`.
+**Cross-run persist assertion (LOCKED):** start a second run on the same profile → `unlocked_builds` equals the previous profile snapshot (not `[]`, not run-local). Death / `run_over` between runs must not wipe it. Fresh profile (no prior Finish) → `unlocked_builds == []` and planner is all `?`. Same persist law as the rest of the Dex (`31`).
 
 ---
 
@@ -158,7 +158,7 @@ The adventurer brings a **target-enemy brief** styled like a **guild quest poste
 | Enemy name | `17` display name for `threat_id` |
 | Environment one-liner | `17` Environment column |
 | Flavor | Short quest line (Client may use `17` prose) |
-| Favor / punish | From `17` — **shown** if that tag-axis is unlocked knowledge (see below); else `?` |
+| Favor / punish | From `17` — **shown only if** `dex_enemies[threat_id].fought` ([31](31-dex.md)); else `?` |
 
 `threat_id`:
 
@@ -178,7 +178,17 @@ Extends Current / Potential (`27`): unlocked info shown; locked / unknown = **`?
 | Neg-syn warning | Named `syn_neg_*` if the planned bag would fire it | `?` |
 | Letter band | `S\|A\|B\|C\|D\|F` (knob bands) | `?` |
 
-**Unlocked knowledge** for a line = the player owns the `unlocked_builds` key that justifies it (the planned outlook+tier, or a family already known for that tag). Fresh profile → poster name / environment may still show (the adventurer handed you the paper); mechanical favor / punish / band / skill = `?`.
+**Source of truth = Dex (`31`).** Do not invent a second reveal flag.
+
+| Line | Reveals when |
+|---|---|
+| Planned outlook + tier | `{outlook_id, tier}` ∈ `unlocked_builds` |
+| Poster name / environment | `dex_enemies[threat_id].seen` (showing the brief **writes** seen, then shows the name) |
+| Favor / punish hits | `dex_enemies[threat_id].fought` — **not** gated on Builds |
+| Letter band | **fought** (band uses favor / punish) |
+| Skill / neg-syn (build-side) | Relevant Builds key unlocked |
+
+Fresh profile → first brief can show the name (now `seen`); favor / punish / band stay `?` until a **boss-beat fight**.
 
 ### Deterministic estimate (ugly-Client)
 
@@ -219,16 +229,16 @@ function estimate(adventurer, planned_build, enemy):
 | ≥ −2 | D |
 | else | F |
 
-C2 / C3 **punish starter tags**. A Metal-mid plan vs `boss_gilded_warden` **must** subtract `PUNISH_W` (Metal ∈ punishes). A Silk-mid plan vs `boss_ivory_judge` same. The estimate is how M1 teaches that — once those keys are unlocked. Until then the punish line is `?`.
+C2 / C3 **punish starter tags**. A Metal-mid plan vs `boss_gilded_warden` **must** subtract `PUNISH_W` (Metal ∈ punishes) in the **internal** score. A Silk-mid plan vs `boss_ivory_judge` same. The **displayed** punish line and band stay `?` until that enemy is **fought** (`31`). After `fought`, the Dex reveals the tags and the estimate can show the hits.
 
 This estimate is a **prediction window**, not the live resolver. After Finish, `20` / `23` remain the real stamp (`rating`, `favor_tags_hit`, `punish_tags_hit`, `cleared`, …). Do not assert estimate band == post-sim `rating` this stamp (bags ≠ planned chips).
 
 ### Client needs
 
-- Poster block: enemy display name + environment string + `?` for locked favor / punish.
+- Poster block: name / environment from Dex `seen`; favor / punish from Dex `fought` (`31`). Showing the brief writes `seen`.
 - `threat_id` = catalog target on shop orders; `chapter_boss_id` on the boss beat.
 - Run the estimate from **adventurer stats + skill + planned tags + construction tags** vs `17` favor / punish. Deterministic, no RNG, no art.
-- Gate mechanical lines on `unlocked_builds`. Show `?` otherwise.
+- Gate outlook lines on `unlocked_builds`. Gate enemy tags / band on `dex_enemies.fought`. Show `?` otherwise.
 - Ugly labels OK. Do not wait on poster illustration.
 
 ### Test logs
@@ -242,7 +252,8 @@ This estimate is a **prediction window**, not the live resolver. After Finish, `
 | `estimate_punish_hits` | string[] or `?` |
 | `estimate_skill_fired` | bool or `?` |
 | `estimate_neg_warnings` | `syn_neg_*`[] or `?` |
-| `unlocked_builds` | Profile list used to gate `?` |
+| `unlocked_builds` | Profile Builds list — gates outlook `?` |
+| `dex_enemies` | `seen` / `fought` for this `threat_id` — gates tag / band `?` (`31`) |
 
 On boss beat: `threat_id == chapter_boss_id` (`20` assert 23) even if the catalog default was a different `boss_*`.
 
@@ -258,7 +269,7 @@ After Finish: a simple **animated battle playback** driven by the mission resolv
 
 - Portraits, poster illustration, posture sheets
 - Per-item or per-`con_*` unlock keys
-- Wiping `unlocked_builds` on death / run end (unless Jonathan overrides the confirmation Q)
+- Wiping `unlocked_builds` or the Dex on death / run end (**LOCKED** cross-run)
 - Estimate as a `20` Required substitute for the real resolver
 - Slice 4 implementation
 - Shop-event systems (still required for M1 “full experience” per PM — not this doc)
@@ -267,6 +278,7 @@ After Finish: a simple **animated battle playback** driven by the mission resolv
 
 ## Pointers
 
+- Dex (profile collection; `?` source of truth): [31-dex](31-dex.md)
 - Catalog: [29-adventurer-catalog](29-adventurer-catalog.md)
 - Jobs / constructions: [28-boss-client-pool](28-boss-client-pool.md)
 - Synergy thresholds / cross-tags / neg: [14-synergies](14-synergies.md)

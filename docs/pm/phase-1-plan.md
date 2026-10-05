@@ -79,7 +79,7 @@ Slices 1–3 are Design-then-Client. Slice 4 art (postures/posters) waits for Jo
 
 ## Sequence after this stamp merges
 
-1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md).
+1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md).
 2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client.
 3. **Szayelaporro** — Godot re-smoke **each** Client land.
 4. **Slice 4 art** (postures/posters) — when Jonathan opens that lane for M1, or defers to M2.

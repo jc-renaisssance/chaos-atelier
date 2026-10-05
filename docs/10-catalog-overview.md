@@ -41,6 +41,7 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 - Shared boss-client / job pool: `28`
 - M1 named adventurers: `29`
 - Interactive-order slices 1–3: `30`
+- Dex (profile collection): `31`
 - Missions before boss: `22`
 - Mission report + letter: `23`
 - App pseudocode: `21`
