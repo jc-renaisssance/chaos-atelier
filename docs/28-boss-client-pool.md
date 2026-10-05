@@ -1,5 +1,7 @@
 # Shared boss-client pool (adventurer jobs)
 
+**Terminology (2026-10-05):** people in this pool are **adventurers**. **Client** = Godot Client seat / codebase. Filename / `boss_client_id` stay until Grimmjow’s bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
+
 Jonathan lock (2026-10-02). **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
 
 ## Pool law

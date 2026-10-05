@@ -184,3 +184,35 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 - Boss-client **roster Later / do not invent catalog** (`17` / `20` / `22` / `STAMP` 2026-10-02 morning)
 - Fixed-client-per-boss reading of the boss beat
 - Scrap Duelist (or any appointment) as the boss-client
+
+---
+
+# Jonathan stamp — 2026-10-05 (roadmap + adventurers + M1/M2)
+
+## Locked (docs only)
+
+1. **Terminology:** shop / walk-in / appointment / boss-pool people are **adventurers**, not “clients.” **Client** = Godot Client seat / codebase only. Do not mass-rename historical bible docs in this drop — Grimmjow owns deeper bible renames Later.
+2. **M1 — Ugly full-experience Client (limited options).** Fully developed ugly Client that ships the **full experience** with limited content: limited adventurer **jobs** + limited **enemy types**. Shop adventurers: **more than one per job/class**. Define **stats / skills / requirement tags** first (Design catalog before Client wire).
+3. **Interactive order pack** (text-first, discussed 2026-10-05):
+   1. Adventurer stats/skills panel on order
+   2. Unlocked syn-target draft (persist unlocks across runs) under that panel
+   3. Enemy quest brief + estimate/outcome window (extends Current/Potential; unlocked items shown, `?` if locked)
+   4. After-craft battle playback (deterministic from mission resolver) then posture art slots — can follow 1–3
+4. Shop systems and events are **not done yet** and remain required for “full experience” under M1. C1 craft path **works** (Jonathan confirmed). Art may stay panels / partial armor fallbacks for M1. Pinned demo seed = optional.
+5. **M2 — Steam demo.** Ugly UI replaced / handled. Adventurer (and related Client) arts mostly done. Remaining: stat/event tuning + art gen fill. **Not** shipping the full game this month. PixelLab / Cursor budget treated as **fine** for this plan (Harribel watches burn).
+6. **Sequence after merge:** Grimmjow Design (limited M1 job set + multi-adventurer-per-job catalog + interactive-order slices 1–3) → Ulquiorra Client PRs after those stamps → Szayelaporro Godot re-smoke each Client land → slice 4 art when Jonathan opens that lane for M1 or defers to M2.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/pm/phase-1-plan.md` | **Rewrite** — current 2026-10-05 roadmap (supersedes 2026-09-28 Cursor-reset / Phase-0–1C framing) |
+| `docs/STAMP.md` | This note |
+| `docs/README.md` · `00-doc-categories.md` | Index / findability for the live PM roadmap |
+| `docs/03-clients-and-adventure.md` · `28-boss-client-pool.md` | One-line terminology pointers only |
+
+## Supersedes
+
+- 2026-09-28 PM framing: hold Client until Cursor monthly reset; Phase-1A/1B/1C as the live plan
+- Calling shop / walk-in / appointment / boss-pool people “clients”
+- “0 PixelLab from Client” / “no Cursor add-on until monthly reset” as the live spend envelope
