@@ -16,7 +16,7 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 
 Example: C1 may draw Ash Drake as boss; C1 (or C2 / C3) may still draw a knight or a mage. Different jobs → different **order constructions** and different requirement tags. Knight orders armor + gauntlet; mage orders robe + hood. Ash Drake’s favor / punish (`17`) is the threat axis.
 
-Portraits / UI wire / named individuals = **Later**. Phase-1 identity = job title.
+Portraits / UI wire = **Later**. Named M1 people (3 per M1 job) supersede job-title-only identity: **[29-adventurer-catalog](29-adventurer-catalog.md)**.
 
 ## Draw
 
@@ -185,3 +185,5 @@ Portraits / Client widgets / extra UI = **Later**.
 - Constructions: [12-constructions](12-constructions.md)
 - Craft: [27-craft-mode-stamina](27-craft-mode-stamina.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
+- Named M1 adventurers: [29-adventurer-catalog](29-adventurer-catalog.md)
+- Interactive-order slices 1–3: [30-interactive-order](30-interactive-order.md)

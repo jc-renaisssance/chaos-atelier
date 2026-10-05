@@ -39,10 +39,13 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 
 - Boss pools 3×3 → 27 paths: `17`
 - Shared boss-client / job pool: `28`
+- M1 named adventurers: `29`
+- Interactive-order slices 1–3: `30`
+- Dex (profile collection): `31`
 - Missions before boss: `22`
 - Mission report + letter: `23`
 - App pseudocode: `21`
 
 ## ID conventions
 
-`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*`
+`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*` · `ask_*` (adventurer battle / estimate skill — **new** in `29`; distinct from `sk_*` owner craft skills)

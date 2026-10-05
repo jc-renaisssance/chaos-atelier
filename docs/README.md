@@ -34,5 +34,8 @@ Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventur
 | [26-newspaper](26-newspaper.md) | Kingdom newspaper |
 | [27-craft-mode-stamina](27-craft-mode-stamina.md) | **Live craft UX** — stamina hand game |
 | [28-boss-client-pool](28-boss-client-pool.md) | **Shared boss-adventurer pool** — job titles + order constructions (filename stays; term lock 2026-10-05) |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-05** roadmap) |
+| [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
+| [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
+| [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-05** Dex + cross-run lock) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |
