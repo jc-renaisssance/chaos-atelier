@@ -1,5 +1,7 @@
 # Clients, bosses, adventure report
 
+**Terminology (2026-10-05):** shop / walk-in / appointment / boss-pool people are **adventurers** — not “clients.” **Client** = Godot Client seat / codebase. Filename stays; Grimmjow owns deeper bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
+
 ## Clients & events
 Mid-chapter missions from **per-chapter pools** — live spine **[22-chapter-schedule](22-chapter-schedule.md)** (appointments / walk-ins on schedule). Old 1-of-3 lineup in [22-chapter-flow](22-chapter-flow.md) is **superseded (2026-09-28)**.
 

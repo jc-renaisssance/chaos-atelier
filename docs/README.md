@@ -1,6 +1,6 @@
 # Chaos Atelier — Bible
 
-Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
+Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). Design locks through 2026-10-02 still hold unless a later stamp says otherwise.
 
 | Doc | Topic |
 |---|---|
@@ -8,7 +8,7 @@ Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
 | [00-doc-categories](00-doc-categories.md) | Category map |
 | [01-core-loop](01-core-loop.md) | Spine *(node clock superseded → [22-schedule](22-chapter-schedule.md))* |
 | [02-craft-and-tags](02-craft-and-tags.md) | Layers *(2m1r superseded → [27-stamina](27-craft-mode-stamina.md))* |
-| [03-clients-and-adventure](03-clients-and-adventure.md) | Pointer |
+| [03-clients-and-adventure](03-clients-and-adventure.md) | Pointer — people here are **adventurers** (term lock 2026-10-05; file name stays) |
 | [04-progression](04-progression.md) | Meta |
 | [05-art](05-art.md) | Art |
 | [06-phases](06-phases.md) | Phases |
@@ -33,6 +33,6 @@ Docs-first (locks through 2026-09-28 Jonathan / Aizen stamp).
 | [25-reps-meter](25-reps-meter.md) | Trust / reps gate |
 | [26-newspaper](26-newspaper.md) | Kingdom newspaper |
 | [27-craft-mode-stamina](27-craft-mode-stamina.md) | **Live craft UX** — stamina hand game |
-| [28-boss-client-pool](28-boss-client-pool.md) | **Shared boss-client pool** — job titles + order constructions |
-| [STAMP](STAMP.md) | Jonathan 2026-09-28 drop |
-| [pm/phase-1-plan](pm/phase-1-plan.md) | Plan |
+| [28-boss-client-pool](28-boss-client-pool.md) | **Shared boss-adventurer pool** — job titles + order constructions (filename stays; term lock 2026-10-05) |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-05** roadmap) |
+| [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |

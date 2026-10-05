@@ -1,75 +1,100 @@
-# Phase plan — Chaos Atelier
+# Roadmap — Chaos Atelier
 
-Updated **2026-09-28** after Jonathan stamp (travelling atelier schedule + stamina craft) + Aizen category / hygiene pass. **No Cursor budget add-on until monthly reset.** PixelLab may burn **this month’s remaining** quota when a gen lane is stamped.
-
-## Live Design spine (2026-09-28)
-
-| Lock | Where |
-|------|--------|
-| Travelling atelier + **schedule board** (`CHAPTER_ROUND_COUNT=8`, appointments) | `22-chapter-schedule` |
-| Craft = **stamina hand game**; construction from order; infinite monostack gated by stamina | `27` |
-| Synergy thresholds retuned (3 / 5 / apex 8 Fire·Metal·Earth); RETUNE applied | `14` |
-| Pos + **neg** synergies; neg `outlook_order` **above** peers; rare/leg **skip all neg** | `14` / `18` |
-| Owner = **player clothier**; Phase-1 = `own_basic` only | `16` / `19` |
-| Boss pools C1–C3 → 27 paths; C1 diverse | `17` |
-| Win-con / reps / newspaper / mission report | `24` / `25` / `26` / `23` |
-
-**Superseded (history only):** 1-of-3 card lineup (`22-chapter-flow`, old `21`), `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default **2m1r** slot UI (`12b`), construction picker in craft.
+Updated **2026-10-05** after Jonathan stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology). **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file.
 
 See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 
 ---
 
-## Phase targets
+## Terminology
 
-### Phase 0 — Bible
+Call shop / walk-in / appointment / boss-pool people **adventurers**. Do **not** call them “clients.”
 
-- [x] Vision / loop / craft / clients / progression / art / phases seed
-- [x] Materials dictionary + constructions + enchantments + synergies + outlook list + owners
-- [x] Chapter schedule + stamina craft stamp (2026-09-28)
-- [x] Category map + README / STAMP indexes
-- [ ] Soft nits closed (this plan + categories explicit `23`–`26`)
+**Client** = the Godot **Client** seat / codebase only.
 
-**Exit:** stamped docs are the contract; no src required until Cursor reset.
+This PR locks the term in PM + STAMP. It does **not** mass-rename historical bible docs. Grimmjow owns deeper bible renames Later. One-line pointers: [03](../03-clients-and-adventure.md), [28](../28-boss-client-pool.md).
 
-### Phase 1A — Docs harden
+---
 
-- [x] Boss pools, rarity, `own_basic` starter, harness stamp fields
-- [x] Schedule + stamina craft stamped
-- [x] Optional: harness asserts retargeted off 2m1r / 1-of-3 → schedule + stamina (`20`)
-- [ ] Optional: trim dictionary only if Jonathan asks
+## Already on `dev`
 
-**Budget:** ~$0 Cursor on-demand (human / connector docs). No gens.
+As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 
-### Phase 1B — Client vertical slice (after monthly Cursor reset)
+| Landed | Where |
+|--------|--------|
+| Travelling atelier + schedule board (`CHAPTER_ROUND_COUNT=8`) | `22-chapter-schedule` |
+| Craft = stamina hand game; construction from order | `27` |
+| **Finish-only** (stamina 0 ≠ finish) | `27` / Client |
+| **StS** cycle (play→discard, dig dump, reshuffle) + Current/Potential | `27` / Client |
+| **Multi-piece** parallel session (dedicated UI, `12 × N` stamina, ≤4 zones) | `27` / Client |
+| Shared boss-adventurer pool by job + C1–C3 rewrite | `28` / `17` / Client |
+| Synergy thresholds, pos+neg, rarity skip-neg | `14` / `18` |
+| Owner = player clothier; Phase-1 = `own_basic` | `16` / `19` |
+| Win-con / reps / newspaper / mission report (docs) | `24` / `25` / `26` / `23` |
 
-Ship **one** loop as `own_basic`:
+**Jonathan confirmed 2026-10-05:** C1 **craft path works**. Shop systems and events are **not done yet**.
 
-1. Chapter start → schedule board + boss announce
-2. Rounds (appointments / walk-in / wagon shop / event / prep craft)
-3. Craft: stamina hand game (`27`) — order-fixed construction(s)
-4. Resolver: tags → powers (skip neg on rare/legendary) → outlook = max order
-5. Mission report + reps + newspaper
-6. Boss → next chapter
+**Superseded (history only):** 1-of-3 card lineup, `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default 2m1r slot UI, construction picker in craft, sequential per-piece stamina, auto-finish on `stamina_0`, fixed-client-per-boss, “hold Client until Cursor monthly reset.”
 
-Also: data tables from catalogs, one resolver, headless harness + stamp, placeholders for looks.
+---
 
-**Park:** multi-owner unlocks, encyclopedia, scars, named-unique art, full outlook matrix, skill owners catalog.
+## Milestone 1 — Ugly full-experience Client (limited options)
 
-**Budget:** Cursor after reset (prefer included); **0** PixelLab from Client.
+Fully developed **ugly** Client that ships the **full experience** with **limited content options**.
 
-### Phase 1C — Art gen (only when Jonathan stamps)
+| Lock | Note |
+|------|------|
+| Limited **adventurer jobs** | Count / which jobs = Grimmjow Design catalog. Do not invent a set here. |
+| Limited **enemy types** | Same — Design stamps the cut. |
+| Shop adventurers | **More than one adventurer per job/class.** |
+| Catalog before wire | Define **stats / skills / requirement tags** first. Design catalog lands before Client wires people. |
+| Shop + events | **Not done yet.** Still required for “full experience” under M1. |
+| Art | Panels / partial armor fallbacks OK for M1. |
+| Demo seed | Pinned demo seed = **optional**. |
 
-- Batch **1 = armor × 10 outlooks** first (not full 50 until stamped)
-- Optional later: robe/cloak/coat/tunic rows + atelier
-- Burn **this month’s remaining** PixelLab only; hard stop; no gens on locked icons
-- Neg outlook assets + other owners = Later
+### Interactive order pack (2026-10-05, text-first)
 
-### Phase 2+ (park)
+| Slice | What |
+|------:|------|
+| 1 | Adventurer **stats/skills panel** on the order |
+| 2 | **Unlocked syn-target draft** under that panel — persist unlocks **across runs** |
+| 3 | **Enemy quest brief** + estimate/outcome window (extends Current/Potential; unlocked items shown, `?` if locked) |
+| 4 | After-craft **battle playback** (deterministic from mission resolver) then **posture art slots** — can follow 1–3 |
 
-- Unlockable player-owners
-- Full outlook matrix + neg looks
-- Encyclopedia, scars, special clients, IAP wiring
+Slices 1–3 are Design-then-Client. Slice 4 art (postures/posters) waits for Jonathan to open that lane for M1 **or** defer it to M2.
+
+---
+
+## Milestone 2 — Steam demo
+
+| Lock | Note |
+|------|------|
+| Ugly UI | Replaced / handled |
+| Art | Adventurer (and related Client) arts **mostly done** |
+| Remaining | Stat / event **tuning** + art gen **fill** |
+| Ship scope | **Not** shipping the full game this month |
+| Budget | PixelLab / Cursor treated as **fine** for this plan. Harribel watches burn. |
+
+---
+
+## Sequence after this stamp merges
+
+1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**.
+2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client.
+3. **Szayelaporro** — Godot re-smoke **each** Client land.
+4. **Slice 4 art** (postures/posters) — when Jonathan opens that lane for M1, or defers to M2.
+
+This stamp is **docs only**. No game Client code in this drop.
+
+---
+
+## Park / Later (not M1 exit)
+
+- Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
+- Full game ship (beyond Steam demo)
+- Grimmjow deeper bible “client” → adventurer renames
+- 0-cost cards / further owner abilities at 0 stamina
+- N > 4 zones / split orders
 
 ---
 
@@ -77,14 +102,7 @@ Also: data tables from catalogs, one resolver, headless harness + stamp, placeho
 
 | Line | Cap |
 |------|-----|
-| Cursor on-demand | **No add-on** until monthly reset; docs land via human commit |
-| PixelLab | This-month remaining only; Phase-1C when Jonathan stamps |
+| Cursor / PixelLab | **Fine** for this plan (2026-10-05). Harribel watches burn. |
 | Grok | Quiet |
 
-## Sequence
-
-1. Close remaining 1A paper nits (this doc).
-2. Hold Client (**1B**) until Cursor monthly reset.
-3. Hold armor gens (**1C**) until Jonathan stamps the gen lane after docs confirmed.
-4. Harribel watches if eng/gen opens.
-5. Design / Test: harness retarget when Jonathan opens that lane.
+**Supersedes** 2026-09-28: “no Cursor add-on until monthly reset” / “0 PixelLab from Client” / hold 1B until reset.
