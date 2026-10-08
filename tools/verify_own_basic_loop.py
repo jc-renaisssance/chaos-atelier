@@ -52,6 +52,11 @@ def check_godot_47_hotfix(blob: str) -> None:
         fail("const … Color.html is not a constant expression in Godot 4.7")
     if re.search(r":=\s*[^\n]*\belse\s+null\b", blob):
         fail(":= … else null infers Variant — Godot 4.7.2 warning-as-error (use an explicit type)")
+    gd_only = "\n".join(
+        path.read_text(encoding="utf-8") for path in SRC.rglob("*.gd")
+    )
+    if re.search(r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", gd_only):
+        fail("const Packed*Array(...) is not a constant expression in Godot 4.7 — use array literals")
 
 
 def check_source_symbols(blob: str) -> None:
