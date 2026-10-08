@@ -552,7 +552,7 @@ func _refresh_brief_and_estimate(order: ClientOrder) -> void:
 		order.construction_ids,
 		threat_id
 	)
-	var plan := PlannerCatalog.dup_plan(AtelierSession.planned_build)
+	var plan: Variant = PlannerCatalog.dup_plan(AtelierSession.planned_build)
 	var build_unlocked := false
 	if plan is Dictionary:
 		var row: Dictionary = plan
