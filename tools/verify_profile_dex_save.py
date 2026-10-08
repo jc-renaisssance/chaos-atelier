@@ -338,6 +338,14 @@ def check_source() -> None:
         fail("Color.html(...) is not a constant expression in Godot 4.7")
     if re.search(r":=\s*[^\n]*\belse\s+null\b", blob):
         fail(":= … else null infers Variant — Godot 4.7.2 warning-as-error")
+    if re.search(r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", profile) or re.search(
+        r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", unlock
+    ):
+        fail("const Packed*Array(...) is not a constant expression in Godot 4.7 — use array literals")
+    if 'const TIERS_BUILD := ["low", "mid", "apex", "cross"]' not in profile:
+        fail("TIERS_BUILD must be an array-literal const (Godot 4.7)")
+    if 'const TIERS_CRAFT := ["low", "mid", "apex", "cross", "base"]' not in profile:
+        fail("TIERS_CRAFT must be an array-literal const (Godot 4.7)")
     ui_blob = ""
     for path in (SRC / "ui").rglob("*"):
         if path.suffix in {".gd", ".tscn"}:

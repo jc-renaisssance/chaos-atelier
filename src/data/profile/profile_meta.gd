@@ -5,8 +5,9 @@ extends RefCounted
 ## Never clear on run end, run_over, boss_death, or new run.
 
 const SAVE_PATH := "user://atelier_profile.json"
-const TIERS_BUILD := PackedStringArray(["low", "mid", "apex", "cross"])
-const TIERS_CRAFT := PackedStringArray(["low", "mid", "apex", "cross", "base"])
+## Godot 4.7: PackedStringArray(...) is not a constant expression — use array literals.
+const TIERS_BUILD := ["low", "mid", "apex", "cross"]
+const TIERS_CRAFT := ["low", "mid", "apex", "cross", "base"]
 
 var unlocked_builds: Array = [] ## {outlook_id, tier}
 var dex_crafts: Array = [] ## {construction_id, outlook_id, tier, first_run_id, first_day}
