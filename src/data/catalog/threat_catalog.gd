@@ -153,54 +153,72 @@ const BOSSES := {
 		"threat_tags": ["Fire", "Sharp"],
 		"favor_tags": ["Metal", "Earth", "Frost", "Pure"],
 		"punish_tags": ["Soft", "Sticky"],
+		"environment": "Scorched gorge — wyrm-breath cooks the soft",
+		"flavor": "Gorge-wyrm. Heat and tooth. Soft / sticky cook off; metal, earth, frost, and clean weave hold.",
 	},
 	"boss_salt_widow": {
 		"name": "Salt Widow",
 		"threat_tags": ["Frost", "Sticky", "Storm"],
 		"favor_tags": ["Frost", "Silent", "Metal"],
 		"punish_tags": ["Soft", "Solar"],
+		"environment": "Brine docks — salt webs; spray that sloughs cloth",
+		"flavor": "Widow of the brine docks. Soft dissolves in the spray; frost, silent, and metal keep a hem.",
 	},
 	"boss_rust_knave": {
 		"name": "Rust Knave",
 		"threat_tags": ["Metal", "Earth", "Sharp"],
 		"favor_tags": ["Metal", "Earth", "Sharp"],
 		"punish_tags": ["Soft", "Silk"],
+		"environment": "Scrap yard — a knave grown from the pile",
+		"flavor": "Scrap given a spine. Soft and silk catch every barb; metal, earth, and sharp speak its language.",
 	},
 	"boss_mire_bride": {
 		"name": "Mire Bride",
 		"threat_tags": ["Occult", "Sticky", "Lunar"],
 		"favor_tags": ["Silent", "Occult", "Lunar", "Sticky"],
 		"punish_tags": ["Soft", "Pure", "Silk"],
+		"environment": "Drowned chapel — aisle under peat, wedding still in session",
+		"flavor": "Drowned wedding that never ended. Clean cloth and pale silk are offerings; silent / occult / lunar / sticky walk the aisle.",
 	},
 	"boss_bog_king": {
 		"name": "Bog King",
 		"threat_tags": ["Sticky", "Wild", "Earth"],
 		"favor_tags": ["Frost", "Occult", "Storm", "Silent"],
 		"punish_tags": ["Soft", "Earth", "Metal", "Wild"],
+		"environment": "Root throne — peat crown; swallows scrap and stone",
+		"flavor": "Root throne that claims grounded work. Soft, earth, metal, and wild become more bog.",
 	},
 	"boss_pale_choir": {
 		"name": "Pale Choir",
 		"threat_tags": ["Lunar", "Occult", "Storm"],
 		"favor_tags": ["Lunar", "Occult", "Silent", "Frost"],
 		"punish_tags": ["Soft", "Metal", "Silk"],
+		"environment": "Bone gallery — stacked ribs, hymn with no language",
+		"flavor": "Bone gallery that sings cloth to rags and finds you by clang.",
 	},
 	"boss_gilded_warden": {
 		"name": "Gilded Warden",
 		"threat_tags": ["Royal", "Solar", "Sharp"],
 		"favor_tags": ["Royal", "Solar", "Fire", "Sharp"],
 		"punish_tags": ["Soft", "Earth", "Wild", "Metal"],
+		"environment": "Marble court — gold-leaf plate, no mud on the tiles",
+		"flavor": "Marble-court enforcer. Soft, earth, wild, and scrap-metal look like mud on the tiles.",
 	},
 	"boss_ivory_judge": {
 		"name": "Ivory Judge",
 		"threat_tags": ["Royal", "Lunar", "Silent"],
 		"favor_tags": ["Royal", "Lunar", "Silent", "Occult"],
 		"punish_tags": ["Soft", "Metal", "Pure", "Silk"],
+		"environment": "Hearing hall — ivory gavel; hemp is contempt",
+		"flavor": "Hearing hall. Soft, metal, pure, and silk are entered as contempt.",
 	},
 	"boss_sunspear_captain": {
 		"name": "Sunspear Captain",
 		"threat_tags": ["Solar", "Sharp", "Fire"],
 		"favor_tags": ["Solar", "Sharp", "Fire", "Royal"],
 		"punish_tags": ["Soft", "Silk", "Pure", "Earth"],
+		"environment": "Parade yard — mirrored spears; shade is desertion",
+		"flavor": "Parade glare. Soft, silk, pure, and earth wilt. Solar, sharp, fire, royal hold the line.",
 	},
 }
 
@@ -236,3 +254,11 @@ static func punish_tags(threat_id: String) -> PackedStringArray:
 
 static func threat_tags(threat_id: String) -> PackedStringArray:
 	return PackedStringArray(row(threat_id).get("threat_tags", []))
+
+
+static func environment(threat_id: String) -> String:
+	return String(row(threat_id).get("environment", ""))
+
+
+static func flavor(threat_id: String) -> String:
+	return String(row(threat_id).get("flavor", ""))

@@ -301,10 +301,10 @@ def check_source() -> None:
         fail("order Finish must increment orders_completed")
     if "PLAYER_FINISH" not in profile or "player_finish" not in session:
         fail("Dex craft/build writes must gate on player_finish")
-    if "TODO(PR 3)" not in session and "TODO(PR 3)" not in profile:
-        fail("shop brief must leave a TODO(PR 3) hook")
     if "note_shop_brief" not in session and "note_enemy_brief" not in profile:
-        fail("thin shop-brief seen hook missing")
+        fail("shop-brief seen hook missing")
+    if "_note_order_brief" not in session and "note_shop_brief" not in session.split("func _begin_craft", 1)[-1]:
+        fail("order open / brief show must write dex_enemies.seen")
     if "CraftResolver.POSITIVE_TAG_ROWS" not in unlock:
         fail("UnlockLaw must reuse CraftResolver positive rows (no second threshold table)")
     if "CROSS_UNLOCK" not in unlock:
@@ -323,7 +323,7 @@ def check_source() -> None:
         if f'errs.append("{key}' in schema or f"{key} must" in schema:
             fail(f"{key} must stay log-only — not a 20 Required schema field")
     if "planned_build: Variant = null" not in stamp:
-        fail("planned_build must be explicit Variant (Godot 4.7), null until PR 3 planner")
+        fail("planned_build must be explicit Variant (Godot 4.7)")
     if "resolve_id" not in profile or "appt_" not in profile:
         fail("adventurer write must resolve aliases and refuse appt_*")
     if "load_from_disk" not in session or "load_from_disk" not in profile:
@@ -350,9 +350,9 @@ def check_source() -> None:
     for path in (SRC / "ui").rglob("*"):
         if path.suffix in {".gd", ".tscn"}:
             ui_blob += path.read_text(encoding="utf-8")
-    for token in ("estimate_band", "syn-target", "Dex tab", "Builds | Crafts"):
+    for token in ("Dex tab", "Builds | Crafts"):
         if token in ui_blob:
-            fail(f"planner / Dex UI must not land in this PR ({token})")
+            fail(f"Dex shop/menu screen must not land here ({token})")
     if "POSITIVE_TAG_ROWS" not in resolver:
         fail("CraftResolver positive rows missing — unlock law has nothing to reuse")
     for path in SRC.rglob("*.gd"):
@@ -529,8 +529,6 @@ def check_spec() -> None:
     dump = {key: ([] if key != "planned_build" else None) for key in LOG_KEYS}
     if "dex_builds" in dump:
         fail("dump must not grow a dex_builds key")
-    if dump["planned_build"] is not None:
-        fail("planned_build is null until PR 3 planner UI")
 
 
 def main() -> int:

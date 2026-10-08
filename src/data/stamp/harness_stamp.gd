@@ -76,8 +76,13 @@ extends Resource
 @export var dex_enemy_seen_new: Array = []
 @export var dex_enemy_fought_new: Array = []
 @export var profile_day: int = 0
-## Planner intent is PR 3. Finish still logs this key; null until that UI lands.
+## Slice 2/3 logs (docs/30). Not 20 Required. planned_build is {outlook_id, tier} or null.
 var planned_build: Variant = null
+var estimate_band: Variant = "?"
+var estimate_favor_hits: Variant = "?"
+var estimate_punish_hits: Variant = "?"
+var estimate_skill_fired: Variant = "?"
+var estimate_neg_warnings: Variant = "?"
 
 
 func emit_mission() -> bool:
@@ -248,6 +253,11 @@ func to_dict() -> Dictionary:
 		"unlocked_builds": unlocked_builds.duplicate(true),
 		"unlocks_new": unlocks_new.duplicate(true),
 		"planned_build": planned_build,
+		"estimate_band": estimate_band,
+		"estimate_favor_hits": estimate_favor_hits,
+		"estimate_punish_hits": estimate_punish_hits,
+		"estimate_skill_fired": estimate_skill_fired,
+		"estimate_neg_warnings": estimate_neg_warnings,
 		"dex_crafts": dex_crafts.duplicate(true),
 		"dex_crafts_new": dex_crafts_new.duplicate(true),
 		"dex_adventurers": dex_adventurers.duplicate(true),
@@ -369,8 +379,9 @@ func schema_errors() -> PackedStringArray:
 			errs.append("cant_craft must not clear")
 	if run_over and run_over_reason == GameEnums.RunOverReason.NONE:
 		errs.append("run_over without run_over_reason")
-	## unlocked_builds / Dex keys are log-only (docs/30, 31). Do not schema-require them.
+	## unlocked_builds / Dex / estimate keys are log-only (docs/30, 31). Do not schema-require them.
 	## Builds tab reads unlocked_builds only — no parallel builds list.
+	## Planned-chip estimate is a prediction window, not the live resolver letter.
 	if mission_kind == GameEnums.MissionKind.BOSS:
 		if BossClientCatalog.is_appointment_id(boss_client_id):
 			errs.append("boss_client_id must never be appt_*")

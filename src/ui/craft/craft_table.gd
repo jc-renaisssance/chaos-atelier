@@ -17,6 +17,10 @@ var _order_title: Label
 var _order_stats: Label
 var _order_skill: Label
 var _order_body: Label
+var _tag_chips: Dictionary = {}
+var _planner_list: Label
+var _brief_body: Label
+var _estimate_body: Label
 var _stam_label: Label
 var _stam_bar: ProgressBar
 var _current_body: Label
@@ -80,9 +84,15 @@ func _build() -> void:
 	left.size_flags_stretch_ratio = 0.9
 	left.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	upper.add_child(left)
+	var left_scroll := ScrollContainer.new()
+	left_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left.add_child(left_scroll)
 	var left_box := VBoxContainer.new()
 	left_box.add_theme_constant_override("separation", 6)
-	left.add_child(left_box)
+	left_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_scroll.add_child(left_box)
 	left_box.add_child(_caption("UPPER LEFT  ·  adventurer order detail"))
 	_order_title = _label("No order", 16, GOLD)
 	left_box.add_child(_order_title)
@@ -95,6 +105,30 @@ func _build() -> void:
 	_order_body = _label("", 13, INK)
 	_order_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_order_body)
+	left_box.add_child(_caption("SLICE 2  ·  syn-target planner  ·  chip 1=low 2=mid 3=apex  ·  two-tag = cross"))
+	var chip_row := HFlowContainer.new()
+	chip_row.add_theme_constant_override("h_separation", 4)
+	chip_row.add_theme_constant_override("v_separation", 4)
+	left_box.add_child(chip_row)
+	_tag_chips.clear()
+	for tag in PlannerCatalog.MONOSTACK_TAGS:
+		var chip := Button.new()
+		var tag_name := String(tag)
+		chip.text = tag_name
+		chip.pressed.connect(_on_planner_tag.bind(tag_name))
+		chip_row.add_child(chip)
+		_tag_chips[tag_name] = chip
+	_planner_list = _label("?", 12, MUTED)
+	_planner_list.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_planner_list)
+	left_box.add_child(_caption("SLICE 3  ·  guild-quest brief  ·  showing this writes seen"))
+	_brief_body = _label("", 12, INK)
+	_brief_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_brief_body)
+	left_box.add_child(_caption("ESTIMATE  ·  planned vs brief  ·  Test knobs  ·  locked = ?"))
+	_estimate_body = _label("", 12, INK)
+	_estimate_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_estimate_body)
 	left_box.add_child(_caption("STAMINA  ·  12 × N  ·  0 stays open  ·  Finish crafts"))
 	_stam_label = _label("12 / 12", 15, INK)
 	left_box.add_child(_stam_label)
@@ -273,6 +307,10 @@ func _refresh() -> void:
 		_order_stats.text = ""
 		_order_skill.text = ""
 		_order_body.text = "Leave the schedule board to sew an order here."
+		_planner_list.text = "?"
+		_brief_body.text = ""
+		_estimate_body.text = ""
+		_refresh_planner_chips(null)
 		return
 	var threat := ThreatCatalog.display_name(order.threat_id) if not order.threat_id.is_empty() else "—"
 	_title.text = "CRAFT  ·  %s  ·  own_basic  ·  one session" % order.order_id
@@ -347,6 +385,8 @@ func _refresh() -> void:
 	else:
 		_continue_btn.text = "Return to schedule"
 	_refresh_result(session)
+	_refresh_planner()
+	_refresh_brief_and_estimate(order)
 	_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 
 
@@ -429,6 +469,118 @@ func _refresh_result(session: CraftStaminaSession) -> void:
 
 func _on_piece(_result: Dictionary) -> void:
 	_refresh()
+
+
+func _on_planner_tag(tag: String) -> void:
+	AtelierSession.click_planner_tag(tag)
+
+
+func _refresh_planner_chips(planned: Variant) -> void:
+	for tag in _tag_chips.keys():
+		var chip: Button = _tag_chips[tag]
+		chip.text = PlannerCatalog.chip_caption(String(tag), planned)
+
+
+func _refresh_planner() -> void:
+	var planned: Variant = AtelierSession.planned_build
+	_refresh_planner_chips(planned)
+	var lines := PlannerCatalog.list_lines(AtelierSession.profile.unlocked_builds)
+	_planner_list.text = "unlocked  ·  %s" % "  |  ".join(lines)
+
+
+func _gate_text(value: Variant) -> String:
+	if value == null:
+		return EstimateLaw.LOCKED
+	if value is String:
+		return String(value)
+	if value is bool:
+		return "fires" if bool(value) else "does not"
+	if value is Array:
+		var bits: PackedStringArray = PackedStringArray()
+		for item in value:
+			bits.append(str(item))
+		if bits.is_empty():
+			return "(none)"
+		return ", ".join(bits)
+	return str(value)
+
+
+func _refresh_brief_and_estimate(order: ClientOrder) -> void:
+	var threat_id := AtelierSession.brief_threat_id(order)
+	if threat_id.is_empty():
+		_brief_body.text = "No guild-quest brief on this order (prep has no threat)."
+		_estimate_body.text = "Estimate waits on a brief + a planned chip."
+		return
+	var seen := AtelierSession.profile.enemy_seen(threat_id)
+	if not ThreatCatalog.is_boss(threat_id):
+		seen = true
+	var fought := AtelierSession.profile.enemy_fought(threat_id)
+	var name_line := ThreatCatalog.display_name(threat_id) if seen else EstimateLaw.LOCKED
+	var env := ThreatCatalog.environment(threat_id) if seen else EstimateLaw.LOCKED
+	if seen and env.is_empty():
+		env = "—"
+	var flavor := ThreatCatalog.flavor(threat_id) if seen else EstimateLaw.LOCKED
+	if seen and flavor.is_empty():
+		flavor = "—"
+	var favor_line := EstimateLaw.LOCKED
+	var punish_line := EstimateLaw.LOCKED
+	if fought:
+		favor_line = ", ".join(ThreatCatalog.favor_tags(threat_id))
+		punish_line = ", ".join(ThreatCatalog.punish_tags(threat_id))
+		if favor_line.is_empty():
+			favor_line = "(none)"
+		if punish_line.is_empty():
+			punish_line = "(none)"
+	_brief_body.text = (
+		"threat %s   ·   name %s   ·   env %s   ·   flavor %s   ·   favor %s   ·   punish %s   ·   seen %s   ·   fought %s"
+		% [
+			threat_id,
+			name_line,
+			env,
+			flavor,
+			favor_line,
+			punish_line,
+			"yes" if AtelierSession.profile.enemy_seen(threat_id) else "no",
+			"yes" if fought else "no",
+		]
+	)
+	var adv_id := AdventurerCatalog.order_adventurer_id(order)
+	var raw := EstimateLaw.compute(
+		AdventurerCatalog.stats_dict(adv_id),
+		AdventurerCatalog.skill_id(adv_id),
+		AtelierSession.planned_build,
+		order.construction_ids,
+		threat_id
+	)
+	var plan := PlannerCatalog.dup_plan(AtelierSession.planned_build)
+	var build_unlocked := false
+	if plan is Dictionary:
+		var row: Dictionary = plan
+		build_unlocked = AtelierSession.profile.has_build(
+			String(row.get("outlook_id", "")),
+			String(row.get("tier", ""))
+		)
+	var gated := EstimateLaw.gated_dump(raw, AtelierSession.planned_build, build_unlocked, fought)
+	var skill_line := AdventurerCatalog.skill_panel_line(adv_id)
+	var skill_txt := _gate_text(gated.get("estimate_skill_fired", EstimateLaw.LOCKED))
+	if skill_txt != EstimateLaw.LOCKED and not skill_line.is_empty():
+		skill_txt = "%s  ·  %s" % [skill_txt, skill_line]
+	_estimate_body.text = (
+		"planned %s   ·   favor hits %s   ·   punish hits %s   ·   skill %s   ·   neg %s   ·   band %s   ·   knobs FAVOR_W %d PUNISH_W %d SKILL_W %d NEG_W %d STAT_W %d"
+		% [
+			_gate_text(gated.get("planned_outlook", EstimateLaw.LOCKED)),
+			_gate_text(gated.get("estimate_favor_hits", EstimateLaw.LOCKED)),
+			_gate_text(gated.get("estimate_punish_hits", EstimateLaw.LOCKED)),
+			skill_txt,
+			_gate_text(gated.get("estimate_neg_warnings", EstimateLaw.LOCKED)),
+			_gate_text(gated.get("estimate_band", EstimateLaw.LOCKED)),
+			EstimateLaw.FAVOR_W,
+			EstimateLaw.PUNISH_W,
+			EstimateLaw.SKILL_W,
+			EstimateLaw.NEG_W,
+			EstimateLaw.STAT_W,
+		]
+	)
 
 
 func _play_slot(index: int) -> void:

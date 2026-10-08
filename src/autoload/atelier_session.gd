@@ -61,6 +61,8 @@ var last_dex_crafts_new: Array = []
 var last_dex_adventurer_new_met: Array = []
 var last_dex_enemy_seen_new: Array = []
 var last_dex_enemy_fought_new: Array = []
+## Slice 2 intent (docs/30). Estimate-only. Null until the player clicks a planner chip.
+var planned_build: Variant = null
 
 
 func _ready() -> void:
@@ -133,6 +135,7 @@ func _reset_craft_state() -> void:
 	piece_results.clear()
 	piece_stamps.clear()
 	dex_order_adventurer_id = ""
+	planned_build = null
 
 
 func legal_actions() -> Array[GameEnums.RoundAction]:
@@ -233,7 +236,9 @@ func _begin_craft(order: ClientOrder) -> bool:
 	next_mat_free = false
 	craft_open = true
 	resolve_open = false
+	planned_build = null
 	_note_order_panel(order)
+	_note_order_brief(order)
 	_open_session()
 	craft_started.emit()
 	board_changed.emit()
@@ -394,6 +399,7 @@ func _return_to_schedule() -> void:
 	craft_session = null
 	resolve_open = true
 	last_stamp = _make_mission_return_stamp(mission)
+	planned_build = null
 	last_note = (
 		"Mission %s · cleared %s · hp %.2f. Continue to the next schedule round."
 		% [
@@ -547,6 +553,7 @@ func _run_boss() -> void:
 	last_dex_enemy_seen_new = Array(fought.get("dex_enemy_seen_new", []))
 	last_dex_enemy_fought_new = Array(fought.get("dex_enemy_fought_new", []))
 	last_stamp = _make_boss_stamp(mission)
+	planned_build = null
 	last_note = (
 		"Boss %s · %s vs %s · rating %s · cleared %s · run_over %s."
 		% [
@@ -593,11 +600,42 @@ func is_outlook_unlocked(outlook_id: String) -> bool:
 
 
 func note_shop_brief(threat_id: String) -> void:
-	## TODO(PR 3): call from the guild-quest poster / estimate brief when that UI lands.
-	## Shop brief writes seen + briefs_seen++, not fought (docs/31).
+	## Guild-quest poster show (docs/31). Writes seen + briefs_seen++, not fought.
 	var out := profile.note_enemy_brief(threat_id)
 	last_dex_enemy_seen_new = Array(out.get("dex_enemy_seen_new", []))
 	last_dex_enemy_fought_new = []
+
+
+func brief_threat_id(order: ClientOrder = null) -> String:
+	## Shop / walk-in / appointment: catalog target on the order.
+	## Boss beat: announced chapter_boss_id, not the person's shop default.
+	var live: ClientOrder = order if order != null else craft_order
+	if live == null:
+		return ""
+	if live.mission_kind == GameEnums.MissionKind.BOSS:
+		if board != null and not board.chapter_boss_id.is_empty():
+			return board.chapter_boss_id
+	return live.threat_id
+
+
+func click_planner_tag(tag: String) -> void:
+	## Slice 2 chip cycle. Does not change construction_ids or stamina craft.
+	if not craft_open or craft_order == null:
+		return
+	planned_build = PlannerCatalog.after_click(planned_build, tag)
+	if craft_session != null:
+		last_stamp = _make_craft_stamp()
+	craft_changed.emit()
+
+
+func _note_order_brief(order: ClientOrder) -> void:
+	## Showing the slice 3 poster writes seen, then the UI can show the name.
+	if order == null:
+		return
+	var threat_id := brief_threat_id(order)
+	if threat_id.is_empty() or not ThreatCatalog.is_boss(threat_id):
+		return
+	note_shop_brief(threat_id)
 
 
 func _note_order_panel(order: ClientOrder) -> void:
@@ -665,13 +703,43 @@ func _apply_profile_logs(stamp: HarnessStamp) -> void:
 	stamp.dex_adventurer_new_met = last_dex_adventurer_new_met.duplicate(true)
 	stamp.dex_enemy_seen_new = last_dex_enemy_seen_new.duplicate(true)
 	stamp.dex_enemy_fought_new = last_dex_enemy_fought_new.duplicate(true)
-	## Planner intent is PR 3. Finish still logs planned_build as null this stamp.
-	stamp.planned_build = null
+	stamp.planned_build = PlannerCatalog.dup_plan(planned_build)
+	_apply_estimate_logs(stamp)
 	last_unlocks_new = []
 	last_dex_crafts_new = []
 	last_dex_adventurer_new_met = []
 	last_dex_enemy_seen_new = []
 	last_dex_enemy_fought_new = []
+
+
+func _apply_estimate_logs(stamp: HarnessStamp) -> void:
+	## Log-only slice 3 keys (docs/30). Gated values dump as "?" when Dex says so.
+	var threat_id := brief_threat_id()
+	var adv_id := ""
+	var construction_ids: PackedStringArray = PackedStringArray()
+	if craft_order != null:
+		adv_id = AdventurerCatalog.order_adventurer_id(craft_order)
+		construction_ids = craft_order.construction_ids.duplicate()
+	elif stamp.mission_kind == GameEnums.MissionKind.BOSS:
+		adv_id = boss_client_id
+		construction_ids = stamp.construction_ids.duplicate()
+		if threat_id.is_empty():
+			threat_id = stamp.threat_id
+	var stats := AdventurerCatalog.stats_dict(adv_id)
+	var skill_id := AdventurerCatalog.skill_id(adv_id)
+	var raw := EstimateLaw.compute(stats, skill_id, planned_build, construction_ids, threat_id)
+	var plan := PlannerCatalog.dup_plan(planned_build)
+	var build_unlocked := false
+	if plan is Dictionary:
+		var row: Dictionary = plan
+		build_unlocked = profile.has_build(String(row.get("outlook_id", "")), String(row.get("tier", "")))
+	var fought := profile.enemy_fought(threat_id)
+	var gated := EstimateLaw.gated_dump(raw, planned_build, build_unlocked, fought)
+	stamp.estimate_band = gated.get("estimate_band", EstimateLaw.LOCKED)
+	stamp.estimate_favor_hits = gated.get("estimate_favor_hits", EstimateLaw.LOCKED)
+	stamp.estimate_punish_hits = gated.get("estimate_punish_hits", EstimateLaw.LOCKED)
+	stamp.estimate_skill_fired = gated.get("estimate_skill_fired", EstimateLaw.LOCKED)
+	stamp.estimate_neg_warnings = gated.get("estimate_neg_warnings", EstimateLaw.LOCKED)
 
 
 func _base_stamp() -> HarnessStamp:
