@@ -44,8 +44,8 @@ Each round: player picks **one** primary action (Phase-1). Later: dual actions v
 ## Boss
 
 - Announced at chapter start (favor / punish / environment from `17`). Newspaper announces the **boss**, not the client (`26`).
-- After round budget, final prep window → **draw one adventurer from the shared boss-client pool** (`28`) → **craft that job’s order constructions** → that **adventurer** fights the announced boss. Sim uses **that client's gear**. Player is not the fighter (`03`, `17`, `28`).
-- Pool is **shared across all bosses / chapters**, by **job title**. Draw is **independent** of `chapter_boss_id`. Order constructions are the listed `con_*` for that job (e.g. knight → `con_armor` + `con_gloves` / gauntlet).
+- After round budget, final prep window → **draw one adventurer from the M1 4-job pool** (`28` / `29`: Knight, Mage, Blade Dancer, Lagoon — **LOCKED** Jonathan 2026-10-08) → **craft that job’s order constructions** → that **adventurer** fights the announced boss. Sim uses **that client's gear**. Player is not the fighter (`03`, `17`, `28`). Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1.
+- Pool is **shared across all bosses / chapters**, by **job title**. Draw is **independent** of `chapter_boss_id`. M1 **filters** that pool to 4 jobs. Order constructions are the listed `con_*` for that job (e.g. knight → `con_armor` + `con_gloves` / gauntlet).
 - Boss fail (boss-client / adventurer dead / hard loss): **`run_over`**, no retry (Phase-1 hardcore).
 - **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client. Do not pin Scrap Duelist to reserved rounds (7–8) or the boss beat.
 - Portraits / UI widgets = **Later**. Job catalog is stamped in `28` — do not invent Godot scenes or art.

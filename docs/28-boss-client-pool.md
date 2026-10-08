@@ -2,7 +2,7 @@
 
 **Terminology (2026-10-05):** people in this pool are **adventurers**. **Client** = Godot Client seat / codebase. Filename / `boss_client_id` stay until Grimmjow’s bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
 
-Jonathan lock (2026-10-02). **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
+Jonathan lock (2026-10-02). **M1 4-job draw LOCKED (Jonathan 2026-10-08).** **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
 
 ## Pool law
 
@@ -10,6 +10,7 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 
 - Organized by **job title** (knight, mage, lagoon, wizard, blade dancer, …).
 - At the **boss beat**, draw **one** adventurer from this pool (seeded). That draw is **independent** of which chapter boss was announced (`17`).
+- **M1 draw filter — LOCKED (Jonathan 2026-10-08):** pool for the draw is **4 jobs only** — Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Those four stay in this catalog as Later/M2 until their adventurer catalog exists ([29](29-adventurer-catalog.md)). Do **not** fall back to job-stubs for Later jobs.
 - The drawn adventurer’s **order constructions** (`con_*`) **+ requirement tags** are what the player crafts for.
 - The drawn adventurer **fights** the announced chapter boss. Player is the clothier, not the fighter.
 - Mid-chapter appointments / walk-ins (`appt_*`, schedule `22`) are **not** this pool. Scrap Duelist stays an **appointment** — never the boss-client; do not pin to reserved rounds or the boss beat.
@@ -20,22 +21,30 @@ Portraits / UI wire = **Later**. Named M1 people (3 per M1 job) supersede job-ti
 
 ## Draw
 
+**LOCKED (Jonathan 2026-10-08):** M1 boss-draw pool = **4 jobs only**. Closes PR #28 open question 1 (restrict to 4 vs keep 8-job draw + job-stub fallback).
+
 ```
+# catalog (8 jobs) stays below — M1 draw is a filter, not a delete
+M1_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon
+# NOT in M1 draw (Later/M2): job_wizard, job_hexer, job_outrider, job_oathbound
+
 function pick_boss_client(seed):
-  return seeded_choice(SHARED_BOSS_CLIENT_POOL, seed)
-  # SHARED_BOSS_CLIENT_POOL = job rows below
+  job = seeded_choice(M1_JOB_POOL, seed)
   # do not pass chapter_boss_id — draws are independent
+  # named person: 29 (one of that job's 3)
+  return job
 ```
 
-| Rule | Phase-1 |
+| Rule | Phase-1 / M1 |
 |---|---|
 | When | Boss beat (after reserved rounds / final prep) — not chapter-start newspaper |
-| What | One `job_*` → `adv_*` + that job’s **order constructions** |
+| What | One `job_*` from **`M1_JOB_POOL`** (4 jobs) → named `adv_*` from that job (`29`) + that job’s **order constructions** |
 | Vs boss | Independent of `chapter_boss_id` |
 | Repeat | Same job may recur across chapters |
 | Unique-per-run | Later |
 | Telegraph job before beat | Later |
 | Newspaper | Announces the **boss** (`26`), not the client |
+| Wizard / Hexer / Outrider / Oathbound | **Out of the M1 draw.** Job rows stay for M2. Do not draw; do not stub-fallback |
 
 ## Job catalog
 
@@ -59,6 +68,8 @@ Requirement tags = **order taste** (what this job wants on the garment). Not the
 | `job_oathbound` | Oathbound | `adv_oathbound` | `ord_oathbound` | `con_armor` + `con_mantle` (armor + mantle) | 2 | Royal, Solar, Pure |
 
 N = 2 → one parallel session, `stamina_start = 12 * 2` (`27`). Finish-only / StS hand cycle unchanged. N > 4 = Later.
+
+**M1 draw (LOCKED Jonathan 2026-10-08):** Knight / Mage / Blade Dancer / Lagoon only. Wizard / Hexer / Outrider / Oathbound stay in this table for constructions — **out of `M1_JOB_POOL`** until `29` names people for them.
 
 ### Per-job order (explicit)
 
@@ -176,6 +187,7 @@ Portraits / Client widgets / extra UI = **Later**.
 - Inventing `con_*`, Godot scenes, or portraits
 - Per-chapter client pools for the **boss** beat (mid-chapter pools stay schedule / appointments)
 - Flavor-only job rows with no order constructions
+- Drawing Wizard / Hexer / Outrider / Oathbound in M1 (or 8-job draw + job-stub fallback)
 
 ## Pointers
 

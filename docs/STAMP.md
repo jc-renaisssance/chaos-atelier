@@ -257,3 +257,30 @@ Morning gaps for frost/silent/silk/royal mid+apex are **closed** by the stamped 
 | `docs/30-interactive-order.md` | Cross-run LOCKED; `?` gates → Dex |
 | `docs/README.md` · `00-doc-categories.md` · `10` · `04` · `29` · `pm/phase-1-plan.md` | Index / pointers |
 | `docs/STAMP.md` | This note |
+
+---
+
+# Jonathan stamp — 2026-10-08 (M1 4-job draw + estimate bands as knobs)
+
+## Locked (docs only)
+
+1. **M1 boss-draw pool = 4 jobs only** (Jonathan 2026-10-08). Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Those four stay Later/M2 until their adventurer catalog exists. Closes PR #28 open question 1 (restrict to 4 vs 8-job draw + job-stub fallback).
+2. **Estimate S–F letter bands stay Test knobs.** Do **not** lock the cutoff table for the first Client wire. Working cutoffs (tunable): ≥10=S, ≥7=A, ≥4=B, ≥1=C, ≥−2=D, else F. **LOCKED** decision is **leave as knobs**. Closes PR #28 open question 2.
+
+Both items **removed from open questions**. Client can proceed on Ulquiorra PR 1.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/28-boss-client-pool.md` | M1 draw filters to 4 jobs (`M1_JOB_POOL`); Later jobs out of draw |
+| `docs/29-adventurer-catalog.md` | Draw lock stamp; no stub-fallback |
+| `docs/30-interactive-order.md` | S–F cutoff table = Test knobs; leave-as-knobs LOCKED |
+| `docs/17-chapter-bosses.md` · `22` · `20` · `27` · `03` · `01` | Draw-rule pointers |
+| `docs/pm/phase-1-plan.md` · `docs/README.md` | Client-can-proceed / stamp pointer |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- PR #28 open questions (2) — both closed
+- `28` / `17` Phase-1 draw from the full 8-job `SHARED_BOSS_CLIENT_POOL`
