@@ -114,8 +114,7 @@ func note_enemy_seen(threat_id: String) -> Dictionary:
 
 
 func note_enemy_brief(threat_id: String) -> Dictionary:
-	## TODO(PR 3): call from the guild-quest poster / estimate brief when that UI lands.
-	## Shop brief writes seen + briefs_seen++, not fought.
+	## Guild-quest poster / estimate brief show. Shop brief writes seen + briefs_seen++, not fought.
 	return _upsert_enemy(threat_id, true, false, true)
 
 
@@ -127,6 +126,20 @@ func note_enemy_fought(threat_id: String) -> Dictionary:
 
 func has_build(outlook_id: String, tier: String) -> bool:
 	return not _find_build(outlook_id, tier).is_empty()
+
+
+func enemy_seen(threat_id: String) -> bool:
+	var row := _enemy_row(threat_id)
+	if row.is_empty():
+		return false
+	return bool(row.get("seen", false))
+
+
+func enemy_fought(threat_id: String) -> bool:
+	var row := _enemy_row(threat_id)
+	if row.is_empty():
+		return false
+	return bool(row.get("fought", false))
 
 
 func to_dict() -> Dictionary:
