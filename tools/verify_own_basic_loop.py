@@ -77,7 +77,10 @@ def check_source_symbols(blob: str) -> None:
         "boss_client_id",
         "boss_job_id",
         "adv_knight",
+        "adv_halden_rook",
         "job_knight",
+        "class_name AdventurerCatalog",
+        "ask_plate_oath",
     ]
     for token in need:
         if token not in blob:
@@ -253,6 +256,8 @@ def run_spec() -> None:
         "boss_pool_id",
         "boss_client_id",
         "boss_job_id",
+        "adventurer_skill_id",
+        "adventurer_stats",
         "CHAPTER_ROUND_COUNT",
         "round_index",
         "rounds_left",

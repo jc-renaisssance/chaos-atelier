@@ -134,9 +134,16 @@ static func build_resolve(
 			if order != null:
 				title = "Walk-in — %s" % ScheduleCatalog.walk_in_title(order)
 			body = (
-				"Order path — a client appeared this round. Enter stamina craft. "
+				"Order path — an adventurer appeared this round. Enter stamina craft. "
 				+ "Pieces stay order-fixed."
 			)
+			if order != null:
+				var walk_adv := AdventurerCatalog.order_adventurer_id(order)
+				if AdventurerCatalog.is_known(walk_adv):
+					body += " %s · %s." % [
+						AdventurerCatalog.display_name(walk_adv),
+						AdventurerCatalog.requirement_taste(walk_adv),
+					]
 		GameEnums.RoundAction.PREP_CRAFT:
 			stub = "craft"
 			title = "Prep craft"
@@ -282,7 +289,7 @@ static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 		"title": "Final prep — sew for a fighter vs %s" % title,
 		"body": (
 			"Eight rounds resolved. Appointments never claimed 7–8. "
-			+ "Draw one adventurer from the shared job pool (docs/28), independent of the announced boss. "
+			+ "Draw one named adventurer from the M1 4-job pool (docs/29), independent of the announced boss. "
 			+ "Sew that job's listed constructions. That adventurer fights %s. "
 			% title
 			+ "Player is the clothier. Fail (adventurer dead / hard loss) = run_over, no retry (docs/24)."
@@ -295,24 +302,33 @@ static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 static func build_boss_client_draw(board: ChapterSchedule, job: Dictionary) -> Dictionary:
 	var boss_title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
 	var job_id := String(job.get("job_id", ""))
-	var display := String(job.get("display", job_id))
+	var job_display := String(job.get("display", job_id))
+	var adv_id := String(job.get("boss_client_id", ""))
+	var who := String(job.get("adventurer_display", ""))
+	if who.is_empty():
+		who = AdventurerCatalog.display_name(adv_id)
+	if who.is_empty():
+		who = job_display
 	var cons: Array = job.get("construction_ids", [])
+	var taste := String(job.get("requirement_taste", ""))
+	if taste.is_empty():
+		taste = ", ".join(PackedStringArray(job.get("requirement_tags", [])))
 	return {
 		"resolve_class": "boss",
 		"round_action": null,
 		"mission_kind": "boss",
-		"title": "Boss-client — %s vs %s" % [display, boss_title],
+		"title": "Boss-client — %s · %s vs %s" % [who, job_display, boss_title],
 		"body": (
-			"Shared-pool draw (docs/28): %s / %s / %s. "
-			% [job_id, String(job.get("boss_client_id", "")), String(job.get("order_id", ""))]
-			+ "Order constructions: %s. Requirement tags: %s. "
-			% [", ".join(PackedStringArray(cons)), ", ".join(PackedStringArray(job.get("requirement_tags", [])))]
+			"M1 named draw (docs/29): %s / %s / %s / %s. "
+			% [who, job_id, adv_id, String(job.get("order_id", ""))]
+			+ "Order constructions: %s. Taste: %s. "
+			% [", ".join(PackedStringArray(cons)), taste]
 			+ "Independent of chapter_boss_id=%s. Enter stamina craft (N=2, 12×2)."
 			% (board.chapter_boss_id if board != null else "")
 		),
 		"stub": "craft",
 		"order_id": String(job.get("order_id", "")),
-		"boss_client_id": String(job.get("boss_client_id", "")),
+		"boss_client_id": adv_id,
 		"boss_job_id": job_id,
 		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.CRAFT),
 	}
@@ -326,7 +342,9 @@ static func build_boss_result(
 	boss_client_id: String = ""
 ) -> Dictionary:
 	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
-	var fighter := BossClientCatalog.display_name(boss_job_id) if boss_job_id != "" else "Adventurer"
+	var fighter := AdventurerCatalog.display_name(boss_client_id)
+	if fighter.is_empty() or fighter == boss_client_id:
+		fighter = BossClientCatalog.display_name(boss_job_id) if boss_job_id != "" else "Adventurer"
 	var rating = mission.get("rating", GameEnums.Rating.NONE)
 	var cleared := bool(mission.get("cleared", false))
 	var hp := float(mission.get("hp_remaining", 0.0))

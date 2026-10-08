@@ -246,6 +246,10 @@ static func order_for_appointment(pin: AppointmentPin) -> ClientOrder:
 
 
 static func make_walk_in(chapter_id: int, round_index: int, rng: RandomNumberGenerator) -> ClientOrder:
+	## M1 walk-in draws a named person from the 12 (docs/29). Job constructions from docs/28.
+	var named := BossClientCatalog.make_walk_in_order(chapter_id, round_index, rng)
+	if not named.adventurer_id.is_empty():
+		return named
 	var pool: Array = walk_ins_for(chapter_id)
 	var row: Dictionary = pool[rng.randi_range(0, pool.size() - 1)].duplicate()
 	row["order_id"] = "ord_walk_c%d_r%d" % [chapter_id, round_index]
@@ -256,6 +260,9 @@ static func make_walk_in(chapter_id: int, round_index: int, rng: RandomNumberGen
 static func walk_in_title(order: ClientOrder) -> String:
 	if order == null:
 		return "Walk-in"
+	var adv_id := AdventurerCatalog.order_adventurer_id(order)
+	if AdventurerCatalog.is_known(adv_id):
+		return AdventurerCatalog.display_name(adv_id)
 	for chapter_id in WALK_INS.keys():
 		for row in WALK_INS[chapter_id]:
 			if String(row.get("threat_id", "")) == order.threat_id:
@@ -266,6 +273,12 @@ static func walk_in_title(order: ClientOrder) -> String:
 static func order_title(order: ClientOrder) -> String:
 	if order == null:
 		return ""
+	var adv_id := AdventurerCatalog.order_adventurer_id(order)
+	if AdventurerCatalog.is_known(adv_id):
+		var job_id := AdventurerCatalog.job_id_for(adv_id)
+		if job_id.is_empty():
+			job_id = order.boss_job_id
+		return "%s  ·  %s" % [AdventurerCatalog.display_name(adv_id), BossClientCatalog.display_name(job_id)]
 	if order.mission_kind == GameEnums.MissionKind.BOSS:
 		if order.boss_job_id != "":
 			return BossClientCatalog.display_name(order.boss_job_id)
