@@ -57,6 +57,22 @@ def check_godot_47_hotfix(blob: str) -> None:
     )
     if re.search(r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", gd_only):
         fail("const Packed*Array(...) is not a constant expression in Godot 4.7 — use array literals")
+    names: set[str] = set()
+    for path in SRC.rglob("*.gd"):
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(r"func\s+(\w+)\s*\([^)]*\)\s*->\s*Variant", text):
+            names.add(match.group(1))
+    if names:
+        joined = "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True))
+        infer = re.compile(rf"^\s*var\s+\w+\s+:=\s*.*\b({joined})\s*\(")
+        for path in SRC.rglob("*.gd"):
+            rel = path.relative_to(ROOT)
+            for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if infer.search(line):
+                    fail(
+                        f"{rel}:{i} var x := Variant-returning helper infers Variant — "
+                        "Godot 4.7.2 warning-as-error (use var x: Variant = …)"
+                    )
 
 
 def check_source_symbols(blob: str) -> None:

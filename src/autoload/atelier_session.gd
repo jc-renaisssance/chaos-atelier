@@ -728,7 +728,7 @@ func _apply_estimate_logs(stamp: HarnessStamp) -> void:
 	var stats := AdventurerCatalog.stats_dict(adv_id)
 	var skill_id := AdventurerCatalog.skill_id(adv_id)
 	var raw := EstimateLaw.compute(stats, skill_id, planned_build, construction_ids, threat_id)
-	var plan := PlannerCatalog.dup_plan(planned_build)
+	var plan: Variant = PlannerCatalog.dup_plan(planned_build)
 	var build_unlocked := false
 	if plan is Dictionary:
 		var row: Dictionary = plan

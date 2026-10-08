@@ -161,7 +161,7 @@ static func gated_dump(
 	build_unlocked: bool,
 	enemy_fought: bool
 ) -> Dictionary:
-	var plan := PlannerCatalog.dup_plan(planned)
+	var plan: Variant = PlannerCatalog.dup_plan(planned)
 	var outlook_open := build_unlocked and plan is Dictionary
 	var favor: Variant = LOCKED
 	var punish: Variant = LOCKED

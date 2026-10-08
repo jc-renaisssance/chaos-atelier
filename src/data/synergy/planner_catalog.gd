@@ -104,7 +104,7 @@ static func dup_plan(planned: Variant) -> Variant:
 
 
 static func plan_label(planned: Variant) -> String:
-	var row := dup_plan(planned)
+	var row: Variant = dup_plan(planned)
 	if not row is Dictionary:
 		return "—"
 	var item: Dictionary = row
@@ -116,7 +116,7 @@ static func after_click(planned: Variant, clicked_tag: String) -> Variant:
 	if not is_monostack_tag(clicked_tag):
 		return dup_plan(planned)
 	var slug := outlook_for_tag(clicked_tag)
-	var current := dup_plan(planned)
+	var current: Variant = dup_plan(planned)
 	if not current is Dictionary:
 		return build_row(slug, "low")
 	var row: Dictionary = current
@@ -140,7 +140,7 @@ static func after_click(planned: Variant, clicked_tag: String) -> Variant:
 
 
 static func chip_caption(tag: String, planned: Variant) -> String:
-	var row := dup_plan(planned)
+	var row: Variant = dup_plan(planned)
 	if not row is Dictionary:
 		return tag
 	var item: Dictionary = row
@@ -158,7 +158,7 @@ static func chip_caption(tag: String, planned: Variant) -> String:
 
 static func planned_tags(planned: Variant) -> Dictionary:
 	var bag := {}
-	var row := dup_plan(planned)
+	var row: Variant = dup_plan(planned)
 	if not row is Dictionary:
 		return bag
 	var item: Dictionary = row

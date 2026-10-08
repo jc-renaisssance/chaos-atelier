@@ -366,6 +366,7 @@ def check_source() -> None:
         fail("Color.html(...) is not a constant expression in Godot 4.7")
     if re.search(r":=\s*[^\n]*\belse\s+null\b", blob):
         fail(":= … else null infers Variant — Godot 4.7.2 warning-as-error")
+    check_variant_infer()
     gd_only = "\n".join(path.read_text(encoding="utf-8") for path in SRC.rglob("*.gd"))
     if re.search(r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", gd_only):
         fail("const Packed*Array(...) is not a constant expression in Godot 4.7 — use array literals")
@@ -379,6 +380,32 @@ def check_source() -> None:
             if line.startswith("    ") and not line.startswith("\t"):
                 fail(f"space indent {path.relative_to(ROOT)}:{i}")
                 break
+
+
+def variant_returning_funcs() -> set[str]:
+    names: set[str] = set()
+    for path in SRC.rglob("*.gd"):
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(r"func\s+(\w+)\s*\([^)]*\)\s*->\s*Variant", text):
+            names.add(match.group(1))
+    return names
+
+
+def check_variant_infer() -> None:
+    ## Godot 4.7.2 warning-as-error: `var x := variant_fn()` infers Variant.
+    names = variant_returning_funcs()
+    if not names:
+        return
+    joined = "|".join(re.escape(name) for name in sorted(names, key=len, reverse=True))
+    pattern = re.compile(rf"^\s*var\s+\w+\s+:=\s*.*\b({joined})\s*\(")
+    for path in SRC.rglob("*.gd"):
+        rel = path.relative_to(ROOT)
+        for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if pattern.search(line):
+                fail(
+                    f"{rel}:{i} var x := …() infers Variant — Godot 4.7.2 warning-as-error "
+                    "(use var x: Variant = …)"
+                )
 
 
 def check_spec() -> None:
