@@ -10,7 +10,7 @@ Mid-chapter missions from **per-chapter pools** — live spine **[22-chapter-sch
 
 **Boss-client (2026-10-02):** a **client** is responsible for the boss event. Player crafts **for that client**; the **client fights** the boss (not the player). Sim uses that client's gear.
 
-**Shared pool (same stamp):** one pool for **all** bosses / chapters, organized by **job title** — **not** a fixed client per boss. Draw at the boss beat, independent of which boss was announced. That job’s **order constructions** (`con_*`) + requirement tags are the craft brief. Catalog: **[28-boss-client-pool](28-boss-client-pool.md)**. Bosses / starter-tag law: [17](17-chapter-bosses.md). Schedule: [22](22-chapter-schedule.md). Harness: [20](20-harness-stamp.md).
+**Shared pool (same stamp):** one pool for **all** bosses / chapters, organized by **job title** — **not** a fixed client per boss. Draw at the boss beat, independent of which boss was announced. That job’s **order constructions** (`con_*`) + requirement tags are the craft brief. Catalog: **[28-boss-client-pool](28-boss-client-pool.md)**. **M1 draw — LOCKED (Jonathan 2026-10-08):** 4 jobs only (Knight, Mage, Blade Dancer, Lagoon) — [29](29-adventurer-catalog.md). Wizard / Hexer / Outrider / Oathbound stay Later/M2. Bosses / starter-tag law: [17](17-chapter-bosses.md). Schedule: [22](22-chapter-schedule.md). Harness: [20](20-harness-stamp.md).
 
 Mid-chapter appointments (incl. Scrap Duelist) stay `appt_*` — they are **not** the boss-client.
 

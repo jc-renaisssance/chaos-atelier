@@ -66,6 +66,7 @@ There is a **client responsible for the boss event**. The player crafts **for th
 **Pool law:** one **shared adventurer / boss-client pool for all bosses and chapters** — **not** a fixed client per boss. Organized by **job title**. Catalog + draw: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 - At the **boss beat**, draw one adventurer from the shared pool (seeded). Independent of which boss was drawn.
+- **M1 draw — LOCKED (Jonathan 2026-10-08):** filter to **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). Do **not** draw Wizard / Hexer / Outrider / Oathbound.
 - That adventurer’s **order constructions** (`con_*` listed per job in `28`) **+ requirement tags** are what the player crafts for. Constructions come from that order (`27`) — not a picker.
 - That adventurer **fights** the announced chapter boss. Sim (`20` `mission_kind=boss`) uses **that client's gear**.
 - Example: C1 may draw Ash Drake as boss; C1 (or any chapter) may still draw a knight or a mage — different jobs → different constructions and different requirement tags.
@@ -82,8 +83,11 @@ function pick_chapter_boss(chapter_index, seed):
   return seeded_choice(BOSS_POOLS[chapter_index], seed)
 
 function pick_boss_client(seed):
-  return seeded_choice(SHARED_BOSS_CLIENT_POOL, seed)
+  job = seeded_choice(M1_JOB_POOL, seed)
+  # M1_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon
+  # LOCKED Jonathan 2026-10-08 — not the 8-job catalog
   # independent of chapter_boss_id / chapter_index
+  return seeded_choice(ADVENTURERS_BY_JOB[job], seed)  # named people: 29
 
 # UI: kingdom newspaper front page (26) — boss only, not the client
 ```
@@ -101,7 +105,7 @@ Boss portraits Later. Newspaper chrome can share atelier grain when 1C opens. Cl
 
 ## Pointers
 
-- Shared pool / jobs: [28-boss-client-pool](28-boss-client-pool.md)
+- Shared pool / jobs: [28-boss-client-pool](28-boss-client-pool.md) · M1 named people / 4-job draw: [29-adventurer-catalog](29-adventurer-catalog.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
 - Schedule / boss beat: [22-chapter-schedule](22-chapter-schedule.md)
 - Harness: [20-harness-stamp](20-harness-stamp.md)

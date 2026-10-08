@@ -10,7 +10,7 @@
 
 ## Entering craft mode
 
-Player takes an **order** (appointment / walk-in / **boss-client**) or **prep craft** on the schedule → leave the schedule board → enter **dedicated craft UI**. Boss beat: draw from the **shared job pool** (`28`); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter.
+Player takes an **order** (appointment / walk-in / **boss-client**) or **prep craft** on the schedule → leave the schedule board → enter **dedicated craft UI**. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter. Do not draw Wizard / Hexer / Outrider / Oathbound.
 
 One order = **one** craft session. Multi-piece does **not** re-enter craft per piece.
 

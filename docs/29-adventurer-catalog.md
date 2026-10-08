@@ -10,15 +10,15 @@
 
 | Lock | Value |
 |---|---|
-| Jobs in M1 draw | **4:** Knight, Mage, Blade Dancer, Lagoon |
+| Jobs in M1 draw | **LOCKED (Jonathan 2026-10-08) — 4 only:** Knight, Mage, Blade Dancer, Lagoon. Closes PR #28 open question 1 |
 | Adventurers / job | **3** (more than one per job — PM lock) |
 | M1 roster | **12** named `adv_*` |
-| Later / M2 jobs | Wizard, Hexer, Outrider, Oathbound — stay in `28`, **out of the M1 draw** until named people land |
+| Later / M2 jobs | Wizard, Hexer, Outrider, Oathbound — stay in `28`, **out of the M1 draw** until named people land. Do **not** draw them; do **not** stub-fallback |
 | Constructions | Job-fixed from `28` — do not invent `con_*` |
 | Target enemies | Existing `boss_*` from `17` (limited enemy types = the 9 chapter bosses) |
 | Appointments | Not this catalog. Scrap Duelist stays `appt_scrap_duelist` |
 
-Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune.
+Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune. **S–F estimate letter bands** in `30` stay Test knobs — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do not lock the cutoff table.
 
 ---
 
@@ -45,12 +45,13 @@ No new harness **person** field. `boss_client_id` = the drawn named `adv_*`. `bo
 
 **Boss beat stays `28`:** seeded, **independent** of `chapter_boss_id`. Player is the clothier; the drawn adventurer fights the announced boss.
 
-M1 only changes **who is in the pool** (4 jobs × 3 people). After a job is drawn, draw one adventurer from **that job’s pool**.
+**LOCKED (Jonathan 2026-10-08):** M1 pool = **those 4 jobs**, then one of that job’s 3 named people. `28`’s catalog still lists 8 jobs; the **draw** filters to `M1_JOB_POOL`. Wizard / Hexer / Outrider / Oathbound are **not** drawn in M1.
 
 ```
 function pick_boss_client(seed):
   job = seeded_choice(M1_JOB_POOL, seed)
   # M1_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon
+  # NOT: job_wizard, job_hexer, job_outrider, job_oathbound
   # do not pass chapter_boss_id
   return seeded_choice(ADVENTURERS_BY_JOB[job], seed)
 ```
@@ -66,7 +67,7 @@ function pick_boss_client(seed):
 | Repeat | Same job or person may recur (Phase-1) |
 | Unique-per-run | Later |
 | Shop / walk-in | Draw from the same 12 (or from a job’s 3 when a job is offered). Same constructions + that person’s tags + that person’s `target_threat_id` |
-| Wizard / Hexer / Outrider / Oathbound | **Not** in `M1_JOB_POOL`. Job stubs in `28` remain for M2 |
+| Wizard / Hexer / Outrider / Oathbound | **Not** in `M1_JOB_POOL` (**LOCKED**). Job stubs in `28` remain for M2. Do not draw; do not stub-fallback |
 
 ---
 
@@ -355,7 +356,7 @@ Salt Widow **favors Metal** and the cloak **punishes Metal**. Rime is the person
 
 ## Later / M2 jobs (not M1 people)
 
-Rows stay in `28`. No named `adv_*` this stamp. Not in `M1_JOB_POOL`.
+Rows stay in `28`. No named `adv_*` this stamp. **Not in `M1_JOB_POOL` — LOCKED (Jonathan 2026-10-08).** Do not draw these jobs in M1. Do not fall back to `adv_wizard` / `adv_hexer` / `adv_outrider` / `adv_oathbound` stubs.
 
 | job id | Display | Order constructions | Requirement tags (`28`) |
 |---|---|---|---|
@@ -401,6 +402,7 @@ No portraits, no poster art, no posture sheets this stamp. Names + job + stats +
 - Wiring catalog in Client this PR
 - Slice 4 battle playback / posture art (`30` Later)
 - Named people for Wizard / Hexer / Outrider / Oathbound
+- Drawing Wizard / Hexer / Outrider / Oathbound in M1 (or 8-job draw + job-stub fallback) — **LOCKED** out (Jonathan 2026-10-08)
 
 ---
 

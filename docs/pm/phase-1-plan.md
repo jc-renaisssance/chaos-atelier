@@ -44,7 +44,7 @@ Fully developed **ugly** Client that ships the **full experience** with **limite
 
 | Lock | Note |
 |------|------|
-| Limited **adventurer jobs** | Count / which jobs = Grimmjow Design catalog. Do not invent a set here. |
+| Limited **adventurer jobs** | **LOCKED (Jonathan 2026-10-08):** M1 draw = **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). Wizard / Hexer / Outrider / Oathbound stay Later/M2. |
 | Limited **enemy types** | Same — Design stamps the cut. |
 | Shop adventurers | **More than one adventurer per job/class.** |
 | Catalog before wire | Define **stats / skills / requirement tags** first. Design catalog lands before Client wires people. |
@@ -79,8 +79,8 @@ Slices 1–3 are Design-then-Client. Slice 4 art (postures/posters) waits for Jo
 
 ## Sequence after this stamp merges
 
-1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md).
-2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client.
+1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md). **2026-10-08:** M1 4-job draw + estimate S–F bands-as-knobs stamped — PR #28 open questions closed.
+2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client. **Can proceed on PR 1** (4-job draw + estimate bands as Test knobs).
 3. **Szayelaporro** — Godot re-smoke **each** Client land.
 4. **Slice 4 art** (postures/posters) — when Jonathan opens that lane for M1, or defers to M2.
 

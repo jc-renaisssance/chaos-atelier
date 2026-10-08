@@ -1,12 +1,12 @@
 # Interactive order — slices 1–3
 
-**Doc id: `30`.** Design only — text-first, ugly-Client friendly. No art dependencies for M1. Grimmjow 2026-10-05. People / jobs / constructions: **[29-adventurer-catalog](29-adventurer-catalog.md)** · **[28-boss-client-pool](28-boss-client-pool.md)**.
+**Doc id: `30`.** Design only — text-first, ugly-Client friendly. No art dependencies for M1. Grimmjow 2026-10-05. **Estimate S–F bands stay Test knobs — LOCKED leave-as-knobs (Jonathan 2026-10-08).** People / jobs / constructions: **[29-adventurer-catalog](29-adventurer-catalog.md)** · **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Ids unchanged (`boss_client_id`, `con_*`, `appt_*`, `adv_*`). Scrap Duelist stays `appt_*`.
 
 Slices **1–3** are Design-then-Client (this stamp). Slice **4** is **Later** — one paragraph, no detail.
 
-Numbers below are **test knobs** unless a row says lock. **Cross-run `unlocked_builds` is LOCKED** (Jonathan 2026-10-05). Dex: [31-dex](31-dex.md).
+Numbers below are **test knobs** unless a row says lock. **Cross-run `unlocked_builds` is LOCKED** (Jonathan 2026-10-05). **S–F estimate letter bands stay Test knobs** — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do **not** lock the cutoff table. Closes PR #28 open question 2. Dex: [31-dex](31-dex.md).
 
 ---
 
@@ -176,7 +176,7 @@ Extends Current / Potential (`27`): unlocked info shown; locked / unknown = **`?
 | Punish tags hit | Tag list | `?` |
 | Skill proc (`ask_*`) | Fires / does not, + one clause | `?` |
 | Neg-syn warning | Named `syn_neg_*` if the planned bag would fire it | `?` |
-| Letter band | `S\|A\|B\|C\|D\|F` (knob bands) | `?` |
+| Letter band | `S\|A\|B\|C\|D\|F` (Test knobs — **not** a locked cutoff table) | `?` |
 
 **Source of truth = Dex (`31`).** Do not invent a second reveal flag.
 
@@ -195,7 +195,7 @@ Fresh profile → first brief can show the name (now `seen`); favor / punish / b
 Client can implement this with ints and tag-set hits. **No** animation, **no** RNG. Same inputs as the mission resolver spine, **planned** tags instead of a finished bag when the player is still aiming.
 
 ```
-# knobs — not a hard lock
+# Test knobs — not a hard lock (weights + S–F cutoffs)
 FAVOR_W  = 2
 PUNISH_W = 3
 SKILL_W  = 2
@@ -216,11 +216,15 @@ function estimate(adventurer, planned_build, enemy):
     score += SKILL_W
   if would_fire_syn_neg(tags, construction_ids) and rarity_would_not_skip:
     score -= NEG_W
-  band = letter_from_score(score)   # knob table below
+  band = letter_from_score(score)   # Test-knob table below — not a lock
   return { score, band, favor_hits, punish_hits, skill_fired, neg_warnings }
 ```
 
-| Score (knob) | Band |
+**Letter bands — Test knobs (LOCKED leave-as-knobs, Jonathan 2026-10-08).** Do **not** lock this cutoff table for the first Client wire. Ulquiorra uses the working cutoffs; Jonathan / Test may retune. Closes PR #28 open question 2.
+
+Working cutoffs (tunable):
+
+| Score (Test knob) | Band |
 |---:|---|
 | ≥ 10 | S |
 | ≥ 7 | A |
@@ -271,6 +275,7 @@ After Finish: a simple **animated battle playback** driven by the mission resolv
 - Per-item or per-`con_*` unlock keys
 - Wiping `unlocked_builds` or the Dex on death / run end (**LOCKED** cross-run)
 - Estimate as a `20` Required substitute for the real resolver
+- Locking the S–F cutoff table (or `FAVOR_W` / `PUNISH_W`) on the first Client wire — they stay Test knobs
 - Slice 4 implementation
 - Shop-event systems (still required for M1 “full experience” per PM — not this doc)
 

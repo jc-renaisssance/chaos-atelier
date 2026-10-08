@@ -1,6 +1,6 @@
 # Chaos Atelier — Bible
 
-Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). Design locks through 2026-10-02 still hold unless a later stamp says otherwise.
+Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. Design locks through 2026-10-02 still hold unless a later stamp says otherwise.
 
 | Doc | Topic |
 |---|---|
@@ -37,5 +37,5 @@ Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventur
 | [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
 | [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
 | [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-05** Dex + cross-run lock) |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-08** M1 4-job draw + estimate bands as knobs) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |
