@@ -14,6 +14,8 @@ const BORDER := Color(0.239, 0.204, 0.173)
 var _title: Label
 var _note: Label
 var _order_title: Label
+var _order_stats: Label
+var _order_skill: Label
 var _order_body: Label
 var _stam_label: Label
 var _stam_bar: ProgressBar
@@ -81,9 +83,15 @@ func _build() -> void:
 	var left_box := VBoxContainer.new()
 	left_box.add_theme_constant_override("separation", 6)
 	left.add_child(left_box)
-	left_box.add_child(_caption("UPPER LEFT  ·  client order detail"))
+	left_box.add_child(_caption("UPPER LEFT  ·  adventurer order detail"))
 	_order_title = _label("No order", 16, GOLD)
 	left_box.add_child(_order_title)
+	_order_stats = _label("", 13, INK)
+	_order_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_order_stats)
+	_order_skill = _label("", 12, MUTED)
+	_order_skill.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left_box.add_child(_order_skill)
 	_order_body = _label("", 13, INK)
 	_order_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_order_body)
@@ -262,20 +270,39 @@ func _refresh() -> void:
 	if session == null or order == null:
 		_title.text = "CRAFT  ·  dedicated table"
 		_order_title.text = "No session."
+		_order_stats.text = ""
+		_order_skill.text = ""
 		_order_body.text = "Leave the schedule board to sew an order here."
 		return
-	var who := ScheduleCatalog.order_title(order)
 	var threat := ThreatCatalog.display_name(order.threat_id) if not order.threat_id.is_empty() else "—"
 	_title.text = "CRAFT  ·  %s  ·  own_basic  ·  one session" % order.order_id
 	_note.text = AtelierSession.last_note
-	_order_title.text = "%s  ·  %s" % [who, GameEnums.mission_kind_wire(order.mission_kind)]
+	var adv_id := AdventurerCatalog.order_adventurer_id(order)
+	var person := AdventurerCatalog.row_resolved(adv_id)
+	if not person.is_empty():
+		_order_title.text = "%s  ·  %s  ·  %s" % [
+			String(person.get("display", adv_id)),
+			BossClientCatalog.display_name(String(person.get("job_id", ""))),
+			GameEnums.mission_kind_wire(order.mission_kind),
+		]
+		_order_stats.text = AdventurerCatalog.stats_line(adv_id)
+		_order_skill.text = AdventurerCatalog.skill_panel_line(adv_id)
+	else:
+		_order_title.text = "%s  ·  %s" % [
+			ScheduleCatalog.order_title(order),
+			GameEnums.mission_kind_wire(order.mission_kind),
+		]
+		_order_stats.text = ""
+		_order_skill.text = ""
 	var listed: PackedStringArray = PackedStringArray()
 	for i in range(session.construction_ids.size()):
 		var con_id := session.construction_ids[i]
 		listed.append("%d %s" % [i + 1, CraftCatalog.construction_name(con_id)])
-	var taste := ", ".join(order.requirement_tags) if order.requirement_tags.size() > 0 else "—"
+	var taste := AdventurerCatalog.requirement_taste(adv_id)
+	if taste.is_empty():
+		taste = ", ".join(order.requirement_tags) if order.requirement_tags.size() > 0 else "—"
 	_order_body.text = (
-		"Order %s   ·   threat %s   ·   difficulty %s   ·   listed %s   ·   want %s   ·   zones %d / %d   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d   ·   construction from the order, not a hand card"
+		"Order %s   ·   threat %s   ·   difficulty %s   ·   listed %s   ·   taste %s   ·   zones %d / %d   ·   draw %d   ·   discard %d   ·   next-mat-free %s   ·   pieces sewn %d / %d   ·   construction from the order, not a hand card"
 		% [
 			order.order_id,
 			threat,

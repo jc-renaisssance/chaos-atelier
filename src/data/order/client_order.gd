@@ -9,7 +9,8 @@ extends Resource
 @export var mission_kind: GameEnums.MissionKind = GameEnums.MissionKind.ORDER
 @export var boss_client_id: String = "" ## adv_* on mission_kind=boss; empty otherwise
 @export var boss_job_id: String = "" ## job_* on mission_kind=boss; empty otherwise
-@export var requirement_tags: PackedStringArray = PackedStringArray() ## order taste (docs/28); not boss favor
+@export var adventurer_id: String = "" ## named adv_* for the order panel (docs/29). Not a 20 Required field.
+@export var requirement_tags: PackedStringArray = PackedStringArray() ## order taste (docs/29 person / 28 job); not boss favor
 
 
 func piece_count() -> int:

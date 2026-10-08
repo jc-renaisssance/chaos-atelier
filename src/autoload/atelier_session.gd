@@ -476,7 +476,7 @@ func _reps_gate_miss() -> bool:
 
 
 func _begin_boss_client_craft() -> void:
-	## Boss beat (docs/28): seeded shared-pool draw, independent of chapter_boss_id.
+	## Boss beat (docs/28 + 29): seeded 4-job named draw, independent of chapter_boss_id.
 	awaiting_boss = false
 	var job := BossClientCatalog.pick_boss_client(chapter_seed)
 	boss_client_id = String(job.get("boss_client_id", ""))
@@ -485,9 +485,11 @@ func _begin_boss_client_craft() -> void:
 	var order := BossClientCatalog.make_order(job, boss_id)
 	last_resolve = ScheduleRules.build_boss_client_draw(board, job)
 	if _begin_craft(order):
+		var who := AdventurerCatalog.display_name(boss_client_id)
 		last_note = (
-			"Boss beat — %s (%s) sews %s vs %s. Player is the clothier."
+			"Boss beat — %s · %s (%s) sews %s vs %s. Player is the clothier."
 			% [
+				who,
 				BossClientCatalog.display_name(boss_job_id),
 				boss_client_id,
 				", ".join(Array(order.construction_ids)),
@@ -524,8 +526,9 @@ func _run_boss() -> void:
 	last_resolve = ScheduleRules.build_boss_result(board, mission, run_over, boss_job_id, boss_client_id)
 	last_stamp = _make_boss_stamp(mission)
 	last_note = (
-		"Boss %s vs %s · rating %s · cleared %s · run_over %s."
+		"Boss %s · %s vs %s · rating %s · cleared %s · run_over %s."
 		% [
+			AdventurerCatalog.display_name(boss_client_id),
 			BossClientCatalog.display_name(boss_job_id),
 			ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "",
 			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
@@ -629,6 +632,10 @@ func _make_mission_return_stamp(mission: Dictionary) -> HarnessStamp:
 		stamp.threat_id = craft_order.threat_id
 		stamp.construction_ids = craft_order.construction_ids.duplicate()
 		stamp.card_difficulty = craft_order.card_difficulty
+		if craft_order.mission_kind == GameEnums.MissionKind.BOSS:
+			stamp.boss_client_id = craft_order.boss_client_id
+			stamp.boss_job_id = craft_order.boss_job_id
+		stamp.apply_adventurer_logs(AdventurerCatalog.order_adventurer_id(craft_order))
 	stamp.phase = GameEnums.StampPhase.CRAFT
 	stamp.session = null
 	stamp.apply_resolver(mission)
@@ -643,6 +650,10 @@ func _make_cant_craft_stamp(order: ClientOrder, result: Dictionary) -> HarnessSt
 		stamp.threat_id = order.threat_id
 		stamp.construction_ids = order.construction_ids.duplicate()
 		stamp.card_difficulty = order.card_difficulty
+		if order.mission_kind == GameEnums.MissionKind.BOSS:
+			stamp.boss_client_id = order.boss_client_id
+			stamp.boss_job_id = order.boss_job_id
+		stamp.apply_adventurer_logs(AdventurerCatalog.order_adventurer_id(order))
 	stamp.phase = GameEnums.StampPhase.CRAFT
 	stamp.session = null
 	stamp.cant_craft = true
@@ -656,6 +667,7 @@ func _make_boss_stamp(result: Dictionary) -> HarnessStamp:
 	stamp.mission_kind = GameEnums.MissionKind.BOSS
 	stamp.boss_client_id = boss_client_id
 	stamp.boss_job_id = boss_job_id
+	stamp.apply_adventurer_logs(boss_client_id)
 	if craft_order != null:
 		stamp.order_id = craft_order.order_id
 		stamp.construction_ids = craft_order.construction_ids.duplicate()

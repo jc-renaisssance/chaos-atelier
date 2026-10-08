@@ -257,6 +257,8 @@ def check_harness_and_flow(blob: str) -> None:
         "func make_order",
         "func _begin_boss_client_craft",
         "SHARED_BOSS_CLIENT_POOL",
+        "M1_JOB_POOL",
+        "class_name AdventurerCatalog",
         "boss_client_id",
         "boss_job_id",
         "OWN_BASIC_STARTER_TAGS",
@@ -278,6 +280,11 @@ def check_harness_and_flow(blob: str) -> None:
         fail("boss sim must use the boss-client sew, not mid-chapter pieces")
     if "pick_boss_client(chapter_seed)" not in session:
         fail("boss beat must call pick_boss_client(seed) without chapter_boss_id")
+    catalog = (SRC / "data" / "catalog" / "boss_client_catalog.gd").read_text(encoding="utf-8")
+    if "AdventurerCatalog.M1_JOB_POOL" not in catalog:
+        fail("M1 pick_boss_client must draw from the 4-job pool, not the 8-job SHARED list")
+    if "SHARED_BOSS_CLIENT_POOL[rng.randi_range" in catalog:
+        fail("M1 draw still indexes the 8-job SHARED_BOSS_CLIENT_POOL")
     if "BossClientCatalog.make_order" not in session:
         fail("boss beat must open the drawn job's order")
     if "MissionKind.BOSS" not in session:
@@ -352,20 +359,29 @@ def run_spec() -> None:
         "mission_kind": "boss",
         "chapter_boss_id": "boss_ash_drake",
         "boss_pool_id": "pool_c1_outer_holdings",
-        "boss_client_id": "adv_knight",
+        "boss_client_id": "adv_halden_rook",
         "boss_job_id": "job_knight",
         "order_id": "ord_knight",
         "construction_ids": list(JOBS["job_knight"]["construction_ids"]),
         "threat_id": "boss_ash_drake",
+        "adventurer_skill_id": "ask_plate_oath",
+        "adventurer_stats": {"HP": 14, "ATK": 4, "DEF": 6, "RES": 3, "MOB": 2, "PRE": 4},
     }
-    if dump["boss_client_id"].startswith("appt_"):
+    alias_dump = dict(dump)
+    alias_dump["boss_client_id"] = "adv_knight"
+    if dump["boss_client_id"].startswith("appt_") or alias_dump["boss_client_id"].startswith("appt_"):
         fail("harness boss_client_id must never be appt_*")
     if dump["construction_ids"] != JOBS[dump["boss_job_id"]]["construction_ids"]:
         fail("harness construction_ids must equal the job list in sequence")
     if dump["threat_id"] != dump["chapter_boss_id"]:
         fail("harness threat_id must equal chapter_boss_id")
-    if dump["boss_client_id"] != JOBS[dump["boss_job_id"]]["boss_client_id"]:
-        fail("harness boss_job_id must match boss_client_id")
+    knight_ids = {"adv_knight", "adv_halden_rook", "adv_vex_bramble", "adv_solenne_ward"}
+    if dump["boss_client_id"] not in knight_ids or alias_dump["boss_client_id"] not in knight_ids:
+        fail("harness boss_job_id must match named person or job-default alias")
+    if dump["adventurer_skill_id"] != "ask_plate_oath":
+        fail("slice 1 log adventurer_skill_id should be ask_*")
+    if set(dump["adventurer_stats"]) != {"HP", "ATK", "DEF", "RES", "MOB", "PRE"}:
+        fail("slice 1 log adventurer_stats must be the six panel knobs")
     # C2 starter-tag punish lands in the sim bag
     bag = {"Soft": 2, "Earth": 1, "Metal": 1}
     punish = [t for t in BOSSES_17["boss_bog_king"]["punish_tags"] if bag.get(t, 0) > 0]

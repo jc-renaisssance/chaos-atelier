@@ -10,6 +10,8 @@ extends Resource
 @export var boss_pool_id: String = ""
 @export var boss_client_id: String = "" ## adv_* on mission_kind=boss; dump null otherwise
 @export var boss_job_id: String = "" ## job_* on mission_kind=boss; dump null otherwise
+@export var adventurer_skill_id: String = "" ## ask_* log-only (docs/30 slice 1); not a 20 Required field
+@export var adventurer_stats: Dictionary = {} ## panel knobs {HP,ATK,DEF,RES,MOB,PRE}; log-only
 
 @export_group("Schedule board")
 @export var CHAPTER_ROUND_COUNT: int = GameConstants.CHAPTER_ROUND_COUNT
@@ -91,6 +93,8 @@ func apply_schedule(board: ChapterSchedule) -> void:
 	crafts_max = board.crafts_max
 	phase = GameEnums.StampPhase.SCHEDULE
 	session = null
+	adventurer_skill_id = ""
+	adventurer_stats = {}
 
 
 func apply_piece_session(order: ClientOrder, piece_session: CraftStaminaSession) -> void:
@@ -108,6 +112,7 @@ func apply_piece_session(order: ClientOrder, piece_session: CraftStaminaSession)
 	else:
 		boss_client_id = ""
 		boss_job_id = ""
+	apply_adventurer_logs(AdventurerCatalog.order_adventurer_id(order))
 
 
 func apply_resolver(result: Dictionary) -> void:
@@ -166,6 +171,29 @@ func _boss_job_wire() -> Variant:
 	return _null_str(boss_job_id)
 
 
+func apply_adventurer_logs(adv_id: String) -> void:
+	var person := AdventurerCatalog.row_resolved(adv_id)
+	if person.is_empty():
+		adventurer_skill_id = ""
+		adventurer_stats = {}
+		return
+	adventurer_skill_id = String(person.get("skill_id", ""))
+	adventurer_stats = AdventurerCatalog.stats_dict(adv_id)
+
+
+func _adventurer_stats_wire() -> Variant:
+	if adventurer_stats.is_empty():
+		return null
+	return {
+		"HP": int(adventurer_stats.get("HP", 0)),
+		"ATK": int(adventurer_stats.get("ATK", 0)),
+		"DEF": int(adventurer_stats.get("DEF", 0)),
+		"RES": int(adventurer_stats.get("RES", 0)),
+		"MOB": int(adventurer_stats.get("MOB", 0)),
+		"PRE": int(adventurer_stats.get("PRE", 0)),
+	}
+
+
 func _pin_rows() -> Array:
 	var rows: Array = []
 	for pin in appointment_pins:
@@ -182,6 +210,8 @@ func to_dict() -> Dictionary:
 		"boss_pool_id": boss_pool_id,
 		"boss_client_id": _boss_client_wire(),
 		"boss_job_id": _boss_job_wire(),
+		"adventurer_skill_id": _null_str(adventurer_skill_id),
+		"adventurer_stats": _adventurer_stats_wire(),
 		"CHAPTER_ROUND_COUNT": CHAPTER_ROUND_COUNT,
 		"round_index": _null_int(round_index),
 		"rounds_left": rounds_left,
@@ -321,8 +351,7 @@ func schema_errors() -> PackedStringArray:
 			errs.append("mission_kind=boss requires boss_client_id adv_* from the shared pool")
 		if not BossClientCatalog.has_job(boss_job_id):
 			errs.append("mission_kind=boss requires boss_job_id from the shared pool")
-		var job := BossClientCatalog.row(boss_job_id)
-		if not job.is_empty() and String(job.get("boss_client_id", "")) != boss_client_id:
+		if not BossClientCatalog.client_matches_job(boss_client_id, boss_job_id):
 			errs.append("boss_job_id does not match boss_client_id")
 		if not BossClientCatalog.constructions_match(boss_job_id, construction_ids):
 			errs.append("construction_ids must equal that job's listed con_*")
