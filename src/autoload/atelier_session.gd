@@ -50,10 +50,21 @@ var last_newspaper_event: GameEnums.NewspaperEvent = GameEnums.NewspaperEvent.NO
 var last_headline_id: String = ""
 var last_letter_id: String = ""
 ## Fashion encyclopedia is Later (docs/04). Phase-1 unlock set for Potential readout (docs/27).
+## Run-local Potential ids (syn_metal_5 etc.). Dex Builds is unlocked_builds on profile (docs/30).
 var unlocked_outlooks: PackedStringArray = PackedStringArray(["plain"])
+
+## Profile / meta save (docs/30, 31). Cross-run LOCKED. Not run state. Never cleared here.
+var profile: ProfileMeta = ProfileMeta.new()
+var dex_order_adventurer_id: String = ""
+var last_unlocks_new: Array = []
+var last_dex_crafts_new: Array = []
+var last_dex_adventurer_new_met: Array = []
+var last_dex_enemy_seen_new: Array = []
+var last_dex_enemy_fought_new: Array = []
 
 
 func _ready() -> void:
+	profile.load_from_disk()
 	start_chapter(1)
 
 
@@ -86,6 +97,8 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	unlocked_outlooks = PackedStringArray(["plain"])
 	chapter_piece_results.clear()
 	_reset_craft_state()
+	## Dex / unlocked_builds stay on profile — do not clear on new run / death / run_over.
+	profile.note_new_run()
 	stock = WagonStock.new()
 	stock.fill_starter()
 	board = ChapterSchedule.make_empty(chapter_id)
@@ -98,6 +111,8 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	last_newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
 	last_headline_id = GameConstants.HEADLINE_BOSS_ANNOUNCE
 	last_resolve = ScheduleRules.build_boss_announce(board)
+	var seen := profile.note_enemy_seen(boss_id)
+	last_dex_enemy_seen_new = Array(seen.get("dex_enemy_seen_new", []))
 	last_stamp = _make_newspaper_stamp()
 	var errs := board.schema_errors()
 	if not errs.is_empty():
@@ -117,6 +132,7 @@ func _reset_craft_state() -> void:
 	last_piece_result = {}
 	piece_results.clear()
 	piece_stamps.clear()
+	dex_order_adventurer_id = ""
 
 
 func legal_actions() -> Array[GameEnums.RoundAction]:
@@ -217,6 +233,7 @@ func _begin_craft(order: ClientOrder) -> bool:
 	next_mat_free = false
 	craft_open = true
 	resolve_open = false
+	_note_order_panel(order)
 	_open_session()
 	craft_started.emit()
 	board_changed.emit()
@@ -335,6 +352,7 @@ func _resolve_session() -> void:
 		_unlock_outlook(String(result.get("outlook_id", "plain")))
 		if counted:
 			chapter_piece_results.append(result)
+		_write_finish_profile(result, i == n)
 		var stamp := _make_craft_stamp(result)
 		piece_stamps.append(stamp.to_dict())
 		last_stamp = stamp
@@ -524,6 +542,10 @@ func _run_boss() -> void:
 	mission["run_over"] = run_over
 	mission["run_over_reason"] = run_over_reason
 	last_resolve = ScheduleRules.build_boss_result(board, mission, run_over, boss_job_id, boss_client_id)
+	var threat_id := board.chapter_boss_id if board != null else ""
+	var fought := profile.note_enemy_fought(threat_id)
+	last_dex_enemy_seen_new = Array(fought.get("dex_enemy_seen_new", []))
+	last_dex_enemy_fought_new = Array(fought.get("dex_enemy_fought_new", []))
 	last_stamp = _make_boss_stamp(mission)
 	last_note = (
 		"Boss %s · %s vs %s · rating %s · cleared %s · run_over %s."
@@ -570,6 +592,45 @@ func is_outlook_unlocked(outlook_id: String) -> bool:
 	return CraftReadout.is_outlook_unlocked(outlook_id, unlocked_outlooks)
 
 
+func note_shop_brief(threat_id: String) -> void:
+	## TODO(PR 3): call from the guild-quest poster / estimate brief when that UI lands.
+	## Shop brief writes seen + briefs_seen++, not fought (docs/31).
+	var out := profile.note_enemy_brief(threat_id)
+	last_dex_enemy_seen_new = Array(out.get("dex_enemy_seen_new", []))
+	last_dex_enemy_fought_new = []
+
+
+func _note_order_panel(order: ClientOrder) -> void:
+	## Named adventurer order panel open (docs/31). Job-stub aliases resolve first.
+	## Never stores appt_*. Decline / abandon / never-opened panel does not call this.
+	dex_order_adventurer_id = ""
+	if order == null:
+		return
+	var raw := AdventurerCatalog.order_adventurer_id(order)
+	var out := profile.note_adventurer_order(raw)
+	last_dex_adventurer_new_met = Array(out.get("dex_adventurer_new_met", []))
+	dex_order_adventurer_id = AdventurerCatalog.resolve_id(raw)
+	if not AdventurerCatalog.is_named(dex_order_adventurer_id):
+		dex_order_adventurer_id = ""
+
+
+func _write_finish_profile(result: Dictionary, last_piece: bool) -> void:
+	## Finish-only (player_finish). Abandon / stamina 0 without Finish never reaches here.
+	## Order win/lose/death does not matter. One completed bump per order, not per piece.
+	var reason := GameEnums.FinishReason.NONE
+	if craft_session != null:
+		reason = craft_session.finish_reason
+	var powers := PackedStringArray(result.get("powers_positive", PackedStringArray()))
+	var con_id := String(result.get("construction_id", ""))
+	if con_id.is_empty() and craft_session != null:
+		con_id = craft_session.construction_id
+	var write := profile.apply_finish(con_id, powers, run_id, reason)
+	last_unlocks_new = Array(write.get("unlocks_new", []))
+	last_dex_crafts_new = Array(write.get("dex_crafts_new", []))
+	if last_piece and not dex_order_adventurer_id.is_empty():
+		profile.complete_adventurer_order(dex_order_adventurer_id)
+
+
 func _unlock_outlook(outlook_id: String) -> void:
 	var id := outlook_id
 	if id.is_empty():
@@ -591,12 +652,35 @@ func _apply_run_meta(stamp: HarnessStamp) -> void:
 	stamp.letter_id = last_letter_id
 
 
+func _apply_profile_logs(stamp: HarnessStamp) -> void:
+	## Log-only Dex / unlock keys (docs/30, 31). Not 20 Required run-identity fields.
+	var snap := profile.to_dict()
+	stamp.unlocked_builds = Array(snap.get("unlocked_builds", []))
+	stamp.dex_crafts = Array(snap.get("dex_crafts", []))
+	stamp.dex_adventurers = Array(snap.get("dex_adventurers", []))
+	stamp.dex_enemies = Array(snap.get("dex_enemies", []))
+	stamp.profile_day = int(snap.get("profile_day", 0))
+	stamp.unlocks_new = last_unlocks_new.duplicate(true)
+	stamp.dex_crafts_new = last_dex_crafts_new.duplicate(true)
+	stamp.dex_adventurer_new_met = last_dex_adventurer_new_met.duplicate(true)
+	stamp.dex_enemy_seen_new = last_dex_enemy_seen_new.duplicate(true)
+	stamp.dex_enemy_fought_new = last_dex_enemy_fought_new.duplicate(true)
+	## Planner intent is PR 3. Finish still logs planned_build as null this stamp.
+	stamp.planned_build = null
+	last_unlocks_new = []
+	last_dex_crafts_new = []
+	last_dex_adventurer_new_met = []
+	last_dex_enemy_seen_new = []
+	last_dex_enemy_fought_new = []
+
+
 func _base_stamp() -> HarnessStamp:
 	var stamp := HarnessStamp.new()
 	stamp.run_id = run_id
 	if board != null:
 		stamp.apply_schedule(board)
 	_apply_run_meta(stamp)
+	_apply_profile_logs(stamp)
 	return stamp
 
 
