@@ -81,6 +81,12 @@ def check_source_symbols(blob: str) -> None:
         "job_knight",
         "class_name AdventurerCatalog",
         "ask_plate_oath",
+        "class_name ProfileMeta",
+        "class_name UnlockLaw",
+        "unlocked_builds",
+        "dex_crafts",
+        "dex_adventurers",
+        "dex_enemies",
     ]
     for token in need:
         if token not in blob:
@@ -93,6 +99,7 @@ def check_source_symbols(blob: str) -> None:
         "max_runes",
         "craft_task",
         "StampPhase.SHOP",
+        "dex_builds",
     ]
     for token in banned:
         if token in code_only:
@@ -291,6 +298,16 @@ def run_spec() -> None:
         "newspaper_headline_id",
         "letter_id",
         "cant_craft",
+        "unlocked_builds",
+        "unlocks_new",
+        "planned_build",
+        "dex_crafts",
+        "dex_crafts_new",
+        "dex_adventurers",
+        "dex_adventurer_new_met",
+        "dex_enemies",
+        "dex_enemy_seen_new",
+        "dex_enemy_fought_new",
     ]
     dump_src = (SRC / "data" / "stamp" / "harness_stamp.gd").read_text(encoding="utf-8")
     for field in stamp_fields:

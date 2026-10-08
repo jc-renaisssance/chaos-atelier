@@ -65,6 +65,20 @@ extends Resource
 @export var letter_id: String = ""
 @export var cant_craft: bool = false
 
+@export_group("Profile / Dex logs (docs/30, 31) — not 20 Required")
+@export var unlocked_builds: Array = []
+@export var unlocks_new: Array = []
+@export var dex_crafts: Array = []
+@export var dex_crafts_new: Array = []
+@export var dex_adventurers: Array = []
+@export var dex_adventurer_new_met: Array = []
+@export var dex_enemies: Array = []
+@export var dex_enemy_seen_new: Array = []
+@export var dex_enemy_fought_new: Array = []
+@export var profile_day: int = 0
+## Planner intent is PR 3. Finish still logs this key; null until that UI lands.
+var planned_build: Variant = null
+
 
 func emit_mission() -> bool:
 	return phase == GameEnums.StampPhase.CRAFT or phase == GameEnums.StampPhase.BOSS
@@ -231,6 +245,17 @@ func to_dict() -> Dictionary:
 		"reps_after": reps_after,
 		"reps_delta": reps_delta,
 		"reps_gate": reps_gate,
+		"unlocked_builds": unlocked_builds.duplicate(true),
+		"unlocks_new": unlocks_new.duplicate(true),
+		"planned_build": planned_build,
+		"dex_crafts": dex_crafts.duplicate(true),
+		"dex_crafts_new": dex_crafts_new.duplicate(true),
+		"dex_adventurers": dex_adventurers.duplicate(true),
+		"dex_adventurer_new_met": dex_adventurer_new_met.duplicate(true),
+		"dex_enemies": dex_enemies.duplicate(true),
+		"dex_enemy_seen_new": dex_enemy_seen_new.duplicate(true),
+		"dex_enemy_fought_new": dex_enemy_fought_new.duplicate(true),
+		"profile_day": profile_day,
 	}
 	if emit_mission():
 		dump["mission_kind"] = GameEnums.mission_kind_wire(mission_kind)
@@ -344,6 +369,8 @@ func schema_errors() -> PackedStringArray:
 			errs.append("cant_craft must not clear")
 	if run_over and run_over_reason == GameEnums.RunOverReason.NONE:
 		errs.append("run_over without run_over_reason")
+	## unlocked_builds / Dex keys are log-only (docs/30, 31). Do not schema-require them.
+	## Builds tab reads unlocked_builds only — no parallel builds list.
 	if mission_kind == GameEnums.MissionKind.BOSS:
 		if BossClientCatalog.is_appointment_id(boss_client_id):
 			errs.append("boss_client_id must never be appt_*")
