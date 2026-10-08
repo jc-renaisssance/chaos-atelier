@@ -23,6 +23,8 @@ var _continue_btn: Button
 var _decline_btn: Button
 var _schedule_root: Control
 var _craft_table: CraftTable
+var _dex_screen: DexScreen
+var _dex_open: bool = false
 
 
 func _ready() -> void:
@@ -133,9 +135,10 @@ func _build() -> void:
 	var demo := HBoxContainer.new()
 	demo.add_theme_constant_override("separation", 8)
 	root.add_child(demo)
+	demo.add_child(_btn("Dex", _on_dex))
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("own_basic loop: newspaper (boss) → schedule → craft → boss-client sew → fight. Shop / portraits Later.", 12, MUTED)
+	var hint := _label("Dex · shop / menu collection list. own_basic loop: newspaper → schedule → craft → boss-client sew → fight. Shop events / portraits Later.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	demo.add_child(hint)
@@ -144,6 +147,12 @@ func _build() -> void:
 	_craft_table.visible = false
 	_craft_table.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_craft_table)
+
+	_dex_screen = DexScreen.new()
+	_dex_screen.visible = false
+	_dex_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_dex_screen.closed.connect(_on_dex_closed)
+	add_child(_dex_screen)
 
 
 func _caption(text: String) -> Label:
@@ -182,13 +191,21 @@ func _btn(text: String, cb: Callable) -> Button:
 
 func _redraw() -> void:
 	var in_craft := AtelierSession.craft_open
+	if in_craft:
+		_dex_open = false
+	if _dex_screen != null:
+		_dex_screen.visible = _dex_open and not in_craft
 	if _schedule_root != null:
-		_schedule_root.visible = not in_craft
+		_schedule_root.visible = not in_craft and not _dex_open
 	if _craft_table != null:
 		_craft_table.visible = in_craft
 		if in_craft:
 			_craft_table.refresh()
 	if in_craft:
+		return
+	if _dex_open:
+		if _dex_screen != null:
+			_dex_screen.refresh()
 		return
 	var board: ChapterSchedule = AtelierSession.board
 	if board == null:
@@ -306,6 +323,20 @@ func _on_decline() -> void:
 
 func _on_continue() -> void:
 	AtelierSession.acknowledge_resolve()
+
+
+func _on_dex() -> void:
+	if AtelierSession.craft_open:
+		return
+	_dex_open = true
+	if _dex_screen != null:
+		_dex_screen.open_screen()
+	_redraw()
+
+
+func _on_dex_closed() -> void:
+	_dex_open = false
+	_redraw()
 
 
 func _on_reroll() -> void:

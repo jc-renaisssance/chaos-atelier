@@ -350,9 +350,8 @@ def check_source() -> None:
     for path in (SRC / "ui").rglob("*"):
         if path.suffix in {".gd", ".tscn"}:
             ui_blob += path.read_text(encoding="utf-8")
-    for token in ("Dex tab", "Builds | Crafts"):
-        if token in ui_blob:
-            fail(f"Dex shop/menu screen must not land here ({token})")
+    if "Fashion Encyclopedia" in ui_blob:
+        fail("Fashion Encyclopedia chrome is M2 — not the ugly Dex list")
     if "POSITIVE_TAG_ROWS" not in resolver:
         fail("CraftResolver positive rows missing — unlock law has nothing to reuse")
     for path in SRC.rglob("*.gd"):

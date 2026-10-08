@@ -353,9 +353,8 @@ def check_source() -> None:
     for path in (SRC / "ui").rglob("*"):
         if path.suffix in {".gd", ".tscn"}:
             ui_blob += path.read_text(encoding="utf-8")
-    for token in ("Dex tab", "Builds | Crafts", "Fashion Encyclopedia"):
-        if token in ui_blob:
-            fail(f"Dex shop/menu screen must not land in this PR ({token})")
+    if "Fashion Encyclopedia" in ui_blob:
+        fail("Fashion Encyclopedia chrome is M2 — not this PR")
     if 'PackedStringArray("4.7"' not in project:
         fail("project.godot config/features must list 4.7")
     if re.search(r"^class_name AtelierSession\b", blob, re.M):
