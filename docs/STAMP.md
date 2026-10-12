@@ -297,6 +297,7 @@ Both items **removed from open questions**. Client can proceed on Ulquiorra PR 1
 4. **Last 2 days reserved** relative to map length (8-day map: **D7** travel / final prep, **D8** boss approach). Player assigns **D1..(N−2)** only. Fixed-window events may still pin inside assignable days.
 5. **Event pool `E*`.** Keep `adv_*` / `appt_*` on the row when they exist. Windows e.g. E1 shop D2; E2 adv D2; E3 event D2–D3; E4 adv D2 & D6. M1 / current test: **2–4 options per day**. D1 may only list first-customer adventurer option(s). **Scrap Duelist / `appt_*` stay appointments**, not Dex Adventurers.
 6. Client needs + Test logs sketched in `22` / `20` (no piece cap; Day labels; options panel; assign at start; mid-chapter update; fixed windows; reserved last-2).
+7. **M1 `E*` panel = type + id** (Jonathan 2026-10-12). Type ∈ {shop, adventurer, appointment, event}. Fancy titles **Later**. Do not invent title copy. Display-title lock **held** — closed.
 
 ## Files in this drop
 

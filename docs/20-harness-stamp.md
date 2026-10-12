@@ -45,7 +45,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `day_index` | int\|null | 1..N on planner / craft stamps; null on chapter-start newspaper. Labels **D1..DN** |
 | `days_left` | int | Remaining days (includes reserved) |
 | `day_action` | enum\|null | `appointment` \| `walk_in` \| `wagon_shop` \| `wagon_event` \| `prep_craft` \| `rest_dig` — the **one** primary action this day (from the assigned `E*`) |
-| `event_pool` | object[] | `{ event_id, kind, windows, fixed, ref_id }`. `event_id` = `E1`… ; `ref_id` = `adv_*` / `appt_*` / null. Current-map sketch in [22](22-chapter-schedule.md) |
+| `event_pool` | object[] | `{ event_id, kind, windows, fixed, ref_id }`. `event_id` = `E1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`}; `ref_id` = `adv_*` / `appt_*` / null. M1 panel = **type + id** — no title field. Current-map sketch in [22](22-chapter-schedule.md) |
 | `day_assignments` | object[] | `{ day_index, event_id }` — player-assigned (and fixed pins). Only `day_index` ∈ 1..(N−2) |
 | `appointment_pins` | object[] | `appt_*` rows still on the planner: `{ appointment_id, order_id, pinned_day }`. Scrap Duelist stays here. `pinned_day` ∈ 1..(N−2) |
 | `appt_decline_used` | bool | Phase-1: decline allowed **once** / chapter (−reps) |

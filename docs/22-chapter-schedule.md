@@ -81,26 +81,27 @@ Events are **`E*`**. Keep **adventurer / appointment ids** on the row when they 
 
 UI **options panel** lists the events whose window includes the inspected day. **M1 / current test: 2–4 options per day.** Exception: **D1 may only list the first-customer adventurer option(s)**.
 
+**M1 panel (LOCKED Jonathan 2026-10-12):** show **type + id** only — e.g. `shop` · `E1`. Type ∈ {`shop`, `adventurer`, `appointment`, `event`}. Fancy titles **Later**. Do **not** invent title copy.
+
 ### Current map (N=8) — M1 / Test sketch
 
-Assignable D1..D6. Reserved D7 / D8. Titles are Test stubs; **windows / kinds / 2–4-per-day / D1 exception / Scrap Duelist as `appt_*` are LOCKED** for this map’s sketch.
+Assignable D1..D6. Reserved D7 / D8. **Windows / types / 2–4-per-day / D1 exception / Scrap Duelist as `appt_*` are LOCKED** for this map’s sketch. No display titles this stamp.
 
-| id | Kind | Window | Fixed | Ref | Stub title |
-|---|---|---|---|---|---|
-| **E5** | adventurer | **D1** | yes | `adv_*` first customer | First customer |
-| **E1** | shop | **D2** | yes | — | Wagon shop |
-| **E2** | adventurer | **D2** | no | `adv_*` | Road walk-in |
-| **E3** | event | **D2–D3** | no | — | Road event |
-| **E4** | adventurer | **D2 & D6** | no | `adv_*` | Repeat caller |
-| **E6** | shop | **D3–D4** | no | — | Wayside stall |
-| **E8** | appointment | **D3** | yes | `appt_scrap_duelist` | Scrap Duelist |
-| **E13** | event | **D3** | no | — | Wagon trouble |
-| **E7** | event | **D4** | no | — | Crossroads |
-| **E9** | adventurer | **D4–D5** | no | `adv_*` | Named walk-in |
-| **E14** | prep | **D4 & D5** | no | — | Prep craft |
-| **E10** | shop | **D5–D6** | no | — | Last stall |
-| **E11** | event | **D5** | no | — | Weather |
-| **E12** | adventurer | **D6** | no | `adv_*` | Late walk-in |
+| id | Type | Window | Fixed | Ref |
+|---|---|---|---|---|
+| **E5** | adventurer | **D1** | yes | `adv_*` (first-customer slot) |
+| **E1** | shop | **D2** | yes | — |
+| **E2** | adventurer | **D2** | no | `adv_*` |
+| **E3** | event | **D2–D3** | no | — |
+| **E4** | adventurer | **D2 & D6** | no | `adv_*` |
+| **E6** | shop | **D3–D4** | no | — |
+| **E8** | appointment | **D3** | yes | `appt_scrap_duelist` |
+| **E13** | event | **D3** | no | — |
+| **E7** | event | **D4** | no | — |
+| **E9** | adventurer | **D4–D5** | no | `adv_*` |
+| **E10** | shop | **D5–D6** | no | — |
+| **E11** | event | **D5** | no | — |
+| **E12** | adventurer | **D6** | no | `adv_*` |
 
 Options per day (current map):
 
@@ -109,8 +110,8 @@ Options per day (current map):
 | **D1** | E5 only — first-customer adventurer | yes |
 | **D2** | E1, E2, E3, E4 | yes |
 | **D3** | E3, E6, E8, E13 | yes |
-| **D4** | E6, E7, E9, E14 | yes |
-| **D5** | E9, E10, E11, E14 | yes |
+| **D4** | E6, E7, E9 | yes |
+| **D5** | E9, E10, E11 | yes |
 | **D6** | E4, E10, E12 | yes |
 | **D7** | *(none — travel / final prep)* | **reserved** |
 | **D8** | *(none — boss approach)* | **reserved** |
@@ -141,7 +142,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 
 1. **No piece cap.** Do not block craft when `crafts_done` is high. Do not show a 4/4 garments meter. Do not emit `crafts_max`. Do not fire `cant_craft` because of piece count.
 2. **Day labels.** Timeline says **D1..DN** (N = `map.day_count`). Never R1. Current map N=8.
-3. **Options panel.** Expand / popup on a day lists that day’s `E*` (2–4; D1 may be first-customer only). Show kind + stub title + window + fixed flag. Keep `adv_*` / `appt_*` on the row when present.
+3. **Options panel.** Expand / popup on a day lists that day’s `E*` (2–4; D1 may be first-customer only). **M1:** show **type + id** (`shop` / `adventurer` / `appointment` / `event` + `E1`…). Keep `adv_*` / `appt_*` on the row when present. Fancy titles **Later** — do not invent copy.
 4. **Assign at chapter start.** After the boss newspaper, player assigns one option per D1..(N−2). Reserved last-2 visible, not clickable-to-assign.
 5. **Mid-chapter update.** Remaining unplayed assignable days can be reassigned. Past days frozen.
 6. **Fixed windows pin.** Fixed events cannot be moved off their window. Player cannot drop them on reserved days.
@@ -183,6 +184,7 @@ Log on chapter-start assign, on mid-chapter update, and on each day resolve. **N
 - Hardcoding 8 as global day-count law
 - Putting Scrap Duelist / `appt_*` on Dex Adventurers
 - R1..R8 labels
+- Inventing fancy `E*` display titles (M1 = type + id)
 
 ## Supersedes
 
