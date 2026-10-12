@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-05** after Jonathan stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology). **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file.
+Updated **2026-10-12** after Jonathan / Aizen stamp (**Day planner** + drop `crafts_max`). Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`.
 
 See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 
@@ -22,7 +22,8 @@ As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 
 | Landed | Where |
 |--------|--------|
-| Travelling atelier + schedule board (`CHAPTER_ROUND_COUNT=8`) | `22-chapter-schedule` |
+| Travelling atelier + **Day planner** (`CHAPTER_DAY_COUNT` = `map.day_count`; current map **8**; last 2 reserved; `E*` pool) | `22-chapter-schedule` |
+| **No piece cap** (`crafts_max` GONE; stamina per craft stays) | `22` / `20` / `27` / `24` |
 | Craft = stamina hand game; construction from order | `27` |
 | **Finish-only** (stamina 0 ≠ finish) | `27` / Client |
 | **StS** cycle (play→discard, dig dump, reshuffle) + Current/Potential | `27` / Client |
@@ -34,7 +35,7 @@ As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 
 **Jonathan confirmed 2026-10-05:** C1 **craft path works**. Shop systems and events are **not done yet**.
 
-**Superseded (history only):** 1-of-3 card lineup, `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default 2m1r slot UI, construction picker in craft, sequential per-piece stamina, auto-finish on `stamina_0`, fixed-client-per-boss, “hold Client until Cursor monthly reset.”
+**Superseded (history only):** 1-of-3 card lineup, `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default 2m1r slot UI, construction picker in craft, sequential per-piece stamina, auto-finish on `stamina_0`, fixed-client-per-boss, Round / schedule board as live UX (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8), `crafts_max=4` / cant_craft-at-max, “hold Client until Cursor monthly reset.”
 
 ---
 

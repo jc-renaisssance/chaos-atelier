@@ -70,7 +70,7 @@ There is a **client responsible for the boss event**. The player crafts **for th
 - That adventurer’s **order constructions** (`con_*` listed per job in `28`) **+ requirement tags** are what the player crafts for. Constructions come from that order (`27`) — not a picker.
 - That adventurer **fights** the announced chapter boss. Sim (`20` `mission_kind=boss`) uses **that client's gear**.
 - Example: C1 may draw Ash Drake as boss; C1 (or any chapter) may still draw a knight or a mage — different jobs → different constructions and different requirement tags.
-- **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client. Do not pin Scrap Duelist to reserved rounds or the boss beat.
+- **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client and **not** Dex Adventurers. Do not pin Scrap Duelist to reserved **days** or the boss beat.
 
 Portraits / UI widgets = **Later**. Do not invent Godot scenes or art this stamp.
 
@@ -93,11 +93,11 @@ function pick_boss_client(seed):
 ```
 
 - Announce the **boss** **before** any shop spend that chapter.
-- Draw the **boss-client** at the **boss beat** (after reserved rounds / final prep). Independent of the announced boss.
+- Draw the **boss-client** at the **boss beat** (after reserved last-2 **days** / final prep). Independent of the announced boss.
 - Same job may recur across chapters (Phase-1). Unique-per-run = Later.
 - Telegraph the job before the boss beat = Later.
 - Harness: `chapter_boss_id`, `boss_pool_id`, `boss_client_id`, `boss_job_id`.
-- Mid missions: schedule appointments / walk-ins (`22`) — not this pool.
+- Mid missions: Day-planner `E*` / appointments / walk-ins (`22`) — not this pool.
 
 ## Phase-1 art
 
@@ -107,7 +107,7 @@ Boss portraits Later. Newspaper chrome can share atelier grain when 1C opens. Cl
 
 - Shared pool / jobs: [28-boss-client-pool](28-boss-client-pool.md) · M1 named people / 4-job draw: [29-adventurer-catalog](29-adventurer-catalog.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
-- Schedule / boss beat: [22-chapter-schedule](22-chapter-schedule.md)
+- Day planner / boss beat: [22-chapter-schedule](22-chapter-schedule.md)
 - Harness: [20-harness-stamp](20-harness-stamp.md)
 - Newspaper: [26-newspaper](26-newspaper.md)
 - Craft: [27-craft-mode-stamina](27-craft-mode-stamina.md)

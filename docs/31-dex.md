@@ -6,6 +6,8 @@
 
 The Dex is the **profile-level, cross-run** collection record. It is the same save layer as `unlocked_builds` ([30](30-interactive-order.md) slice 2). Slice 2 / 3 `?` rules **read the Dex** — one source of truth.
 
+**2026-10-12:** Scrap Duelist / `appt_*` stay **appointments** on the Day planner (`22`). They are **not** this Adventurers tab.
+
 Art + lore blurbs = **Later / M2**. M1 is an ugly list / grid.
 
 ---

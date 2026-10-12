@@ -83,7 +83,7 @@ Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare �
 - Play several into one craft (stamina cost + leave hand → discard; no hard slot cap in live craft — `material_slots` is legacy).
 - **Same id may repeat** (Armor + Stone Shard ×3 is valid) via copies or after discard→reshuffle — not by replaying one in-hand card.
 - Stats and tags **sum / bag-count** — three Stone Shards = Earth×3 and Metal×3 from materials alone.
-- Play **removes the card from hand** into discard (unless a special card says otherwise). Cards remain in the atelier via reshuffle. Shop sell / explicit loss still change stock. Round-generated **consumables** (Later, distinct type — [27](27-craft-mode-stamina.md)) **burn** on use; do not treat materials as burn cards. **Supersedes durable-in-hand (#17).**
+- Play **removes the card from hand** into discard (unless a special card says otherwise). Cards remain in the atelier via reshuffle. Shop sell / explicit loss still change stock. Day-generated **consumables** (Later, distinct type — [27](27-craft-mode-stamina.md)) **burn** on use; do not treat materials as burn cards. **Supersedes durable-in-hand (#17).**
 
 ## Draft shop rules
 

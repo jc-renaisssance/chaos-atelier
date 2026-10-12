@@ -1,6 +1,6 @@
 # Harness stamp fields (Phase-1 lock)
 
-**Status:** Design stamped 2026-10-02. **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = schedule board ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)).
+**Status:** Design stamped 2026-10-12 (Day planner + drop `crafts_max`). **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = **Day planner** ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)). **Supersedes** Round-board dumps (`CHAPTER_ROUND_COUNT` as always-8, `round_*`, `crafts_max=4`).
 
 > **Not live — do not assert.** `lineup_card_ids`, `picked_card_id`, and `max_materials` / `max_runes` (2m1r) track the superseded 1-of-3 / slot-fill shell. They are **not** Required. See [Superseded](#superseded).
 
@@ -10,11 +10,11 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 | Key | Value | Notes |
 |---|---:|---|
-| `CHAPTER_ROUND_COUNT` | **8** | Rounds 1..8 |
-| `crafts_max` | **4** | Garments / chapter |
-| Appointment pins | **2–4** | At chapter start; not on last 2 rounds |
-| Reserved rounds | last **2** | No appointments (rounds 7–8) |
-| Primary actions / round | **1** | Phase-1 |
+| `CHAPTER_DAY_COUNT` | **`map.day_count`** | **Map setting — not global law.** Current map = **8**. Later maps may be 3 or 12. Example dumps use 8. |
+| `crafts_max` | **GONE** | Unlimited pieces / chapter. Do **not** emit. |
+| Event pool | `E*` | Windows per event; M1 / current test **2–4 options / day** (D1 may be first-customer only) |
+| Reserved days | last **2** of N | Player assigns D1..(N−2) only. Current map: D7 travel / final prep, D8 boss approach |
+| Primary actions / day | **1** | Phase-1 |
 | `stamina_start` | **12 × N** | Session pool; N = `piece_count` (draft) |
 | `zone_count_max` | **4** | Unused zones empty if N < 4; N > 4 = Later |
 | `hand_size` | **5** | No auto-refill |
@@ -37,29 +37,32 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `boss_client_id` | string\|null | `adv_*` from the shared job pool (`28`). Required on `mission_kind=boss`; null otherwise |
 | `boss_job_id` | string\|null | matching `job_*` title (`28`). Required on `mission_kind=boss`; null otherwise |
 
-### Schedule board
+### Day planner
 
 | Field | Type | Notes |
 |---|---|---|
-| `CHAPTER_ROUND_COUNT` | int | Always **8** |
-| `round_index` | int\|null | 1..8 on schedule / craft stamps; null on chapter-start newspaper |
-| `rounds_left` | int | Remaining schedule rounds (includes reserved) |
-| `round_action` | enum\|null | `appointment` \| `walk_in` \| `wagon_shop` \| `wagon_event` \| `prep_craft` \| `rest_dig` — the **one** primary action this round |
-| `appointment_pins` | object[] | Chapter-start pins: `{ appointment_id, order_id, pinned_round }` — length **2..4**; each `pinned_round` ∈ 1..6 |
+| `CHAPTER_DAY_COUNT` | int | = `map.day_count` this chapter. Current map **8**. **Not** always-8 law. |
+| `day_index` | int\|null | 1..N on planner / craft stamps; null on chapter-start newspaper. Labels **D1..DN** |
+| `days_left` | int | Remaining days (includes reserved) |
+| `day_action` | enum\|null | `appointment` \| `walk_in` \| `wagon_shop` \| `wagon_event` \| `prep_craft` \| `rest_dig` — the **one** primary action this day (from the assigned `E*`) |
+| `event_pool` | object[] | `{ event_id, kind, windows, fixed, ref_id }`. `event_id` = `E1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`}; `ref_id` = `adv_*` / `appt_*` / null. M1 panel = **type + id** — no title field. Current-map sketch in [22](22-chapter-schedule.md) |
+| `day_assignments` | object[] | `{ day_index, event_id }` — player-assigned (and fixed pins). Only `day_index` ∈ 1..(N−2) |
+| `appointment_pins` | object[] | `appt_*` rows still on the planner: `{ appointment_id, order_id, pinned_day }`. Scrap Duelist stays here. `pinned_day` ∈ 1..(N−2) |
 | `appt_decline_used` | bool | Phase-1: decline allowed **once** / chapter (−reps) |
-| `crafts_done_this_chapter` | int | Finished garments this chapter (0..4). Increments per finished **piece**, not per order |
-| `crafts_max` | int | Always **4** |
-| `phase` | enum | `schedule` \| `craft` \| `boss` \| `newspaper` |
+| `crafts_done_this_chapter` | int | Finished **pieces** this chapter — **unbounded** telemetry. Increments per finished piece, not per order. **Not a gate** |
+| `phase` | enum | `schedule` \| `craft` \| `boss` \| `newspaper` — dump name `schedule` = **on the Day planner** (kept; do not invent `phase=planner` this stamp) |
 
-**Lock:** `crafts_done_this_chapter` / `crafts_max=4` counts **pieces** (each construction in a multi-piece order), not whole orders. Example: armor + gloves = 2 of 4. Multi-piece still increments **per piece** after the **one** Finish — not +1 per order.
+**Do not emit `crafts_max`.** **Do not emit `CHAPTER_ROUND_COUNT` / `round_index` / `rounds_left` / `round_action` / `pinned_round`.** Those names are superseded.
 
-`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `round_action` on `phase=schedule`. Travel events are `round_action=wagon_event`. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
+**Lock:** no piece cap. `crafts_done_this_chapter` may count pieces (armor + gloves = +2) after the **one** Finish — it does **not** block the next craft. `cant_craft` because `crafts_done == crafts_max` is **GONE**.
+
+`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `day_action` on `phase=schedule` (Day planner). Travel events are `day_action=wagon_event`. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
 
 ### Mission (when `phase=craft` or `phase=boss`)
 
 | Field | Type | Notes |
 |---|---|---|
-| `mission_kind` | enum\|null | `order` \| `event` \| `boss` \| `prep` — null on pure schedule / newspaper stamps |
+| `mission_kind` | enum\|null | `order` \| `event` \| `boss` \| `prep` — null on pure Day-planner / newspaper stamps |
 | `order_id` | string\|null | Client / appointment / walk-in / prep / **boss-client** order (`ord_*` from `28` on the boss beat) |
 | `threat_id` | string\|null | Client or event or boss threat key |
 | `construction_ids` | string[] | Order-fixed list (`con_*`); **not** player-picked |
@@ -68,7 +71,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 Prep (`mission_kind=prep`) still runs the resolver on finish; mission-sim fields may be null (ready-rack, no live client). Walk-in / appointment enter craft as `order`. Wagon event that does not enter craft stays `phase=schedule` with session fields null.
 
-**Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `boss_client_id` = named `adv_*` drawn from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); `boss_job_id` = matching `job_*`; `order_id` = that job’s `ord_*`; `construction_ids` = that job’s **order constructions** (listed `con_*`, in sequence — e.g. knight = `con_armor`, `con_gloves`); `threat_id` = announced `chapter_boss_id`. Draw is **independent** of which boss was announced. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Sim uses **that client's gear**. `boss_client_id` is **never** an `appt_*` (Scrap Duelist and other appointments stay on the schedule board). Finish-only / multi-piece / StS craft **unchanged**. Portraits / extra Client UI widgets = **Later**.
+**Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `boss_client_id` = named `adv_*` drawn from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); `boss_job_id` = matching `job_*`; `order_id` = that job’s `ord_*`; `construction_ids` = that job’s **order constructions** (listed `con_*`, in sequence — e.g. knight = `con_armor`, `con_gloves`); `threat_id` = announced `chapter_boss_id`. Draw is **independent** of which boss was announced. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Sim uses **that client's gear**. `boss_client_id` is **never** an `appt_*` (Scrap Duelist and other appointments stay on the **Day planner**, not Dex Adventurers). Finish-only / multi-piece / StS craft **unchanged**. Portraits / extra Client UI widgets = **Later**.
 
 ### Stamina craft session (when `phase=craft`)
 
@@ -87,7 +90,7 @@ Prep (`mission_kind=prep`) still runs the resolver on finish; mission-sim fields
 | `early_finish` | bool | **Superseded as a distinct end.** If emitted: player clicked Finish (same as `player_finish`). Not “stop before empty.” |
 | `finish_reason` | enum | **`player_finish` only** — one Finish ends the **session**. Every piece stamp from that Finish uses `player_finish`. |
 
-Null the session block when not in craft (schedule shop / event / rest, newspaper). `cant_craft` stamps have no legal session — see asserts.
+Null the session block when not in craft (planner shop / event / rest, newspaper). `cant_craft` stamps have no legal session — see asserts. **`cant_craft` is not a piece-cap** — that fail is **GONE**.
 
 Skills in `cards_played` are owner skills (manipulate the session, then leave). They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft). Phase-1: skill plays still carry `zone_index` / `construction_id` (target bag). Skills that hit every zone = Later.
 
@@ -97,7 +100,7 @@ Skills in `cards_played` are owner skills (manipulate the session, then leave). 
 
 **Hand cycle (supersedes durable-in-hand, #17):** play any card → it **leaves the hand** → **discard** (unless a special card says otherwise). Refresh / dig: remaining hand drops to discard, then draw up to `hand_size` from the **draw** pile; if draw is short mid-draw, **shuffle discard into draw** and continue. Cards remain in the **run deck** via reshuffle — not deleted from the atelier, and **not** “stay in hand after play.” Stamina still costs on play. Hand / draw / discard pile arrays are Design law in [27](27-craft-mode-stamina.md) — not extra Required dump fields unless Test later stamps them.
 
-Round-generated **consumable** cards (Later; distinct type, **not** in this enum) **burn** on use when stamped. Do not emit a fake consumable field.
+Day-generated **consumable** cards (Later; distinct type, **not** in this enum) **burn** on use when stamped. Do not emit a fake consumable field.
 
 **Live item readout** (Design UX in [27](27-craft-mode-stamina.md)): Current stats + Potential outlook for the **selected / active zone** (locked / hidden if outlook not unlocked). Not a Phase-1 dump assert — no extra stamp fields. Per-zone simultaneous readout = Later.
 
@@ -128,7 +131,7 @@ Round-generated **consumable** cards (Later; distinct type, **not** in this enum
 | `newspaper_event` | enum\|null | `boss_announce` \| `mid_fail` \| `chapter_result` \| `run_over` |
 | `newspaper_headline_id` | string\|null | Stable id (`26`) |
 | `letter_id` | string\|null | Private letter (`23`) |
-| `cant_craft` | bool | Could not open a legal craft session |
+| `cant_craft` | bool | Could not open a legal craft session (**not** piece-cap — that cause is **GONE**) |
 
 `rating_score` (0..100) is UI/debug only — **not** asserted (`23`).
 
@@ -144,14 +147,14 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 4. `cleared == (hp_remaining > 0 ∧ rating ∈ {S,A,B,C})`.
 5. Boss fail (boss-client / adventurer dead / hard loss) → `run_over == true` ∧ `run_over_reason == "boss_death"` — no retry.
 
-### Schedule board
+### Day planner
 
-6. `CHAPTER_ROUND_COUNT == 8`; on schedule / craft stamps `round_index` ∈ 1..8.
-7. Phase-1: exactly **one** `round_action` per round (null only before the player picks, or on non-schedule stamps).
-8. Every `appointment_pins[].pinned_round` ∈ 1..6 — **not** rounds 7–8.
-9. `len(appointment_pins)` ∈ 2..4 at chapter start; pins do not move onto reserved rounds.
-10. `crafts_done_this_chapter ≤ crafts_max` and `crafts_max == 4`. `cant_craft` does not increment `crafts_done_this_chapter`.
-11. `phase` ∈ {`schedule`, `craft`, `boss`, `newspaper`} — never `shop` or `craft_task`.
+6. `CHAPTER_DAY_COUNT == map.day_count`. Current-map dumps use **8**; do **not** assert 8 as global law. On planner / craft stamps `day_index` ∈ 1..`CHAPTER_DAY_COUNT`. Do **not** emit `CHAPTER_ROUND_COUNT` / `round_index`.
+7. Phase-1: exactly **one** `day_action` per day (null only before the player picks, or on non-planner stamps).
+8. Every `day_assignments[].day_index` and `appointment_pins[].pinned_day` ∈ 1..(N−2) — **not** the reserved last 2. Current 8-day map: not D7–D8.
+9. Fixed-window `E*` : assigned day ∈ that event’s window. Player cannot move a `fixed=true` event. Mid-chapter updates only change **unplayed** assignable days.
+10. **No `crafts_max`.** Do not emit it. `crafts_done_this_chapter ≥ 0` unbounded — **not** a gate. `cant_craft` **must not** fire because of piece count. `cant_craft` (other causes) does not increment `crafts_done_this_chapter`.
+11. `phase` ∈ {`schedule`, `craft`, `boss`, `newspaper`} — never `shop` or `craft_task`. `schedule` = on the Day planner.
 
 ### Stamina craft
 
@@ -164,8 +167,8 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 
 ### cant_craft / reps / newspaper (prior intent kept)
 
-18. `cant_craft` → `rating == F` ∧ `hp_remaining > 0` ∧ `damage_aid_pct == 0` ∧ `cleared == false` ∧ normal fail reps Δ (not death Δ). No stamina session / no construction pick required.
-19. After last schedule round, `reps_after < reps_gate` → `run_over` ∧ `run_over_reason == "reps_gate_miss"`.
+18. `cant_craft` → `rating == F` ∧ `hp_remaining > 0` ∧ `damage_aid_pct == 0` ∧ `cleared == false` ∧ normal fail reps Δ (not death Δ). No stamina session / no construction pick required. **Cause is not piece cap** (`crafts_max` is GONE). Mid-fail from other session-open causes may stay.
+19. After last day (including reserved), `reps_after < reps_gate` → `run_over` ∧ `run_over_reason == "reps_gate_miss"`.
 20. Mid death (`hp_remaining ≤ 0`, not `cant_craft`) → large −reps (`−3 * card_difficulty` per `25`).
 21. Always `apply_reps` after an order mission (including `cant_craft`).
 22. Newspaper fields set when the beat applies (`26`): chapter start → `boss_announce`; mid fail → `mid_fail`; chapter end / run over as listed.
@@ -180,7 +183,10 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 | Assert: `len(lineup_card_ids)==3` ∧ pick ∈ lineup | Same |
 | `max_materials` / `max_runes` (defaults 2 / 1) | 2m1r slot UI — [12b-craft-slots](12b-craft-slots.md) |
 | Assert: `len(materials)` ∈ 1..`max_materials` / `construction.material_slots` | Stamina + order-fixed construction replace slot caps |
-| `phase` ∈ {`shop`, `craft_task`} | Wagon shop is a schedule action; craft is stamina |
+| `phase` ∈ {`shop`, `craft_task`} | Wagon shop is a Day-planner action; craft is stamina |
+| `CHAPTER_ROUND_COUNT` always 8 / `round_index` / `rounds_left` / `round_action` / `pinned_round` | **Day planner** — `CHAPTER_DAY_COUNT` = `map.day_count`; `day_*` / `pinned_day` ([22](22-chapter-schedule.md)) |
+| `crafts_max` / assert `crafts_done ≤ 4` / `cant_craft` at cap | **Piece cap GONE** — unlimited pieces; stamina still gates a session ([27](27-craft-mode-stamina.md)) |
+| Chapter-start 2–4 `appointment_pins` as the only assign UX | Event pool `E*` + player assign D1..(N−2); fixed windows pin ([22](22-chapter-schedule.md)) |
 | Assert: `material` play does not decrement inventory / stock | Durable-in-hand (#17) — superseded: play → discard; persist via reshuffle ([27](27-craft-mode-stamina.md)) |
 | `finish_reason: stamina_0` as craft-end / auto-resolver | **Stamina 0 ≠ finish** — session stays open; only Finish crafts ([27](27-craft-mode-stamina.md)) |
 | `early_finish` as a distinct end path vs `stamina_0` | Finish is the only legal Phase-1 end (`player_finish`) |
@@ -195,6 +201,6 @@ Overall adventure **trend** vs the announced boss — not every matrix cell non-
 
 ## Pointers
 
-- Live: [22-chapter-schedule](22-chapter-schedule.md) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
+- Live: [22-chapter-schedule](22-chapter-schedule.md) (Day planner) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
 - Resolver / report: [23-mission-report](23-mission-report.md) · [24-win-conditions](24-win-conditions.md) · [25-reps-meter](25-reps-meter.md) · [26-newspaper](26-newspaper.md) · [14-synergies](14-synergies.md) (RETUNE merged)
 - Legacy (not live): [22-chapter-flow](22-chapter-flow.md) · [12b-craft-slots](12b-craft-slots.md)
