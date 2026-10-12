@@ -376,7 +376,6 @@ def run_spec() -> None:
         "mat_iron_scrap",
     ]
     crafts_done = 0
-    crafts_max = 4
 
     # One session for armor + gloves — stamina 24, two zones
     s = Session(["con_armor", "con_gloves"])
@@ -503,8 +502,9 @@ def run_spec() -> None:
     crafts_done += len(stamps)
     if crafts_done != 2:
         fail("crafts_done increments per piece after the one Finish, not per order")
-    if crafts_done > crafts_max:
-        fail("crafts_done exceeded crafts_max")
+    crafts_done += 3
+    if crafts_done != 5:
+        fail("crafts_done is unbounded telemetry — must not cap at 4")
 
     # Empty zone at Finish = construction-only bag, not cant_craft
     empty = Session(["con_tunic", "con_cloak"])

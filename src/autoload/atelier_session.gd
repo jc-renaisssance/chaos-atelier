@@ -1,5 +1,5 @@
 extends Node
-## Live travelling-atelier session. Schedule (22) + stamina craft (27) + mission (23/24).
+## Live travelling-atelier session. Day planner (22) + stamina craft (27) + mission (23/24).
 ## Autoload singleton is already named AtelierSession — do not add class_name.
 
 signal board_changed
@@ -22,7 +22,7 @@ var last_resolve: Dictionary = {}
 var pending_order: ClientOrder
 var last_event: Dictionary = {}
 var resolve_open: bool = false
-var declined_this_round: bool = false
+var declined_this_day: bool = false
 var reps: int = GameConstants.REPS_START
 var last_note: String = ""
 
@@ -84,7 +84,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	last_mission = {}
 	pending_order = null
 	resolve_open = false
-	declined_this_round = false
+	declined_this_day = false
 	newspaper_open = false
 	awaiting_boss = false
 	boss_open = false
@@ -104,10 +104,10 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	stock = WagonStock.new()
 	stock.fill_starter()
 	board = ChapterSchedule.make_empty(chapter_id)
-	var pins := ScheduleRules.roll_pins(chapter_id, rng)
 	var boss_id := ScheduleRules.roll_boss(chapter_id, rng)
 	var pool_id := String(GameConstants.BOSS_POOL_IDS.get(chapter_id, ""))
-	board.begin_live(boss_id, pool_id, pins)
+	board.begin_live(boss_id, pool_id)
+	ScheduleRules.pin_fixed_events(board)
 	newspaper_open = true
 	resolve_open = true
 	last_newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
@@ -120,7 +120,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	if not errs.is_empty():
 		last_note = "schema: " + ", ".join(errs)
 	else:
-		last_note = "Kingdom newspaper — boss announced before spend. Pins are 2–4 elite telegraphs on rounds 1–6."
+		last_note = "Kingdom newspaper — boss announced before spend. Day planner next: preview E* per day, assign D1..(N-2)."
 	resolve_started.emit(last_resolve)
 	board_changed.emit()
 
@@ -141,7 +141,33 @@ func _reset_craft_state() -> void:
 func legal_actions() -> Array[GameEnums.RoundAction]:
 	if craft_open or newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return []
-	return ScheduleRules.legal_actions(board, declined_this_round)
+	return ScheduleRules.legal_actions(board, declined_this_day)
+
+
+func can_assign_event(day_i: int, event_id: String) -> bool:
+	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	return board.can_assign(day_i, event_id)
+
+
+func assign_event(day_i: int, event_id: String) -> bool:
+	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	if not board.assign_day(day_i, event_id):
+		last_note = board.assign_reason(day_i, event_id)
+		board_changed.emit()
+		return false
+	last_stamp = _make_schedule_stamp()
+	last_note = "Assigned %s to D%d." % [event_id, day_i]
+	board_changed.emit()
+	return true
+
+
+func take_day() -> bool:
+	var legal := legal_actions()
+	if legal.is_empty():
+		return false
+	return pick_action(legal[0])
 
 
 func can_decline() -> bool:
@@ -156,7 +182,7 @@ func decline_appointment() -> bool:
 	if not can_decline():
 		return false
 	board.appt_decline_used = true
-	declined_this_round = true
+	declined_this_day = true
 	reps = maxi(0, reps + DECLINE_REPS_STUB)
 	last_note = "Appointment declined (Phase-1: once / chapter, −reps stub %d). Pick one other action." % DECLINE_REPS_STUB
 	board_changed.emit()
@@ -168,15 +194,17 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 		return false
 	if newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return false
-	if not ScheduleRules.is_legal(board, action, declined_this_round):
+	if not ScheduleRules.is_legal(board, action, declined_this_day):
 		return false
 	var pin := board.current_pin()
-	if pin != null and action != GameEnums.RoundAction.APPOINTMENT and not declined_this_round:
+	var assigned := board.current_assigned_event()
+	if pin != null and action != GameEnums.RoundAction.APPOINTMENT and not declined_this_day:
 		board.appt_decline_used = true
-		declined_this_round = true
+		declined_this_day = true
 		reps = maxi(0, reps + DECLINE_REPS_STUB)
 		last_note = "Pinned appointment skipped — decline used (−reps stub %d)." % DECLINE_REPS_STUB
 	var order_id := ""
+	var event_id := assigned.event_id if assigned != null else ""
 	pending_order = null
 	last_event = {}
 	match action:
@@ -186,16 +214,33 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			pending_order = ScheduleCatalog.order_for_appointment(pin)
 			order_id = pin.order_id
 		GameEnums.RoundAction.WALK_IN:
-			pending_order = ScheduleCatalog.make_walk_in(board.chapter_id, board.round_index, rng)
+			if assigned != null and assigned.kind == "adventurer" and not assigned.ref_id.is_empty():
+				pending_order = ScheduleCatalog.order_for_adventurer(assigned.ref_id, board.chapter_id, board.day_index)
+			else:
+				pending_order = ScheduleCatalog.make_walk_in(board.chapter_id, board.day_index, rng)
 			order_id = pending_order.order_id
 		GameEnums.RoundAction.PREP_CRAFT:
-			pending_order = ScheduleCatalog.make_prep(board.round_index)
+			pending_order = ScheduleCatalog.make_prep(board.day_index)
 			order_id = pending_order.order_id
 		GameEnums.RoundAction.WAGON_EVENT:
-			last_event = ScheduleCatalog.pick_wagon_event(rng)
+			if assigned != null and assigned.kind == "event":
+				last_event = {
+					"id": assigned.event_id,
+					"title": "event · %s" % assigned.event_id,
+					"blurb": "Wagon event %s. No craft unless an event later says so." % assigned.event_id,
+				}
+			else:
+				last_event = ScheduleCatalog.pick_wagon_event(rng)
+		GameEnums.RoundAction.WAGON_SHOP:
+			if assigned != null and assigned.kind == "shop":
+				last_event = {
+					"id": assigned.event_id,
+					"title": "shop · %s" % assigned.event_id,
+					"blurb": "Wagon shop %s. Stock rotates with the road. Shop UI is not this slice." % assigned.event_id,
+				}
 		_:
 			pass
-	if not board.set_primary_action(action, order_id):
+	if not board.set_primary_action(action, order_id, event_id):
 		return false
 	last_resolve = ScheduleRules.build_resolve(action, pending_order, last_event)
 	if ScheduleRules.is_order_class(action):
@@ -206,8 +251,8 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 		return true
 	last_stamp = _make_schedule_stamp()
 	resolve_open = true
-	if not declined_this_round:
-		last_note = "One primary action locked for round %d." % board.round_index
+	if not declined_this_day:
+		last_note = "One primary action locked for D%d." % board.day_index
 	resolve_started.emit(last_resolve)
 	board_changed.emit()
 	return true
@@ -223,10 +268,7 @@ func _begin_craft(order: ClientOrder) -> bool:
 	if order.piece_count() > GameConstants.ZONE_COUNT_MAX:
 		last_note = "Order lists more than 4 constructions — Later / split. No fifth zone."
 		return false
-	## Boss-client sew is the boss beat — not one of the 4 chapter pieces (docs/20, 28).
-	if not _is_boss_order(order) and (board == null or not board.can_open_piece()):
-		_emit_cant_craft(order)
-		return false
+	## Piece cap is GONE (docs/22, 20). Stamina still gates a session. Other cant_craft causes may remain.
 	craft_order = order
 	pending_order = order
 	piece_results.clear()
@@ -366,8 +408,8 @@ func _resolve_session() -> void:
 		craft_session.focus_zone(keep_zone)
 	order_craft_done = true
 	last_note = (
-		"Session finished (player_finish). %d piece(s) stamped in listed order. crafts_done=%d / %d."
-		% [piece_results.size(), board.crafts_done, board.crafts_max]
+		"Session finished (player_finish). %d piece(s) stamped in listed order. crafts_done=%d (unbounded)."
+		% [piece_results.size(), board.crafts_done]
 	)
 	craft_changed.emit()
 	board_changed.emit()
@@ -401,7 +443,7 @@ func _return_to_schedule() -> void:
 	last_stamp = _make_mission_return_stamp(mission)
 	planned_build = null
 	last_note = (
-		"Mission %s · cleared %s · hp %.2f. Continue to the next schedule round."
+		"Mission %s · cleared %s · hp %.2f. Continue to the next planner day."
 		% [
 			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
 			str(bool(mission.get("cleared", false))),
@@ -437,7 +479,7 @@ func acknowledge_resolve() -> void:
 		last_newspaper_event = GameEnums.NewspaperEvent.NONE
 		last_headline_id = ""
 		last_resolve = {}
-		last_note = "Round %d — pick one action." % board.round_index
+		last_note = "Day planner — preview options per day, assign D1..(N-2), then take D%d." % board.day_index
 		last_stamp = _make_schedule_stamp()
 		board_changed.emit()
 		return
@@ -458,11 +500,11 @@ func acknowledge_resolve() -> void:
 	if chapter_over or run_over:
 		return
 	resolve_open = false
-	declined_this_round = false
+	declined_this_day = false
 	pending_order = null
 	last_newspaper_event = GameEnums.NewspaperEvent.NONE
 	last_headline_id = ""
-	if not board.advance_round():
+	if not board.advance_day():
 		if _reps_gate_miss():
 			run_over = true
 			run_over_reason = GameEnums.RunOverReason.REPS_GATE_MISS
@@ -484,12 +526,12 @@ func acknowledge_resolve() -> void:
 			awaiting_boss = true
 			resolve_open = true
 			last_resolve = ScheduleRules.build_awaiting_boss(board)
-			last_note = "Schedule complete. Boss beat: draw a shared-pool adventurer, then sew that job's constructions."
+			last_note = "Day planner complete. Boss beat: draw a shared-pool adventurer, then sew that job's constructions."
 			last_stamp = _make_schedule_stamp()
 			resolve_started.emit(last_resolve)
 	else:
 		last_resolve = {}
-		last_note = "Round %d — pick one action." % board.round_index
+		last_note = "D%d — take the assigned event, or update unplayed assignable days." % board.day_index
 		last_stamp = _make_schedule_stamp()
 	board_changed.emit()
 
@@ -759,8 +801,8 @@ func _make_schedule_stamp() -> HarnessStamp:
 func _make_newspaper_stamp() -> HarnessStamp:
 	var stamp := _base_stamp()
 	stamp.phase = GameEnums.StampPhase.NEWSPAPER
-	stamp.round_index = GameConstants.NULL_INT
-	stamp.round_action = GameEnums.RoundAction.NONE
+	stamp.day_index = GameConstants.NULL_INT
+	stamp.day_action = GameEnums.RoundAction.NONE
 	stamp.session = null
 	stamp.newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
 	stamp.newspaper_headline_id = GameConstants.HEADLINE_BOSS_ANNOUNCE

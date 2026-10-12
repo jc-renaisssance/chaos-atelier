@@ -199,13 +199,13 @@ static func make_order(job: Dictionary, chapter_boss_id: String) -> ClientOrder:
 	return order
 
 
-static func make_walk_in_order(chapter_id: int, round_index: int, rng: RandomNumberGenerator) -> ClientOrder:
+static func make_walk_in_order(chapter_id: int, day_index: int, rng: RandomNumberGenerator) -> ClientOrder:
 	var person := AdventurerCatalog.pick_named(rng)
 	var order := ClientOrder.new()
 	if person.is_empty():
 		return order
 	var job_row := row(String(person.get("job_id", "")))
-	order.order_id = "ord_walk_c%d_r%d" % [chapter_id, round_index]
+	order.order_id = "ord_walk_c%d_d%d" % [chapter_id, day_index]
 	order.threat_id = String(person.get("target_threat_id", ""))
 	order.construction_ids = PackedStringArray(job_row.get("construction_ids", []))
 	order.card_difficulty = 2

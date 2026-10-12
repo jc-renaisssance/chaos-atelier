@@ -161,6 +161,11 @@ static func round_action_wire(value: RoundAction) -> Variant:
 	return _wire_or_null(ROUND_ACTION_WIRE, value, RoundAction.NONE)
 
 
+static func day_action_wire(value: RoundAction) -> Variant:
+	## Dump field is day_action (docs/20). Wire values unchanged.
+	return round_action_wire(value)
+
+
 static func stamp_phase_wire(value: StampPhase) -> String:
 	return STAMP_PHASE_WIRE[value]
 

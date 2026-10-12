@@ -1,5 +1,5 @@
 ; Engine configuration file.
-; Chaos Atelier — Client 1B own_basic loop (schedule + stamina + mission).
+; Chaos Atelier — Client 1B own_basic loop (Day planner + stamina + mission).
 ; Live spine: docs/22, docs/27, docs/20, docs/23, docs/24.
 ; Target editor: Godot 4.7 (Jonathan). Scripts are normal Godot 4 GDScript.
 
@@ -8,7 +8,7 @@ config_version=5
 [application]
 
 config/name="Chaos Atelier"
-config/description="Travelling atelier — own_basic chapter loop (Client 1B)"
+config/description="Travelling atelier — own_basic Day planner loop (Client 1B)"
 run/main_scene="res://src/ui/schedule/schedule_board.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"

@@ -1,8 +1,8 @@
 class_name ScheduleRules
 extends RefCounted
-## Travelling-atelier board rules (docs/22, docs/20). No 1-of-3 lineup.
+## Day planner rules (docs/22, docs/20). No 1-of-3 lineup. No crafts_max.
 
-## Order-class actions enter stamina craft (docs/27). Event-class stays on schedule.
+## Order-class actions enter stamina craft (docs/27). Event-class stays on the planner.
 const RESOLVE_ORDER := "order"
 const RESOLVE_EVENT := "event"
 
@@ -41,39 +41,48 @@ static func is_order_class(action: GameEnums.RoundAction) -> bool:
 	return resolve_class(action) == RESOLVE_ORDER
 
 
-static func legal_actions(board: ChapterSchedule, declined_this_round: bool) -> Array[GameEnums.RoundAction]:
+static func action_for_kind(kind: String) -> GameEnums.RoundAction:
+	match kind:
+		"appointment":
+			return GameEnums.RoundAction.APPOINTMENT
+		"adventurer":
+			return GameEnums.RoundAction.WALK_IN
+		"shop":
+			return GameEnums.RoundAction.WAGON_SHOP
+		"event":
+			return GameEnums.RoundAction.WAGON_EVENT
+		_:
+			return GameEnums.RoundAction.NONE
+
+
+static func legal_actions(board: ChapterSchedule, declined_this_day: bool) -> Array[GameEnums.RoundAction]:
 	var out: Array[GameEnums.RoundAction] = []
 	if board == null:
 		return out
-	var slot := board.current_round()
-	if slot == null or slot.round_action != GameEnums.RoundAction.NONE:
+	var slot := board.current_day()
+	if slot == null or slot.day_action != GameEnums.RoundAction.NONE:
 		return out
-	var pin := board.current_pin()
-	var reserved := GameConstants.is_reserved_final_round(board.round_index)
-	if pin != null and not reserved and not declined_this_round:
-		out.append(GameEnums.RoundAction.APPOINTMENT)
-		## Phase-1: decline once / chapter. Other actions on a pinned round consume it.
-		if not board.appt_decline_used:
-			for action in free_actions():
-				out.append(action)
+	if board.is_reserved_day(board.day_index):
+		out.append(GameEnums.RoundAction.REST_DIG)
 		return out
-	for action in free_actions():
-		out.append(action)
+	var event := board.current_assigned_event()
+	if event != null and not declined_this_day:
+		var action := action_for_kind(event.kind)
+		if action != GameEnums.RoundAction.NONE:
+			out.append(action)
+		## Phase-1: decline once / chapter. Other actions on a pinned appointment consume it.
+		if action == GameEnums.RoundAction.APPOINTMENT and not board.appt_decline_used:
+			for free in free_actions():
+				out.append(free)
+		return out
+	if declined_this_day:
+		for free in free_actions():
+			out.append(free)
 	return out
 
 
-static func is_legal(board: ChapterSchedule, action: GameEnums.RoundAction, declined_this_round: bool) -> bool:
-	return action in legal_actions(board, declined_this_round)
-
-
-static func _shuffle(items: Array, rng: RandomNumberGenerator) -> Array:
-	var copy: Array = items.duplicate()
-	for i in range(copy.size() - 1, 0, -1):
-		var j := rng.randi_range(0, i)
-		var tmp = copy[i]
-		copy[i] = copy[j]
-		copy[j] = tmp
-	return copy
+static func is_legal(board: ChapterSchedule, action: GameEnums.RoundAction, declined_this_day: bool) -> bool:
+	return action in legal_actions(board, declined_this_day)
 
 
 static func roll_boss(chapter_id: int, rng: RandomNumberGenerator) -> String:
@@ -83,26 +92,10 @@ static func roll_boss(chapter_id: int, rng: RandomNumberGenerator) -> String:
 	return String(pool[rng.randi_range(0, pool.size() - 1)])
 
 
-static func roll_pins(chapter_id: int, rng: RandomNumberGenerator) -> Array[AppointmentPin]:
-	var pins: Array[AppointmentPin] = []
-	var catalog: Array = ScheduleCatalog.appointments_for(chapter_id)
-	if catalog.is_empty():
-		return pins
-	var pin_n: int = rng.randi_range(GameConstants.APPOINTMENT_PIN_MIN, GameConstants.APPOINTMENT_PIN_MAX)
-	pin_n = mini(pin_n, catalog.size())
-	var pin_rounds: Array = []
-	for r in range(GameConstants.APPOINTMENT_PIN_ROUND_MIN, GameConstants.APPOINTMENT_PIN_ROUND_MAX + 1):
-		pin_rounds.append(r)
-	pin_rounds = _shuffle(pin_rounds, rng)
-	var rows: Array = _shuffle(catalog, rng)
-	for i in range(pin_n):
-		var row: Dictionary = rows[i]
-		var pin := AppointmentPin.new()
-		pin.appointment_id = String(row.get("appointment_id", ""))
-		pin.order_id = String(row.get("order_id", ""))
-		pin.pinned_round = int(pin_rounds[i])
-		pins.append(pin)
-	return pins
+static func pin_fixed_events(board: ChapterSchedule) -> void:
+	if board == null:
+		return
+	board.pin_fixed_events()
 
 
 static func build_resolve(
@@ -124,7 +117,7 @@ static func build_resolve(
 					title = "Appointment — %s" % who
 			body = (
 				"Order path — enter stamina craft for this pinned client. "
-				+ "Construction is order-fixed; each piece is one session / one stamp / one crafts_done."
+				+ "Construction is order-fixed; each piece is one session / one stamp. No piece cap."
 			)
 			if order != null:
 				body += " order_id=%s constructions=%s" % [order.order_id, str(Array(order.construction_ids))]
@@ -134,7 +127,7 @@ static func build_resolve(
 			if order != null:
 				title = "Walk-in — %s" % ScheduleCatalog.walk_in_title(order)
 			body = (
-				"Order path — an adventurer appeared this round. Enter stamina craft. "
+				"Order path — an adventurer appeared this day. Enter stamina craft. "
 				+ "Pieces stay order-fixed."
 			)
 			if order != null:
@@ -153,8 +146,10 @@ static func build_resolve(
 			)
 		GameEnums.RoundAction.WAGON_SHOP:
 			stub = "shop"
-			title = "Wagon shop"
-			body = "Event path — stock rotates with the road. Shop UI is not this slice."
+			title = String(event_row.get("title", "shop"))
+			if title.is_empty():
+				title = "shop"
+			body = String(event_row.get("blurb", "Event path — stock rotates with the road. Shop UI is not this slice."))
 		GameEnums.RoundAction.WAGON_EVENT:
 			stub = "event"
 			title = String(event_row.get("title", "Wagon event"))
@@ -168,7 +163,7 @@ static func build_resolve(
 			body = "No action."
 	return {
 		"resolve_class": klass,
-		"round_action": GameEnums.round_action_wire(action),
+		"day_action": GameEnums.day_action_wire(action),
 		"mission_kind": GameEnums.mission_kind_wire(mission_kind_for(action)),
 		"title": title,
 		"body": body,
@@ -195,7 +190,7 @@ static func build_mission_return(order: ClientOrder, mission: Dictionary, piece_
 		% [GameEnums.rating_wire(rating), str(cleared), _hp_text(hp), aid, stars]
 	)
 	lines.append(
-		"Gate: cleared = (hp > 0) ∧ rating ∈ {S,A,B,C}. %d piece stamp(s); crafts_done counts pieces."
+		"Gate: cleared = (hp > 0) ∧ rating ∈ {S,A,B,C}. %d piece stamp(s); crafts_done is unbounded telemetry."
 		% piece_results.size()
 	)
 	if bool(mission.get("cant_craft", false)):
@@ -219,7 +214,7 @@ static func build_mission_return(order: ClientOrder, mission: Dictionary, piece_
 		)
 	return {
 		"resolve_class": RESOLVE_ORDER,
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": kind,
 		"title": "Mission — %s" % GameEnums.rating_wire(rating),
 		"body": "\n".join(lines),
@@ -238,12 +233,12 @@ static func build_cant_craft(order: ClientOrder, mission: Dictionary = {}) -> Di
 	var hp := float(mission.get("hp_remaining", 1.0))
 	return {
 		"resolve_class": RESOLVE_ORDER,
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
 		"title": "cant_craft — F",
 		"body": (
-			"Could not open a legal craft session (crafts_done already at crafts_max=4). "
-			+ "No stamina session. crafts_done does not increment. "
+			"Could not open a legal craft session. "
+			+ "Not a piece cap (crafts_max is GONE). No stamina session. crafts_done does not increment. "
 			+ "rating %s · hp %s · aid 0 · cleared false (docs/24)."
 			% [GameEnums.rating_wire(rating), _hp_text(hp)]
 		),
@@ -264,14 +259,14 @@ static func build_boss_announce(board: ChapterSchedule) -> Dictionary:
 	var punishes := ", ".join(ThreatCatalog.punish_tags(boss_id))
 	return {
 		"resolve_class": "newspaper",
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": null,
 		"title": "Kingdom newspaper — %s" % title,
 		"body": (
 			"Boss announced before spend (docs/17, 26). %s  ·  pool %s.\n"
 			% [title, board.boss_pool_id if board != null else ""]
 			+ "Threat %s. Favors %s. Punishes %s.\n" % [tags, favors, punishes]
-			+ "Headline id %s (copy Later). Dismiss into the schedule board."
+			+ "Headline id %s (copy Later). Dismiss into the Day planner."
 			% GameConstants.HEADLINE_BOSS_ANNOUNCE
 		),
 		"stub": "newspaper_chrome",
@@ -284,11 +279,11 @@ static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
 	return {
 		"resolve_class": "boss",
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": "boss",
 		"title": "Final prep — sew for a fighter vs %s" % title,
 		"body": (
-			"Eight rounds resolved. Appointments never claimed 7–8. "
+			"Day budget resolved (including reserved last-2). Appointments never claimed reserved days. "
 			+ "Draw one named adventurer from the M1 4-job pool (docs/29), independent of the announced boss. "
 			+ "Sew that job's listed constructions. That adventurer fights %s. "
 			% title
@@ -315,7 +310,7 @@ static func build_boss_client_draw(board: ChapterSchedule, job: Dictionary) -> D
 		taste = ", ".join(PackedStringArray(job.get("requirement_tags", [])))
 	return {
 		"resolve_class": "boss",
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": "boss",
 		"title": "Boss-client — %s · %s vs %s" % [who, job_display, boss_title],
 		"body": (
@@ -359,7 +354,7 @@ static func build_boss_result(
 		lines.append("Chapter boss cleared. Newspaper chrome hd_chapter_result (copy Later).")
 	return {
 		"resolve_class": "boss",
-		"round_action": null,
+		"day_action": null,
 		"mission_kind": "boss",
 		"title": ("Run over — %s" % title) if run_over else ("Boss clear — %s" % title),
 		"body": "\n".join(lines),

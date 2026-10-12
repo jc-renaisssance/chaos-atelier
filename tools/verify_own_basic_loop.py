@@ -286,14 +286,15 @@ def run_spec() -> None:
         "boss_job_id",
         "adventurer_skill_id",
         "adventurer_stats",
-        "CHAPTER_ROUND_COUNT",
-        "round_index",
-        "rounds_left",
-        "round_action",
+        "CHAPTER_DAY_COUNT",
+        "day_index",
+        "days_left",
+        "day_action",
+        "event_pool",
+        "day_assignments",
         "appointment_pins",
         "appt_decline_used",
         "crafts_done_this_chapter",
-        "crafts_max",
         "phase",
         "mission_kind",
         "zone_count",
@@ -339,6 +340,9 @@ def run_spec() -> None:
     for field in stamp_fields:
         if f'"{field}"' not in dump_src:
             fail(f"stamp dump missing {field}")
+    for banned_dump in ("crafts_max", "CHAPTER_ROUND_COUNT", "round_index", "rounds_left", "round_action", "pinned_round"):
+        if f'"{banned_dump}"' in dump_src:
+            fail(f"stamp dump must not emit superseded {banned_dump}")
 
 
 def main() -> int:

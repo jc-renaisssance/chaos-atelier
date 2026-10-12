@@ -1,7 +1,8 @@
 class_name ScheduleCatalog
 extends RefCounted
-## Placeholder appointments / walk-ins / wagon events for the board (docs/22).
+## Placeholder appointments / walk-ins / wagon events for the Day planner (docs/22).
 ## Not a 1-of-3 lineup and not a client encyclopedia.
+## Scrap Duelist / appt_* stay appointments — not Dex Adventurers.
 
 const BOSS_TITLES := {
 	"boss_ash_drake": "Ash Drake",
@@ -24,7 +25,7 @@ const ROUND_ACTION_TITLE := {
 	GameEnums.RoundAction.REST_DIG: "Rest / dig",
 }
 
-## C1–C3 named appointments. Length ≥ APPOINTMENT_PIN_MAX so a chapter can pin 2–4.
+## C1–C3 named appointments. Scrap Duelist stays appt_* (E8 on the current map).
 const APPOINTMENTS := {
 	1: [
 		{
@@ -245,16 +246,32 @@ static func order_for_appointment(pin: AppointmentPin) -> ClientOrder:
 	return order
 
 
-static func make_walk_in(chapter_id: int, round_index: int, rng: RandomNumberGenerator) -> ClientOrder:
+static func make_walk_in(chapter_id: int, day_index: int, rng: RandomNumberGenerator) -> ClientOrder:
 	## M1 walk-in draws a named person from the 12 (docs/29). Job constructions from docs/28.
-	var named := BossClientCatalog.make_walk_in_order(chapter_id, round_index, rng)
+	var named := BossClientCatalog.make_walk_in_order(chapter_id, day_index, rng)
 	if not named.adventurer_id.is_empty():
 		return named
 	var pool: Array = walk_ins_for(chapter_id)
 	var row: Dictionary = pool[rng.randi_range(0, pool.size() - 1)].duplicate()
-	row["order_id"] = "ord_walk_c%d_r%d" % [chapter_id, round_index]
+	row["order_id"] = "ord_walk_c%d_d%d" % [chapter_id, day_index]
 	var order := ClientOrder.new()
 	return _apply_row(order, row, GameEnums.MissionKind.ORDER)
+
+
+static func order_for_adventurer(adv_id: String, chapter_id: int, day_index: int) -> ClientOrder:
+	var person := AdventurerCatalog.row_resolved(adv_id)
+	var order := ClientOrder.new()
+	if person.is_empty():
+		return make_walk_in(chapter_id, day_index, RandomNumberGenerator.new())
+	var job_row := BossClientCatalog.row(String(person.get("job_id", "")))
+	order.order_id = "ord_walk_c%d_d%d" % [chapter_id, day_index]
+	order.threat_id = String(person.get("target_threat_id", ""))
+	order.construction_ids = PackedStringArray(job_row.get("construction_ids", ["con_tunic"]))
+	order.card_difficulty = 2
+	order.mission_kind = GameEnums.MissionKind.ORDER
+	order.adventurer_id = String(person.get("id", adv_id))
+	order.requirement_tags = PackedStringArray(person.get("requirement_tags", []))
+	return order
 
 
 static func walk_in_title(order: ClientOrder) -> String:
@@ -299,9 +316,9 @@ static func order_title(order: ClientOrder) -> String:
 	return order.order_id
 
 
-static func make_prep(round_index: int) -> ClientOrder:
+static func make_prep(day_index: int) -> ClientOrder:
 	var order := ClientOrder.new()
-	order.order_id = "ord_prep_r%d" % round_index
+	order.order_id = "ord_prep_d%d" % day_index
 	order.threat_id = ""
 	order.construction_ids = PackedStringArray(["con_tunic"])
 	order.card_difficulty = GameConstants.NULL_INT
