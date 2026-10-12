@@ -511,7 +511,7 @@ def check_spec() -> None:
         fail("displayed band stays ? until fought even when internal score has PUNISH_W")
     if "dex_builds" in dump:
         fail("dump must not grow a dex_builds key")
-    required_20 = {"run_id", "player_owner_id", "CHAPTER_ROUND_COUNT"}
+    required_20 = {"run_id", "player_owner_id", "CHAPTER_DAY_COUNT"}
     for key in (
         "planned_build",
         "estimate_band",

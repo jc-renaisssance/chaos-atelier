@@ -13,17 +13,17 @@ extends Resource
 @export var adventurer_skill_id: String = "" ## ask_* log-only (docs/30 slice 1); not a 20 Required field
 @export var adventurer_stats: Dictionary = {} ## panel knobs {HP,ATK,DEF,RES,MOB,PRE}; log-only
 
-@export_group("Schedule board")
-@export var CHAPTER_ROUND_COUNT: int = GameConstants.CHAPTER_ROUND_COUNT
-@export var round_index: int = GameConstants.NULL_INT ## null on chapter-start newspaper
-@export var rounds_left: int = GameConstants.CHAPTER_ROUND_COUNT
-@export var round_action: GameEnums.RoundAction = GameEnums.RoundAction.NONE
+@export_group("Day planner")
+@export var CHAPTER_DAY_COUNT: int = 0 ## = map.day_count this chapter — not always-8
+@export var day_index: int = GameConstants.NULL_INT ## null on chapter-start newspaper
+@export var days_left: int = 0
+@export var day_action: GameEnums.RoundAction = GameEnums.RoundAction.NONE
+@export var event_pool: Array[PlannerEvent] = []
+@export var day_assignments: Array[DayAssignment] = []
 @export var appointment_pins: Array[AppointmentPin] = []
 @export var appt_decline_used: bool = false
-## Lock: crafts_done_this_chapter / crafts_max=4 counts pieces, not whole orders.
-## Each construction in a multi-piece order; armor+gloves = 2 of 4.
+## Unbounded piece telemetry. Not a gate. Do not emit crafts_max.
 @export var crafts_done_this_chapter: int = 0
-@export var crafts_max: int = GameConstants.CRAFTS_MAX
 @export var phase: GameEnums.StampPhase = GameEnums.StampPhase.SCHEDULE
 
 @export_group("Mission")
@@ -102,14 +102,15 @@ func apply_schedule(board: ChapterSchedule) -> void:
 	chapter_id = board.chapter_id
 	chapter_boss_id = board.chapter_boss_id
 	boss_pool_id = board.boss_pool_id
-	CHAPTER_ROUND_COUNT = GameConstants.CHAPTER_ROUND_COUNT
-	round_index = board.round_index
-	rounds_left = board.rounds_left
-	round_action = board.current_round_action()
+	CHAPTER_DAY_COUNT = board.day_count
+	day_index = board.day_index
+	days_left = board.days_left
+	day_action = board.current_day_action()
+	event_pool = board.event_pool.duplicate()
+	day_assignments = board.day_assignments.duplicate()
 	appointment_pins = board.appointment_pins.duplicate()
 	appt_decline_used = board.appt_decline_used
 	crafts_done_this_chapter = board.crafts_done
-	crafts_max = board.crafts_max
 	phase = GameEnums.StampPhase.SCHEDULE
 	session = null
 	adventurer_skill_id = ""
@@ -220,6 +221,20 @@ func _pin_rows() -> Array:
 	return rows
 
 
+func _event_pool_rows() -> Array:
+	var rows: Array = []
+	for event in event_pool:
+		rows.append(event.to_dict())
+	return rows
+
+
+func _assignment_rows() -> Array:
+	var rows: Array = []
+	for row in day_assignments:
+		rows.append(row.to_dict())
+	return rows
+
+
 func to_dict() -> Dictionary:
 	var dump := {
 		"run_id": run_id,
@@ -231,14 +246,15 @@ func to_dict() -> Dictionary:
 		"boss_job_id": _boss_job_wire(),
 		"adventurer_skill_id": _null_str(adventurer_skill_id),
 		"adventurer_stats": _adventurer_stats_wire(),
-		"CHAPTER_ROUND_COUNT": CHAPTER_ROUND_COUNT,
-		"round_index": _null_int(round_index),
-		"rounds_left": rounds_left,
-		"round_action": GameEnums.round_action_wire(round_action),
+		"CHAPTER_DAY_COUNT": CHAPTER_DAY_COUNT,
+		"day_index": _null_int(day_index),
+		"days_left": days_left,
+		"day_action": GameEnums.day_action_wire(day_action),
+		"event_pool": _event_pool_rows(),
+		"day_assignments": _assignment_rows(),
 		"appointment_pins": _pin_rows(),
 		"appt_decline_used": appt_decline_used,
 		"crafts_done_this_chapter": crafts_done_this_chapter,
-		"crafts_max": crafts_max,
 		"phase": GameEnums.stamp_phase_wire(phase),
 		"cant_craft": cant_craft,
 		"newspaper_event": GameEnums.newspaper_event_wire(newspaper_event),
@@ -338,21 +354,20 @@ func schema_errors() -> PackedStringArray:
 	var errs := PackedStringArray()
 	if player_owner_id != GameConstants.PHASE1_OWNER_ID:
 		errs.append("player_owner_id must be own_basic")
-	if CHAPTER_ROUND_COUNT != GameConstants.CHAPTER_ROUND_COUNT:
-		errs.append("CHAPTER_ROUND_COUNT != 8")
-	if crafts_max != GameConstants.CRAFTS_MAX:
-		errs.append("crafts_max != 4")
-	if crafts_done_this_chapter < 0 or crafts_done_this_chapter > crafts_max:
-		errs.append("crafts_done_this_chapter out of 0..4 (counts pieces, not orders)")
+	if CHAPTER_DAY_COUNT <= 0:
+		errs.append("CHAPTER_DAY_COUNT must equal map.day_count")
+	if crafts_done_this_chapter < 0:
+		errs.append("crafts_done_this_chapter must be >= 0 (unbounded telemetry, not a gate)")
 	# cant_craft must not increment crafts_done_this_chapter (docs/20 assert 10).
 	if phase == GameEnums.StampPhase.SCHEDULE or phase == GameEnums.StampPhase.CRAFT:
-		if round_index != GameConstants.NULL_INT and not GameConstants.is_schedule_round(round_index):
-			errs.append("round_index not in 1..8")
-	var pin_n := appointment_pins.size()
-	if pin_n != 0 and (pin_n < GameConstants.APPOINTMENT_PIN_MIN or pin_n > GameConstants.APPOINTMENT_PIN_MAX):
-		errs.append("appointment_pins length %d not in 2..4" % pin_n)
+		if day_index != GameConstants.NULL_INT and not GameConstants.is_schedule_day(day_index, CHAPTER_DAY_COUNT):
+			errs.append("day_index not in 1..CHAPTER_DAY_COUNT")
 	for pin in appointment_pins:
-		errs.append_array(pin.schema_errors())
+		errs.append_array(pin.schema_errors(CHAPTER_DAY_COUNT))
+	for row in day_assignments:
+		errs.append_array(row.schema_errors(CHAPTER_DAY_COUNT))
+	for event in event_pool:
+		errs.append_array(event.schema_errors(CHAPTER_DAY_COUNT))
 	if emit_session():
 		errs.append_array(session.schema_errors())
 		if session.construction_id != construction_id and not construction_id.is_empty():

@@ -6,16 +6,11 @@ extends Node
 const SCHEMA_SLICE := "1B"
 const PHASE1_OWNER_ID := "own_basic"
 
-## docs/22 — travelling atelier schedule board (not a path map, not 1-of-3 lineup).
+## docs/22 — Day planner (not a path map, not a Round board).
+## Day count is map.day_count — do not treat 8 as global law.
 const CHAPTERS_PER_RUN := 3
-const CHAPTER_ROUND_COUNT := 8
-const CRAFTS_MAX := 4 ## lock: crafts_done / crafts_max=4 counts pieces, not orders (armor+gloves = 2 of 4)
-const APPOINTMENT_PIN_MIN := 2
-const APPOINTMENT_PIN_MAX := 4
-const RESERVED_FINAL_ROUND_COUNT := 2
-const APPOINTMENT_PIN_ROUND_MIN := 1
-const APPOINTMENT_PIN_ROUND_MAX := 6 ## last 2 rounds (7–8) cannot take pins
-const PRIMARY_ACTIONS_PER_ROUND := 1
+const RESERVED_FINAL_DAY_COUNT := 2 ## last 2 of N; player assigns D1..(N-2)
+const PRIMARY_ACTIONS_PER_DAY := 1
 
 ## docs/27 — stamina craft (replaces 2m1r). One session pool: start = 12 * N.
 const STAMINA_START := 12 ## per-piece base; session stamina_start = 12 * piece_count
@@ -79,19 +74,24 @@ const LETTER_LEG_AWE := "let_leg_awe"
 const LETTER_BOSS_VICTORY := "let_boss_victory"
 
 
-static func is_appointment_pin_round(round_index: int) -> bool:
-	return round_index >= APPOINTMENT_PIN_ROUND_MIN and round_index <= APPOINTMENT_PIN_ROUND_MAX
+static func assignable_day_max(day_count: int) -> int:
+	return day_count - RESERVED_FINAL_DAY_COUNT
 
 
-static func is_reserved_final_round(round_index: int) -> bool:
+static func is_assignable_day(day_index: int, day_count: int) -> bool:
+	return day_index >= 1 and day_index <= assignable_day_max(day_count)
+
+
+static func is_reserved_final_day(day_index: int, day_count: int) -> bool:
 	return (
-		round_index > APPOINTMENT_PIN_ROUND_MAX
-		and round_index <= CHAPTER_ROUND_COUNT
+		day_count >= RESERVED_FINAL_DAY_COUNT
+		and day_index > assignable_day_max(day_count)
+		and day_index <= day_count
 	)
 
 
-static func is_schedule_round(round_index: int) -> bool:
-	return round_index >= 1 and round_index <= CHAPTER_ROUND_COUNT
+static func is_schedule_day(day_index: int, day_count: int) -> bool:
+	return day_index >= 1 and day_index <= day_count
 
 
 static func session_stamina_start(piece_count: int) -> int:
