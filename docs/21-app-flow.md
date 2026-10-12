@@ -1,4 +1,4 @@
-> **Superseded (2026-09-28 Jonathan stamp):** **1-of-3 card lineup** / `CHAPTER_ROUND_LIMIT=3` pseudocode below is **not** the live chapter spine. Live = travelling atelier **schedule board**, `CHAPTER_ROUND_COUNT=8`, appointments — [22-chapter-schedule](22-chapter-schedule.md). Craft = stamina mode — [27-craft-mode-stamina](27-craft-mode-stamina.md). Keep this file as historical PR #7 shell notes.
+> **Superseded (2026-10-12 Jonathan stamp):** **1-of-3 card lineup** / `CHAPTER_ROUND_LIMIT=3` / Round board below is **not** the live chapter spine. Live = travelling atelier **Day planner**, `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8**), `E*` pool — [22-chapter-schedule](22-chapter-schedule.md). Craft = stamina mode — [27-craft-mode-stamina](27-craft-mode-stamina.md). **No `crafts_max`.** Keep this file as historical PR #7 shell notes.
 # Application flow (pseudocode) — Phase-1 `own_basic`
 
 ```
@@ -16,7 +16,7 @@ RUN
    └─ newspaper: chapter result
 ```
 
-**Was:** not an StS route map — **1 of 3 cards** per round (old `22-chapter-flow`). **Now:** schedule board — [22-chapter-schedule](22-chapter-schedule.md).
+**Was:** not an StS route map — **1 of 3 cards** per round (old `22-chapter-flow`). **Now:** Day planner — [22-chapter-schedule](22-chapter-schedule.md).
 
 ## Chapter body
 
@@ -53,4 +53,4 @@ function chapter_body(...):
 
 ## Review
 
-**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** schedule ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)).
+**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** Day planner ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)). `cant_craft` at piece-cap is **GONE**.

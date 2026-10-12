@@ -58,7 +58,7 @@ function pick_boss_client(seed):
 
 | Rule | M1 |
 |---|---|
-| When | Boss beat (after reserved rounds / final prep) — not chapter-start newspaper |
+| When | Boss beat (after reserved last-2 **days** / final prep) — not chapter-start newspaper |
 | What | One `job_*` from the **4-job M1 pool** → one named `adv_*` from that job’s **3** |
 | Vs boss | Independent of `chapter_boss_id` |
 | Order constructions | Still the **job** list from `28` (not per-person `con_*`) |

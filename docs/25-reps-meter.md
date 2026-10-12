@@ -1,6 +1,6 @@
 # Reps meter (atelier trust)
 
-Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter has a **reps gate** within **round limit**. Miss → **run fail** (competitors / shop broken).
+Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter has a **reps gate** within the **day budget**. Miss → **run fail** (competitors / shop broken). Live days = [22 Day planner](22-chapter-schedule.md) (`map.day_count`; current map **8**).
 
 ## Meter
 
@@ -8,15 +8,15 @@ Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter h
 |---|---|
 | `reps` | Integer trust (start **0**; floor 0) |
 | `reps_gate` | Minimum before boss |
-| `rounds_left` | Schedule rounds remaining *(was card-lineup; live = [22-schedule](22-chapter-schedule.md))* |
+| `days_left` | Day-planner days remaining *(was `rounds_left` / card-lineup; live = [22](22-chapter-schedule.md))* |
 
 ### Phase-1 draft numbers (tune in Test)
 
-| Chapter | `reps_gate` | Rounds |
-|---|---:|---:|
-| C1 | **8** | **3** |
-| C2 | **14** | **3** |
-| C3 | **20** | **3** |
+| Chapter | `reps_gate` | Days (live) |
+|---|---:|---|
+| C1 | **8** | `map.day_count` (current map **8**; old table **3** was 1-of-3) |
+| C2 | **14** | same — not a hardcoded 3 |
+| C3 | **20** | same |
 
 ## Delta
 
@@ -35,15 +35,15 @@ else:
 reps = max(0, reps + Δreps)
 ```
 
-Always `apply_reps` after an order mission (including cant_craft). Events may apply smaller Δ per event table.
+Always `apply_reps` after an order mission (including cant_craft from **other** session-open fails). `cant_craft` at piece-cap does **not** exist (`crafts_max` GONE). Events may apply smaller Δ per event table.
 
 ## Gates
 
 | Check | Fail |
 |---|---|
-| After last round, `reps < reps_gate` | `run_over` / competitors |
+| After last day, `reps < reps_gate` | `run_over` / competitors |
 | Boss fail | `run_over` / adventurer dead — no retry |
 
 ## Stamps
 
-`reps_before/after/delta`, `reps_gate`, `rounds_left`, `card_difficulty` (was node_difficulty), `run_over_reason`.
+`reps_before/after/delta`, `reps_gate`, `days_left` (not `rounds_left`), `card_difficulty` (was node_difficulty), `run_over_reason`.

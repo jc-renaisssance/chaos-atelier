@@ -6,17 +6,19 @@
 
 **Jonathan 2026-10-02 (stamina 0 ≠ finish):** **supersedes** `27` / `20` auto-finish on `stamina_0` / `finish_reason: stamina_0`. When stamina hits 0 the session **stays open**. Cards do **not** disappear or auto-resolve. Only the player clicking **Finish** crafts and runs the resolver. StS cycle + Current/Potential **unchanged**.
 
-**Jonathan 2026-10-02 (multi-piece craft UI):** **supersedes** Phase-1 sequential per-piece stamina pools (piece N then N+1 sessions) for multi-construction orders. Multi-item order → craft **all pieces in one session** with **higher initial stamina**. **Dedicated craft UI** — not the schedule board.
+**Jonathan 2026-10-02 (multi-piece craft UI):** **supersedes** Phase-1 sequential per-piece stamina pools (piece N then N+1 sessions) for multi-construction orders. Multi-item order → craft **all pieces in one session** with **higher initial stamina**. **Dedicated craft UI** — not the Day planner.
+
+**Jonathan 2026-10-12 (piece cap GONE):** **supersedes** `crafts_max=4` / cant_craft-at-max. Unlimited pieces per chapter. Stamina per session **stays**. Live chapter = **Day planner** ([22](22-chapter-schedule.md)) — Days not Rounds.
 
 ## Entering craft mode
 
-Player takes an **order** (appointment / walk-in / **boss-client**) or **prep craft** on the schedule → leave the schedule board → enter **dedicated craft UI**. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter. Do not draw Wizard / Hexer / Outrider / Oathbound.
+Player takes an **order** (appointment / walk-in / **boss-client**) or **prep craft** on the **Day planner** → leave the planner → enter **dedicated craft UI**. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter. Do not draw Wizard / Hexer / Outrider / Oathbound.
 
-One order = **one** craft session. Multi-piece does **not** re-enter craft per piece.
+One order = **one** craft session. Multi-piece does **not** re-enter craft per piece. **No chapter piece cap** — do not refuse craft because of `crafts_done`.
 
-## Dedicated craft UI (not schedule)
+## Dedicated craft UI (not Day planner)
 
-Craft is its **own** screen. Do not overlay the schedule board as the live table.
+Craft is its **own** screen. Do not overlay the Day planner as the live table.
 
 | Region | Contents |
 |---|---|
@@ -62,9 +64,9 @@ Materials / runes / skills apply to **that piece’s bag only**. Skills that say
 | **Material** | Stats + tags; same id may stack across plays (copies, or after discard→reshuffle). Play costs **stamina**; card **leaves the hand** → discard |
 | **Enchantment / rune** | Extra tags / powers. Play → discard (same cycle) |
 | **Owner skill** | Player/owner skill — **not** an equipment power. Play → discard (same cycle). Target zone’s bag only (Phase-1) |
-| **Consumable** | **Later.** Round-generated that round; **burns** on use (exception to discard). Distinct from `material` — not in Phase-1 `cards_played` type enum; no fake field |
+| **Consumable** | **Later.** Day-generated that day; **burns** on use (exception to discard). Distinct from `material` — not in Phase-1 `cards_played` type enum; no fake field |
 
-**Law (supersedes durable-in-hand, #17):** Play **any** craft hand card (material included) → it **leaves the hand**. Played cards go to the **discard pile**, unless a special card says otherwise. Cards remain in the **run deck** via discard→reshuffle — they are **not** deleted from the atelier. That is **not** “stay in hand after play.” Round-generated **consumable** cards (Later, distinct type) **burn** on use. Do not treat `material` as a burn type.
+**Law (supersedes durable-in-hand, #17):** Play **any** craft hand card (material included) → it **leaves the hand**. Played cards go to the **discard pile**, unless a special card says otherwise. Cards remain in the **run deck** via discard→reshuffle — they are **not** deleted from the atelier. That is **not** “stay in hand after play.” Day-generated **consumable** cards (Later, distinct type) **burn** on use. Do not treat `material` as a burn type.
 
 Skills manipulate the craft session (costs, converts, doubles, digs), then leave to discard. They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft). Phase-1: if a skill edits a bag, it edits the **target zone** only.
 
@@ -133,7 +135,7 @@ Not a harness dump assert unless Test later stamps fields in [20](20-harness-sta
 
 ## Resolver (unchanged spine)
 
-After **one Finish:** for each zone in **listed order**, bag tags from that zone’s played materials + that construction + that zone’s played runes → rarity (`18`) → positives / negatives (`14`) → outlook = max `outlook_order` → stamp (`20`). One stamp / piece. `crafts_done_this_chapter` still increments **per piece**, not per order.
+After **one Finish:** for each zone in **listed order**, bag tags from that zone’s played materials + that construction + that zone’s played runes → rarity (`18`) → positives / negatives (`14`) → outlook = max `outlook_order` → stamp (`20`). One stamp / piece. `crafts_done_this_chapter` may increment **per piece** (unbounded telemetry) — **not a gate**. **No `crafts_max`.** `cant_craft` because pieces-at-max is **GONE**.
 
 ## Superseded
 
@@ -143,6 +145,7 @@ After **one Finish:** for each zone in **listed order**, bag tags from that zone
 - **Durable-in-hand (#17):** “play spends stamina only; card stays in hand / stock”
 - **Stamina 0 auto-finish:** `stamina_0` / `finish_reason: stamina_0` as the craft-end trigger (`20` old assert 14)
 - **Sequential multi-piece:** each piece its own stamina pool; resolve piece N before starting N+1; N enter-craft sessions for N constructions
+- **`crafts_max=4` / cant_craft-at-max:** piece cap is **GONE** (2026-10-12). Unlimited pieces / chapter; stamina still gates a session
 
 ## Phase-1 draft numbers (Design 2026-09-28 / 2026-10-02, for Ulquiorra)
 
@@ -164,4 +167,4 @@ After **one Finish:** for each zone in **listed order**, bag tags from that zone
 | Rare mat play cost | 3 |
 | Enchantment play cost | 2 |
 
-**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = **one session**, stamina **`12 * N`**, up to **4** zones. **One Finish** resolves listed pieces in order — **N harness stamps**, not N sessions. Play any card → leave hand → discard (unless special); play is tagged to a zone. Refresh dumps remaining hand to discard, then draws; mid-draw shortfall shuffles discard into draw. Cards stay in the run deck via reshuffle — **not** in hand after play. Consumables (Later) burn. Live readout = Current + Potential for the **selected zone** (locked if outlook not unlocked). **Stamina 0 ≠ finish** — session stays open; only **Finish** crafts (`player_finish`). `stamina_0` is state, not auto-craft.
+**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = **one session**, stamina **`12 * N`**, up to **4** zones. **One Finish** resolves listed pieces in order — **N harness stamps**, not N sessions. Play any card → leave hand → discard (unless special); play is tagged to a zone. Refresh dumps remaining hand to discard, then draws; mid-draw shortfall shuffles discard into draw. Cards stay in the run deck via reshuffle — **not** in hand after play. Consumables (Later) burn. Live readout = Current + Potential for the **selected zone** (locked if outlook not unlocked). **Stamina 0 ≠ finish** — session stays open; only **Finish** crafts (`player_finish`). `stamina_0` is state, not auto-craft. **No chapter piece cap** (`crafts_max` GONE). Live chapter spine = **Day planner** ([22](22-chapter-schedule.md)).
