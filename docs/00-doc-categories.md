@@ -14,3 +14,5 @@
 Canonical: `15` → Art; `22` → Chapter **Day planner** only ([22-chapter-schedule](22-chapter-schedule.md) — **not** Round board, **not** 1-of-3 lineup; [22-chapter-flow](22-chapter-flow.md) superseded). Craft stamina = `27` ([27-craft-mode-stamina](27-craft-mode-stamina.md)); `23` remains mission-report. Shared boss-adventurer / job pool = `28` ([28-boss-client-pool](28-boss-client-pool.md)). M1 named people = `29` ([29-adventurer-catalog](29-adventurer-catalog.md)). Interactive-order slices 1–3 = `30` ([30-interactive-order](30-interactive-order.md)). Dex (profile collection) = `31` ([31-dex](31-dex.md)). **2026-10-12:** `crafts_max` GONE; day count = `map.day_count`.
 
 **Terminology (2026-10-05):** shop / walk-in / appointment / boss-pool people are **adventurers**. **Client** = Godot Client seat / codebase. Live PM: [phase-1-plan](pm/phase-1-plan.md). Grimmjow owns deeper bible renames Later.
+
+**Title lock (2026-10-13):** product / display name = **Wombaste**. Repo / paths stay `chaos-atelier`. See [00-vision](00-vision.md).

@@ -1,4 +1,6 @@
 > **Superseded (2026-10-12 Jonathan stamp):** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as law, R1..R8, `crafts_max=4`) is replaced by the travelling atelier **Day planner** — [22-chapter-schedule](22-chapter-schedule.md). Day count = `map.day_count` (current map **8**). Craft UX is stamina hand game — [27-craft-mode-stamina](27-craft-mode-stamina.md). 1-of-3 card lineup and shop↔craft node clock are **not** live. Piece cap is **GONE**.
+>
+> **Title lock (Jonathan / Harribel 2026-10-13):** product / display name = **Wombaste**. Repo / paths stay `chaos-atelier`.
 # Core loop
 
 ## Chapter loop (Day planner — Jonathan lock 2026-10-12)

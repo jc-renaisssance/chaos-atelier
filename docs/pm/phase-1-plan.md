@@ -1,6 +1,8 @@
-# Roadmap — Chaos Atelier
+# Roadmap — Wombaste
 
-Updated **2026-10-12** after Jonathan / Aizen stamp (**Day planner** + drop `crafts_max`). Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`.
+**Title lock (Jonathan / Harribel 2026-10-13):** product / display name = **Wombaste**. Repo / paths stay `chaos-atelier`. Supersedes temp name Chaos Atelier.
+
+Updated **2026-10-13** after Jonathan / Harribel title lock. Prior 2026-10-12 stamp (**Day planner** + drop `crafts_max`) and 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still hold. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`.
 
 See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 

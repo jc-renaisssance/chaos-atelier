@@ -316,3 +316,29 @@ Both items **removed from open questions**. Client can proceed on Ulquiorra PR 1
 - Round / schedule board as live UX (`CHAPTER_ROUND_COUNT=8` as **global** law, R1..R8) — `STAMP` 2026-09-28 §1–2
 - `crafts_max=4` garments / chapter; `cant_craft` at cap — `20` / `22` / `24`
 - Chapter-start 2–4 appointment pins as the only assign UX
+
+---
+
+# Jonathan / Harribel stamp — 2026-10-13 (product title Wombaste)
+
+## Locked (docs only)
+
+1. **Product / display name = Wombaste** (wombat + batiste). EN wordmark **Wombaste**.
+2. Soft maison alternate **Wombatiste** may appear once in maison/copy; it is **not** the player-facing title. Canonical note: [00-vision](00-vision.md).
+3. Chinese shortlist lead **巴蒂袋熊** = **Later** — not locked.
+4. Internal repo / paths stay **chaos-atelier**. Do not rename the GitHub repo or folder paths.
+5. Bible / player-facing “Chaos Atelier” (temp name) → **Wombaste**. Historical `STAMP` 2026-09-28 header kept for provenance.
+6. No logo art. No `src/` / Client / art / material filename changes this pass. `project.godot` `config/name` and HUD copy stay until a Client PR.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/00-vision.md` | Name lock (Wombaste; Wombatiste once; 巴蒂袋熊 Later; repo stays) |
+| `docs/README.md` · `01-core-loop.md` · `00-doc-categories.md` · `pm/phase-1-plan.md` | One-line title lock; bible/roadmap display name |
+| `docs/06-phases.md` | Drop “final product name” open question |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Temporary name Chaos Atelier as the product / display title (`00` / `06` open question)

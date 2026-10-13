@@ -16,8 +16,10 @@ Must exist before content flood:
 - Parallel special-client lanes
 - Deep shop meta / scars systems
 
+## Locked (title)
+Product / display name = **Wombaste** (Jonathan / Harribel 2026-10-13). See [00-vision](00-vision.md). Repo / paths stay `chaos-atelier`.
+
 ## Open questions
-- Final product name (Chaos Atelier is temporary)
 - Exact starter tag list and thresholds
 - Adventure sim resolution rules (combat vs environment checks)
 - Shop economy numbers

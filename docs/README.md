@@ -1,6 +1,8 @@
-# Chaos Atelier — Bible
+# Wombaste — Bible
 
-Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` (Aizen / Jonathan). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
+**Title lock (Jonathan / Harribel 2026-10-13):** product / display name = **Wombaste**. Repo / paths stay `chaos-atelier`. Chinese **巴蒂袋熊** = Later.
+
+Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` (Aizen / Jonathan). **2026-10-13:** product title **Wombaste**. Design locks through 2026-10-12 still hold unless a later stamp says otherwise.
 
 | Doc | Topic |
 |---|---|
@@ -37,5 +39,5 @@ Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventur
 | [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
 | [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
 | [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-12** Day planner + drop `crafts_max`) |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-13** product title **Wombaste**) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |
