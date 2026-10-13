@@ -189,7 +189,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 | Assert: `len(lineup_card_ids)==3` ∧ pick ∈ lineup | Same |
 | `max_materials` / `max_runes` (defaults 2 / 1) | 2m1r slot UI — [12b-craft-slots](12b-craft-slots.md) |
 | Assert: `len(materials)` ∈ 1..`max_materials` / `construction.material_slots` | Stamina + order-fixed construction replace slot caps |
-| `phase` ∈ {`shop`, `craft_task`} | Wagon shop is a Day-planner action; craft is stamina |
+| `phase` ∈ {`shop`, `craft_task`} | Wagon shop is a timetable / route-map action; craft is stamina |
 | `CHAPTER_ROUND_COUNT` always 8 / `round_index` / `rounds_left` / `round_action` / `pinned_round` | **Route map** — `CHAPTER_DAY_COUNT` = `map.day_count`; `day_*` / `N*` ([22](22-chapter-schedule.md)) |
 | `crafts_max` / assert `crafts_done ≤ 4` / `cant_craft` at cap | **Piece cap GONE** — unlimited pieces; stamina still gates a session ([27](27-craft-mode-stamina.md)) |
 | Chapter-start 2–4 `appointment_pins` as the only assign UX | Authored route graph; appointment is a node kind (C1 elite = N5) ([22](22-chapter-schedule.md)) |
