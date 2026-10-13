@@ -1,6 +1,6 @@
 class_name CraftTable
 extends Control
-## Dedicated stamina craft screen (docs/27). Not the Day planner.
+## Dedicated stamina craft screen (docs/27). Not the route-graph board.
 ## Lower: hand + actions. Upper left: order detail. Upper right: ≤4 drop zones.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
@@ -208,7 +208,7 @@ func _build() -> void:
 	btns.add_child(_dig_btn)
 	_finish_btn = _btn("Finish", _on_finish)
 	btns.add_child(_finish_btn)
-	_continue_btn = _btn("Return to the Day planner", _on_continue)
+	_continue_btn = _btn("Return to the route graph", _on_continue)
 	btns.add_child(_continue_btn)
 
 	root.add_child(_caption("RESOLVER  ·  one Finish → N stamps  ·  docs/20"))
@@ -306,7 +306,7 @@ func _refresh() -> void:
 		_order_title.text = "No session."
 		_order_stats.text = ""
 		_order_skill.text = ""
-		_order_body.text = "Leave the Day planner to sew an order here."
+		_order_body.text = "Leave the route graph to sew an order here."
 		_planner_list.text = "?"
 		_brief_body.text = ""
 		_estimate_body.text = ""
@@ -382,7 +382,7 @@ func _refresh() -> void:
 	if order.mission_kind == GameEnums.MissionKind.BOSS:
 		_continue_btn.text = "Resolve the fight"
 	else:
-		_continue_btn.text = "Return to the Day planner"
+		_continue_btn.text = "Return to the route graph"
 	_refresh_result(session)
 	_refresh_planner()
 	_refresh_brief_and_estimate(order)

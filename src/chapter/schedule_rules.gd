@@ -1,6 +1,6 @@
 class_name ScheduleRules
 extends RefCounted
-## Day planner rules (docs/22, docs/20). No 1-of-3 lineup. No crafts_max.
+## Route-graph rules (docs/22, docs/20). No 1-of-3 lineup. No crafts_max.
 
 ## Order-class actions enter stamina craft (docs/27). Event-class stays on the planner.
 const RESOLVE_ORDER := "order"
@@ -51,6 +51,8 @@ static func action_for_kind(kind: String) -> GameEnums.RoundAction:
 			return GameEnums.RoundAction.WAGON_SHOP
 		"event":
 			return GameEnums.RoundAction.WAGON_EVENT
+		"reserved":
+			return GameEnums.RoundAction.REST_DIG
 		_:
 			return GameEnums.RoundAction.NONE
 
@@ -62,12 +64,14 @@ static func legal_actions(board: ChapterSchedule, declined_this_day: bool) -> Ar
 	var slot := board.current_day()
 	if slot == null or slot.day_action != GameEnums.RoundAction.NONE:
 		return out
+	if not board.day_node_confirmed():
+		return out
 	if board.is_reserved_day(board.day_index):
 		out.append(GameEnums.RoundAction.REST_DIG)
 		return out
-	var event := board.current_assigned_event()
-	if event != null and not declined_this_day:
-		var action := action_for_kind(event.kind)
+	var node := board.node_for_day(board.day_index)
+	if node != null and not declined_this_day:
+		var action := action_for_kind(node.kind)
 		if action != GameEnums.RoundAction.NONE:
 			out.append(action)
 		## Phase-1: decline once / chapter. Other actions on a pinned appointment consume it.
@@ -95,7 +99,7 @@ static func roll_boss(chapter_id: int, rng: RandomNumberGenerator) -> String:
 static func pin_fixed_events(board: ChapterSchedule) -> void:
 	if board == null:
 		return
-	board.pin_fixed_events()
+	board.enter_current_day()
 
 
 static func build_resolve(
@@ -266,7 +270,7 @@ static func build_boss_announce(board: ChapterSchedule) -> Dictionary:
 			"Boss announced before spend (docs/17, 26). %s  ·  pool %s.\n"
 			% [title, board.boss_pool_id if board != null else ""]
 			+ "Threat %s. Favors %s. Punishes %s.\n" % [tags, favors, punishes]
-			+ "Headline id %s (copy Later). Dismiss into the Day planner."
+			+ "Headline id %s (copy Later). Dismiss into the route graph."
 			% GameConstants.HEADLINE_BOSS_ANNOUNCE
 		),
 		"stub": "newspaper_chrome",

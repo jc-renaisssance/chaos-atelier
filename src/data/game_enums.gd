@@ -90,6 +90,16 @@ const ROUND_ACTION_WIRE := {
 	RoundAction.REST_DIG: "rest_dig",
 }
 
+## Live dump day_action (docs/20). Old walk_in / wagon_* names are superseded aliases.
+const DAY_ACTION_WIRE := {
+	RoundAction.APPOINTMENT: "appointment",
+	RoundAction.WALK_IN: "adventurer",
+	RoundAction.WAGON_SHOP: "shop",
+	RoundAction.WAGON_EVENT: "event",
+	RoundAction.PREP_CRAFT: "event",
+	RoundAction.REST_DIG: "event",
+}
+
 const STAMP_PHASE_WIRE := {
 	StampPhase.SCHEDULE: "schedule",
 	StampPhase.CRAFT: "craft",
@@ -162,8 +172,8 @@ static func round_action_wire(value: RoundAction) -> Variant:
 
 
 static func day_action_wire(value: RoundAction) -> Variant:
-	## Dump field is day_action (docs/20). Wire values unchanged.
-	return round_action_wire(value)
+	## Dump field is day_action (docs/20). Node-kind names, not walk_in / wagon_*.
+	return _wire_or_null(DAY_ACTION_WIRE, value, RoundAction.NONE)
 
 
 static func stamp_phase_wire(value: StampPhase) -> String:

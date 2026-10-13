@@ -6,7 +6,7 @@ extends Node
 const SCHEMA_SLICE := "1B"
 const PHASE1_OWNER_ID := "own_basic"
 
-## docs/22 — Day planner (not a path map, not a Round board).
+## docs/22 — Route graph (hand-authored map with forks). Not a free E* board.
 ## Day count is map.day_count — do not treat 8 as global law.
 const CHAPTERS_PER_RUN := 3
 const RESERVED_FINAL_DAY_COUNT := 2 ## last 2 of N; player assigns D1..(N-2)

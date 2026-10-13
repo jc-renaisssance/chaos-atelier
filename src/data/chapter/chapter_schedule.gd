@@ -1,6 +1,6 @@
 class_name ChapterSchedule
 extends Resource
-## Day planner board (docs/22). Day count from map.day_count. No piece cap.
+## Route-graph board (docs/22). Day count from map.day_count. No piece cap.
 
 @export var player_owner_id: String = GameConstants.PHASE1_OWNER_ID
 @export var chapter_id: int = 1
@@ -11,8 +11,11 @@ extends Resource
 @export var day_index: int = GameConstants.NULL_INT ## 1..N once a day is live
 @export var days_left: int = 0
 @export var days: Array[ScheduleDay] = []
-@export var event_pool: Array[PlannerEvent] = []
-@export var day_assignments: Array[DayAssignment] = []
+@export var route_nodes: Array[RouteNode] = []
+@export var route_edges: Array[RouteEdge] = []
+@export var route_path: Array[String] = [] ## confirmed node ids — never drafts
+@export var draft_path: Array[String] = [] ## ghost future only
+@export var current_node_id: String = ""
 @export var appointment_pins: Array[AppointmentPin] = []
 @export var appt_decline_used: bool = false
 ## Unbounded piece telemetry (docs/20). Not a gate. No crafts_max.
@@ -27,7 +30,8 @@ static func make_empty(chapter_id_: int = 1, map_id_: String = "") -> ChapterSch
 	board.map_id = map_id_ if not map_id_.is_empty() else MapCatalog.CURRENT_MAP_ID
 	board.day_count = MapCatalog.day_count(board.map_id)
 	board.days_left = board.day_count
-	board.event_pool = MapCatalog.make_event_pool(board.map_id)
+	board.route_nodes = MapCatalog.make_nodes(board.map_id)
+	board.route_edges = MapCatalog.make_edges(board.map_id)
 	for i in range(1, board.day_count + 1):
 		var slot := ScheduleDay.new()
 		slot.day_index = i
@@ -42,38 +46,33 @@ func slot_at(day_i: int) -> ScheduleDay:
 	return null
 
 
+func node_by_id(node_id: String) -> RouteNode:
+	for node in route_nodes:
+		if node.node_id == node_id:
+			return node
+	return null
+
+
+func nodes_on_day(day_i: int) -> Array[RouteNode]:
+	var out: Array[RouteNode] = []
+	for node in route_nodes:
+		if node.day_index == day_i:
+			out.append(node)
+	return out
+
+
+func outgoing_ids(from_id: String) -> Array[String]:
+	var out: Array[String] = []
+	for edge in route_edges:
+		if edge.from_id == from_id:
+			out.append(edge.to_id)
+	return out
+
+
 func pin_at(day_i: int) -> AppointmentPin:
 	for pin in appointment_pins:
 		if pin.pinned_day == day_i:
 			return pin
-	return null
-
-
-func event_by_id(event_id: String) -> PlannerEvent:
-	for event in event_pool:
-		if event.event_id == event_id:
-			return event
-	return null
-
-
-func assignment_at(day_i: int) -> DayAssignment:
-	for row in day_assignments:
-		if row.day_index == day_i:
-			return row
-	return null
-
-
-func assigned_event(day_i: int) -> PlannerEvent:
-	var row := assignment_at(day_i)
-	if row == null:
-		return null
-	return event_by_id(row.event_id)
-
-
-func assignment_for_event(event_id: String) -> DayAssignment:
-	for row in day_assignments:
-		if row.event_id == event_id:
-			return row
 	return null
 
 
@@ -90,16 +89,44 @@ func current_day_action() -> GameEnums.RoundAction:
 	return slot.day_action
 
 
+func dump_day_action() -> Variant:
+	var slot := current_day()
+	if slot == null or slot.day_action == GameEnums.RoundAction.NONE:
+		return null
+	if is_reserved_day(day_index):
+		return "reserved"
+	return GameEnums.day_action_wire(slot.day_action)
+
+
+func current_node() -> RouteNode:
+	return node_by_id(current_node_id)
+
+
+func node_for_day(day_i: int) -> RouteNode:
+	for nid in route_path:
+		var node := node_by_id(nid)
+		if node != null and node.day_index == day_i:
+			return node
+	if day_i == day_index:
+		return current_node()
+	return null
+
+
 func current_pin() -> AppointmentPin:
-	if not GameConstants.is_schedule_day(day_index, day_count):
+	var node := node_for_day(day_index)
+	if node == null or node.kind != "appointment":
 		return null
-	return pin_at(day_index)
+	for pin in appointment_pins:
+		if pin.node_id == node.node_id:
+			return pin
+	return null
 
 
-func current_assigned_event() -> PlannerEvent:
-	if not GameConstants.is_schedule_day(day_index, day_count):
-		return null
-	return assigned_event(day_index)
+func bound_block_id() -> String:
+	var node := current_node()
+	if node == null:
+		return ""
+	return node.bound_block_id
 
 
 func resolved_count() -> int:
@@ -132,12 +159,23 @@ func is_reserved_day(day_i: int) -> bool:
 	return GameConstants.is_reserved_final_day(day_i, day_count)
 
 
-func options_for_day(day_i: int) -> Array[PlannerEvent]:
-	var out: Array[PlannerEvent] = []
-	for event in event_pool:
-		if event.covers_day(day_i):
-			out.append(event)
-	return out
+func last_confirmed_id() -> String:
+	if route_path.is_empty():
+		return ""
+	return route_path[route_path.size() - 1]
+
+
+func day_node_confirmed(day_i: int = 0) -> bool:
+	var d := day_i if day_i > 0 else day_index
+	return node_for_day(d) != null and _path_has_day(d)
+
+
+func _path_has_day(day_i: int) -> bool:
+	for nid in route_path:
+		var node := node_by_id(nid)
+		if node != null and node.day_index == day_i:
+			return true
+	return false
 
 
 func begin_live(boss_id: String, pool_id: String) -> void:
@@ -147,97 +185,314 @@ func begin_live(boss_id: String, pool_id: String) -> void:
 	crafts_done = 0
 	player_owner_id = GameConstants.PHASE1_OWNER_ID
 	day_index = 1
-	day_assignments.clear()
+	route_path.clear()
+	draft_path.clear()
+	current_node_id = MapCatalog.START_NODE_ID
 	appointment_pins.clear()
 	for slot in days:
 		slot.day_action = GameEnums.RoundAction.NONE
 		slot.order_id = ""
 		slot.event_id = ""
-	sync_days_left()
-
-
-func can_assign(day_i: int, event_id: String) -> bool:
-	return assign_reason(day_i, event_id).is_empty()
-
-
-func assign_reason(day_i: int, event_id: String) -> String:
-	if not GameConstants.is_assignable_day(day_i, day_count):
-		return "day %d is reserved / not assignable" % day_i
-	if is_day_played(day_i):
-		return "day %d is frozen (played)" % day_i
-	var event := event_by_id(event_id)
-	if event == null:
-		return "unknown event %s" % event_id
-	if not event.covers_day(day_i):
-		return "%s window does not include D%d" % [event_id, day_i]
-	var here := assignment_at(day_i)
-	if here != null:
-		var pinned := event_by_id(here.event_id)
-		if pinned != null and pinned.fixed and pinned.event_id != event_id:
-			return "fixed %s cannot leave D%d" % [pinned.event_id, day_i]
-	var elsewhere := assignment_for_event(event_id)
-	if elsewhere != null and elsewhere.day_index != day_i:
-		if event.fixed:
-			return "fixed %s cannot move off D%d" % [event_id, elsewhere.day_index]
-		if is_day_played(elsewhere.day_index):
-			return "%s already resolved on D%d" % [event_id, elsewhere.day_index]
-	return ""
-
-
-func assign_day(day_i: int, event_id: String) -> bool:
-	if not can_assign(day_i, event_id):
-		return false
-	var event := event_by_id(event_id)
-	var elsewhere := assignment_for_event(event_id)
-	if elsewhere != null and elsewhere.day_index != day_i:
-		_clear_assignment(elsewhere.day_index)
-	var here := assignment_at(day_i)
-	if here != null:
-		here.event_id = event_id
-	else:
-		var row := DayAssignment.new()
-		row.day_index = day_i
-		row.event_id = event_id
-		day_assignments.append(row)
-	var slot := slot_at(day_i)
-	if slot != null and not slot.is_played():
-		slot.event_id = event_id
+		slot.node_id = ""
 	_sync_pins()
-	return event != null
+	sync_days_left()
+	enter_current_day()
 
 
-func pin_fixed_events() -> void:
-	for event in event_pool:
-		if not event.fixed:
-			continue
-		for day_i in event.windows:
-			if GameConstants.is_assignable_day(day_i, day_count):
-				assign_day(day_i, event.event_id)
+func enter_current_day() -> void:
+	if not GameConstants.is_schedule_day(day_index, day_count):
+		return
+	if day_index == 1:
+		_confirm_internal(MapCatalog.START_NODE_ID)
+		_prune_draft()
+		return
+	if _path_has_day(day_index):
+		var pinned := node_for_day(day_index)
+		if pinned != null:
+			current_node_id = pinned.node_id
+		_prune_draft()
+		return
+	var prev := last_confirmed_id()
+	var today := _outgoing_on_day(prev, day_index)
+	if today.size() == 1:
+		_confirm_internal(today[0])
+	_prune_draft()
+
+
+func _outgoing_on_day(from_id: String, day_i: int) -> Array[String]:
+	var out: Array[String] = []
+	for nid in outgoing_ids(from_id):
+		var node := node_by_id(nid)
+		if node != null and node.day_index == day_i:
+			out.append(nid)
+	return out
+
+
+func fork_options() -> Array[RouteNode]:
+	var out: Array[RouteNode] = []
+	if not GameConstants.is_schedule_day(day_index, day_count):
+		return out
+	if is_reserved_day(day_index):
+		return out
+	if day_index == 1:
+		return out
+	if is_day_played(day_index):
+		return out
+	if _path_has_day(day_index):
+		return out
+	var prev := last_confirmed_id()
+	if prev.is_empty():
+		return out
+	var prev_node := node_by_id(prev)
+	if prev_node != null and prev_node.is_bound() and outgoing_ids(prev).size() == 1:
+		return out
+	var ids := _outgoing_on_day(prev, day_index)
+	if ids.size() < 2 or ids.size() > 4:
+		return out
+	for nid in ids:
+		var node := node_by_id(nid)
+		if node != null:
+			out.append(node)
+	return out
+
+
+func fork_option_rows() -> Array:
+	var rows: Array = []
+	for node in fork_options():
+		rows.append(node.option_row())
+	return rows
+
+
+func can_confirm_node(node_id: String) -> bool:
+	return confirm_reason(node_id).is_empty()
+
+
+func confirm_reason(node_id: String) -> String:
+	if is_day_played(day_index):
+		return "D%d is frozen (played)" % day_index
+	if day_index == 1:
+		return "D1 is fixed (N1) — no fork panel"
+	if is_reserved_day(day_index):
+		return "D%d is reserved — no fork panel" % day_index
+	if _path_has_day(day_index):
+		return "D%d already confirmed" % day_index
+	var opts := fork_options()
+	if opts.is_empty():
+		return "no live fork on D%d" % day_index
+	for node in opts:
+		if node.node_id == node_id:
+			return ""
+	return "%s is not an outgoing option of %s" % [node_id, last_confirmed_id()]
+
+
+func confirm_node(node_id: String) -> bool:
+	if not can_confirm_node(node_id):
+		return false
+	_confirm_internal(node_id)
+	_prune_draft()
+	return true
+
+
+func _confirm_internal(node_id: String) -> void:
+	var node := node_by_id(node_id)
+	if node == null:
+		return
+	if node.node_id in route_path:
+		current_node_id = node.node_id
+		var slot := slot_at(node.day_index)
+		if slot != null:
+			slot.node_id = node.node_id
+			slot.event_id = node.node_id
+		return
+	route_path.append(node.node_id)
+	current_node_id = node.node_id
+	var live := slot_at(node.day_index)
+	if live != null and not live.is_played():
+		live.node_id = node.node_id
+		live.event_id = node.node_id
+
+
+func can_draft_node(node_id: String) -> bool:
+	var node := node_by_id(node_id)
+	if node == null or node.is_reserved():
+		return false
+	if node.day_index <= day_index:
+		return false
+	if is_day_played(node.day_index):
+		return false
+	if _path_has_day(node.day_index):
+		return false
+	var bound := bound_block_id()
+	if not bound.is_empty() and node.bound_block_id == bound:
+		return false
+	var path := _shortest_future_path(node_id)
+	return not path.is_empty()
+
+
+func draft_node(node_id: String) -> bool:
+	if not can_draft_node(node_id):
+		return false
+	if node_id in draft_path:
+		var kept: Array[String] = []
+		for nid in draft_path:
+			kept.append(nid)
+			if nid == node_id:
 				break
+		draft_path = kept
+		return true
+	var path := _shortest_future_path(node_id)
+	if path.is_empty():
+		return false
+	draft_path = path
+	return true
 
 
-func _clear_assignment(day_i: int) -> void:
-	var kept: Array[DayAssignment] = []
-	for row in day_assignments:
-		if row.day_index != day_i:
-			kept.append(row)
-	day_assignments = kept
-	var slot := slot_at(day_i)
-	if slot != null and not slot.is_played():
-		slot.event_id = ""
+func _shortest_future_path(target_id: String) -> Array[String]:
+	var start := last_confirmed_id()
+	if start.is_empty():
+		start = current_node_id
+	if start.is_empty():
+		return []
+	var came := {}
+	var queue: Array[String] = [start]
+	var seen := {start: true}
+	var found := false
+	while not queue.is_empty():
+		var cur: String = queue.pop_front()
+		if cur == target_id and cur != start:
+			found = true
+			break
+		for nid in outgoing_ids(cur):
+			if seen.has(nid):
+				continue
+			var node := node_by_id(nid)
+			if node == null:
+				continue
+			if node.day_index < day_index:
+				continue
+			if node.day_index == day_index and _path_has_day(day_index) and nid != current_node_id:
+				continue
+			if node.day_index == day_index and nid in route_path:
+				continue
+			if is_day_played(node.day_index):
+				continue
+			seen[nid] = true
+			came[nid] = cur
+			queue.append(nid)
+	if not found and not came.has(target_id):
+		return []
+	var walk: Array[String] = []
+	var step := target_id
+	while step != start and came.has(step):
+		walk.push_front(step)
+		step = String(came[step])
+	if step != start:
+		return []
+	var future: Array[String] = []
+	for nid in walk:
+		var node := node_by_id(nid)
+		if node != null and node.day_index > day_index:
+			future.append(nid)
+	return future
+
+
+func _prune_draft() -> void:
+	if draft_path.is_empty():
+		return
+	var kept: Array[String] = []
+	var from_id := last_confirmed_id()
+	if from_id.is_empty():
+		from_id = current_node_id
+	for nid in draft_path:
+		if nid in route_path:
+			continue
+		var node := node_by_id(nid)
+		if node == null or node.day_index <= day_index:
+			continue
+		if not _has_edge(from_id, nid) and kept.is_empty():
+			## allow if reachable from last kept / from_id
+			if not can_draft_node(nid):
+				break
+		if not kept.is_empty():
+			if not _has_edge(kept[kept.size() - 1], nid):
+				break
+		elif not _has_edge(from_id, nid):
+			var hop := _shortest_future_path(nid)
+			if hop.is_empty():
+				break
+			kept = hop
+			from_id = nid
+			continue
+		kept.append(nid)
+		from_id = nid
+	draft_path = kept
+
+
+func _has_edge(from_id: String, to_id: String) -> bool:
+	for edge in route_edges:
+		if edge.from_id == from_id and edge.to_id == to_id:
+			return true
+	return false
+
+
+func is_cut(node_id: String) -> bool:
+	if node_id in route_path or node_id == current_node_id:
+		return false
+	var node := node_by_id(node_id)
+	if node == null:
+		return true
+	if node.day_index < day_index:
+		return true
+	if node.day_index == day_index and _path_has_day(day_index) and node_id != current_node_id:
+		return true
+	var start := last_confirmed_id()
+	if start.is_empty():
+		start = current_node_id
+	if start.is_empty():
+		return false
+	if node_id == start:
+		return false
+	var seen := {start: true}
+	var queue: Array[String] = [start]
+	while not queue.is_empty():
+		var cur: String = queue.pop_front()
+		if cur == node_id:
+			return false
+		for nid in outgoing_ids(cur):
+			if seen.has(nid):
+				continue
+			var nxt := node_by_id(nid)
+			if nxt == null:
+				continue
+			if nxt.day_index < day_index:
+				continue
+			if nxt.day_index == day_index and _path_has_day(day_index) and nid != current_node_id:
+				continue
+			seen[nid] = true
+			queue.append(nid)
+	return true
+
+
+func shops_on_path() -> int:
+	var n := 0
+	for nid in route_path:
+		var node := node_by_id(nid)
+		if node != null and node.kind == "shop" and not node.is_reserved():
+			n += 1
+	return n
 
 
 func _sync_pins() -> void:
 	appointment_pins.clear()
-	for row in day_assignments:
-		var event := event_by_id(row.event_id)
-		if event == null or event.kind != "appointment":
+	for node in route_nodes:
+		if node.kind != "appointment":
 			continue
 		var pin := AppointmentPin.new()
-		pin.appointment_id = event.ref_id
-		var appt: Dictionary = ScheduleCatalog.appointment_row(event.ref_id)
+		pin.appointment_id = node.ref_id
+		pin.node_id = node.node_id
+		pin.pinned_day = node.day_index
+		var appt: Dictionary = ScheduleCatalog.appointment_row(node.ref_id)
 		pin.order_id = String(appt.get("order_id", ""))
-		pin.pinned_day = row.day_index
 		appointment_pins.append(pin)
 
 
@@ -250,9 +505,15 @@ func set_primary_action(action: GameEnums.RoundAction, order_id_: String = "", e
 		return false
 	if slot.is_reserved_final(day_count) and action == GameEnums.RoundAction.APPOINTMENT:
 		return false
+	if not day_node_confirmed():
+		return false
 	slot.day_action = action
 	slot.order_id = order_id_
-	if not event_id_.is_empty():
+	var node := current_node()
+	if node != null:
+		slot.node_id = node.node_id
+		slot.event_id = node.node_id if event_id_.is_empty() else event_id_
+	elif not event_id_.is_empty():
 		slot.event_id = event_id_
 	sync_days_left()
 	return true
@@ -270,6 +531,7 @@ func advance_day() -> bool:
 	if day_index >= day_count:
 		return false
 	day_index += 1
+	enter_current_day()
 	return true
 
 
@@ -280,24 +542,37 @@ func to_dict() -> Dictionary:
 	var day_rows: Array = []
 	for slot in days:
 		day_rows.append(slot.to_dict(day_count))
-	var pool_rows: Array = []
-	for event in event_pool:
-		pool_rows.append(event.to_dict())
-	var assign_rows: Array = []
-	for row in day_assignments:
-		assign_rows.append(row.to_dict())
+	var node_rows: Array = []
+	for node in route_nodes:
+		node_rows.append(node.to_dict())
+	var edge_rows: Array = []
+	for edge in route_edges:
+		edge_rows.append(edge.to_dict())
+	var path_rows: Array = []
+	for nid in route_path:
+		path_rows.append(nid)
+	var draft_rows: Array = []
+	for nid in draft_path:
+		draft_rows.append(nid)
+	var bound := bound_block_id()
 	return {
 		"player_owner_id": player_owner_id,
 		"chapter_id": chapter_id,
 		"chapter_boss_id": chapter_boss_id,
 		"boss_pool_id": boss_pool_id,
 		"map_id": map_id,
+		"route_map_id": map_id,
 		"CHAPTER_DAY_COUNT": day_count,
 		"day_index": null if day_index == GameConstants.NULL_INT else day_index,
 		"days_left": days_left,
-		"day_action": GameEnums.day_action_wire(current_day_action()),
-		"event_pool": pool_rows,
-		"day_assignments": assign_rows,
+		"day_action": dump_day_action(),
+		"route_nodes": node_rows,
+		"route_edges": edge_rows,
+		"route_path": path_rows,
+		"draft_path": draft_rows,
+		"current_node_id": null if current_node_id.is_empty() else current_node_id,
+		"bound_block_id": null if bound.is_empty() else bound,
+		"fork_options": fork_option_rows(),
 		"appointment_pins": pin_rows,
 		"days": day_rows,
 		"appt_decline_used": appt_decline_used,
@@ -317,6 +592,16 @@ func schema_errors() -> PackedStringArray:
 		errs.append("days size %d != CHAPTER_DAY_COUNT %d" % [days.size(), day_count])
 	if day_index != GameConstants.NULL_INT and not GameConstants.is_schedule_day(day_index, day_count):
 		errs.append("day_index %d not in 1..%d" % [day_index, day_count])
+	var seen_nodes := {}
+	for node in route_nodes:
+		errs.append_array(node.schema_errors(day_count))
+		if seen_nodes.has(node.node_id):
+			errs.append("duplicate route node %s" % node.node_id)
+		seen_nodes[node.node_id] = true
+	for edge in route_edges:
+		errs.append_array(edge.schema_errors())
+		if not seen_nodes.has(edge.from_id) or not seen_nodes.has(edge.to_id):
+			errs.append("edge %s→%s missing node" % [edge.from_id, edge.to_id])
 	var seen_pin_days := {}
 	var seen_pin_ids := {}
 	for pin in appointment_pins:
@@ -327,33 +612,22 @@ func schema_errors() -> PackedStringArray:
 		if seen_pin_ids.has(pin.appointment_id):
 			errs.append("duplicate appointment_id %s" % pin.appointment_id)
 		seen_pin_ids[pin.appointment_id] = true
-	var seen_assign_days := {}
-	var seen_assign_events := {}
-	for row in day_assignments:
-		errs.append_array(row.schema_errors(day_count))
-		if seen_assign_days.has(row.day_index):
-			errs.append("duplicate day_assignments on day %d" % row.day_index)
-		seen_assign_days[row.day_index] = true
-		if seen_assign_events.has(row.event_id):
-			errs.append("duplicate day_assignments event %s" % row.event_id)
-		seen_assign_events[row.event_id] = true
-		var event := event_by_id(row.event_id)
-		if event == null:
-			errs.append("day_assignments unknown event %s" % row.event_id)
-		elif not event.covers_day(row.day_index):
-			errs.append("%s assigned to D%d outside window" % [row.event_id, row.day_index])
-		elif event.fixed:
-			var in_window := false
-			for w in event.windows:
-				if w == row.day_index:
-					in_window = true
-					break
-			if not in_window:
-				errs.append("fixed %s assigned outside window" % event.event_id)
-	for event in event_pool:
-		errs.append_array(event.schema_errors(day_count))
-	for slot in days:
-		errs.append_array(slot.schema_errors(day_count))
+	for nid in route_path:
+		if not seen_nodes.has(nid):
+			errs.append("route_path unknown node %s" % nid)
+		if nid in draft_path:
+			errs.append("draft_path must not overlap confirmed %s" % nid)
+	for nid in draft_path:
+		if not seen_nodes.has(nid):
+			errs.append("draft_path unknown node %s" % nid)
+	var d1 := node_by_id(MapCatalog.START_NODE_ID)
+	if d1 == null or d1.day_index != 1 or d1.kind != "adventurer":
+		errs.append("D1 must be N1 adventurer")
+	var opts := fork_options()
+	if opts.size() == 1 or opts.size() > 4:
+		errs.append("live fork_options length %d not in 2..4" % opts.size())
 	if crafts_done < 0:
 		errs.append("crafts_done %d < 0" % crafts_done)
+	for slot in days:
+		errs.append_array(slot.schema_errors(day_count))
 	return errs

@@ -1,10 +1,11 @@
 class_name AppointmentPin
 extends Resource
-## appt_* row still on the Day planner. pinned_day ∈ 1..(N-2) (docs/22, docs/20).
+## appt_* row on the route map. pinned_day ∈ 1..(N-2) (docs/22, docs/20).
 ## Scrap Duelist stays here — not Dex Adventurers.
 
 @export var appointment_id: String = ""
 @export var order_id: String = ""
+@export var node_id: String = ""
 @export var pinned_day: int = 1
 
 
@@ -12,6 +13,7 @@ func to_dict() -> Dictionary:
 	return {
 		"appointment_id": appointment_id,
 		"order_id": order_id,
+		"node_id": null if node_id.is_empty() else node_id,
 		"pinned_day": pinned_day,
 	}
 
