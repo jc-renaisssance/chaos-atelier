@@ -17,6 +17,8 @@ var _edges: Array[RouteEdge] = []
 var _cut: Dictionary = {}
 var _draft: Dictionary = {}
 var _path: Dictionary = {}
+var _pending_board: ChapterSchedule
+var _bind_queued: bool = false
 
 
 func _ready() -> void:
@@ -32,6 +34,21 @@ func _ready() -> void:
 
 func bind(board: ChapterSchedule) -> void:
 	if board == null:
+		return
+	# Click-draft: picked is still emitting when board_changed → bind.
+	# Object.free() mid-signal is free-locked-object in Godot 4.7 — defer rebuild.
+	_pending_board = board
+	if _bind_queued:
+		return
+	_bind_queued = true
+	call_deferred("_apply_bind")
+
+
+func _apply_bind() -> void:
+	_bind_queued = false
+	var board: ChapterSchedule = _pending_board
+	_pending_board = null
+	if board == null or not is_inside_tree():
 		return
 	_ensure_columns(board.day_count)
 	_cards.clear()
@@ -58,13 +75,7 @@ func bind(board: ChapterSchedule) -> void:
 					head.text = "D%d  travel / final prep" % day_i
 			else:
 				head.text = "D%d" % day_i
-		var stale: Array[Node] = []
-		for child in col.get_children():
-			if child is RouteNodeView:
-				stale.append(child)
-		for child in stale:
-			col.remove_child(child)
-			child.free()
+		_drop_stale_cards(col)
 	for node in board.route_nodes:
 		var col_i := node.day_index - 1
 		if col_i < 0 or col_i >= _columns.size():
@@ -87,6 +98,21 @@ func bind(board: ChapterSchedule) -> void:
 		)
 	queue_redraw()
 	call_deferred("queue_redraw")
+
+
+func _drop_stale_cards(col: VBoxContainer) -> void:
+	var stale: Array[Node] = []
+	for child in col.get_children():
+		if child is RouteNodeView:
+			stale.append(child)
+	for child in stale:
+		var card := child as RouteNodeView
+		if card == null:
+			continue
+		if card.picked.is_connected(_on_picked):
+			card.picked.disconnect(_on_picked)
+		col.remove_child(card)
+		card.queue_free()
 
 
 func col_head(col: VBoxContainer) -> Label:
