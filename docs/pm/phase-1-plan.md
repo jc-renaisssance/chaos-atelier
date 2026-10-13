@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-13** after Jonathan stamp (**route map with forks**; free per-day `E*` board from #36/#37 superseded). Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
+Updated **2026-10-13** after Jonathan stamp (**route map with forks**; free per-day `E*` board from #36/#37 superseded) and Grimmjow **shop visit + event resolve** Design ([32](../32-shop-and-events.md) — this PR; Jonathan stamp pending). Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
 See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 
@@ -33,7 +33,7 @@ As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 | Owner = player clothier; Phase-1 = `own_basic` | `16` / `19` |
 | Win-con / reps / newspaper / mission report (docs) | `24` / `25` / `26` / `23` |
 
-**Jonathan confirmed 2026-10-05:** C1 **craft path works**. Shop systems and events are **not done yet**.
+**Jonathan confirmed 2026-10-05:** C1 **craft path works**. Shop systems and events were **not done yet** — Design now in [32](../32-shop-and-events.md) (this PR). Client still holds.
 
 **Superseded (history only):** 1-of-3 card lineup, `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default 2m1r slot UI, construction picker in craft, sequential per-piece stamina, auto-finish on `stamina_0`, fixed-client-per-boss, Round / schedule board as live UX (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8), `crafts_max=4` / cant_craft-at-max, free per-day `E*` options board (#36/#37), “hold Client until Cursor monthly reset.”
 
@@ -49,7 +49,7 @@ Fully developed **ugly** Client that ships the **full experience** with **limite
 | Limited **enemy types** | Same — Design stamps the cut. |
 | Shop adventurers | **More than one adventurer per job/class.** |
 | Catalog before wire | Define **stats / skills / requirement tags** first. Design catalog lands before Client wires people. |
-| Shop + events | **Not done yet.** Still required for “full experience” under M1. |
+| Shop + events | **Design in this PR** — [32](../32-shop-and-events.md) (shop visit + event resolve M1). Jonathan stamp pending. **Ulquiorra holds** until that stamp. Szayelaporro after Client. Elite telegraph N5 + adventurer catalog stay parked. |
 | Art | Panels / partial armor fallbacks OK for M1. |
 | Demo seed | Pinned demo seed = **optional**. |
 
@@ -80,9 +80,9 @@ Slices 1–3 are Design-then-Client. Slice 4 art (postures/posters) waits for Jo
 
 ## Sequence after this stamp merges
 
-1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md). **2026-10-08:** M1 4-job draw + estimate S–F bands-as-knobs stamped — PR #28 open questions closed.
-2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client. **Can proceed on PR 1** (4-job draw + estimate bands as Test knobs).
-3. **Szayelaporro** — Godot re-smoke **each** Client land.
+1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md). **2026-10-08:** M1 4-job draw + estimate S–F bands-as-knobs stamped — PR #28 open questions closed. **2026-10-13:** shop visit + event resolve M1 — [32](../32-shop-and-events.md) (this PR; Jonathan stamp pending). Route-graph Client #41–#43 already locked.
+2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client. **Can proceed on PR 1** (4-job draw + estimate bands as Test knobs). **Hold shop/event Client** until Jonathan stamps `32`. Do **not** invent reshape / shop owners / art / elite telegraph.
+3. **Szayelaporro** — Godot re-smoke **each** Client land. Shop/event asserts after the shop/event Client PR (sketch in `32` / `20`).
 4. **Slice 4 art** (postures/posters) — when Jonathan opens that lane for M1, or defers to M2.
 
 This stamp is **docs only**. No game Client code in this drop.

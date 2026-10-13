@@ -89,7 +89,7 @@ Zone with **zero plays** at Finish = existing empty-piece path (mono Finish with
 
 ### Hand cycle (Slay the Spire–like)
 
-Piles this **session** (shared across zones): **hand** · **draw** · **discard**. Together they **are** the run deck. Shop sell / explicit loss still change stock between beats.
+Piles this **session** (shared across zones): **hand** · **draw** · **discard**. Together they **are** the run deck. **Between beats** the same cards live on `WagonStock`. Shop buy / sell / event ±1 mat ([32](32-shop-and-events.md)) change that stock — do **not** invent a second deck. Shop sell / explicit loss still change stock between beats.
 
 1. **Play** any hand card → it leaves the hand → **discard** (unless a special card says otherwise). Play is tagged to the **target zone**.
 2. **Refresh / dig** → remaining hand cards drop to **discard**, then draw a new hand (up to hand size from the **draw** pile).

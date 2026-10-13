@@ -375,3 +375,45 @@ Follow-up on the route-map stamp (same day). Docs only. Same PR.
 | `docs/20-harness-stamp.md` | Optional `draft_path`; confirm ≠ draft |
 | `docs/01-core-loop.md` | Draft-only + graph board pointer |
 | `docs/STAMP.md` | This note |
+
+---
+
+# Grimmjow stamp — 2026-10-13 (shop visit + event resolve M1)
+
+Docs only. Ready for **Jonathan to stamp**. Ulquiorra **holds**. Szayelaporro after the shop/event Client PR. Elite telegraph N5 and adventurer catalog stay parked. Material icons stay Nnoitra 1:1.
+
+## Locked (docs only — Grimmjow intent)
+
+1. **Enter shop** only from current route node `kind=shop`. No auto opening-shop (`21` shell is historical).
+2. **M1 actions = Buy + Sell only.** Reshape = **Later**.
+3. **Stock** = authored 4–6 `mat_*` from `11` per shop node on `map_m1` (N2, N7, N12, N15, N16). Rotate by travel fiction, not a live ban.
+4. **Buy:** pay `$` from `11`; add one copy to the run deck (`WagonStock` / `27`). **Sell:** ⌊$ / 2⌋ min 1; soft floor **≥ 3** material cards after sell.
+5. **Exit** with no buy is legal. Day resolves like other primary actions.
+6. Shop visits **1–3** stay **graph law** (`22`). Client must **not** grey-out shop picks.
+7. **Enter event** from current `kind=event`. M1 = text resolve. Catalog `evt_*` with `ref_id` on C1 nodes N4 / N6 / N10 / N17. Outcomes: ±gold / ±1 mat / small reps. No craft. No run-kill.
+8. **One gold purse** (start 12 from `19` — Test knob). Ugly UI only. Dump keys in `20` / `32`.
+9. **Later:** shop owners (`16`), forbidden rooms, reshape, unique stock UI, PixelLab icons (Nnoitra parallel), event art / trees.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Add** — canonical shop-visit + event-resolve M1 |
+| `docs/22-chapter-schedule.md` | Shop/event “what it does” → `32`; C1 `evt_*` refs; Client need 14 |
+| `docs/20-harness-stamp.md` | Shop / event / gold dump keys + asserts 24–26 |
+| `docs/01-core-loop.md` · `21-app-flow.md` · `24-win-conditions.md` | Pointers; `21` opening-shop = historical |
+| `docs/11-materials.md` · `25-reps-meter.md` · `10` · `19` · `16` · `03` · `04` · `27` | Shop / event / deck pointers |
+| `docs/README.md` · `00-doc-categories.md` · `pm/phase-1-plan.md` | Index `32`; PM = Design in this PR, Ulquiorra holds |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- “Shop systems and events are not done yet” as the live hole (`STAMP` / PM 2026-10-05) — Design now in `32` (Jonathan stamp pending; Client still holds)
+- Auto opening-shop / last-shop-before-boss as live M1 (`21` shell)
+- Weighted roll-5 atelier shop (`19`) as the live route-node visit
+- Sell-back “$1 scraps → 0 gold” (`19`) — M1 sell is ⌊$ / 2⌋ min 1
+- Old `22-chapter-flow` event-pool outcomes as live law (ids may be reused)
+
+## Open questions (Jonathan)
+
+None this pass. Sell rate, shared gold, and C1 stock / `evt_*` rows are M1 defaults / Test knobs.

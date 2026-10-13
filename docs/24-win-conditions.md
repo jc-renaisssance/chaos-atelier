@@ -25,7 +25,7 @@ Clear floor **C** — pending Test tune.
 |---|---|
 | Days | **Live:** route map, ``CHAPTER_DAY_COUNT = map.day_count`` (current map **8**) ([22](22-chapter-schedule.md)). Graph days D1..(N−2); last 2 reserved; forks 2–4 next; binds pin. **No piece cap.** **Legacy:** free `E*` board / 3 lineups of 3 cards / Round board — superseded. |
 | Order pick | shop → craft → report |
-| Event pick | resolve event (ends day) |
+| Event pick | resolve event (ends day) — live = [32](32-shop-and-events.md) |
 | After days | `reps < reps_gate` → `run_over` (`reps_gate_miss`) |
 | Boss fail | Adventurer dead → `run_over`, no retry |
 

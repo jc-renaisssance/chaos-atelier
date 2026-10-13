@@ -22,7 +22,9 @@ Starting enchantments unlocked: none in hand; shop may sell common runes (`enc_r
 
 ## Atelier shop — `own_basic` pool weights
 
-Each shop visit rolls **5** material offers from the weighted table (replacement). Prices = material `$` from `11`.
+> **M1 route-node shop is not this roll.** Live visit = authored 4–6 stock per `map_m1` shop node — **[32](32-shop-and-events.md)**. This table stays **owner-pool / Later weights** (other owners, forbidden rooms). Do not implement the roll-5 as the C1 shop.
+
+Each shop visit **used to** roll **5** material offers from the weighted table (replacement). Prices = material `$` from `11`.
 
 | mat id | weight | Family |
 |---|---:|---|
@@ -60,7 +62,9 @@ Each shop visit rolls **5** material offers from the weighted table (replacement
 
 ### Sell-back
 
-Player may sell owned mats for **⌊$ / 2⌋** gold (min 1 if $ ≥ 2, else 0 for $1 scraps — draft).
+**M1 live ([32](32-shop-and-events.md)):** **⌊$ / 2⌋**, **min 1** (including $1 scraps). Soft floor **≥ 3** material cards after sell. **Supersedes** the draft below for route-node shops.
+
+Historical draft (not live): sell owned mats for **⌊$ / 2⌋** gold (min 1 if $ ≥ 2, else 0 for $1 scraps).
 
 ## Harness note
 

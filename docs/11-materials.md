@@ -87,5 +87,6 @@ Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare �
 
 ## Draft shop rules
 
-- Phase-1 starter hand: `mat_hemp_plain`, `mat_cotton_spring`, `mat_leather_tan`, `mat_wool_grey`, `mat_iron_scrap` + 1 random common.
-- Forbidden ($5) unlocked via shop room / scars — not day-one free pile.
+- **M1 route-node shop visit** (buy / sell, authored 4–6 stock, sell ⌊$ / 2⌋ min 1, ≥3 material floor) is **[32](32-shop-and-events.md)**. That stamp is live law. Weighted roll-5 in [19](19-own-basic-starter.md) is **not** the M1 visit.
+- Phase-1 starter hand: `mat_hemp_plain`, `mat_cotton_spring`, `mat_leather_tan`, `mat_wool_grey`, `mat_iron_scrap` + 1 random common — concrete 8-card list in [19](19-own-basic-starter.md).
+- Forbidden ($5) unlocked via shop room / scars — not day-one free pile. **Later** (not C1 `32` stock).

@@ -1,6 +1,6 @@
 # Harness stamp fields (Phase-1 lock)
 
-**Status:** Design stamped 2026-10-13 (route map with forks). **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = **hand-authored route map** ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)). **Supersedes** the free per-day `E*` options board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) windowed `event_pool` / `day_assignments`). **Still superseded:** Round-board dumps (`CHAPTER_ROUND_COUNT` as always-8, `round_*`, `crafts_max=4`).
+**Status:** Design stamped 2026-10-13 (route map with forks). **2026-10-13 add:** shop-visit + event-resolve dump keys ([32](32-shop-and-events.md)) — ready for Jonathan stamp. **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = **hand-authored route map** ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)). Shop / event resolve = [32](32-shop-and-events.md). **Supersedes** the free per-day `E*` options board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) windowed `event_pool` / `day_assignments`). **Still superseded:** Round-board dumps (`CHAPTER_ROUND_COUNT` as always-8, `round_*`, `crafts_max=4`).
 
 > **Not live — do not assert.** `lineup_card_ids`, `picked_card_id`, and `max_materials` / `max_runes` (2m1r) track the superseded 1-of-3 / slot-fill shell. They are **not** Required. See [Superseded](#superseded).
 
@@ -47,7 +47,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `days_left` | int | Remaining days (includes reserved) |
 | `day_action` | enum\|null | `adventurer` \| `shop` \| `appointment` \| `event` \| `reserved` — the **one** primary action this day (from `current_node_id`). Null before D1 play / on newspaper. Old `walk_in` / `wagon_shop` / `wagon_event` names are **superseded aliases** — do not emit as live Required |
 | `route_map_id` | string | Current wagon **`map_m1`**. Later maps stamp their own id |
-| `route_nodes` | object[] | `{ node_id, day_index, kind, ref_id, bound_block_id }`. `node_id` = `N1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}; `ref_id` = `adv_*` / `appt_*` / null. M1 panel = **type + id** — no title field. C1 graph in [22](22-chapter-schedule.md) |
+| `route_nodes` | object[] | `{ node_id, day_index, kind, ref_id, bound_block_id }`. `node_id` = `N1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}; `ref_id` = `adv_*` / `appt_*` / `evt_*` / null. Shop stock is **not** `ref_id` — see shop block. M1 panel = **type + id** — no title field. C1 graph in [22](22-chapter-schedule.md). Event `ref_id` rows in [32](32-shop-and-events.md) |
 | `route_edges` | object[] | `{ from, to }` — authored, not seeded |
 | `route_path` | string[] | Node ids **confirmed**, in order. Never a draft |
 | `draft_path` | string[] | Optional ghosted future node ids. **Not Required.** Must not overlap frozen past / entered bind. Confirm on the current day writes `route_path`, not this field |
@@ -63,7 +63,41 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 **Lock:** no piece cap. `crafts_done_this_chapter` may count pieces (armor + gloves = +2) after the **one** Finish — it does **not** block the next craft. `cant_craft` because `crafts_done == crafts_max` is **GONE**.
 
-`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `day_action=shop` on `phase=schedule` (timetable). Travel events are `day_action=event`. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
+`phase` **does not** include `shop` or `craft_task` (old lineup shell). Wagon shop is a `day_action=shop` on `phase=schedule` (timetable) — buy/sell law in [32](32-shop-and-events.md). Travel events are `day_action=event` (text resolve, same doc). Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
+
+### Gold (run purse)
+
+One purse. Shop buy/sell, event gold, and (when Client pays them) mission gold all write this field. Start **12** ([19](19-own-basic-starter.md) — Test knob). Floor **0**. Law in [32](32-shop-and-events.md).
+
+| Field | Type | Notes |
+|---|---|---|
+| `gold` | int | Current purse. Emit on timetable / shop / event stamps once Client has a purse; craft stamps may repeat it (unchanged during sew) |
+| `gold_before` / `gold_after` | int | **Required** on shop-visit and event-resolve stamps. Visit / event open → after last action |
+| `gold_delta` | int | Optional. `gold_after - gold_before` |
+| `deck_material_count` | int | `type=material` cards in the between-beats run deck after the last shop / event action. After a legal sell: **≥ 3** |
+
+### Shop visit (when `day_action=shop`)
+
+| Field | Type | Notes |
+|---|---|---|
+| `shop_node_id` | string | Equals `current_node_id`. C1 ∈ {`N2`, `N7`, `N12`, `N15`, `N16`} |
+| `shop_stock` | object[] | Live remaining `{ mat_id, price, qty_offered }`. `mat_id` ∈ [11](11-materials.md). `price` = that row’s `$`. Authored lists in [32](32-shop-and-events.md) |
+| `shop_buys` | object[] | `{ mat_id, price }[]` this visit, in order. `[]` if exit with no buy |
+| `shop_sells` | object[] | `{ mat_id, gold_gained }[]` this visit, in order. `[]` if none |
+
+Null the shop block when `day_action` is not `shop`. **Reshape is Later** — do not emit a reshape field.
+
+### Event resolve (when `day_action=event`)
+
+| Field | Type | Notes |
+|---|---|---|
+| `event_id` | string | `evt_*` from `current_node_id` `ref_id` ([32](32-shop-and-events.md)) |
+| `event_choice_id` | string | `choice_*` from that catalog row |
+| `event_deltas` | object | `{ gold: int, mat_add: string\|null, mat_remove: string\|null, reps: int }` — **applied** values (skipped mat-remove → null) |
+| `event_resolved` | bool | Choice applied (including documented mat skip). M1 rows are **not** a mission-clear gate |
+| `event_result_line` | string | Optional debug copy. **Not Required** |
+
+Null the event block when `day_action` is not `event`. Do **not** emit `cleared` as a mission gate for these rows. Do **not** emit windowed `event_pool`.
 
 ### Mission (when `phase=craft` or `phase=boss`)
 
@@ -76,7 +110,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `construction_id` | string\|null | Current piece = `construction_ids[piece_index-1]` |
 | `card_difficulty` | int\|null | 1..3 — reps Δ input (`25`); not a lineup card |
 
-Prep (`mission_kind=prep`) is **Later** on the C1 sample (no prep nodes). Walk-in / appointment enter craft as `order`. Route-map event that does not enter craft stays `phase=schedule` with session fields null.
+Prep (`mission_kind=prep`) is **Later** on the C1 sample (no prep nodes). Walk-in / appointment enter craft as `order`. Route-map event that does not enter craft stays `phase=schedule` with session fields null — **M1 text events are [32](32-shop-and-events.md)**, not `mission_kind=event`.
 
 **Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `boss_client_id` = named `adv_*` drawn from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); `boss_job_id` = matching `job_*`; `order_id` = that job’s `ord_*`; `construction_ids` = that job’s **order constructions** (listed `con_*`, in sequence — e.g. knight = `con_armor`, `con_gloves`); `threat_id` = announced `chapter_boss_id`. Draw is **independent** of which boss was announced. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Sim uses **that client's gear**. `boss_client_id` is **never** an `appt_*` (Scrap Duelist and other appointments stay on the **route map**, not Dex Adventurers). Finish-only / multi-piece / StS craft **unchanged**. Portraits / extra Client UI widgets = **Later**.
 
@@ -181,6 +215,12 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 22. Newspaper fields set when the beat applies (`26`): chapter start → `boss_announce`; mid fail → `mid_fail`; chapter end / run over as listed.
 23. On `mission_kind=boss`: `boss_client_id` is a named `adv_*` from the **M1 4-job catalog** ([29](29-adventurer-catalog.md)) or that job’s default alias; `boss_job_id` ∈ `{job_knight, job_mage, job_blade_dancer, job_lagoon}` (**LOCKED** Jonathan 2026-10-08 — not Wizard / Hexer / Outrider / Oathbound); `construction_ids` equals that job’s **order constructions** (listed `con_*`, in sequence); `threat_id == chapter_boss_id`; `boss_client_id` is never an `appt_*`. Draw is independent of `chapter_boss_id`.
 
+### Shop visit / event resolve ([32](32-shop-and-events.md))
+
+24. On `day_action=shop`: `shop_node_id == current_node_id`; every `shop_stock[].mat_id` ∈ `11`; `price` matches `11` `$`. Buy: `gold_after == gold_before - price` (per buy, or visit totals agree with `shop_buys`) and `deck_material_count` rose by the number of buys. Sell: each `gold_gained == max(1, floor($/2))`; after the visit `deck_material_count ≥ 3`. A refused sell (would drop below 3) does not change gold or count. Exit with `shop_buys == []` is legal. `gold ≥ 0`.
+25. On `day_action=event`: `event_id` equals the node `ref_id` (`evt_*`); `event_choice_id` is a catalog choice for that row; `event_resolved == true`; applied `event_deltas` match [32](32-shop-and-events.md) (or documented mat skip). C1: N4=`evt_c1_heat_mirage`, N6=`evt_c1_ashfall`, N10=`evt_c1_scrap_market`, N17=`evt_c1_salt_spray`. Gold never < 0. Illegal pay-gold choices do not apply.
+26. `day_action` matches `current_node_id` kind. Shop graph options are **not** banned by visit count. No reshape field. No live `event_pool`.
+
 ## Superseded
 
 | Field / assert | Why |
@@ -210,6 +250,6 @@ Overall adventure **trend** vs the announced boss — not every matrix cell non-
 
 ## Pointers
 
-- Live: [22-chapter-schedule](22-chapter-schedule.md) (route map) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
+- Live: [22-chapter-schedule](22-chapter-schedule.md) (route map) · [32-shop-and-events](32-shop-and-events.md) (shop visit + event resolve) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
 - Resolver / report: [23-mission-report](23-mission-report.md) · [24-win-conditions](24-win-conditions.md) · [25-reps-meter](25-reps-meter.md) · [26-newspaper](26-newspaper.md) · [14-synergies](14-synergies.md) (RETUNE merged)
 - Legacy (not live): [22-chapter-flow](22-chapter-flow.md) · [12b-craft-slots](12b-craft-slots.md)
