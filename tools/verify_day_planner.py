@@ -61,6 +61,32 @@ def check_godot_47_hotfix(blob: str) -> None:
         fail(":= … else null infers Variant — Godot 4.7.2 warning-as-error (use an explicit type)")
     if re.search(r"const\s+\w+\s*:?=?\s*Packed\w*Array\s*\(", gd_blob()):
         fail("const Packed*Array(...) is not a constant expression in Godot 4.7 — use array literals")
+    if re.search(r"(?<![_\w])GameConstants\.is_assignable_day\b", blob):
+        fail(
+            "GameConstants.is_assignable_day calls a static on the autoload instance — "
+            "use preload(\"res://src/autoload/game_constants.gd\").is_assignable_day(...) "
+            "(no class_name on the autoload)"
+        )
+    for path in SRC.rglob("*.gd"):
+        rel = path.relative_to(ROOT)
+        for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.search(r":\s*null if ", line):
+                fail(
+                    f"{rel}:{i} dict ternary null vs T is INCOMPATIBLE_TERNARY — "
+                    "assign to var x: Variant first"
+                )
+    for rel in (
+        "src/data/chapter/appointment_pin.gd",
+        "src/data/chapter/route_node.gd",
+        "src/data/chapter/planner_event.gd",
+        "src/data/chapter/day_assignment.gd",
+    ):
+        text = (ROOT / rel).read_text(encoding="utf-8")
+        if re.search(
+            r"\bGameConstants\.(is_assignable_day|is_reserved_final_day|is_schedule_day|assignable_day_max)\b",
+            text,
+        ):
+            fail(f"{rel} calls GameConstants statics on the autoload instance")
     names: set[str] = set()
     for path in SRC.rglob("*.gd"):
         text = path.read_text(encoding="utf-8")

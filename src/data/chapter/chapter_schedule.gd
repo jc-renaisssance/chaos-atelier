@@ -555,6 +555,9 @@ func to_dict() -> Dictionary:
 	for nid in draft_path:
 		draft_rows.append(nid)
 	var bound := bound_block_id()
+	var dump_day: Variant = null if day_index == GameConstants.NULL_INT else day_index
+	var dump_node: Variant = null if current_node_id.is_empty() else current_node_id
+	var dump_bound: Variant = null if bound.is_empty() else bound
 	return {
 		"player_owner_id": player_owner_id,
 		"chapter_id": chapter_id,
@@ -563,15 +566,15 @@ func to_dict() -> Dictionary:
 		"map_id": map_id,
 		"route_map_id": map_id,
 		"CHAPTER_DAY_COUNT": day_count,
-		"day_index": null if day_index == GameConstants.NULL_INT else day_index,
+		"day_index": dump_day,
 		"days_left": days_left,
 		"day_action": dump_day_action(),
 		"route_nodes": node_rows,
 		"route_edges": edge_rows,
 		"route_path": path_rows,
 		"draft_path": draft_rows,
-		"current_node_id": null if current_node_id.is_empty() else current_node_id,
-		"bound_block_id": null if bound.is_empty() else bound,
+		"current_node_id": dump_node,
+		"bound_block_id": dump_bound,
 		"fork_options": fork_option_rows(),
 		"appointment_pins": pin_rows,
 		"days": day_rows,
