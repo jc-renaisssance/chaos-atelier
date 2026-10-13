@@ -1,4 +1,4 @@
-> **Superseded (2026-10-12 Jonathan stamp):** this **1-of-3 card lineup** chapter shell (and the later Round / schedule board) is replaced by the travelling atelier **Day planner** — canonical doc is [22-chapter-schedule](22-chapter-schedule.md). Kept for history / PR #7 reference. Do **not** treat as live Design.
+> **Superseded:** this **1-of-3 card lineup** chapter shell (and the later Round / schedule board, and the 2026-10-12 free per-day `E*` Day planner) is replaced by the travelling atelier **route map with forks** — canonical doc is [22-chapter-schedule](22-chapter-schedule.md). Kept for history / PR #7 reference. Do **not** treat as live Design.
 # Chapter flow — round picks, clients, events
 
 Jonathan lock (2026-09-22, corrected): **not** an StS path map. Each round the atelier lines up **3 cards** (orders and/or events). Player picks **one**; that ends the round.

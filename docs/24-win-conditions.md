@@ -1,4 +1,4 @@
-> **Note (2026-10-12):** Live chapter = **Day planner** ([22-chapter-schedule](22-chapter-schedule.md)). `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8** — not global law). **Piece cap / `crafts_max` GONE.** Win/loss outcomes still apply. Old 1-of-3 lineup wording below is history.
+> **Note (2026-10-13):** Live chapter = **route map with forks** ([22-chapter-schedule](22-chapter-schedule.md)). `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8** — not global law). **Piece cap / `crafts_max` GONE.** Free per-day `E*` board is **superseded**. Win/loss outcomes still apply. Old 1-of-3 lineup wording below is history.
 
 # Win conditions (Phase-1 lock)
 
@@ -23,7 +23,7 @@ Clear floor **C** — pending Test tune.
 
 | Event | Effect |
 |---|---|
-| Days | **Live:** Day planner, ``CHAPTER_DAY_COUNT = map.day_count`` (current map **8**) ([22](22-chapter-schedule.md)). Player assigns D1..(N−2); last 2 reserved. **No piece cap.** **Legacy:** 3 lineups of 3 cards / pick 1 — superseded. Round board / `CHAPTER_ROUND_COUNT=8` as law — superseded. |
+| Days | **Live:** route map, ``CHAPTER_DAY_COUNT = map.day_count`` (current map **8**) ([22](22-chapter-schedule.md)). Graph days D1..(N−2); last 2 reserved; forks 2–4 next; binds pin. **No piece cap.** **Legacy:** free `E*` board / 3 lineups of 3 cards / Round board — superseded. |
 | Order pick | shop → craft → report |
 | Event pick | resolve event (ends day) |
 | After days | `reps < reps_gate` → `run_over` (`reps_gate_miss`) |
@@ -35,4 +35,4 @@ Win = clear C1–C3 bosses. `run_over` = boss death or reps gate miss.
 
 ## Pointers
 
-`25` reps · `26` newspaper · `22` Day planner · `23` report · `20` stamps · `17` bosses · `28` boss-client pool
+`25` reps · `26` newspaper · `22` route map · `23` report · `20` stamps · `17` bosses · `28` boss-client pool

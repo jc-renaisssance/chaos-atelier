@@ -97,7 +97,7 @@ function pick_boss_client(seed):
 - Same job may recur across chapters (Phase-1). Unique-per-run = Later.
 - Telegraph the job before the boss beat = Later.
 - Harness: `chapter_boss_id`, `boss_pool_id`, `boss_client_id`, `boss_job_id`.
-- Mid missions: Day-planner `E*` / appointments / walk-ins (`22`) — not this pool.
+- Mid missions: route-map nodes / appointments / walk-ins (`22`) — not this pool.
 
 ## Phase-1 art
 
@@ -107,7 +107,7 @@ Boss portraits Later. Newspaper chrome can share atelier grain when 1C opens. Cl
 
 - Shared pool / jobs: [28-boss-client-pool](28-boss-client-pool.md) · M1 named people / 4-job draw: [29-adventurer-catalog](29-adventurer-catalog.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
-- Day planner / boss beat: [22-chapter-schedule](22-chapter-schedule.md)
+- Route map / boss beat: [22-chapter-schedule](22-chapter-schedule.md)
 - Harness: [20-harness-stamp](20-harness-stamp.md)
 - Newspaper: [26-newspaper](26-newspaper.md)
 - Craft: [27-craft-mode-stamina](27-craft-mode-stamina.md)

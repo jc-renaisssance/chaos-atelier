@@ -1,6 +1,6 @@
 # Reps meter (atelier trust)
 
-Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter has a **reps gate** within the **day budget**. Miss → **run fail** (competitors / shop broken). Live days = [22 Day planner](22-chapter-schedule.md) (`map.day_count`; current map **8**).
+Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter has a **reps gate** within the **day budget**. Miss → **run fail** (competitors / shop broken). Live days = [22 route map](22-chapter-schedule.md) (`map.day_count`; current map **8**).
 
 ## Meter
 

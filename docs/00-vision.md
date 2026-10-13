@@ -6,9 +6,10 @@ Roguelike deckbuilder where you are a **magical clothier**. You do not fight —
 You craft magical garments for adventurers who face dangerous monsters and environments. Success or failure depends on the **stats + tag synergies** of the equipment you create.
 
 ## Name
-- **Temporary name locked:** Chaos Atelier
-- Thematic fit: *chaos* = wild synergies and unpredictable results; *Atelier* = magical workshop
-- Preliminary search: relatively clean coverage (no major conflicting video game title found)
+- **Display name locked:** **Wombaste** (Jonathan 2026-10-13)
+- Repo / working tree: `chaos-atelier`
+- Older stamps say Chaos Atelier — historical working name; **not** the live display name
+- Thematic fit: travelling atelier, wild synergies; *Wombaste* is the product the player sees
 
 ## Design priorities (stamped)
 - Keep systems **accountable and linear** for easier balancing and debugging

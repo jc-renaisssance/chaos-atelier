@@ -316,3 +316,62 @@ Both items **removed from open questions**. Client can proceed on Ulquiorra PR 1
 - Round / schedule board as live UX (`CHAPTER_ROUND_COUNT=8` as **global** law, R1..R8) — `STAMP` 2026-09-28 §1–2
 - `crafts_max=4` garments / chapter; `cant_craft` at cap — `20` / `22` / `24`
 - Chapter-start 2–4 appointment pins as the only assign UX
+
+---
+
+# Jonathan stamp — 2026-10-13 (route map with forks — sample C1)
+
+## Locked (docs only)
+
+1. **Supersede** the free per-day `E*` options board from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37). No more “every windowed event whose day includes today” / assign all of D1..(N−2) from that list.
+2. **Hand-authored route map with forks** (StS-like, **not** seed-generated sprawl). Combos = **bound multi-day blocks** on the graph. One-combo vs stack = **corridor + forks** (path through overlapping choices), not stacked arbitrary combos.
+3. **M1:** one concrete map for current wagon `day_count` = **8**. Last 2 reserved: D7 travel / final prep, D8 boss approach. D1 = fixed first-customer adventurer. Sample graph + paths in `22`.
+4. At forks: player chooses among **2–4 visible next options** (not an identical list under every day). Bound days = **no** free options panel. Unbound days = limited free picks from that day’s remaining outgoing options. **No choice → no panel.**
+5. Shop visits **1–3** come from **graph design** (reachable shop nodes on a complete path), not a hard UI ban on picking shop. C1 sample complete paths: **2 / 1 / 1** shops.
+6. Appointment = **StS-elite analog**. Scrap Duelist / `appt_*` stay appointments, not Dex Adventurers.
+7. **M1 panel = type + id** (`shop · N2`). Fancy titles **Later**. Dump `phase=schedule` kept.
+8. Product display name **Wombaste** (repo `chaos-atelier`).
+9. Piece cap stays **GONE**. `map.day_count` stays a map setting. Boss-client draw unchanged (`28` / `29`).
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/22-chapter-schedule.md` | **Rewrite** — route-map law + C1 sample graph (filename kept; free `E*` board superseded) |
+| `docs/20-harness-stamp.md` | `route_nodes` / `route_edges` / `route_path` / `fork_options`; drop live `event_pool` windows |
+| `docs/01-core-loop.md` · `03` | Route-map pointers |
+| `docs/README.md` · `00-vision.md` · `00-doc-categories.md` | Display name **Wombaste**; `22` = route map |
+| `docs/21-app-flow.md` · `22-chapter-flow.md` · `10` · `24` · `25` · `27` · `28` · `31` · `17` · `pm/phase-1-plan.md` | Pointers: live spine is the route map |
+| `docs/STAMP.md` | This note |
+
+## Open questions (Jonathan) — ≤2
+
+1. After leaving a fork, may the player **re-route unbound future days**, or is the next pick only when that day is current?
+2. Does appointment-elite get a distinct ahead-of-time marker (StS elite telegraph), or is M1 type + id in the graph enough?
+
+## Supersedes
+
+- Free per-day `E*` options board (`STAMP` 2026-10-12 §2, §5–7) — windows, 2–4 options every assignable day, chapter-start assign from that pool
+- “Not a path map” as live law (`STAMP` 2026-09-28 §1; Day planner 2026-10-12)
+- Chaos Atelier as live **display name** (`00-vision` temporary lock) — product is **Wombaste**
+
+---
+
+# Jonathan stamp — 2026-10-13 (draft-only future + graph board)
+
+Follow-up on the route-map stamp (same day). Docs only. Same PR.
+
+## Locked
+
+1. **Future unbound days are draft only.** Player may preview / draft a legal remaining path. The **real pick is confirmed when that day is current.** Past and current / entered **bound blocks stay frozen.** Closes open question 1 (re-route vs pick-when-current).
+2. **M1 Client = simple route-graph layout** (nodes + edges, ugly) so later art / UI can plug in. **Not** a day strip. **Graph board now, art Later (Nnoitra).**
+3. Elite telegraph stays **open**. M1 default = type + id on the graph (no distinct StS-elite marker this stamp).
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/22-chapter-schedule.md` | Draft-future law; graph-board Client need; OQ1 closed |
+| `docs/20-harness-stamp.md` | Optional `draft_path`; confirm ≠ draft |
+| `docs/01-core-loop.md` | Draft-only + graph board pointer |
+| `docs/STAMP.md` | This note |
