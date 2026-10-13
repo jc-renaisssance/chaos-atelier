@@ -265,6 +265,30 @@ def check_map_pool() -> None:
         fail("boss approach label must be relative to map length, not hardcoded D8")
 
 
+def check_board_scroll() -> None:
+    """1280×720: overflow body must scroll; day strip must not steal the leftover height."""
+    ui = (SRC / "ui" / "schedule" / "schedule_board.gd").read_text(encoding="utf-8")
+    if "_body_scroll" not in ui:
+        fail("schedule board must keep _body_scroll for 1280×720 overflow")
+    if ui.count("ScrollContainer.new()") < 2:
+        fail("board must construct a body ScrollContainer (stamp scroll alone is not enough)")
+    if "horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED" not in ui:
+        fail("overflow ScrollContainer must disable horizontal so labels wrap at viewport width")
+    if re.search(r"timeline_panel\.size_flags_vertical\s*=\s*Control\.SIZE_EXPAND_FILL", ui):
+        fail("day strip must not SIZE_EXPAND_FILL vertically — that clips EVENT OPTIONS / TODAY / RESOLVE at 720")
+    build = ui.split("func _build", 1)[-1].split("func _caption", 1)[0]
+    scroll_at = build.find("_body_scroll")
+    if scroll_at < 0:
+        fail("board _build must create _body_scroll")
+        return
+    after = build[scroll_at:]
+    for token in ('"EVENT OPTIONS', '"TODAY', '"RESOLVE'):
+        if token not in after:
+            fail(f"{token} panel must be parented under the overflow ScrollContainer")
+    if "size_flags_vertical = Control.SIZE_EXPAND_FILL" not in after:
+        fail("overflow ScrollContainer must SIZE_EXPAND_FILL the leftover height")
+
+
 def main() -> int:
     blob = src_text()
     check_project_godot()
@@ -272,6 +296,7 @@ def main() -> int:
     check_source_symbols(blob)
     check_gd_balance()
     check_map_pool()
+    check_board_scroll()
     if FAILS:
         print("FAIL")
         for item in FAILS:
