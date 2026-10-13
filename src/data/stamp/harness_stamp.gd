@@ -13,13 +13,19 @@ extends Resource
 @export var adventurer_skill_id: String = "" ## ask_* log-only (docs/30 slice 1); not a 20 Required field
 @export var adventurer_stats: Dictionary = {} ## panel knobs {HP,ATK,DEF,RES,MOB,PRE}; log-only
 
-@export_group("Day planner")
+@export_group("Route map")
 @export var CHAPTER_DAY_COUNT: int = 0 ## = map.day_count this chapter — not always-8
 @export var day_index: int = GameConstants.NULL_INT ## null on chapter-start newspaper
 @export var days_left: int = 0
 @export var day_action: GameEnums.RoundAction = GameEnums.RoundAction.NONE
-@export var event_pool: Array[PlannerEvent] = []
-@export var day_assignments: Array[DayAssignment] = []
+@export var route_map_id: String = ""
+@export var route_nodes: Array[RouteNode] = []
+@export var route_edges: Array[RouteEdge] = []
+@export var route_path: Array[String] = []
+@export var draft_path: Array[String] = []
+@export var current_node_id: String = ""
+@export var bound_block_id: String = ""
+@export var fork_options: Array = []
 @export var appointment_pins: Array[AppointmentPin] = []
 @export var appt_decline_used: bool = false
 ## Unbounded piece telemetry. Not a gate. Do not emit crafts_max.
@@ -106,8 +112,14 @@ func apply_schedule(board: ChapterSchedule) -> void:
 	day_index = board.day_index
 	days_left = board.days_left
 	day_action = board.current_day_action()
-	event_pool = board.event_pool.duplicate()
-	day_assignments = board.day_assignments.duplicate()
+	route_map_id = board.map_id
+	route_nodes = board.route_nodes.duplicate()
+	route_edges = board.route_edges.duplicate()
+	route_path = board.route_path.duplicate()
+	draft_path = board.draft_path.duplicate()
+	current_node_id = board.current_node_id
+	bound_block_id = board.bound_block_id()
+	fork_options = board.fork_option_rows()
 	appointment_pins = board.appointment_pins.duplicate()
 	appt_decline_used = board.appt_decline_used
 	crafts_done_this_chapter = board.crafts_done
@@ -161,6 +173,12 @@ func apply_resolver(result: Dictionary) -> void:
 		run_over = bool(result.get("run_over", false))
 	if result.has("run_over_reason"):
 		run_over_reason = result.get("run_over_reason", GameEnums.RunOverReason.NONE)
+
+
+func _reserved_day_action() -> bool:
+	if day_action == GameEnums.RoundAction.NONE:
+		return false
+	return GameConstants.is_reserved_final_day(day_index, CHAPTER_DAY_COUNT)
 
 
 func _null_int(value: int) -> Variant:
@@ -221,17 +239,24 @@ func _pin_rows() -> Array:
 	return rows
 
 
-func _event_pool_rows() -> Array:
+func _route_node_rows() -> Array:
 	var rows: Array = []
-	for event in event_pool:
-		rows.append(event.to_dict())
+	for node in route_nodes:
+		rows.append(node.to_dict())
 	return rows
 
 
-func _assignment_rows() -> Array:
+func _route_edge_rows() -> Array:
 	var rows: Array = []
-	for row in day_assignments:
-		rows.append(row.to_dict())
+	for edge in route_edges:
+		rows.append(edge.to_dict())
+	return rows
+
+
+func _path_rows(path: Array[String]) -> Array:
+	var rows: Array = []
+	for nid in path:
+		rows.append(nid)
 	return rows
 
 
@@ -249,9 +274,15 @@ func to_dict() -> Dictionary:
 		"CHAPTER_DAY_COUNT": CHAPTER_DAY_COUNT,
 		"day_index": _null_int(day_index),
 		"days_left": days_left,
-		"day_action": GameEnums.day_action_wire(day_action),
-		"event_pool": _event_pool_rows(),
-		"day_assignments": _assignment_rows(),
+		"day_action": GameEnums.day_action_wire(day_action) if not _reserved_day_action() else "reserved",
+		"route_map_id": route_map_id,
+		"route_nodes": _route_node_rows(),
+		"route_edges": _route_edge_rows(),
+		"route_path": _path_rows(route_path),
+		"draft_path": _path_rows(draft_path),
+		"current_node_id": _null_str(current_node_id),
+		"bound_block_id": _null_str(bound_block_id),
+		"fork_options": fork_options.duplicate(true),
 		"appointment_pins": _pin_rows(),
 		"appt_decline_used": appt_decline_used,
 		"crafts_done_this_chapter": crafts_done_this_chapter,
@@ -364,10 +395,16 @@ func schema_errors() -> PackedStringArray:
 			errs.append("day_index not in 1..CHAPTER_DAY_COUNT")
 	for pin in appointment_pins:
 		errs.append_array(pin.schema_errors(CHAPTER_DAY_COUNT))
-	for row in day_assignments:
-		errs.append_array(row.schema_errors(CHAPTER_DAY_COUNT))
-	for event in event_pool:
-		errs.append_array(event.schema_errors(CHAPTER_DAY_COUNT))
+	for node in route_nodes:
+		errs.append_array(node.schema_errors(CHAPTER_DAY_COUNT))
+	for edge in route_edges:
+		errs.append_array(edge.schema_errors())
+	if fork_options.size() == 1 or fork_options.size() > 4:
+		errs.append("fork_options length must be 0 or 2..4")
+	for nid in draft_path:
+		if nid in route_path:
+			errs.append("draft_path must not overlap route_path")
+			break
 	if emit_session():
 		errs.append_array(session.schema_errors())
 		if session.construction_id != construction_id and not construction_id.is_empty():

@@ -1,5 +1,5 @@
 extends Control
-## Travelling-atelier Day planner (docs/22). Craft is a dedicated screen (docs/27).
+## Travelling-atelier route graph (docs/22). Craft is a dedicated screen (docs/27).
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -13,11 +13,12 @@ var _title: Label
 var _meta: Label
 var _note: Label
 var _planner_caption: Label
-var _timeline: HBoxContainer
-var _slots: Array[DaySlotView] = []
-var _focus_day: int = 1
+var _graph: RouteGraphView
+var _options_caption: Label
+var _options_panel: PanelContainer
 var _options_title: Label
 var _options: VBoxContainer
+var _draft_lab: Label
 var _today_title: Label
 var _actions: HFlowContainer
 var _resolve_title: Label
@@ -67,7 +68,7 @@ func _build() -> void:
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
-	_title = _label("CHAOS ATELIER  ·  travelling wagon", 26, GOLD)
+	_title = _label("WOMBASTE  ·  travelling wagon", 26, GOLD)
 	root.add_child(_title)
 	_meta = _label("", 15, INK)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -78,17 +79,16 @@ func _build() -> void:
 	_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(_note)
 
-	_planner_caption = _caption("DAY PLANNER  ·  map day_count  ·  not a path map")
+	_planner_caption = _caption("ROUTE GRAPH  ·  map_m1  ·  nodes + edges  ·  ugly M1")
 	root.add_child(_planner_caption)
-	var timeline_panel := _panel()
-	timeline_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_child(timeline_panel)
-	_timeline = HBoxContainer.new()
-	_timeline.add_theme_constant_override("separation", 8)
-	_timeline.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	timeline_panel.add_child(_timeline)
+	var graph_panel := _panel()
+	graph_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(graph_panel)
+	_graph = RouteGraphView.new()
+	_graph.node_picked.connect(_on_graph_pick)
+	graph_panel.add_child(_graph)
 
-	## 1280×720: day strip stays put; EVENT OPTIONS / TODAY / RESOLVE scroll.
+	## 1280×720: graph stays put; FORK OPTIONS / TODAY / RESOLVE scroll.
 	_body_scroll = ScrollContainer.new()
 	_body_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -99,15 +99,16 @@ func _build() -> void:
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.add_child(body)
 
-	body.add_child(_caption("EVENT OPTIONS  ·  type + id  ·  expand the focused day"))
-	var options_panel := _panel()
-	options_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(options_panel)
+	_options_caption = _caption("FORK OPTIONS  ·  type + id  ·  current choice only")
+	body.add_child(_options_caption)
+	_options_panel = _panel()
+	_options_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(_options_panel)
 	var options_box := VBoxContainer.new()
 	options_box.add_theme_constant_override("separation", 6)
 	options_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	options_panel.add_child(options_box)
-	_options_title = _label("Click a day to preview E*.", 15, INK)
+	_options_panel.add_child(options_box)
+	_options_title = _label("No live fork.", 15, INK)
 	_options_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_options_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options_box.add_child(_options_title)
@@ -115,8 +116,12 @@ func _build() -> void:
 	_options.add_theme_constant_override("separation", 4)
 	_options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options_box.add_child(_options)
+	_draft_lab = _label("", 13, MUTED)
+	_draft_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_draft_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(_draft_lab)
 
-	body.add_child(_caption("TODAY  ·  one primary action from the assigned E*"))
+	body.add_child(_caption("TODAY  ·  one primary action from the current node"))
 	var today := _panel()
 	today.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(today)
@@ -124,7 +129,7 @@ func _build() -> void:
 	today_box.add_theme_constant_override("separation", 8)
 	today_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today.add_child(today_box)
-	_today_title = _label("Assign the chapter, then take today.", 16, INK)
+	_today_title = _label("D1 is N1. Confirm forks when current.", 16, INK)
 	_today_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_today_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today_box.add_child(_today_title)
@@ -136,7 +141,7 @@ func _build() -> void:
 	var today_row := HBoxContainer.new()
 	today_row.add_theme_constant_override("separation", 8)
 	today_box.add_child(today_row)
-	_take_btn = _btn("Take assigned", _on_take)
+	_take_btn = _btn("Take node", _on_take)
 	today_row.add_child(_take_btn)
 	_decline_btn = _btn("Decline appointment (−reps)", _on_decline)
 	today_row.add_child(_decline_btn)
@@ -156,8 +161,8 @@ func _build() -> void:
 	_resolve_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_box.add_child(_resolve_title)
 	_resolve_body = _label(
-		"Appointment / adventurer / prep craft → stamina craft (order-fixed construction). "
-		+ "Wagon event / shop / rest → event path (stays on the planner).",
+		"Current node: adventurer / appointment → stamina craft. "
+		+ "Shop / event / reserved stay phase=schedule. Draft is ghost only.",
 		14,
 		INK
 	)
@@ -187,7 +192,7 @@ func _build() -> void:
 	demo.add_child(_btn("Dex", _on_dex))
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("Dex · shop / menu collection list. own_basic loop: newspaper → Day planner → craft → boss-client sew → fight. Shop events / portraits Later.", 12, MUTED)
+	var hint := _label("Dex · shop / menu collection list. own_basic loop: newspaper → route graph → craft → boss-client sew → fight. Shop UI / portraits Later.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -239,18 +244,6 @@ func _btn(text: String, cb: Callable) -> Button:
 	return btn
 
 
-func _ensure_slots(n: int) -> void:
-	while _slots.size() < n:
-		var cell := DaySlotView.new()
-		cell.focused.connect(_on_focus_day)
-		_timeline.add_child(cell)
-		_slots.append(cell)
-	while _slots.size() > n:
-		var cell: Variant = _slots.pop_back()
-		if cell is Node:
-			(cell as Node).queue_free()
-
-
 func _redraw() -> void:
 	var in_craft := AtelierSession.craft_open
 	if in_craft:
@@ -273,14 +266,11 @@ func _redraw() -> void:
 	if board == null:
 		return
 	var n := board.day_count
-	_ensure_slots(n)
-	if _focus_day < 1 or _focus_day > n:
-		_focus_day = board.day_index if GameConstants.is_schedule_day(board.day_index, n) else 1
 	var boss := ScheduleCatalog.boss_title(board.chapter_boss_id)
-	_title.text = "CHAOS ATELIER  ·  travelling wagon  ·  %s" % board.player_owner_id
-	_planner_caption.text = "DAY PLANNER  ·  %d days (map.day_count)  ·  last 2 reserved  ·  not a path map" % n
+	_title.text = "WOMBASTE  ·  travelling wagon  ·  %s" % board.player_owner_id
+	_planner_caption.text = "ROUTE GRAPH  ·  %s  ·  %d days (map.day_count)  ·  last 2 reserved  ·  nodes + edges" % [board.map_id, n]
 	_meta.text = (
-		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   pieces %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
+		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
 		% [
 			board.chapter_id,
 			GameConstants.CHAPTERS_PER_RUN,
@@ -289,6 +279,7 @@ func _redraw() -> void:
 			"—" if AtelierSession.newspaper_open else str(board.day_index),
 			n,
 			board.days_left,
+			board.current_node_id if not board.current_node_id.is_empty() else "—",
 			board.crafts_done,
 			AtelierSession.reps,
 			GameConstants.REPS_GATE_STUB,
@@ -297,20 +288,8 @@ func _redraw() -> void:
 		]
 	)
 	_note.text = AtelierSession.last_note
-	if _slots.size() != board.days.size():
-		return
-	for i in range(board.days.size()):
-		var slot: ScheduleDay = board.days[i]
-		var pin := board.pin_at(slot.day_index)
-		var assigned := board.assigned_event(slot.day_index)
-		_slots[i].bind(
-			slot,
-			pin,
-			assigned,
-			slot.day_index == board.day_index and not AtelierSession.newspaper_open,
-			slot.day_index == _focus_day,
-			n
-		)
+	if _graph != null:
+		_graph.bind(board)
 	_rebuild_options()
 	_rebuild_actions()
 	_refresh_resolve()
@@ -323,49 +302,31 @@ func _rebuild_options() -> void:
 	var board: ChapterSchedule = AtelierSession.board
 	if board == null:
 		return
-	var day_i := _focus_day
-	var reserved := board.is_reserved_day(day_i)
-	var played := board.is_day_played(day_i)
-	var assigned := board.assigned_event(day_i)
-	var opts := board.options_for_day(day_i)
-	if reserved:
-		_options_title.text = (
-			"D%d reserved — travel / final prep or boss approach. Not player-assignable."
-			% day_i
-		)
+	var opts := board.fork_options()
+	var show := not opts.is_empty() and not AtelierSession.newspaper_open
+	if _options_caption != null:
+		_options_caption.visible = show
+	if _options_panel != null:
+		_options_panel.visible = show
+	var draft_line := ""
+	if not board.draft_path.is_empty():
+		draft_line = "DRAFT  ·  ghost only  ·  %s" % ", ".join(board.draft_path)
+	if _draft_lab != null:
+		_draft_lab.text = draft_line
+		_draft_lab.visible = not draft_line.is_empty()
+	if not show:
+		_options_title.text = "No live fork — corridor / bind / reserved / D1 / draft-only future hide this panel."
 		return
-	var count_note := "%d option(s)" % opts.size()
-	if day_i == 1:
-		count_note += " · D1 first-customer"
-	_options_title.text = "D%d  ·  %s  ·  M1 shows type + id" % [day_i, count_note]
-	if opts.is_empty():
-		_options.add_child(_label("No E* on this day.", 13, MUTED))
-		return
-	for event in opts:
+	_options_title.text = "D%d  ·  %d next  ·  M1 type + id  ·  confirm writes route_path" % [board.day_index, opts.size()]
+	for node in opts:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
-		var line := event.panel_line()
-		if event.fixed:
-			line += "  [fixed]"
-		var lab := _label(line, 14, INK)
+		var lab := _label(node.panel_line(), 14, INK)
 		lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(lab)
-		var state := ""
-		var elsewhere := board.assignment_for_event(event.event_id)
-		if assigned != null and assigned.event_id == event.event_id:
-			state = "assigned here"
-		elif elsewhere != null:
-			state = "assigned D%d" % elsewhere.day_index
-		if played:
-			var frozen := _label("frozen", 12, MUTED)
-			row.add_child(frozen)
-		elif AtelierSession.can_assign_event(day_i, event.event_id):
-			var btn := _btn("Assign", _on_assign.bind(day_i, event.event_id))
+		if AtelierSession.can_confirm_node(node.node_id):
+			var btn := _btn("Confirm", _on_confirm.bind(node.node_id))
 			row.add_child(btn)
-		elif not state.is_empty():
-			row.add_child(_label(state, 12, MUTED))
-		else:
-			row.add_child(_label("locked", 12, MUTED))
 		_options.add_child(row)
 
 
@@ -381,8 +342,8 @@ func _rebuild_actions() -> void:
 	_continue_btn.visible = AtelierSession.resolve_open or AtelierSession.chapter_over or AtelierSession.run_over
 	_continue_btn.disabled = not AtelierSession.resolve_open
 	if AtelierSession.newspaper_open:
-		_today_title.text = "Kingdom newspaper — boss announced. Dismiss into the Day planner."
-		_continue_btn.text = "Open the Day planner"
+		_today_title.text = "Kingdom newspaper — boss announced. Dismiss into the route graph."
+		_continue_btn.text = "Open the route graph"
 		_take_btn.visible = false
 		return
 	if AtelierSession.boss_open:
@@ -406,29 +367,36 @@ func _rebuild_actions() -> void:
 		_continue_btn.text = "Continue"
 		_take_btn.visible = false
 		return
-	var pin: AppointmentPin = board.current_pin() if board != null else null
-	var assigned: PlannerEvent = board.current_assigned_event() if board != null else null
-	if pin != null and not AtelierSession.declined_this_day:
+	if board == null:
+		return
+	var pin: AppointmentPin = board.current_pin()
+	var node: RouteNode = board.node_for_day(board.day_index)
+	if not board.day_node_confirmed():
+		_today_title.text = "Live fork on D%d — confirm 1 of %d next nodes (type + id). Draft is not a pick." % [board.day_index, board.fork_options().size()]
+		_take_btn.text = "Take node"
+		_take_btn.disabled = true
+		return
+	if pin != null and node != null and node.kind == "appointment" and not AtelierSession.declined_this_day:
 		_today_title.text = (
-			"Pinned appointment: %s. Take it, or decline once this chapter (−reps) and pick another action."
-			% pin.appointment_id
+			"Current node %s appointment: %s. Take it, or decline once this chapter (−reps)."
+			% [node.node_id, pin.appointment_id]
 		)
 		_take_btn.text = "Take appointment"
 	elif board != null and board.is_reserved_day(board.day_index):
 		if board.day_index == board.day_count:
-			_today_title.text = "Reserved D%d — boss approach. Not player-assignable." % board.day_index
+			_today_title.text = "Reserved D%d — boss approach. Not player-pickable." % board.day_index
 			_take_btn.text = "Resolve reserved day"
 		else:
-			_today_title.text = "Reserved D%d — travel / final prep. Not player-assignable." % board.day_index
+			_today_title.text = "Reserved D%d — travel / final prep. Not player-pickable." % board.day_index
 			_take_btn.text = "Resolve reserved day"
-	elif assigned != null:
-		_today_title.text = "Assigned today: %s. Take it, or update unplayed assignable days." % assigned.panel_line()
-		_take_btn.text = "Take assigned"
+	elif node != null:
+		_today_title.text = "Current node %s. Take it. Shop 1–3 is graph law — not a UI ban." % node.panel_line()
+		_take_btn.text = "Take node"
 	else:
-		_today_title.text = "Assign an E* to D%d (options panel), then take the day." % (board.day_index if board != null else 0)
-		_take_btn.text = "Take assigned"
+		_today_title.text = "Confirm today's node, then take it."
+		_take_btn.text = "Take node"
 	for action in legal:
-		if assigned != null and action == ScheduleRules.action_for_kind(assigned.kind) and not AtelierSession.declined_this_day:
+		if node != null and action == ScheduleRules.action_for_kind(node.kind) and not AtelierSession.declined_this_day:
 			continue
 		if board != null and board.is_reserved_day(board.day_index) and action == GameEnums.RoundAction.REST_DIG:
 			continue
@@ -447,10 +415,11 @@ func _refresh_resolve() -> void:
 		else:
 			_resolve_title.text = "Waiting for a pick."
 			_resolve_body.text = (
-				"Assign E* at chapter start (and update unplayed assignable days). "
-				+ "Order path: appointment, adventurer, prep craft → stamina craft → mission result (docs/23, 24). "
-				+ "Event path: wagon event, wagon shop, rest / dig → stay phase=schedule. "
-				+ "After the day budget: shared-pool boss-client sew, then that adventurer fights. Mid-fail continues; boss fail = run_over."
+				"Walk the authored graph. Confirm a live fork when that day is current. "
+				+ "Draft future is ghost only — not route_path. "
+				+ "Order path: appointment / adventurer → stamina craft. "
+				+ "Event path: shop / event / reserved stay phase=schedule. "
+				+ "After the day budget: shared-pool boss-client sew, then that adventurer fights."
 			)
 		return
 	var payload: Dictionary = AtelierSession.last_resolve
@@ -463,13 +432,15 @@ func _on_resolve(_payload: Dictionary) -> void:
 	_redraw()
 
 
-func _on_focus_day(day_index: int) -> void:
-	_focus_day = day_index
-	_redraw()
+func _on_graph_pick(node_id: String) -> void:
+	if AtelierSession.can_confirm_node(node_id):
+		AtelierSession.confirm_node(node_id)
+		return
+	AtelierSession.draft_node(node_id)
 
 
-func _on_assign(day_index: int, event_id: String) -> void:
-	AtelierSession.assign_event(day_index, event_id)
+func _on_confirm(node_id: String) -> void:
+	AtelierSession.confirm_node(node_id)
 
 
 func _on_pick(action: GameEnums.RoundAction) -> void:

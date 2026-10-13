@@ -290,8 +290,14 @@ def run_spec() -> None:
         "day_index",
         "days_left",
         "day_action",
-        "event_pool",
-        "day_assignments",
+        "route_map_id",
+        "route_nodes",
+        "route_edges",
+        "route_path",
+        "draft_path",
+        "current_node_id",
+        "bound_block_id",
+        "fork_options",
         "appointment_pins",
         "appt_decline_used",
         "crafts_done_this_chapter",
@@ -340,7 +346,16 @@ def run_spec() -> None:
     for field in stamp_fields:
         if f'"{field}"' not in dump_src:
             fail(f"stamp dump missing {field}")
-    for banned_dump in ("crafts_max", "CHAPTER_ROUND_COUNT", "round_index", "rounds_left", "round_action", "pinned_round"):
+    for banned_dump in (
+        "crafts_max",
+        "CHAPTER_ROUND_COUNT",
+        "round_index",
+        "rounds_left",
+        "round_action",
+        "pinned_round",
+        "event_pool",
+        "day_assignments",
+    ):
         if f'"{banned_dump}"' in dump_src:
             fail(f"stamp dump must not emit superseded {banned_dump}")
 

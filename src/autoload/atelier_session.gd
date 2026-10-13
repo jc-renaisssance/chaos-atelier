@@ -1,5 +1,5 @@
 extends Node
-## Live travelling-atelier session. Day planner (22) + stamina craft (27) + mission (23/24).
+## Live travelling-atelier session. Route graph (22) + stamina craft (27) + mission (23/24).
 ## Autoload singleton is already named AtelierSession — do not add class_name.
 
 signal board_changed
@@ -107,7 +107,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	var boss_id := ScheduleRules.roll_boss(chapter_id, rng)
 	var pool_id := String(GameConstants.BOSS_POOL_IDS.get(chapter_id, ""))
 	board.begin_live(boss_id, pool_id)
-	ScheduleRules.pin_fixed_events(board)
+	board.enter_current_day()
 	newspaper_open = true
 	resolve_open = true
 	last_newspaper_event = GameEnums.NewspaperEvent.BOSS_ANNOUNCE
@@ -120,7 +120,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	if not errs.is_empty():
 		last_note = "schema: " + ", ".join(errs)
 	else:
-		last_note = "Kingdom newspaper — boss announced before spend. Day planner next: preview E* per day, assign D1..(N-2)."
+		last_note = "Kingdom newspaper — boss announced before spend. Route graph next: D1 is N1; draft future; confirm when current."
 	resolve_started.emit(last_resolve)
 	board_changed.emit()
 
@@ -144,21 +144,42 @@ func legal_actions() -> Array[GameEnums.RoundAction]:
 	return ScheduleRules.legal_actions(board, declined_this_day)
 
 
-func can_assign_event(day_i: int, event_id: String) -> bool:
+func can_confirm_node(node_id: String) -> bool:
 	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
 		return false
-	return board.can_assign(day_i, event_id)
+	if resolve_open:
+		return false
+	return board.can_confirm_node(node_id)
 
 
-func assign_event(day_i: int, event_id: String) -> bool:
+func confirm_node(node_id: String) -> bool:
 	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
 		return false
-	if not board.assign_day(day_i, event_id):
-		last_note = board.assign_reason(day_i, event_id)
+	if resolve_open:
+		return false
+	if not board.confirm_node(node_id):
+		last_note = board.confirm_reason(node_id)
 		board_changed.emit()
 		return false
 	last_stamp = _make_schedule_stamp()
-	last_note = "Assigned %s to D%d." % [event_id, day_i]
+	last_note = "Confirmed %s on D%d." % [node_id, board.day_index]
+	board_changed.emit()
+	return true
+
+
+func can_draft_node(node_id: String) -> bool:
+	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	return board.can_draft_node(node_id)
+
+
+func draft_node(node_id: String) -> bool:
+	if not can_draft_node(node_id):
+		return false
+	if not board.draft_node(node_id):
+		return false
+	last_stamp = _make_schedule_stamp()
+	last_note = "Draft ghost %s (not confirmed)." % node_id
 	board_changed.emit()
 	return true
 
@@ -197,14 +218,14 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 	if not ScheduleRules.is_legal(board, action, declined_this_day):
 		return false
 	var pin := board.current_pin()
-	var assigned := board.current_assigned_event()
+	var node := board.node_for_day(board.day_index)
 	if pin != null and action != GameEnums.RoundAction.APPOINTMENT and not declined_this_day:
 		board.appt_decline_used = true
 		declined_this_day = true
 		reps = maxi(0, reps + DECLINE_REPS_STUB)
 		last_note = "Pinned appointment skipped — decline used (−reps stub %d)." % DECLINE_REPS_STUB
 	var order_id := ""
-	var event_id := assigned.event_id if assigned != null else ""
+	var event_id := node.node_id if node != null else ""
 	pending_order = null
 	last_event = {}
 	match action:
@@ -214,8 +235,8 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			pending_order = ScheduleCatalog.order_for_appointment(pin)
 			order_id = pin.order_id
 		GameEnums.RoundAction.WALK_IN:
-			if assigned != null and assigned.kind == "adventurer" and not assigned.ref_id.is_empty():
-				pending_order = ScheduleCatalog.order_for_adventurer(assigned.ref_id, board.chapter_id, board.day_index)
+			if node != null and node.kind == "adventurer" and not node.ref_id.is_empty():
+				pending_order = ScheduleCatalog.order_for_adventurer(node.ref_id, board.chapter_id, board.day_index)
 			else:
 				pending_order = ScheduleCatalog.make_walk_in(board.chapter_id, board.day_index, rng)
 			order_id = pending_order.order_id
@@ -223,20 +244,20 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			pending_order = ScheduleCatalog.make_prep(board.day_index)
 			order_id = pending_order.order_id
 		GameEnums.RoundAction.WAGON_EVENT:
-			if assigned != null and assigned.kind == "event":
+			if node != null and node.kind == "event":
 				last_event = {
-					"id": assigned.event_id,
-					"title": "event · %s" % assigned.event_id,
-					"blurb": "Wagon event %s. No craft unless an event later says so." % assigned.event_id,
+					"id": node.node_id,
+					"title": "event · %s" % node.node_id,
+					"blurb": "Wagon event %s. No craft unless an event later says so." % node.node_id,
 				}
 			else:
 				last_event = ScheduleCatalog.pick_wagon_event(rng)
 		GameEnums.RoundAction.WAGON_SHOP:
-			if assigned != null and assigned.kind == "shop":
+			if node != null and node.kind == "shop":
 				last_event = {
-					"id": assigned.event_id,
-					"title": "shop · %s" % assigned.event_id,
-					"blurb": "Wagon shop %s. Stock rotates with the road. Shop UI is not this slice." % assigned.event_id,
+					"id": node.node_id,
+					"title": "shop · %s" % node.node_id,
+					"blurb": "Wagon shop %s. Stock rotates with the road. Shop UI is not this slice." % node.node_id,
 				}
 		_:
 			pass
@@ -443,7 +464,7 @@ func _return_to_schedule() -> void:
 	last_stamp = _make_mission_return_stamp(mission)
 	planned_build = null
 	last_note = (
-		"Mission %s · cleared %s · hp %.2f. Continue to the next planner day."
+		"Mission %s · cleared %s · hp %.2f. Continue to the next graph day."
 		% [
 			GameEnums.rating_wire(mission.get("rating", GameEnums.Rating.NONE)),
 			str(bool(mission.get("cleared", false))),
@@ -479,7 +500,7 @@ func acknowledge_resolve() -> void:
 		last_newspaper_event = GameEnums.NewspaperEvent.NONE
 		last_headline_id = ""
 		last_resolve = {}
-		last_note = "Day planner — preview options per day, assign D1..(N-2), then take D%d." % board.day_index
+		last_note = "Route graph — D1 is N1. Draft a future path; confirm a fork when that day is current."
 		last_stamp = _make_schedule_stamp()
 		board_changed.emit()
 		return
@@ -526,12 +547,12 @@ func acknowledge_resolve() -> void:
 			awaiting_boss = true
 			resolve_open = true
 			last_resolve = ScheduleRules.build_awaiting_boss(board)
-			last_note = "Day planner complete. Boss beat: draw a shared-pool adventurer, then sew that job's constructions."
+			last_note = "Route graph complete. Boss beat: draw a shared-pool adventurer, then sew that job's constructions."
 			last_stamp = _make_schedule_stamp()
 			resolve_started.emit(last_resolve)
 	else:
 		last_resolve = {}
-		last_note = "D%d — take the assigned event, or update unplayed assignable days." % board.day_index
+		last_note = "D%d — confirm the live fork if shown, then take today's node." % board.day_index
 		last_stamp = _make_schedule_stamp()
 	board_changed.emit()
 

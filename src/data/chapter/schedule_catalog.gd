@@ -1,6 +1,6 @@
 class_name ScheduleCatalog
 extends RefCounted
-## Placeholder appointments / walk-ins / wagon events for the Day planner (docs/22).
+## Placeholder appointments / walk-ins / wagon events for the route graph (docs/22).
 ## Not a 1-of-3 lineup and not a client encyclopedia.
 ## Scrap Duelist / appt_* stay appointments — not Dex Adventurers.
 
@@ -25,7 +25,7 @@ const ROUND_ACTION_TITLE := {
 	GameEnums.RoundAction.REST_DIG: "Rest / dig",
 }
 
-## C1–C3 named appointments. Scrap Duelist stays appt_* (E8 on the current map).
+## C1–C3 named appointments. Scrap Duelist stays appt_* (N5 on the current map).
 const APPOINTMENTS := {
 	1: [
 		{
@@ -207,9 +207,13 @@ static func walk_ins_for(chapter_id: int) -> Array:
 
 
 static func appointment_row(appointment_id: String) -> Dictionary:
+	var want := appointment_id
+	if want == "appt_scrap_duelist":
+		want = "appt_c1_scrap_duelist"
 	for chapter_id in APPOINTMENTS.keys():
 		for row in APPOINTMENTS[chapter_id]:
-			if String(row.get("appointment_id", "")) == appointment_id:
+			var aid := String(row.get("appointment_id", ""))
+			if aid == want or aid == appointment_id:
 				return row
 	return {}
 

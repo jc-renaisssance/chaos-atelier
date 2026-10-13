@@ -5,7 +5,8 @@ extends Resource
 @export var day_index: int = 1
 @export var day_action: GameEnums.RoundAction = GameEnums.RoundAction.NONE
 @export var order_id: String = "" ## appointment / walk-in / prep order when applicable
-@export var event_id: String = "" ## assigned E* when resolved from the pool
+@export var event_id: String = "" ## confirmed node id (legacy dump alias)
+@export var node_id: String = "" ## confirmed route node for this day
 
 
 func is_reserved_final(day_count: int) -> bool:
@@ -17,11 +18,14 @@ func is_played() -> bool:
 
 
 func to_dict(day_count: int) -> Dictionary:
+	var action: Variant = GameEnums.day_action_wire(day_action)
+	if is_reserved_final(day_count) and day_action != GameEnums.RoundAction.NONE:
+		action = "reserved"
 	return {
 		"day_index": day_index,
-		"day_action": GameEnums.day_action_wire(day_action),
+		"day_action": action,
 		"order_id": order_id if not order_id.is_empty() else null,
-		"event_id": event_id if not event_id.is_empty() else null,
+		"node_id": node_id if not node_id.is_empty() else null,
 		"reserved_final": is_reserved_final(day_count),
 	}
 
