@@ -2,6 +2,9 @@ class_name PlannerEvent
 extends Resource
 ## One E* row (docs/20, docs/22). M1 dump = type + id — no title field.
 
+## Autoload has no class_name (Godot 4.7). Call statics on the script type.
+const _GameConstants := preload("res://src/autoload/game_constants.gd")
+
 @export var event_id: String = ""
 @export var kind: String = "" ## shop | adventurer | appointment | event
 @export var windows: Array[int] = []
@@ -58,7 +61,7 @@ func schema_errors(day_count: int) -> PackedStringArray:
 	if windows.is_empty():
 		errs.append("%s windows empty" % event_id)
 	for day_i in windows:
-		if not GameConstants.is_assignable_day(day_i, day_count):
+		if not _GameConstants.is_assignable_day(day_i, day_count):
 			errs.append("%s window day %d not assignable for N=%d" % [event_id, day_i, day_count])
 	if kind == "appointment" and not ref_id.begins_with("appt_"):
 		errs.append("%s appointment ref_id must be appt_*" % event_id)
