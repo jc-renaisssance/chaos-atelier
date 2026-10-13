@@ -354,3 +354,24 @@ Both items **removed from open questions**. Client can proceed on Ulquiorra PR 1
 - Free per-day `E*` options board (`STAMP` 2026-10-12 §2, §5–7) — windows, 2–4 options every assignable day, chapter-start assign from that pool
 - “Not a path map” as live law (`STAMP` 2026-09-28 §1; Day planner 2026-10-12)
 - Chaos Atelier as live **display name** (`00-vision` temporary lock) — product is **Wombaste**
+
+---
+
+# Jonathan stamp — 2026-10-13 (draft-only future + graph board)
+
+Follow-up on the route-map stamp (same day). Docs only. Same PR.
+
+## Locked
+
+1. **Future unbound days are draft only.** Player may preview / draft a legal remaining path. The **real pick is confirmed when that day is current.** Past and current / entered **bound blocks stay frozen.** Closes open question 1 (re-route vs pick-when-current).
+2. **M1 Client = simple route-graph layout** (nodes + edges, ugly) so later art / UI can plug in. **Not** a day strip. **Graph board now, art Later (Nnoitra).**
+3. Elite telegraph stays **open**. M1 default = type + id on the graph (no distinct StS-elite marker this stamp).
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/22-chapter-schedule.md` | Draft-future law; graph-board Client need; OQ1 closed |
+| `docs/20-harness-stamp.md` | Optional `draft_path`; confirm ≠ draft |
+| `docs/01-core-loop.md` | Draft-only + graph board pointer |
+| `docs/STAMP.md` | This note |

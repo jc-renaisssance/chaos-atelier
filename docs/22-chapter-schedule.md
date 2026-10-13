@@ -89,6 +89,17 @@ Binds are **path fragments on the graph**, not a second layer the player stacks.
 
 A graph day that is **not** inside a bind, **not** reserved, and **not** a single-exit corridor. If the current node still has remaining outgoing options that day, the player makes a **limited free pick** from those remaining options (still 2–4, still type + id). If none remain besides a single corridor edge, there is no panel.
 
+### Draft future (LOCKED — Jonathan 2026-10-13)
+
+Future **unbound** days are **draft only**. The player may **preview / draft** a legal remaining path on the graph (ghost type + id). That draft is **not** the pick.
+
+- The **real pick is confirmed when that day is current** (live fork or unbound remaining options on the current node).
+- The player may change the draft as often as they like while those days are still future.
+- A draft that is no longer reachable (cut by a confirmed fork) is discarded.
+- **Past** and **current / entered bound blocks stay frozen.** Drafting cannot move a resolved node, un-pick a taken fork, or edit a bind already entered. Remaining days of an entered bind are pinned, not drafts.
+
+Do **not** treat a drafted future node as `route_path` / `current_node_id` / `day_action`.
+
 ### Frozen past
 
 Played days are frozen. The player cannot move a resolved node, cannot un-pick a taken fork, cannot edit a bind already entered.
@@ -250,37 +261,36 @@ Later maps stamp their own graph + `map.day_count`. Do not reuse this node table
 
 ## Timetable UX
 
-Labels are **D1..DN** — never R1. At **chapter start** the board shows the **authored graph** for this map (ugly M1: columns of type + id). Skill is reading corridors, forks, the elite, and the bind — then walking the road.
+Labels are **D1..DN** — never R1. The live board is the **authored route graph** (nodes + edges), not a day strip with a hidden map. Skill is reading corridors, forks, the elite, and the bind — then drafting ahead and confirming when the day is current.
 
 ### Chapter-start UX (LOCKED)
 
 1. Kingdom newspaper announces the **boss** (`26`) — not the boss-client.
-2. **Timetable** opens with days D1..N visible and the C1 graph previewable.
+2. **Graph board** opens: C1 nodes + edges visible (ugly M1: type + id). Days D1..N are columns / slots **on that graph**.
 3. **D1 is fixed** (N1 first-customer). No options panel on D1.
-4. Player does **not** assign the whole chapter from a per-day `E*` list.
+4. Player does **not** assign the whole chapter from a per-day `E*` list. They may **draft** a future unbound path (ghost). Confirm happens when each day is current.
 5. Reserved last-2 are visible, **not** pickable.
-6. Play proceeds day by day. When a fork is live, pick 1 of 2–4 **next** nodes.
+6. When a fork is **current**, pick 1 of 2–4 **next** nodes (draft may pre-highlight a legal option; it is not committed until confirm).
 
 ### Board states (LOCKED)
 
-| State | Options panel | What the day cell shows |
+| State | Options panel | What the board shows |
 |---|---|---|
-| **Fork** (2–4 next) | **Yes** — those next nodes, type + id (`shop · N7`). Keep `adv_*` / `appt_*` on the row. | Current node resolved or pending; next-day cells preview the offered ids |
+| **Fork** (2–4 next, **current**) | **Yes** — those next nodes, type + id (`shop · N7`). Keep `adv_*` / `appt_*` on the row. | Current node live; outgoing edges offered |
 | **Corridor** (exactly one next) | **No** | Next node pinned, type + id |
-| **Bound** (inside `combo_market`) | **No** | Remaining bind nodes pinned |
+| **Bound** (inside `combo_market`) | **No** | Remaining bind nodes **pinned / frozen** (not drafts) |
 | **Reserved** | **No** | D7 travel / final prep · D8 boss approach |
 | **Frozen past** | **No** | Played node, not clickable-to-reassign |
-| **Unbound remaining picks** | **Yes** — only remaining outgoing options from *this* node | Same M1 type + id rows |
+| **Draft future** (unbound, not current) | **No** as a commit panel — ghost the drafted path only | Preview / draft highlight; changeable until that day is current |
+| **Unbound remaining picks** (current) | **Yes** — only remaining outgoing options from *this* node | Same M1 type + id rows; confirm writes `route_path` |
 
-**No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1.
+**No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1 / draft-only future.
 
-**M1 copy:** type + id only. Type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. Fancy titles **Later**.
+**M1 copy:** type + id only. Type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph.
 
 ### Mid-chapter
 
-Past is frozen. Bound days stay pinned once entered. Cut branches stay cut.
-
-Whether the player may **re-route unbound future days after leaving a fork** (lookahead assign + change vs pick-only-when-current) is an **open question** — see below. Until Jonathan answers: **M1 walks day-by-day**; future reachable nodes may be **previewed** (ghost type + id) but are not committed until the choice is live.
+**LOCKED:** future unbound = draft only; real pick when the day is current. Past and entered binds stay frozen. Cut branches stay cut (and drop any draft that used them).
 
 Phase-1: **one** primary action per day.
 
@@ -311,14 +321,16 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 1. **No piece cap.** Do not block craft when `crafts_done` is high. Do not show a 4/4 garments meter. Do not emit `crafts_max`. Do not fire `cant_craft` because of piece count.
 2. **Day labels.** Timeline says **D1..DN** (N = `map.day_count`). Never R1. Current map N=8.
 3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
-4. **Route graph.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
-5. **Options panel only at choice.** Fork or unbound remaining picks: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past).
-6. **Binds.** Entering N7 pins N8 and N9. Bound days are not re-pickable.
-7. **Frozen past.** Played nodes cannot be moved.
-8. **Shop 1–3 from the graph.** Do **not** forbid picking a shop node because the run already visited k shops.
-9. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
-10. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
-11. Dump `phase=schedule` **kept** (on the timetable). Do not invent `phase=planner` / `phase=route` this stamp.
+4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp.
+5. **Route graph data.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
+6. **Options panel only at a current choice.** Fork or unbound remaining picks **on the current day**: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past, draft-only future).
+7. **Draft future.** Player may ghost a legal unbound path. Draft is **not** a confirm. Confirm when that day is current. Do not write drafts into `route_path`.
+8. **Binds.** Entering N7 pins N8 and N9. Bound days are frozen — not drafts, not re-pickable.
+9. **Frozen past.** Played nodes cannot be moved.
+10. **Shop 1–3 from the graph.** Do **not** forbid picking a shop node because the run already visited k shops.
+11. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
+12. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
+13. Dump `phase=schedule` **kept** (on the graph board). Do not invent `phase=planner` / `phase=route` this stamp.
 
 ## Test logs (Szayelaporro)
 
@@ -331,7 +343,8 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 | `route_map_id` | `map_m1` on current wagon |
 | `route_nodes` | `{ node_id, day_index, kind, ref_id, bound_block_id }` |
 | `route_edges` | `{ from, to }[]` |
-| `route_path` | Node ids taken, in order (includes reserved R7/R8 once reached) |
+| `route_path` | Node ids **confirmed**, in order (includes reserved R7/R8 once reached). Never drafts. |
+| `draft_path` | Ghosted future node ids (optional). Not Required. Must not overlap frozen past / entered bind. |
 | `current_node_id` | Live node |
 | `bound_block_id` | `combo_market` while inside the bind; else null |
 | `fork_options` | Visible next `{ node_id, kind, ref_id }[]` — empty when no choice |
@@ -351,7 +364,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 5. At a live fork: `len(fork_options)` ∈ 2..4, and each option is an outgoing edge of `current_node_id`.
 6. Corridor / bind / reserved / D1: `fork_options == []` (no options panel).
 7. Inside `combo_market`: D4=N7, D5=N8, D6=N9; panel hidden.
-8. Frozen past: `route_path` prefix does not change.
+8. Frozen past: `route_path` prefix does not change. `draft_path` is never treated as confirmed. Confirm on the current day appends that node to `route_path`. Drafts cannot rewrite past or an entered bind.
 9. Any **complete** D1..D6 path: shop-node count ∈ **1..3**. C1 sample paths A/B/C = 2 / 1 / 1.
 10. D1 current-map: N1 only (`adv_halden_rook`).
 11. `appt_scrap_duelist` is never `boss_client_id` and never a Dex Adventurers `adv_*`.
@@ -374,6 +387,8 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 - Inventing fancy node display titles (M1 = type + id)
 - Prep-craft / rest-dig nodes on the C1 sample
 - Pre-assigning the whole chapter at start from a pool
+- Treating a drafted future node as confirmed (`route_path` / `day_action`)
+- Day-strip-only M1 board (graph layout is required; art Later)
 
 ## Supersedes
 
@@ -386,10 +401,9 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 
 ## Open questions (Jonathan)
 
-≤2. Everything else in this stamp is locked.
+≤2. **Closed this pass:** future unbound days are **draft only** (real pick when current; past / entered binds frozen) — LOCKED 2026-10-13.
 
-1. **Unbound future after a fork.** After the player leaves a fork, may they **re-route unbound future days** (lookahead assign + change), or is the next pick only when that day is current? Frozen past and entered binds stay uneditable either way. M1 default until answered: walk day-by-day; preview only.
-2. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current?
+1. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current? M1 ships type + id on the graph until this is stamped.
 
 ## Pointers
 

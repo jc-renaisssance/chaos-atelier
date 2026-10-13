@@ -49,10 +49,11 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `route_map_id` | string | Current wagon **`map_m1`**. Later maps stamp their own id |
 | `route_nodes` | object[] | `{ node_id, day_index, kind, ref_id, bound_block_id }`. `node_id` = `N1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}; `ref_id` = `adv_*` / `appt_*` / null. M1 panel = **type + id** — no title field. C1 graph in [22](22-chapter-schedule.md) |
 | `route_edges` | object[] | `{ from, to }` — authored, not seeded |
-| `route_path` | string[] | Node ids taken, in order |
+| `route_path` | string[] | Node ids **confirmed**, in order. Never a draft |
+| `draft_path` | string[] | Optional ghosted future node ids. **Not Required.** Must not overlap frozen past / entered bind. Confirm on the current day writes `route_path`, not this field |
 | `current_node_id` | string\|null | Live node |
 | `bound_block_id` | string\|null | `combo_market` while inside the C1 bind; else null |
-| `fork_options` | object[] | Visible next `{ node_id, kind, ref_id }`. **Empty** when no choice (corridor / bind / reserved / D1 / frozen past). Live fork: length **2–4** |
+| `fork_options` | object[] | Visible next `{ node_id, kind, ref_id }` on the **current** choice. **Empty** when no choice (corridor / bind / reserved / D1 / frozen past / draft-only future). Live fork: length **2–4** |
 | `appointment_pins` | object[] | `appt_*` rows on the route: `{ appointment_id, order_id, node_id, pinned_day }`. Scrap Duelist stays here (C1 = **N5**). `pinned_day` ∈ 1..(N−2) |
 | `appt_decline_used` | bool | Phase-1: decline allowed **once** / chapter (−reps) |
 | `crafts_done_this_chapter` | int | Finished **pieces** this chapter — **unbounded** telemetry. Increments per finished piece, not per order. **Not a gate** |
@@ -158,7 +159,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 6. `CHAPTER_DAY_COUNT == map.day_count`. Current-map dumps use **8**; do **not** assert 8 as global law. On timetable / craft stamps `day_index` ∈ 1..`CHAPTER_DAY_COUNT`. Do **not** emit `CHAPTER_ROUND_COUNT` / `round_index`.
 7. Phase-1: exactly **one** `day_action` per day (null only before D1 play, or on non-timetable stamps). `day_action` ∈ {`adventurer`, `shop`, `appointment`, `event`, `reserved`} when set, and matches `current_node_id` kind.
 8. Every `route_nodes[].day_index` for non-reserved kinds and `appointment_pins[].pinned_day` ∈ 1..(N−2) — **not** the reserved last 2. Current 8-day map: not D7–D8. Reserved last-2 are `kind=reserved` only.
-9. Live fork: `len(fork_options)` ∈ 2..4 and each option is an outgoing `route_edges` row from `current_node_id`. Corridor / bind / reserved / D1 / frozen past: `fork_options == []`. Inside C1 `combo_market`: path contains N7→N8→N9 in order. Frozen `route_path` prefix does not change. Complete D1..D6 path: shop-node count ∈ 1..3.
+9. Live fork: `len(fork_options)` ∈ 2..4 and each option is an outgoing `route_edges` row from `current_node_id`. Corridor / bind / reserved / D1 / frozen past / draft-only future: `fork_options == []`. Inside C1 `combo_market`: path contains N7→N8→N9 in order. Frozen `route_path` prefix does not change. `draft_path` is not confirmed. Complete D1..D6 **confirmed** path: shop-node count ∈ 1..3.
 10. **No `crafts_max`.** Do not emit it. `crafts_done_this_chapter ≥ 0` unbounded — **not** a gate. `cant_craft` **must not** fire because of piece count. `cant_craft` (other causes) does not increment `crafts_done_this_chapter`.
 11. `phase` ∈ {`schedule`, `craft`, `boss`, `newspaper`} — never `shop` or `craft_task`. `schedule` = on the timetable. Do **not** emit windowed `event_pool` / free `day_assignments` as Required.
 
