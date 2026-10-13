@@ -17,7 +17,7 @@ Must exist before content flood:
 - Deep shop meta / scars systems
 
 ## Open questions
-- Final product name (Chaos Atelier is temporary)
+- Final product name — **locked 2026-10-13:** display name **Wombaste** (repo `chaos-atelier`). See [00-vision](00-vision.md).
 - Exact starter tag list and thresholds
 - Adventure sim resolution rules (combat vs environment checks)
 - Shop economy numbers

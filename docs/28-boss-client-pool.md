@@ -13,7 +13,7 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 - **M1 draw filter — LOCKED (Jonathan 2026-10-08):** pool for the draw is **4 jobs only** — Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Those four stay in this catalog as Later/M2 until their adventurer catalog exists ([29](29-adventurer-catalog.md)). Do **not** fall back to job-stubs for Later jobs.
 - The drawn adventurer’s **order constructions** (`con_*`) **+ requirement tags** are what the player crafts for.
 - The drawn adventurer **fights** the announced chapter boss. Player is the clothier, not the fighter.
-- Mid-chapter appointments / walk-ins (`appt_*`, Day planner `22`) are **not** this pool. Scrap Duelist stays an **appointment** — never the boss-client, never Dex Adventurers; do not pin to reserved **days** or the boss beat.
+- Mid-chapter appointments / walk-ins (`appt_*`, route map `22`) are **not** this pool. Scrap Duelist stays an **appointment** (C1 elite node) — never the boss-client, never Dex Adventurers; do not pin to reserved **days** or the boss beat.
 
 Example: C1 may draw Ash Drake as boss; C1 (or C2 / C3) may still draw a knight or a mage. Different jobs → different **order constructions** and different requirement tags. Knight orders armor + gauntlet; mage orders robe + hood. Ash Drake’s favor / punish (`17`) is the threat axis.
 
@@ -175,7 +175,7 @@ On `mission_kind=boss` (`20`):
 | `construction_ids` | **that job’s order constructions** (listed `con_*`, in sequence) |
 | `threat_id` | announced `chapter_boss_id` |
 
-`boss_client_id` is **never** an `appt_*`. Appointments use `appointment_id` on the Day planner (`22`).
+`boss_client_id` is **never** an `appt_*`. Appointments use `appointment_id` on the route map (`22`).
 
 Portraits / Client widgets / extra UI = **Later**.
 
@@ -185,14 +185,14 @@ Portraits / Client widgets / extra UI = **Later**.
 - Scrap Duelist (or any `appt_*`) as boss-client
 - Pinning an appointment to reserved **days** / the boss beat (current map: not D7–D8)
 - Inventing `con_*`, Godot scenes, or portraits
-- Per-chapter client pools for the **boss** beat (mid-chapter pools stay Day-planner `E*` / appointments)
+- Per-chapter client pools for the **boss** beat (mid-chapter people stay route-map nodes / appointments)
 - Flavor-only job rows with no order constructions
 - Drawing Wizard / Hexer / Outrider / Oathbound in M1 (or 8-job draw + job-stub fallback)
 
 ## Pointers
 
 - Bosses / starter-tag law: [17-chapter-bosses](17-chapter-bosses.md)
-- Day planner: [22-chapter-schedule](22-chapter-schedule.md)
+- Route map: [22-chapter-schedule](22-chapter-schedule.md)
 - Harness: [20-harness-stamp](20-harness-stamp.md)
 - Constructions: [12-constructions](12-constructions.md)
 - Craft: [27-craft-mode-stamina](27-craft-mode-stamina.md)

@@ -1,12 +1,12 @@
-# Chaos Atelier — Bible
+# Wombaste — Bible
 
-Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` (Aizen / Jonathan). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
+Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` — **superseded 2026-10-13** by the **route map with forks** (free per-day `E*` board from #36/#37 is not live). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
 
 | Doc | Topic |
 |---|---|
 | [00-vision](00-vision.md) | Concept |
 | [00-doc-categories](00-doc-categories.md) | Category map |
-| [01-core-loop](01-core-loop.md) | Spine *(node clock / Round board superseded → [22 Day planner](22-chapter-schedule.md))* |
+| [01-core-loop](01-core-loop.md) | Spine *(node clock / Round board / free `E*` board superseded → [22 route map](22-chapter-schedule.md))* |
 | [02-craft-and-tags](02-craft-and-tags.md) | Layers *(2m1r superseded → [27-stamina](27-craft-mode-stamina.md))* |
 | [03-clients-and-adventure](03-clients-and-adventure.md) | Pointer — people here are **adventurers** (term lock 2026-10-05; file name stays) |
 | [04-progression](04-progression.md) | Meta |
@@ -24,9 +24,9 @@ Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventur
 | [17-chapter-bosses](17-chapter-bosses.md) | Boss pools (C1 diverse; C2/C3 de-favor starter tags) |
 | [18-rarity](18-rarity.md) | Rarity |
 | [19-own-basic-starter](19-own-basic-starter.md) | Starter |
-| [20-harness-stamp](20-harness-stamp.md) | Stamps — Day planner + stamina assert list (Szayelaporro / 1B); **no `crafts_max`** |
-| [21-app-flow](21-app-flow.md) | Pseudocode *(1-of-3 superseded → [22 Day planner](22-chapter-schedule.md))* |
-| [22-chapter-schedule](22-chapter-schedule.md) | **Live chapter spine** — travelling atelier **Day planner** (filename kept; Rounds superseded) |
+| [20-harness-stamp](20-harness-stamp.md) | Stamps — route map + stamina assert list (Szayelaporro / 1B); **no `crafts_max`**; no live `E*` windows |
+| [21-app-flow](21-app-flow.md) | Pseudocode *(1-of-3 superseded → [22 route map](22-chapter-schedule.md))* |
+| [22-chapter-schedule](22-chapter-schedule.md) | **Live chapter spine** — travelling atelier **route map with forks** (filename kept; free `E*` board + Rounds superseded) |
 | [22-chapter-flow](22-chapter-flow.md) | **Superseded** — old 1-of-3 card lineup / round (kept for history) |
 | [23-mission-report](23-mission-report.md) | Mission card + letter |
 | [24-win-conditions](24-win-conditions.md) | Clear / run-over |
@@ -37,5 +37,5 @@ Docs-first. Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventur
 | [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
 | [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
 | [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-12** Day planner + drop `crafts_max`) |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-13** route map with forks; sample C1) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |

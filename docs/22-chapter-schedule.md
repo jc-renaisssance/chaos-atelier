@@ -1,124 +1,290 @@
-# Chapter day planner — travelling atelier (Jonathan stamp 2026-10-12)
+# Chapter route map — travelling atelier (Jonathan stamp 2026-10-13)
 
-**Status:** Design stamped. **LOCKED** (Aizen / Jonathan 2026-10-12). **Doc id: `22`.** Filename kept; live name is **Day planner**. **Supersedes** the 2026-09-28 **Round / schedule board** shell (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`, chapter-start appointment pins as the only assign UX).
+**Status:** Design stamped. **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`).
 
-Kept: travelling atelier (not a path map). Craft = stamina ([27](27-craft-mode-stamina.md)). Boss-client draw unchanged (`28` / `29`). Scrap Duelist / `appt_*` stay appointments — **not** Dex Adventurers ([31](31-dex.md)).
+**Supersedes** the free per-day **`E*` options board** from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) (preview every windowed event per day, assign D1..(N−2) from an identical-shaped list). **Still superseded:** 2026-09-28 Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`); 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)).
+
+Kept: travelling atelier. Craft = stamina ([27](27-craft-mode-stamina.md)). Boss-client draw unchanged (`28` / `29`). Scrap Duelist / `appt_*` stay appointments — **not** Dex Adventurers ([31](31-dex.md)). Piece cap **GONE**. `map.day_count` **stays** a map setting (current map **8**; last 2 reserved). M1 panel = **type + id**; fancy titles **Later**.
 
 ## Fiction
 
-The atelier rides a **horse-car / wagon** (or other transport). The shop moves with the road. Each chapter is one stretch: **days** on the road → destination **chapter boss**.
+The atelier rides a **horse-car / wagon**. Each chapter is one stretch of road to the destination **chapter boss**. The stretch is a **hand-authored route map**: corridors, forks, and bound multi-day blocks — **StS-like**, **not** seed-generated sprawl, **not** a free options list under every day.
+
+Combos are **bound multi-day blocks on the graph**, not stacked modifiers the player independently equips.
 
 ## Constants (Phase-1)
 
 | Key | Value | Notes |
 |---|---|---|
 | Chapters per run | 3 | Unchanged |
-| Day count | **`map.day_count`** / dump **`CHAPTER_DAY_COUNT`** | **Map setting — not global law.** Current map = **8**. Later maps may be **3** or **12**. Example tables below use 8 for the current map. |
+| Day count | **`map.day_count`** / dump **`CHAPTER_DAY_COUNT`** | **Map setting — not global law.** Current wagon map = **8**. Later maps may be **3** or **12**. |
 | Piece cap / `crafts_max` | **GONE** | Unlimited pieces per chapter. Stamina per craft session **stays** ([27](27-craft-mode-stamina.md)). |
 | Boss telegraph | Chapter start | Boss announced before spend |
-| Reserved days | Last **2** relative to `N = map.day_count` | Player assigns **D1..(N−2)** only. Current 8-day map: **D7** travel / final prep, **D8** boss approach. Appointments cannot claim reserved days. |
+| Reserved days | Last **2** relative to `N = map.day_count` | Graph days = **D1..(N−2)**. Current 8-day map: **D7** travel / final prep, **D8** boss approach. Appointments cannot claim reserved days. |
+| Shop visits / chapter | **1–3** | From **graph design** (how many `shop` nodes sit on a complete path). **Not** a hard UI ban on picking shop. |
+| Fork width | **2–4** visible next options | Only at forks. Corridor / bind / reserved → **no** options panel. |
 
 ### Reserved last-2 (relative to map length)
 
 ```
 N = map.day_count
-assignable = D1 .. D(N-2)
+graph days = D1 .. D(N-2)
 reserved   = D(N-1)  travel / final prep
              D(N)    boss approach
 ```
 
-| Map `day_count` | Assignable | Reserved |
+| Map `day_count` | Graph / assignable | Reserved |
 |---:|---|---|
 | **8** (current) | D1..D6 | D7 travel / final prep · D8 boss approach |
 | 3 (later map) | D1 | D2 travel / final prep · D3 boss approach |
 | 12 (later map) | D1..D10 | D11 travel / final prep · D12 boss approach |
 
-Do **not** hardcode 8 as law. Do **not** hardcode “rounds 7–8”. Fixed-window events may still pin **inside assignable days** — they cannot pin onto reserved days.
+Do **not** hardcode 8 as law. Do **not** hardcode “rounds 7–8”. Reserved days are **not** graph nodes the player picks.
 
-## Day planner (not a path map, not a Round board)
+---
 
-Labels are **D1, D2, … DN** — never R1. At **chapter start** the UI shows a **timeline of days 1..N**. Skill is previewing the pool, then **assigning the chapter**, then updating remaining days as the road unfolds.
+## Law — route-map model
+
+The chapter is a **directed graph** the designer authors. Nodes occupy graph days D1..(N−2). Edges go forward (a node on day D points at node(s) on day D+1, or at the start of a bind whose first day is D+1). The player **walks one path**. Past nodes are **frozen**.
+
+This is **not**:
+
+- a seed-grown StS act map (no procedural sprawl)
+- a per-day windowed `E*` pool (no “every event whose window includes today”)
+- stacking arbitrary combos on the same days
+
+### Node types
+
+| Kind | Dump / M1 type | What it does |
+|---|---|---|
+| **adventurer** | `adventurer` | Walk-in / listed order that day (`adv_*` on the row). |
+| **shop** | `shop` | Buy / sell / reshape material deck (stock rotates with travel). |
+| **appointment** | `appointment` | Named / important order. **StS-elite analog.** Scrap Duelist stays here. **Not** Dex Adventurers. |
+| **event** | `event` | Travel / road event. |
+| **reserved** | `reserved` | Last-2 only (travel / final prep + boss approach). Not player-picked. |
+
+Keep **`adv_*` / `appt_*`** on the row when they exist. **M1:** show **type + id** only — e.g. `shop · N2`. Fancy titles **Later**. Do **not** invent title copy.
+
+Prep craft / rest-dig are **Later** node kinds — **not** on the C1 sample map. Phase-1: **one** primary action per day, from the current node.
+
+Taking an order enters **craft mode once** for that order. Multi-piece = **one** parallel session ([27](27-craft-mode-stamina.md)). **No piece cap.** Decline: Phase-1 once per chapter at −reps (Later: reschedule at rep cost).
+
+### Fork choice
+
+A **fork** is a node with **2–4 outgoing** edges. When that choice is live, the timetable **options panel** lists those next nodes (type + id). The player picks **one**. Nodes not on the chosen edge are **cut** (dim / not offered later).
+
+Do **not** show the same option list under every day. Options are **the outgoing edges from the current node**, not a global pool filtered by window.
+
+### Corridor
+
+Exactly **one** outgoing edge → **no choice → no options panel**. The next node is pinned on the next day.
+
+### Binds (combos)
+
+A **bound multi-day block** is a designer-authored consecutive chain (e.g. shop → adventurer → adventurer over D4–D6). Entering the **first** node of the block **pins the rest**. Bound days show the pinned nodes only — **no free options panel**.
+
+Binds are **path fragments on the graph**, not a second layer the player stacks. One-combo vs stack = **corridor + forks** (a path through overlapping choices), not “equip combo A and combo B onto the same days.”
+
+### Unbound days
+
+A graph day that is **not** inside a bind, **not** reserved, and **not** a single-exit corridor. If the current node still has remaining outgoing options that day, the player makes a **limited free pick** from those remaining options (still 2–4, still type + id). If none remain besides a single corridor edge, there is no panel.
+
+### Frozen past
+
+Played days are frozen. The player cannot move a resolved node, cannot un-pick a taken fork, cannot edit a bind already entered.
+
+### Shop visits 1–3
+
+Count `shop` nodes on the **complete path** D1..(N−2) (reserved last-2 do not count). Authored so **every** full path has **1–3** shops. Client does **not** grey-out shop because `shops_taken == 3`. A path with 0 shops or 4 shops is a **map bug**, not a UI rule.
+
+### `map.day_count`
+
+N is per map. This stamp authors **one** concrete graph for the current wagon map (`day_count` = 8). Later maps stamp their own graph + N. Do not reuse the C1 node table as law for a 3-day or 12-day map.
+
+---
+
+## Sample map — C1 / current wagon (`day_count` = 8)
+
+**Map id:** `map_m1` (C1 current wagon). Graph days **D1..D6**. **D7–D8 reserved** on every path.
+
+Locks for this sample: D1 = fixed first-customer adventurer; ≥2 forks; ≥1 bound multi-day combo; appointment = StS-elite analog; every complete path has 1–3 shops (this map lands **1 or 2**).
+
+### Graph (D1..(N−2); D7–D8 reserved)
+
+```mermaid
+flowchart LR
+  subgraph d1 [D1]
+    N1["N1 adventurer"]
+  end
+  subgraph d2 [D2 fork]
+    N2["N2 shop"]
+    N3["N3 adventurer"]
+    N4["N4 event"]
+  end
+  subgraph d3 [D3]
+    N5["N5 appointment / elite"]
+    N6["N6 event"]
+  end
+  subgraph d4 [D4]
+    N7["N7 shop BIND start"]
+    N10["N10 event"]
+    N11["N11 adventurer"]
+  end
+  subgraph d5 [D5]
+    N8["N8 adventurer BOUND"]
+    N12["N12 shop"]
+    N13["N13 adventurer"]
+    N16["N16 shop"]
+  end
+  subgraph d6 [D6]
+    N9["N9 adventurer BOUND"]
+    N14["N14 adventurer"]
+    N15["N15 shop"]
+    N17["N17 event"]
+  end
+  subgraph res [D7–D8 reserved]
+    R7["D7 travel / final prep"]
+    R8["D8 boss approach"]
+  end
+
+  N1 --> N2
+  N1 --> N3
+  N1 --> N4
+  N2 --> N5
+  N3 --> N5
+  N3 --> N6
+  N4 --> N6
+  N5 --> N7
+  N5 --> N10
+  N5 --> N11
+  N6 --> N7
+  N6 --> N11
+  N7 --> N8 --> N9
+  N10 --> N12 --> N14
+  N10 --> N13 --> N15
+  N11 --> N16 --> N17
+  N9 --> R7
+  N14 --> R7
+  N15 --> R7
+  N17 --> R7
+  R7 --> R8
+```
+
+ASCII (same graph):
+
+```
+D1            D2              D3                 D4               D5               D6            D7     D8
+────────      ────────        ────────           ────────         ────────         ────────      ─────  ─────
+N1 adv ─┬───► N2 shop ──────► N5 elite ───┬────► N7 shop ═══════► N8 adv ════════► N9 adv ──┐
+        │                     ▲           │       BIND start       BOUND            BOUND  │
+        ├───► N3 adv ───┬─────┘           ├────► N10 event ─┬───► N12 shop ──────► N14 adv ─┼──► R7 ─► R8
+        │               └────► N6 event ─┐│                 └───► N13 adv ───────► N15 shop─┤
+        └───► N4 event ──────────────────┴┴────► N11 adv ───────► N16 shop ──────► N17 event┘
+```
+
+`═` = bound block `combo_market` (D4–D6). `─` / `├` / `┬` = ordinary edges. Overlap: N2 and N3 can both reach elite **N5**; N3 and N4 can both reach event **N6**; N5 and N6 can both enter the bind **N7** or the adventurer corridor **N11**.
+
+### Nodes
+
+| id | Day | Kind | Ref | Notes |
+|---|---|---|---|---|
+| **N1** | D1 | adventurer | `adv_halden_rook` | Fixed first-customer. Corridor into Fork 1. |
+| **N2** | D2 | shop | — | Fork 1 option |
+| **N3** | D2 | adventurer | `adv_vex_bramble` | Fork 1 option; then 2-exit onto N5 or N6 |
+| **N4** | D2 | event | — | Fork 1 option |
+| **N5** | D3 | appointment | `appt_scrap_duelist` | **Elite analog.** From N2 (corridor) or N3. |
+| **N6** | D3 | event | — | From N3 or N4. |
+| **N7** | D4 | shop | — | **BIND start** `combo_market` |
+| **N8** | D5 | adventurer | `adv_quill_lumen` | Bound |
+| **N9** | D6 | adventurer | `adv_kite_thornreel` | Bound |
+| **N10** | D4 | event | — | Unbound fork option from N5 |
+| **N11** | D4 | adventurer | `adv_tide_glass` | From N5 or N6; then corridor N16→N17 |
+| **N12** | D5 | shop | — | Unbound pick from N10 |
+| **N13** | D5 | adventurer | `adv_quill_lumen` | Unbound pick from N10 |
+| **N14** | D6 | adventurer | `adv_kite_thornreel` | Corridor from N12 |
+| **N15** | D6 | shop | — | Corridor from N13 |
+| **N16** | D5 | shop | — | Corridor from N11 |
+| **N17** | D6 | event | — | Corridor from N16 |
+| **R7** | D7 | reserved | — | Travel / final prep — all paths |
+| **R8** | D8 | reserved | — | Boss approach — all paths |
+
+Same `adv_*` may appear on **mutually exclusive** branches (N8 vs N13 vs N14, etc.). A single path never double-plays the same person. Do not invent display titles for these rows.
+
+### Bind
+
+| `bound_block_id` | Days | Nodes | Sequence |
+|---|---|---|---|
+| `combo_market` | D4–D6 | N7 → N8 → N9 | shop → adventurer → adventurer |
+
+Picking **N7** at the D4 fork enters the bind. D5 and D6 show N8 / N9 pinned — **no** options panel.
+
+### Forks (this map)
+
+| From | Day of choice | Options (2–4) |
+|---|---|---|
+| N1 | D1 resolve → D2 | **N2** shop · **N3** adventurer · **N4** event |
+| N3 | D2 resolve → D3 | **N5** appointment · **N6** event |
+| N5 | D3 resolve → D4 | **N7** shop (bind) · **N10** event · **N11** adventurer |
+| N6 | D3 resolve → D4 | **N7** shop (bind) · **N11** adventurer |
+| N10 | D4 resolve → D5 | **N12** shop · **N13** adventurer |
+
+Corridors (no panel): N2→N5 · N4→N6 · N7→N8→N9 · N12→N14 · N13→N15 · N11→N16→N17 · every path → R7→R8.
+
+### Example full paths (shop counts)
+
+Reserved D7–D8 trail every path. Shop count = `shop` nodes on D1..D6.
+
+| Path | Route | Shops | Count |
+|---|---|---|---:|
+| **A — Market elite bind** | N1 → **N2 shop** → N5 elite → **N7 shop** → N8 adv → N9 adv | N2, N7 | **2** |
+| **B — Road elite, late shop** | N1 → N3 adv → N5 elite → N10 event → N13 adv → **N15 shop** | N15 | **1** |
+| **C — Event corridor** | N1 → N4 event → N6 event → N11 adv → **N16 shop** → N17 event | N16 | **1** |
+
+Path A is the bound combo. Paths B and C are unbound / corridor. Overlap example (not required to play): N4 → N6 → **N7** also enters `combo_market` (1 shop: N7 only).
+
+This sample’s complete paths have **1 or 2** shops — inside the **1–3** law. A later map may author a 3-shop line. Do **not** cap shop picks in UI.
+
+Later maps stamp their own graph + `map.day_count`. Do not reuse this node table as law for a 3-day or 12-day map.
+
+---
+
+## Timetable UX
+
+Labels are **D1..DN** — never R1. At **chapter start** the board shows the **authored graph** for this map (ugly M1: columns of type + id). Skill is reading corridors, forks, the elite, and the bind — then walking the road.
 
 ### Chapter-start UX (LOCKED)
 
 1. Kingdom newspaper announces the **boss** (`26`) — not the boss-client.
-2. **Day planner** opens with every day D1..N visible.
-3. Player **previews all possible options per day** via **expand / popup** on that day (options whose window includes the day).
-4. Player **assigns the chapter schedule** — one primary option per assignable day D1..(N−2).
-5. Reserved last-2 are visible but **not assignable**.
-6. **Fixed-window** events pin themselves inside their window (cannot move). Player still assigns the rest.
+2. **Timetable** opens with days D1..N visible and the C1 graph previewable.
+3. **D1 is fixed** (N1 first-customer). No options panel on D1.
+4. Player does **not** assign the whole chapter from a per-day `E*` list.
+5. Reserved last-2 are visible, **not** pickable.
+6. Play proceeds day by day. When a fork is live, pick 1 of 2–4 **next** nodes.
 
-### Mid-chapter update (LOCKED)
+### Board states (LOCKED)
 
-The planner **can be updated mid-chapter**. Only **remaining unplayed assignable days**. Past days are frozen. Reserved days stay reserved. Fixed-window events stay pinned inside their window (player cannot drag them off).
-
-Phase-1: **one** primary action per day. Later: dual actions via skills.
-
-### Day action kinds (from the assigned event)
-
-| Kind | What it does |
-|---|---|
-| **Appointment** (`appt_*`) | Named / important order. Scrap Duelist stays here. **Not** Dex Adventurers. |
-| **Adventurer** (`adv_*`) | Walk-in / listed adventurer order that day |
-| **Wagon shop** | Buy / sell / reshape material deck (stock rotates with travel) |
-| **Wagon event** | Travel / road event |
-| **Prep craft** | Enter craft mode without a live adventurer — ready rack for a later appointment |
-| **Rest / dig** | Recover light stamina meta Later; or inventory dig outside craft (optional Phase-1) |
-
-Taking an order / prep **enters craft mode once** for that order. Multi-piece = **one** parallel session ([27](27-craft-mode-stamina.md)). **No piece cap** — `crafts_done_this_chapter` may increment (telemetry) but **never** gates craft. Decline: Phase-1 once per chapter at −reps (Later: reschedule at rep cost).
-
-## Event pool (`E*`)
-
-Events are **`E*`**. Keep **adventurer / appointment ids** on the row when they exist (`adv_*`, `appt_*`). Each event has **day window(s)**:
-
-| Shape | Example |
-|---|---|
-| Single day | E1 shop **D2** |
-| Inclusive range | E3 event **D2–D3** |
-| Discrete days | E4 adv **D2 & D6** |
-
-**Fixed window** = cannot move (pins inside that window, still on assignable days only).
-
-UI **options panel** lists the events whose window includes the inspected day. **M1 / current test: 2–4 options per day.** Exception: **D1 may only list the first-customer adventurer option(s)**.
-
-**M1 panel (LOCKED Jonathan 2026-10-12):** show **type + id** only — e.g. `shop` · `E1`. Type ∈ {`shop`, `adventurer`, `appointment`, `event`}. Fancy titles **Later**. Do **not** invent title copy.
-
-### Current map (N=8) — M1 / Test sketch
-
-Assignable D1..D6. Reserved D7 / D8. **Windows / types / 2–4-per-day / D1 exception / Scrap Duelist as `appt_*` are LOCKED** for this map’s sketch. No display titles this stamp.
-
-| id | Type | Window | Fixed | Ref |
-|---|---|---|---|---|
-| **E5** | adventurer | **D1** | yes | `adv_*` (first-customer slot) |
-| **E1** | shop | **D2** | yes | — |
-| **E2** | adventurer | **D2** | no | `adv_*` |
-| **E3** | event | **D2–D3** | no | — |
-| **E4** | adventurer | **D2 & D6** | no | `adv_*` |
-| **E6** | shop | **D3–D4** | no | — |
-| **E8** | appointment | **D3** | yes | `appt_scrap_duelist` |
-| **E13** | event | **D3** | no | — |
-| **E7** | event | **D4** | no | — |
-| **E9** | adventurer | **D4–D5** | no | `adv_*` |
-| **E10** | shop | **D5–D6** | no | — |
-| **E11** | event | **D5** | no | — |
-| **E12** | adventurer | **D6** | no | `adv_*` |
-
-Options per day (current map):
-
-| Day | Options (2–4; D1 exception) | Assignable |
+| State | Options panel | What the day cell shows |
 |---|---|---|
-| **D1** | E5 only — first-customer adventurer | yes |
-| **D2** | E1, E2, E3, E4 | yes |
-| **D3** | E3, E6, E8, E13 | yes |
-| **D4** | E6, E7, E9 | yes |
-| **D5** | E9, E10, E11 | yes |
-| **D6** | E4, E10, E12 | yes |
-| **D7** | *(none — travel / final prep)* | **reserved** |
-| **D8** | *(none — boss approach)* | **reserved** |
+| **Fork** (2–4 next) | **Yes** — those next nodes, type + id (`shop · N7`). Keep `adv_*` / `appt_*` on the row. | Current node resolved or pending; next-day cells preview the offered ids |
+| **Corridor** (exactly one next) | **No** | Next node pinned, type + id |
+| **Bound** (inside `combo_market`) | **No** | Remaining bind nodes pinned |
+| **Reserved** | **No** | D7 travel / final prep · D8 boss approach |
+| **Frozen past** | **No** | Played node, not clickable-to-reassign |
+| **Unbound remaining picks** | **Yes** — only remaining outgoing options from *this* node | Same M1 type + id rows |
 
-E1 / E2 / E3 / E4 match the stamp examples (shop D2; adv D2; event D2–D3; adv D2 & D6). E5 is the D1 first-customer exception. E8 is Scrap Duelist — **appointment**, not Dex Adventurers.
+**No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1.
 
-Later maps stamp their own `E*` pool + `map.day_count`. Do not reuse this table as law for a 3-day or 12-day map.
+**M1 copy:** type + id only. Type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. Fancy titles **Later**.
+
+### Mid-chapter
+
+Past is frozen. Bound days stay pinned once entered. Cut branches stay cut.
+
+Whether the player may **re-route unbound future days after leaving a fork** (lookahead assign + change vs pick-only-when-current) is an **open question** — see below. Until Jonathan answers: **M1 walks day-by-day**; future reachable nodes may be **previewed** (ghost type + id) but are not committed until the choice is live.
+
+Phase-1: **one** primary action per day.
+
+---
 
 ## Piece cap — GONE (LOCKED)
 
@@ -136,63 +302,95 @@ Later maps stamp their own `E*` pool + `map.day_count`. Do not reuse this table 
 - **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client. Do not pin Scrap Duelist to reserved days or the boss beat. Do **not** put `appt_*` on the Dex Adventurers tab (`31`).
 - Portraits / UI widgets = **Later**. Job catalog is stamped in `28` — do not invent Godot scenes or art.
 
+---
+
 ## Client needs (Ulquiorra)
 
 Docs only this stamp — sketch for the next Client PR. No `src/` here.
 
 1. **No piece cap.** Do not block craft when `crafts_done` is high. Do not show a 4/4 garments meter. Do not emit `crafts_max`. Do not fire `cant_craft` because of piece count.
 2. **Day labels.** Timeline says **D1..DN** (N = `map.day_count`). Never R1. Current map N=8.
-3. **Options panel.** Expand / popup on a day lists that day’s `E*` (2–4; D1 may be first-customer only). **M1:** show **type + id** (`shop` / `adventurer` / `appointment` / `event` + `E1`…). Keep `adv_*` / `appt_*` on the row when present. Fancy titles **Later** — do not invent copy.
-4. **Assign at chapter start.** After the boss newspaper, player assigns one option per D1..(N−2). Reserved last-2 visible, not clickable-to-assign.
-5. **Mid-chapter update.** Remaining unplayed assignable days can be reassigned. Past days frozen.
-6. **Fixed windows pin.** Fixed events cannot be moved off their window. Player cannot drop them on reserved days.
-7. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
-8. Scrap Duelist stays an appointment row — not Dex Adventurers.
+3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
+4. **Route graph.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
+5. **Options panel only at choice.** Fork or unbound remaining picks: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past).
+6. **Binds.** Entering N7 pins N8 and N9. Bound days are not re-pickable.
+7. **Frozen past.** Played nodes cannot be moved.
+8. **Shop 1–3 from the graph.** Do **not** forbid picking a shop node because the run already visited k shops.
+9. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
+10. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
+11. Dump `phase=schedule` **kept** (on the timetable). Do not invent `phase=planner` / `phase=route` this stamp.
 
 ## Test logs (Szayelaporro)
 
-Log on chapter-start assign, on mid-chapter update, and on each day resolve. **Not** all of these must become `20` Required — Required list is in [20](20-harness-stamp.md).
+Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on each day resolve. **Not** all of these must become `20` Required — Required list is in [20](20-harness-stamp.md).
 
 | Key | When / what |
 |---|---|
 | `CHAPTER_DAY_COUNT` | = `map.day_count` (current map **8**) |
 | `day_index` / `days_left` | Live day; remaining including reserved |
-| `event_pool` | Full `E*` rows `{ event_id, kind, windows, fixed, ref_id }` |
-| `day_assignments` | `{ day_index, event_id }[]` after start assign and after each mid-update |
-| `day_action` | Assigned kind this day (null before pick / on newspaper) |
+| `route_map_id` | `map_m1` on current wagon |
+| `route_nodes` | `{ node_id, day_index, kind, ref_id, bound_block_id }` |
+| `route_edges` | `{ from, to }[]` |
+| `route_path` | Node ids taken, in order (includes reserved R7/R8 once reached) |
+| `current_node_id` | Live node |
+| `bound_block_id` | `combo_market` while inside the bind; else null |
+| `fork_options` | Visible next `{ node_id, kind, ref_id }[]` — empty when no choice |
+| `day_action` | Current node kind (`adventurer` \| `shop` \| `appointment` \| `event` \| `reserved`) — null before D1 play / on newspaper |
 | `crafts_done_this_chapter` | Unbounded piece counter (optional telemetry) |
 | `cant_craft` | Only true session-open fail — **never** because of piece count |
-| `appt_*` / `adv_*` | On the event row; Scrap Duelist is `appt_*` |
+| `appt_*` / `adv_*` | On the node row; Scrap Duelist is `appt_*` |
 
-**Asserts (planner)**
+**Do not emit as live law:** windowed `event_pool` (`E*` + `windows` + `fixed`) and free `day_assignments` `{ day_index, event_id }` from the #36/#37 board.
+
+**Asserts (route map)**
 
 1. No `crafts_max` field. No `cant_craft` from `crafts_done`.
 2. `CHAPTER_DAY_COUNT == map.day_count` — current-map dumps use **8**; do not assert 8 on a later 3- or 12-day map.
-3. Player assignments only on `1 .. CHAPTER_DAY_COUNT-2`.
-4. Labels / dump ids use **D** / `day_*`, not R / `round_*`.
-5. Fixed events: assigned `day_index` ∈ that event’s window, and that day is assignable.
-6. Reserved last-2: no appointment / player `E*` assignment.
-7. D1 current-map sketch: options ⊆ {E5} (first-customer). Other assignable days: 2–4 options from the pool.
-8. `appt_scrap_duelist` is never `boss_client_id` and never a Dex Adventurers `adv_*`.
+3. Graph node `day_index` ∈ `1 .. CHAPTER_DAY_COUNT-2`. Reserved last-2 are `kind=reserved` only.
+4. Labels / dump ids use **D** / `day_*` / `N*` node ids, not R / `round_*`, not live `E*` windows.
+5. At a live fork: `len(fork_options)` ∈ 2..4, and each option is an outgoing edge of `current_node_id`.
+6. Corridor / bind / reserved / D1: `fork_options == []` (no options panel).
+7. Inside `combo_market`: D4=N7, D5=N8, D6=N9; panel hidden.
+8. Frozen past: `route_path` prefix does not change.
+9. Any **complete** D1..D6 path: shop-node count ∈ **1..3**. C1 sample paths A/B/C = 2 / 1 / 1.
+10. D1 current-map: N1 only (`adv_halden_rook`).
+11. `appt_scrap_duelist` is never `boss_client_id` and never a Dex Adventurers `adv_*`.
+12. Do **not** assert “2–4 options on every assignable day” or “options = events whose window includes today.”
+
+---
 
 ## Explicit non-goals
 
-- Branching StS path map
+- Seed-generated / procedural StS sprawl
+- Free per-day `E*` options board (identical-shaped list under every day)
+- Stacking arbitrary combos off-graph
+- Hard UI ban on picking shop after k visits (shop 1–3 is **graph** law)
 - Auto 3-node shop↔craft clock
 - Forcing a craft every day
 - `crafts_max` / piece cap / cant_craft-at-max
 - Hardcoding 8 as global day-count law
 - Putting Scrap Duelist / `appt_*` on Dex Adventurers
 - R1..R8 labels
-- Inventing fancy `E*` display titles (M1 = type + id)
+- Inventing fancy node display titles (M1 = type + id)
+- Prep-craft / rest-dig nodes on the C1 sample
+- Pre-assigning the whole chapter at start from a pool
 
 ## Supersedes
 
+- **Free per-day `E*` options board** — windows, 2–4 options every assignable day, chapter-start assign of D1..(N−2), mid-chapter reassign from that pool — Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) / `STAMP` 2026-10-12
+- “Not a path map” as live law (`STAMP` 2026-09-28 §1; Day planner 2026-10-12)
 - Round board / R1..R8 / `CHAPTER_ROUND_COUNT=8` as **global** law (2026-09-28 `22` / `20` / `STAMP`)
 - Chapter-start **2–4 appointment pins** as the only assign UX
 - `crafts_max=4` garments / chapter; `cant_craft` when `crafts_done == crafts_max`
 - 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)) — still history
 
+## Open questions (Jonathan)
+
+≤2. Everything else in this stamp is locked.
+
+1. **Unbound future after a fork.** After the player leaves a fork, may they **re-route unbound future days** (lookahead assign + change), or is the next pick only when that day is current? Frozen past and entered binds stay uneditable either way. M1 default until answered: walk day-by-day; preview only.
+2. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current?
+
 ## Pointers
 
-`20` stamps · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people
+`20` stamps · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `00` vision (display name **Wombaste**)
