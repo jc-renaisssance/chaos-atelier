@@ -479,20 +479,21 @@ def check_light_route_sim() -> None:
 def check_no_free_mid_signal() -> None:
     """bind must not Object.free() RouteNodeView while picked is still emitting."""
     graph = (SRC / "ui" / "schedule" / "route_graph_view.gd").read_text(encoding="utf-8")
-    if re.search(r"(?<!queue_)\.free\s*\(", graph):
+    code = "\n".join(line.split("#", 1)[0] for line in graph.splitlines())
+    if re.search(r"(?<!queue_)\.free\s*\(", code):
         fail(
             "route_graph_view must not Object.free() cards mid-picked — "
             "use disconnect + queue_free + deferred rebuild (Godot 4.7 free-locked-object)"
         )
-    if "queue_free" not in graph:
+    if "queue_free" not in code:
         fail("route_graph_view must queue_free stale RouteNodeView cards")
-    if "picked.disconnect" not in graph and "disconnect(_on_picked)" not in graph:
+    if "picked.disconnect" not in code and "disconnect(_on_picked)" not in code:
         fail("route_graph_view must disconnect picked before dropping cards")
-    if 'call_deferred("_apply_bind")' not in graph:
+    if 'call_deferred("_apply_bind")' not in code:
         fail('route_graph_view bind must call_deferred("_apply_bind") so rebuild is not mid-picked')
-    if "func _apply_bind" not in graph:
+    if "func _apply_bind" not in code:
         fail("route_graph_view missing deferred _apply_bind rebuild")
-    bind_fn = graph.split("func bind(", 1)[-1].split("func ", 1)[0]
+    bind_fn = code.split("func bind(", 1)[-1].split("func ", 1)[0]
     if "RouteNodeView.new()" in bind_fn:
         fail("bind() must not rebuild cards inline — defer to _apply_bind")
     if "queue_free" in bind_fn or ".free(" in bind_fn:
