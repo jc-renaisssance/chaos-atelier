@@ -27,6 +27,7 @@ var _continue_btn: Button
 var _decline_btn: Button
 var _take_btn: Button
 var _schedule_root: Control
+var _body_scroll: ScrollContainer
 var _craft_table: CraftTable
 var _dex_screen: DexScreen
 var _dex_open: bool = false
@@ -62,49 +63,75 @@ func _build() -> void:
 
 	var root := VBoxContainer.new()
 	root.add_theme_constant_override("separation", 12)
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
 	_title = _label("CHAOS ATELIER  ·  travelling wagon", 26, GOLD)
 	root.add_child(_title)
 	_meta = _label("", 15, INK)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_meta.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(_meta)
 	_note = _label("", 14, MUTED)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(_note)
 
 	_planner_caption = _caption("DAY PLANNER  ·  map day_count  ·  not a path map")
 	root.add_child(_planner_caption)
 	var timeline_panel := _panel()
-	timeline_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	timeline_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(timeline_panel)
 	_timeline = HBoxContainer.new()
 	_timeline.add_theme_constant_override("separation", 8)
+	_timeline.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	timeline_panel.add_child(_timeline)
 
-	root.add_child(_caption("EVENT OPTIONS  ·  type + id  ·  expand the focused day"))
+	## 1280×720: day strip stays put; EVENT OPTIONS / TODAY / RESOLVE scroll.
+	_body_scroll = ScrollContainer.new()
+	_body_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_body_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	root.add_child(_body_scroll)
+	var body := VBoxContainer.new()
+	body.add_theme_constant_override("separation", 12)
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body_scroll.add_child(body)
+
+	body.add_child(_caption("EVENT OPTIONS  ·  type + id  ·  expand the focused day"))
 	var options_panel := _panel()
-	root.add_child(options_panel)
+	options_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(options_panel)
 	var options_box := VBoxContainer.new()
 	options_box.add_theme_constant_override("separation", 6)
+	options_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options_panel.add_child(options_box)
 	_options_title = _label("Click a day to preview E*.", 15, INK)
+	_options_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_options_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options_box.add_child(_options_title)
 	_options = VBoxContainer.new()
 	_options.add_theme_constant_override("separation", 4)
+	_options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	options_box.add_child(_options)
 
-	root.add_child(_caption("TODAY  ·  one primary action from the assigned E*"))
+	body.add_child(_caption("TODAY  ·  one primary action from the assigned E*"))
 	var today := _panel()
-	root.add_child(today)
+	today.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(today)
 	var today_box := VBoxContainer.new()
 	today_box.add_theme_constant_override("separation", 8)
+	today_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today.add_child(today_box)
 	_today_title = _label("Assign the chapter, then take today.", 16, INK)
+	_today_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_today_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today_box.add_child(_today_title)
 	_actions = HFlowContainer.new()
 	_actions.add_theme_constant_override("h_separation", 8)
 	_actions.add_theme_constant_override("v_separation", 8)
+	_actions.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today_box.add_child(_actions)
 	var today_row := HBoxContainer.new()
 	today_row.add_theme_constant_override("separation", 8)
@@ -116,13 +143,17 @@ func _build() -> void:
 	_continue_btn = _btn("Continue", _on_continue)
 	today_row.add_child(_continue_btn)
 
-	root.add_child(_caption("RESOLVE  ·  mission (23/24)  ·  no lineup cards"))
+	body.add_child(_caption("RESOLVE  ·  mission (23/24)  ·  no lineup cards"))
 	var resolve := _panel()
-	root.add_child(resolve)
+	resolve.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(resolve)
 	var resolve_box := VBoxContainer.new()
 	resolve_box.add_theme_constant_override("separation", 6)
+	resolve_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve.add_child(resolve_box)
 	_resolve_title = _label("Waiting for a pick.", 16, GOLD)
+	_resolve_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_resolve_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_box.add_child(_resolve_title)
 	_resolve_body = _label(
 		"Appointment / adventurer / prep craft → stamina craft (order-fixed construction). "
@@ -131,12 +162,14 @@ func _build() -> void:
 		INK
 	)
 	_resolve_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_resolve_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_box.add_child(_resolve_body)
 
-	root.add_child(_caption("STAMP  ·  docs/20 full dump  ·  crafts_done unbounded telemetry"))
+	body.add_child(_caption("STAMP  ·  docs/20 full dump  ·  crafts_done unbounded telemetry"))
 	var stamp_panel := _panel()
 	stamp_panel.custom_minimum_size.y = 96
-	root.add_child(stamp_panel)
+	stamp_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(stamp_panel)
 	var stamp_scroll := ScrollContainer.new()
 	stamp_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stamp_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -149,12 +182,14 @@ func _build() -> void:
 
 	var demo := HBoxContainer.new()
 	demo.add_theme_constant_override("separation", 8)
-	root.add_child(demo)
+	demo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(demo)
 	demo.add_child(_btn("Dex", _on_dex))
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
 	var hint := _label("Dex · shop / menu collection list. own_basic loop: newspaper → Day planner → craft → boss-client sew → fight. Shop events / portraits Later.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	demo.add_child(hint)
 
