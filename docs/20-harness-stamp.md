@@ -1,6 +1,6 @@
 # Harness stamp fields (Phase-1 lock)
 
-**Status:** Design stamped 2026-10-13 (route map with forks). **2026-10-15 revise:** market-visit + event-resolve dump keys ([32](32-shop-and-events.md)) — chapter bank + refresh; display **market**, wire `day_action=shop`; ready for Jonathan stamp. **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = **hand-authored route map** ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)). Market / event resolve = [32](32-shop-and-events.md). Display **market**; wire `kind=shop` / `day_action=shop`. **Supersedes** the free per-day `E*` options board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) windowed `event_pool` / `day_assignments`). **Still superseded:** Round-board dumps (`CHAPTER_ROUND_COUNT` as always-8, `round_*`, `crafts_max=4`).
+**Status:** Design stamped 2026-10-13 (route map with forks). **2026-10-15 revise:** market-visit + event-resolve dump keys ([32](32-shop-and-events.md)) — chapter bank + refresh + **material enchant**; display **market**, wire `day_action=shop`; ready for Jonathan stamp. **Doc id: `20`.** Assert-ready field list for **Szayelaporro (Test)** / Client **1B**. One dump = one stamp. Live chapter = **hand-authored route map** ([22](22-chapter-schedule.md)). Live craft = stamina ([27](27-craft-mode-stamina.md)). Market / event resolve = [32](32-shop-and-events.md). Display **market**; wire `kind=shop` / `day_action=shop`. **Supersedes** the free per-day `E*` options board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) windowed `event_pool` / `day_assignments`). **Still superseded:** Round-board dumps (`CHAPTER_ROUND_COUNT` as always-8, `round_*`, `crafts_max=4`).
 
 > **Not live — do not assert.** `lineup_card_ids`, `picked_card_id`, and `max_materials` / `max_runes` (2m1r) track the superseded 1-of-3 / slot-fill shell. They are **not** Required. See [Superseded](#superseded).
 
@@ -63,16 +63,16 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 **Lock:** no piece cap. `crafts_done_this_chapter` may count pieces (armor + gloves = +2) after the **one** Finish — it does **not** block the next craft. `cant_craft` because `crafts_done == crafts_max` is **GONE**.
 
-`phase` **does not** include `shop` or `craft_task` (old lineup shell). Market visit is a `day_action=shop` on `phase=schedule` (timetable; **display Market**) — buy/sell/**refresh** + chapter bank in [32](32-shop-and-events.md). Travel events are `day_action=event` (text resolve, same doc). Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
+`phase` **does not** include `shop` or `craft_task` (old lineup shell). Market visit is a `day_action=shop` on `phase=schedule` (timetable; **display Market**) — buy/sell/**refresh**/**enchant** + chapter bank in [32](32-shop-and-events.md). Travel events are `day_action=event` (text resolve, same doc). Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
 
 ### Gold (run purse)
 
-One purse. Market buy/sell/**refresh**, event gold, and (when Client pays them) mission gold all write this field. Start **12** ([19](19-own-basic-starter.md) — Test knob). Floor **0**. Law in [32](32-shop-and-events.md).
+One purse. Market buy/sell/**refresh**/**enchant**, event gold, and (when Client pays them) mission gold all write this field. Start **12** ([19](19-own-basic-starter.md) — Test knob). Floor **0**. Law in [32](32-shop-and-events.md).
 
 | Field | Type | Notes |
 |---|---|---|
 | `gold` | int | Current purse. Emit on timetable / market / event stamps once Client has a purse; craft stamps may repeat it (unchanged during sew) |
-| `gold_before` / `gold_after` | int | **Required** on market-visit and event-resolve stamps. Visit / event open → after last action |
+| `gold_before` / `gold_after` | int | **Required** on market-visit and event-resolve stamps. Visit / event open → after last action (buy / sell / refresh / **enchant** / exit) |
 | `gold_delta` | int | Optional. `gold_after - gold_before` |
 | `deck_material_count` | int | `type=material` cards in the between-beats run deck after the last market / event action. After a legal sell: **≥ 3** |
 
@@ -90,8 +90,11 @@ One purse. Market buy/sell/**refresh**, event gold, and (when Client pays them) 
 | `market_refresh_count` | int | Successful paid refreshes **this visit**. **0** at enter |
 | `market_refresh_cost_next` | int | `base + count × step` — next Refresh button |
 | `market_refreshes` | object[] | `{ n, cost }[]` this visit, in order. `[]` if none |
+| `market_enchants` | object[] | `{ mat_id, mat_enchant_id, fee }[]` this visit, in order. `[]` if none. Catalog: `mat_ench_thrift` (fee **2**), `mat_ench_heavy` (fee **3**) — [32](32-shop-and-events.md) |
 
-Null the market block when `day_action` is not `shop`. **Reshape is Later** — do not emit a reshape field. Do not emit owner-gear / staff / skill-card offer fields.
+**Card / deck:** enchanted `WagonStock` copies carry `mat_enchant_id` (+ optional `shiny: true`). Client may dump `shiny` or derive it from `mat_enchant_id != null`.
+
+Null the market block when `day_action` is not `shop`. **Reshape is Later** — do not emit a reshape field. Do not emit owner-gear / staff / skill-card offer fields. Do not emit staff/skill/gear enchant fields.
 
 ### Event resolve (when `day_action=event`)
 
@@ -223,10 +226,11 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 
 ### Market visit / event resolve ([32](32-shop-and-events.md))
 
-24. On `day_action=shop`: `market_node_id == current_node_id`; `market_bank_id == market_bank_c1`; `len(market_stock)` ∈ 4..6; every `market_stock[].mat_id` ∈ the C1 bank ⊆ `11`; `price` matches `11` `$`. Buy: `gold_after == gold_before - price` (per buy, or visit totals agree with `market_buys`) and `deck_material_count` rose by the number of buys. Sell: each `gold_gained == max(1, floor($/2))`; after the visit `deck_material_count ≥ 3`. A refused sell (would drop below 3) does not change gold or count. Exit with `market_buys == []` is legal. `gold ≥ 0`.
+24. On `day_action=shop`: `market_node_id == current_node_id`; `market_bank_id == market_bank_c1`; `len(market_stock)` ∈ 4..6; every `market_stock[].mat_id` ∈ the C1 bank ⊆ `11`; `price` matches `11` `$`. Buy: `gold_after == gold_before - price` (per buy, or visit totals agree with `market_buys`) and `deck_material_count` rose by the number of buys. Sell: each `gold_gained == max(1, floor($/2))` from **base** `$` (ignore `mat_ench_thrift` / `mat_ench_heavy`); after the visit `deck_material_count ≥ 3`. A refused sell (would drop below 3) does not change gold or count. Exit with `market_buys == []` is legal. `gold ≥ 0`.
 25. Refresh: `market_refresh_count` starts **0** each visit. Successful refresh n costs `market_refresh_base + (n−1) × market_refresh_step` (M1 defaults 2 / 2). `gold` drops by that cost; `market_refresh_count` += 1; `market_stock` is a new 4–6 draw ⊆ bank. Refused if `gold < market_refresh_cost_next` (count unchanged). Refresh does **not** resolve the day / append `route_path`.
 26. On `day_action=event`: `event_id` equals the node `ref_id` (`evt_*`); `event_choice_id` is a catalog choice for that row; `event_resolved == true`; applied `event_deltas` match [32](32-shop-and-events.md) (or documented mat skip). C1: N4=`evt_c1_heat_mirage`, N6=`evt_c1_ashfall`, N10=`evt_c1_scrap_market`, N17=`evt_c1_salt_spray`. Gold never < 0. Illegal pay-gold choices do not apply.
-27. `day_action` matches `current_node_id` kind (`shop` = display Market). Market graph options are **not** banned by visit count. No reshape field. No owner-gear offer field. No live `event_pool`.
+27. `day_action` matches `current_node_id` kind (`shop` = display Market). Market graph options are **not** banned by visit count. No reshape field. No owner-gear offer field. No staff/skill/gear enchant field. No live `event_pool`.
+28. Enchant: successful stamp writes `market_enchants` `{ mat_id, mat_enchant_id, fee }` with `mat_enchant_id` ∈ {`mat_ench_thrift`, `mat_ench_heavy`} and `gold_after == gold_before - fee` (M1 defaults fee **2** / **3**). That deck copy carries `mat_enchant_id` (+ optional `shiny: true`). Refused if already enchanted / `gold < fee` / not a material (gold and stamp unchanged). Enchant does **not** resolve the day / append `route_path`.
 
 ## Superseded
 
@@ -258,6 +262,6 @@ Overall adventure **trend** vs the announced boss — not every matrix cell non-
 
 ## Pointers
 
-- Live: [22-chapter-schedule](22-chapter-schedule.md) (route map) · [32-shop-and-events](32-shop-and-events.md) (market visit + event resolve) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
+- Live: [22-chapter-schedule](22-chapter-schedule.md) (route map) · [32-shop-and-events](32-shop-and-events.md) (market visit + event resolve + material enchant) · [27-craft-mode-stamina](27-craft-mode-stamina.md) · [28-boss-client-pool](28-boss-client-pool.md) · [29-adventurer-catalog](29-adventurer-catalog.md) · [17-chapter-bosses](17-chapter-bosses.md)
 - Resolver / report: [23-mission-report](23-mission-report.md) · [24-win-conditions](24-win-conditions.md) · [25-reps-meter](25-reps-meter.md) · [26-newspaper](26-newspaper.md) · [14-synergies](14-synergies.md) (RETUNE merged)
 - Legacy (not live): [22-chapter-flow](22-chapter-flow.md) · [12b-craft-slots](12b-craft-slots.md)

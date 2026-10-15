@@ -106,7 +106,7 @@ Played days are frozen. The player cannot move a resolved node, cannot un-pick a
 
 ### Shop visits 1–3
 
-Count `shop` nodes on the **complete path** D1..(N−2) (reserved last-2 do not count). Authored so **every** full path has **1–3** shops. Client does **not** grey-out shop because `shops_taken == 3`. A path with 0 shops or 4 shops is a **map bug**, not a UI rule. What a market **does** when entered = [32](32-shop-and-events.md) (buy/sell/refresh from the chapter bank; display Market; reshape Later).
+Count `shop` nodes on the **complete path** D1..(N−2) (reserved last-2 do not count). Authored so **every** full path has **1–3** shops. Client does **not** grey-out shop because `shops_taken == 3`. A path with 0 shops or 4 shops is a **map bug**, not a UI rule. What a market **does** when entered = [32](32-shop-and-events.md) (buy/sell/refresh/**enchant** from the chapter bank; display Market; reshape Later).
 
 ### `map.day_count`
 
@@ -331,7 +331,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 11. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
 12. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
 13. Dump `phase=schedule` **kept** (on the graph board). Do not invent `phase=planner` / `phase=route` this stamp.
-14. **Market visit + event resolve ([32](32-shop-and-events.md)).** When current `kind=shop`: enter ugly **market** shell (display Market; dump `day_action=shop`); buy/sell/**refresh** from `market_bank_c1` (**M1 tab = materials only**; **M2** = staff / skill / gear tabs). Exit resolves the day; dump `market_*` / gold / `deck_material_count`. When current `kind=event`: enter text resolve from `ref_id` → `evt_*`; one choice; dump `event_id` / `event_choice_id` / `event_deltas`. Do **not** grey-out market picks. Do **not** invent reshape / M2 tabs / owners / art in the M1 Client. Hold Client until Jonathan stamps the **revised** `32`.
+14. **Market visit + event resolve ([32](32-shop-and-events.md)).** When current `kind=shop`: enter ugly **market** shell (display Market; dump `day_action=shop`); buy/sell/**refresh**/**enchant** from `market_bank_c1` (**M1 tab = materials only**; **M2** = staff / skill / gear tabs — do not reopen). Enchant stamps `mat_enchant_id` + shiny overlay on one owned `mat_*` copy. Exit resolves the day; dump `market_*` / `market_enchants` / gold / `deck_material_count`. When current `kind=event`: enter text resolve from `ref_id` → `evt_*`; one choice; dump `event_id` / `event_choice_id` / `event_deltas`. Do **not** grey-out market picks. Do **not** invent reshape / M2 tabs / owners / art in the M1 Client. Hold Client until Jonathan stamps the **revised** `32`.
 
 ## Test logs (Szayelaporro)
 
@@ -353,7 +353,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 | `crafts_done_this_chapter` | Unbounded piece counter (optional telemetry) |
 | `cant_craft` | Only true session-open fail — **never** because of piece count |
 | `appt_*` / `adv_*` / `evt_*` | On the node row; Scrap Duelist is `appt_*`; C1 events in [32](32-shop-and-events.md) |
-| `market_*` / `gold` / `event_*` | Market visit + event resolve dumps — [32](32-shop-and-events.md) / [20](20-harness-stamp.md). `day_action=shop` is the wire |
+| `market_*` / `gold` / `event_*` | Market visit + event resolve dumps — [32](32-shop-and-events.md) / [20](20-harness-stamp.md). Includes `market_enchants`. `day_action=shop` is the wire |
 
 **Do not emit as live law:** windowed `event_pool` (`E*` + `windows` + `fixed`) and free `day_assignments` `{ day_index, event_id }` from the #36/#37 board.
 

@@ -451,3 +451,38 @@ Docs only. Revises #44 / `32` before Jonathan stamp. Ulquiorra **holds**. Aizen 
 ## Open questions
 
 None. **M1 = materials.** **M2 = staffs / skill cards / gear·artifact** on this shell (Jonathan 2026-10-15).
+
+---
+
+# Grimmjow stamp — 2026-10-15 (material enchant add-on)
+
+Docs only. Adds **one** mechanism onto #44 / `32` before Jonathan stamp. **Does not** reopen M1 tab scope (still materials only; M2 staff/skill/artifact unchanged). Ulquiorra **holds**. Aizen merges **after** stamp.
+
+## Locked (docs only)
+
+1. **Enchant** is a materials-tab market action beside Buy / Sell / Refresh / Exit. Not a craft session, not a new tab, not a new day beat. Does **not** resolve the day (same as Refresh).
+2. Player picks **one owned** `mat_*` copy from `WagonStock` + **one** `mat_enchant_id`; pays the fee from the one gold purse; stamps `mat_enchant_id` + `shiny=true` on that copy.
+3. **M1 catalog:** `mat_ench_thrift` (Thrift — effective `$` = ⌊$/2⌋ min 1; tags unchanged; fee **2**) and `mat_ench_heavy` (Heavy — effective `$` = 2× base; tag / synergy contribution doubles; fee **3**). Fees are Test knobs.
+4. **Cost** = mat `$` when Client/craft reads it for spend. **Stat** / tag contribution = existing craft bag-count (`10` / `11` / `14` / `27`). Do not invent a new combat system.
+5. Materials only. One enchant per copy — already enchanted → refuse. Cannot if `gold < fee`. Sell still uses **base** `$` (ignore thrift/heavy M1). Enchant is not a bank offer.
+6. **Shiny overlay** is a Design lock. M1 Client ugly tint / modulate / `shiny` flag = OK. Nnoitra / PixelLab = Later. Do not block Client on art.
+7. Distinct from craft `enc_*` runes. Dump `market_enchants` + card `mat_enchant_id` / `shiny`.
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Revise** — Enchant locks, catalog, shiny, dump, Client, Test |
+| `docs/20-harness-stamp.md` | `market_enchants` + assert 28 |
+| `docs/22-chapter-schedule.md` | Client need 14 + visit pointer |
+| `docs/10` · `11` · `13` · `27` · `01` · `04` · `16` | Prefix / one-liners |
+| `docs/README.md` · `00` · `pm` | Index |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+None of the 2026-10-15 market-tab locks. Adds enchant **on** the materials tab.
+
+## Open questions
+
+None. Enchant fees **2 / 3** are Test knobs.

@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-15** after Grimmjow **market visit + event resolve** Design ([32](../32-shop-and-events.md) — this PR #44; Jonathan stamp pending). Prior 2026-10-13 route-map stamp (**route map with forks**; free per-day `E*` board from #36/#37 superseded) still holds. Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
+Updated **2026-10-15** after Grimmjow **market visit + event resolve** Design ([32](../32-shop-and-events.md) — this PR #44; material enchant add-on; Jonathan stamp pending). Prior 2026-10-13 route-map stamp (**route map with forks**; free per-day `E*` board from #36/#37 superseded) still holds. Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
 See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 
@@ -49,7 +49,7 @@ Fully developed **ugly** Client that ships the **full experience** with **limite
 | Limited **enemy types** | Same — Design stamps the cut. |
 | Shop adventurers | **More than one adventurer per job/class.** |
 | Catalog before wire | Define **stats / skills / requirement tags** first. Design catalog lands before Client wires people. |
-| Market + events | **Design in this PR** — [32](../32-shop-and-events.md) (market visit + event resolve). **M1** = materials tab + refresh + chapter bank. **M2** = staffs / skill cards / gear·artifact tabs on the same shell (Jonathan 2026-10-15). Jonathan Design stamp pending on #44. **Ulquiorra holds** until that stamp. Szayelaporro after Client. Elite telegraph N5 + adventurer catalog stay parked. |
+| Market + events | **Design in this PR** — [32](../32-shop-and-events.md) (market visit + event resolve). **M1** = materials tab + refresh + chapter bank + **material enchant** (`mat_ench_*` + shiny overlay). **M2** = staffs / skill cards / gear·artifact tabs on the same shell (Jonathan 2026-10-15 — do not reopen). Jonathan Design stamp pending on #44. **Ulquiorra holds** until that stamp. Szayelaporro after Client. Elite telegraph N5 + adventurer catalog stay parked. |
 | Art | Panels / partial armor fallbacks OK for M1. |
 | Demo seed | Pinned demo seed = **optional**. |
 
