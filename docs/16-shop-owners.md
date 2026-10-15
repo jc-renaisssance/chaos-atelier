@@ -12,7 +12,7 @@ Jonathan lock (2026-09-21, corrected): an **owner is the player character** — 
 - Pool owners (all current drafts) define starting deck filters + shop stock weights from **their** family list.
 - Skills are on the **player** (rerolls, income floor, hand size) — not a separate vendor visit.
 - Unlockable owners extend play hours / fantasy without needing more Client loop systems.
-- Shop UI still exists (buy/sell mats) but it is **your** atelier stock, gated by the active owner’s pool. **M1 route-node visit** (enter from `kind=shop`, authored stock, no owner chrome) = **[32](32-shop-and-events.md)**. This roster is **Later** for shopkeeper / owner-weighted stock. Do not invent owner NPCs on C1 shops.
+- Market UI exists (buy/sell mats) but it is **your** atelier stock, gated by the active owner’s pool. **M1 route-node visit** (enter from `kind=shop`, display **Market**, chapter bank + refresh, materials tab only) = **[32](32-shop-and-events.md)**. **M2** = staff / skill / gear tabs on that shell. This roster is Later for owner-weighted stock. Do not invent owner NPCs on C1 markets.
 
 ## Owner roster (draft)
 

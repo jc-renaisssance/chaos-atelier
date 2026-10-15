@@ -1,4 +1,4 @@
-> **Superseded:** **1-of-3 card lineup** / `CHAPTER_ROUND_LIMIT=3` / Round board / free per-day `E*` board below is **not** the live chapter spine. Live = travelling atelier **route map with forks**, `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8**) — [22-chapter-schedule](22-chapter-schedule.md). Craft = stamina mode — [27-craft-mode-stamina](27-craft-mode-stamina.md). **No `crafts_max`.** The `atelier_shop(player)` **opening-shop** / last-shop-before-boss calls below are **historical** — M1 shop is a **route node** visit only ([32](32-shop-and-events.md)). Keep this file as historical PR #7 shell notes.
+> **Superseded:** **1-of-3 card lineup** / `CHAPTER_ROUND_LIMIT=3` / Round board / free per-day `E*` board below is **not** the live chapter spine. Live = travelling atelier **route map with forks**, `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8**) — [22-chapter-schedule](22-chapter-schedule.md). Craft = stamina mode — [27-craft-mode-stamina](27-craft-mode-stamina.md). **No `crafts_max`.** The `atelier_shop(player)` **opening-shop** / last-shop-before-boss calls below are **historical** — M1 **market** is a **route node** visit only ([32](32-shop-and-events.md); display Market, wire `kind=shop`). Keep this file as historical PR #7 shell notes.
 # Application flow (pseudocode) — Phase-1 `own_basic`
 
 ```
@@ -53,4 +53,4 @@ function chapter_body(...):
 
 ## Review
 
-**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** route map ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)) · shop visit + event resolve ([32](32-shop-and-events.md)). `cant_craft` at piece-cap is **GONE**. The 2026-10-12 free `E*` Day planner is **superseded**. Opening-shop in the pseudocode above is **not** live.
+**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** route map ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)) · market visit + event resolve ([32](32-shop-and-events.md)). `cant_craft` at piece-cap is **GONE**. The 2026-10-12 free `E*` Day planner is **superseded**. Opening-shop in the pseudocode above is **not** live.

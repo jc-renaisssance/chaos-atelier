@@ -417,3 +417,37 @@ Docs only. Ready for **Jonathan to stamp**. Ulquiorra **holds**. Szayelaporro af
 ## Open questions (Jonathan)
 
 None this pass. Sell rate, shared gold, and C1 stock / `evt_*` rows are M1 defaults / Test knobs.
+
+---
+
+# Grimmjow stamp — 2026-10-15 (market visit revise — refresh + bank + name)
+
+Docs only. Revises #44 / `32` before Jonathan stamp. Ulquiorra **holds**. Aizen merges **after** stamp.
+
+## Locked (docs only)
+
+1. **Name:** Design / UI = **market**. Wire stays `kind=shop` + dump `day_action=shop` (Client graph already ships). New visit dump keys = `market_*`.
+2. **Refresh** on the market visit. Cost curve Test knobs: base **2**, step **2** → **2, 4, 6, 8…**. Count resets each visit. No debt. Does not resolve the day.
+3. **Chapter-shared bank** `market_bank_c1` (**22** `mat_*` from `11`) for all C1 market nodes. Shelf 4–6. Frozen per-node-only lists demoted to first-draw hints. Includes deferred-value mats. No `$5` / sci-fi / voodoo.
+4. **M1 tab = materials only** (Jonathan 2026-10-15). **M2** = staffs / skill cards / gear·artifact tabs on the same market shell. Owner power-up M1 = `16` skills + `10`/`12b` enc/staff. No stamped artifact catalog for sale in M1.
+5. Buy / sell / one purse / sell ⌊$ / 2⌋ min 1 / ≥3 floor / text events / graph 1–3 **unchanged**.
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Revise** — market name, bank, refresh, tabs, owner-gear |
+| `docs/20-harness-stamp.md` | `market_*` dump keys + asserts 24–27 |
+| `docs/22-chapter-schedule.md` | Display Market; Client need 14 |
+| `docs/README.md` · `11` · `19` · `16` · `01` · `21` · `04` · `03` · `00` · `pm` | Pointers |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Frozen per-node 4–6-only stock as sole law (`32` 2026-10-13)
+- Design/UI name **shop** for the visit (wire `shop` kept)
+- M1 shop-sold owner artifacts
+
+## Open questions
+
+None. **M1 = materials.** **M2 = staffs / skill cards / gear·artifact** on this shell (Jonathan 2026-10-15).

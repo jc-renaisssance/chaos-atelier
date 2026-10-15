@@ -43,7 +43,7 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 - Interactive-order slices 1–3: `30`
 - Dex (profile collection): `31`
 - Missions before boss: `22` (route map, `N*` nodes; free `E*` board superseded)
-- Shop visit + event resolve: `32` (`shop` / `event` nodes; `evt_*` catalog)
+- Market visit + event resolve: `32` (display Market; wire `kind=shop`; M1 materials / M2 staff-skill-gear; `evt_*` catalog)
 - Mission report + letter: `23`
 - App pseudocode: `21`
 
