@@ -22,7 +22,7 @@ Starting enchantments unlocked: none in hand; shop may sell common runes (`enc_r
 
 ## Atelier shop — `own_basic` pool weights
 
-> **M1 route-node market is not this roll.** Live visit = chapter-shared `market_bank_c1` + shelf draw + refresh + **material enchant** — **[32](32-shop-and-events.md)** (display Market; wire `kind=shop`). This table stays **owner-pool / Later weights** (other owners, forbidden rooms). Do not implement the roll-5 as the C1 market.
+> **M1 route-node market is not this roll.** Live visit = chapter-shared `market_bank_c1` + shelf draw + refresh + **material enchant** — **[32](32-shop-and-events.md)** (display Market; wire `kind=shop`). **M2** adds Staffs / Skills / Gear tabs on that shell. This table stays **owner-pool / Later weights** (other owners, forbidden rooms). Do not implement the roll-5 as the C1 market.
 
 Each shop visit **used to** roll **5** material offers from the weighted table (replacement). Prices = material `$` from `11`.
 

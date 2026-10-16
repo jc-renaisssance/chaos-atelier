@@ -131,7 +131,9 @@ Not a harness dump assert unless Test later stamps fields in [20](20-harness-sta
 | `sk_deep_dig` | 3 | Refresh hand; draw +1 extra |
 | `sk_steady_hand` | 1 | Ignore first negative synergy roll hint this **target** piece (does **not** skip rarity rules — still full neg skip only on rare/leg) |
 
-`own_basic` starts with a tiny skill stub set Later; Phase-1 may ship 0–2 skills unlocked.
+`own_basic` starts with **0** skills. **M2** market Skills tab sells these six `sk_*` into the run deck (buy-into-kit, run-long via reshuffle — not one-shot burn) — [32](32-shop-and-events.md). Do not invent a parallel skill catalog. Gold prices on that tab are Test knobs.
+
+**M2 staff caps:** equipped `staff_*` raises `max_materials` / `max_runes` ([12b](12b-craft-slots.md) / [32](32-shop-and-events.md)). M2 Client treats those as per-zone bag limits. Stamina still gates. Do **not** revive 2m1r slot-fill UI. The “no hard material-slot cap” line above is the **M1-until-staff** gap.
 
 ## Resolver (unchanged spine)
 

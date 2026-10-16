@@ -5,7 +5,7 @@ Jonathan lock (2026-09-22):
 
 - **Construction is compulsory** (exactly one).
 - Default craft budget: **2 materials + 1 rune** (`2m1r`).
-- Max materials / max runes rise via **owner skill** and/or **staff skill** (Later unlocks).
+- Max materials / max runes rise via **owner skill** and/or **staff skill**. **M2 staff unlock** = market-sold `staff_*` on the Staffs tab — [32](32-shop-and-events.md). Owner-skill Extra Seam / Second Rune stay Later.
 
 ## Runtime rule (Client / Test — locked)
 
@@ -33,18 +33,19 @@ Craft =
   + 0..player.max_runes Enchantments/runes
 ```
 
-## Skill raises (draft — Later content)
+## Skill raises
 
-| Source | Effect |
-|---|---|
-| Owner skill `Extra Seam` | +1 `max_materials` |
-| Owner skill `Second Rune` | +1 `max_runes` |
-| Staff skill `Apprentice Hands` | +1 `max_materials` while staff assigned |
-| Staff skill `Rune Desk` | +1 `max_runes` while staff assigned |
+| Source | Effect | Status |
+|---|---|---|
+| Owner skill `Extra Seam` | +1 `max_materials` | **Later** (not an M2 `sk_*`) |
+| Owner skill `Second Rune` | +1 `max_runes` | **Later** (not an M2 `sk_*`) |
+| Staff `staff_apprentice` (Apprentice Hands) | +1 `max_materials` while equipped | **M2** — [32](32-shop-and-events.md) |
+| Staff `staff_rune_desk` (Rune Desk) | +1 `max_runes` while equipped | **M2** |
+| Staff `staff_loom_pair` / `staff_third_seam` / `staff_rune_pair` | +1/+1, +2 materials, +2 runes | **M2** catalog |
 
-Phase-1 `own_basic`: skills empty → stay at **2m1r**.
+Phase-1 `own_basic` starts with **no staff** → stay at **2 / 1**. Buy / equip from the market Staffs tab ([32](32-shop-and-events.md)). **One** staff equipped. Live craft stays stamina ([27](27-craft-mode-stamina.md)) — do **not** revive 2m1r slot-fill UI. M2 Client treats these numbers as **per-zone bag limits**.
 
-Cairnplate unique (`stone_shard`×3 + armor) requires `max_materials ≥ 3` — **parked** until a skill / staff unlocks the third mat slot (or treat as Later recipe).
+Cairnplate unique (`stone_shard`×3 + armor) requires `max_materials ≥ 3` — **unparked** when a staff raises materials to ≥ 3 (`staff_apprentice`, `staff_loom_pair`, or `staff_third_seam`).
 
 ## Construction table note
 

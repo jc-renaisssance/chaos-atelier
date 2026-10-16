@@ -1,6 +1,10 @@
-# Market visit + event resolve (M1)
+# Market visit + event resolve (M1 + M2 tabs)
 
-**Status:** Revised for Jonathan stamp (2026-10-15). **M1 materials / M2 staff-skill-gear LOCKED** (Jonathan, Game Dev Team). **Add-on: material enchant + shiny overlay** (Grimmjow — Jonathan stamps after this lands). **Doc id: `32`.** Filename kept (`32-shop-and-events`). Docs only — no `src/` / Godot / art this stamp. Ulquiorra holds until Jonathan stamps **this revision**. Aizen merges only after stamp. Elite telegraph (N5) and adventurer catalog stay parked. Material icons stay Nnoitra 1:1. Do **not** reopen M1 tab scope (still materials only; M2 staff/skill/artifact unchanged).
+**Status:** **M2 Design-ready** for Jonathan stamp (2026-10-16). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. Docs only — no `src/` / Godot / art this stamp. Ulquiorra holds the **M2 Client** until Jonathan stamps **this revision**. Aizen merges only after stamp. Nnoitra chrome / icons + `staff_*` / `artifact_*` art after ids lock; ping **Harribel before gens** (PR note — do not ping from this seat). Elite telegraph (N5) and adventurer catalog stay parked.
+
+**M1 is closed.** Materials tab + refresh + `market_bank_c1` + mat Enchant (`mat_ench_*`) + code-only shiny + text `evt_*` stay as stamped in #44 / shipped Client #45. Do **not** reopen M1.
+
+**M2 (this revision):** three new tabs on the **same** market shell — **Staffs / Skills / Gear**. Catalogs below.
 
 Product display name **Wombaste** (repo `chaos-atelier`). Live chapter spine = authored route map ([22](22-chapter-schedule.md)). This doc fills the hole STAMP / PM called out on 2026-10-05: **shop systems and events were not done yet.**
 
@@ -15,7 +19,7 @@ Product display name **Wombaste** (repo `chaos-atelier`). Live chapter spine = a
 - Sell-back “$1 scraps → 0 gold” from `19` — M1 sell is **⌊$ / 2⌋, min 1**
 - Free per-day `E*` / `event_pool` / `wagon_event` pick ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37))
 - Old `22-chapter-flow` event-pool rows as live law (ids may be reused; outcomes are this table)
-- Market-sold **equippable owner artifacts** as an M1 catalog (none exists; see [Owner power-up](#owner-power-up-gear--staff--items))
+- Market-sold **equippable owner artifacts** as an **M1** catalog (M1 had none; **M2** `artifact_*` catalog is this stamp — [Market M2](#market-m2--staffs--skills--gear))
 
 ---
 
@@ -36,9 +40,14 @@ Product display name **Wombaste** (repo `chaos-atelier`). Live chapter spine = a
 13. Outcomes stay **mild and testable**. No run-kill from a single bad pick (that fail is **Later**). Prefer ±gold / ±1 mat / small reps swings.
 14. **Ugly M1 UI:** event id + choice buttons (choice id + short label) + result line. Fancy art / branching trees **Later**.
 15. **One gold purse** for the run. Market buy/sell/refresh/**enchant**, event gold, and (when Client pays them) mission gold all write the same `gold`. Start **12** ([19](19-own-basic-starter.md) — Test knob). Floor **0**.
-16. **Owner power-up.** M1 = skills (`16`) + craft enc / staff-slot mentions (`10` / `12b`) + **material enchant** on this tab (`mat_ench_*`, this doc). No stamped equippable artifact catalog for sale in M1. **M2** = staff / skill-card / gear·artifact market tabs on this shell.
-17. Material icons stay **Nnoitra 1:1**. PixelLab market / event art = **Later** (Nnoitra parallel). Shiny overlay on enchanted mats = **Design lock**; M1 Client ugly tint is enough — do **not** block Client on art.
-18. **Material enchant (M1 — LOCKED).** Owner **enchants** one owned `mat_*` copy from the run deck so it gets enhanced stats / special utility. **Enchant** sits on the materials tab beside Buy / Sell / Refresh / Exit. Pick one owned copy + one `mat_enchant_id` from the M1 catalog; pay the fee; stamp `mat_enchant_id` + `shiny=true` on that instance. One enchant per copy — already enchanted → refuse (no overwrite / stack this stamp). Materials only — cannot enchant runes / skills / staff / gear. Cannot if `gold < fee`. Does **not** resolve the day (same as Refresh). Distinct from craft `enc_*` runes — do **not** merge. Catalog: `mat_ench_thrift` (Thrift, fee **2**) and `mat_ench_heavy` (Heavy, fee **3**) — fees are Test knobs. See [Enchant](#enchant-material--m1).
+16. **Owner power-up.** M1 = skills (`16`) + craft enc / staff-slot mentions (`10` / `12b`) + **material enchant** on this tab (`mat_ench_*`, this doc). **M2 catalogs (this stamp):** `staff_*` · `sk_*` · `artifact_*` — [Market M2](#market-m2--staffs--skills--gear).
+17. Material icons stay **Nnoitra 1:1**. PixelLab market / event art = **Later** (Nnoitra parallel). Shiny overlay on enchanted mats = **Design lock**; M1 Client ugly tint is enough — do **not** block Client on art. **M2 restates:** shiny is **code-only** Client tint / shader on card art. **No** shiny PixelLab assets / overlay gens. Staff / skill / gear cards are **not** enchanted — they do **not** get shiny.
+18. **Material enchant (M1 — LOCKED, M2 restated).** Enchant (Thrift / Heavy) = **materials only.** Staff / skill / gear tabs do **not** take `mat_ench_*`. No overwrite / stack. Distinct from craft `enc_*`. See [Enchant](#enchant-material--m1). **Not an open question — cut this way.** (Separate upgrade systems for gear Later if needed.)
+19. **M2 Staffs tab.** Buy / sell `staff_*` that plug into [12b](12b-craft-slots.md) staff-slot law (raises `max_materials` / `max_runes` while assigned). **One staff equipped** (M2 default). Buy adds to the **run kit** (not the craft deck). Equip / unequip from this tab.
+20. **M2 Skills tab.** Buy / sell existing owner `sk_*` from [27](27-craft-mode-stamina.md) into the `own_basic` **run kit** (run-long deck membership). Not a second skill system. Not one-shot burn. Other-owner passives in [16](16-shop-owners.md) stay Later.
+21. **M2 Gear tab.** Buy / sell / equip `artifact_*` that power the **owner** (income, storage, soft utility). **2 gear slots.** No craft-session use. Prefix is `artifact_*` (crafted garment “gear” in `10` stays the resolver output).
+22. **M2 refresh.** Refresh stays **materials shelf only**. Staff / skill / gear banks do **not** redraw mid-visit.
+23. **Ugly M1/M2 UI:** one shell. Tab strip **Materials | Staffs | Skills | Gear**. Exit still resolves the node.
 
 Numbers marked **Test knob** may retune without a Design re-stamp of the law.
 
@@ -271,31 +280,286 @@ The market is where the owner looks for **materials, staffs, skill cards, or gea
 
 | Tab | Milestone | Notes |
 |---|---|---|
-| **Materials** | **M1** — the live tab | Buy / sell / refresh / **enchant** + `market_bank_c1`. Jonathan locked 2026-10-15. Enchant does **not** add a tab |
-| **Staffs** | **M2** | Same shell. Catalog + UI in M2. Staff-slot law already in `12b` |
-| **Skill cards** | **M2** | Same shell. Owner skills already in `16` (`sk_*`) — this tab sells / picks extras, not a second skill system |
-| **Gear / artifact** | **M2** | Same shell. **No** stamped equippable catalog for sale in M1 |
+| **Materials** | **M1 — shipped** (#45) | Buy / sell / refresh / **enchant** + `market_bank_c1`. Do not reopen |
+| **Staffs** | **M2 — this stamp** | Same shell. Catalog `staff_*` below. Staff-slot law in `12b` |
+| **Skills** | **M2 — this stamp** | Same shell. Sells existing `sk_*` from `27` into the `own_basic` kit. Not a second skill system |
+| **Gear** | **M2 — this stamp** | Same shell. Catalog `artifact_*` below. Owner utility — not craft mats |
 
-**LOCKED (Jonathan 2026-10-15):** M1 = materials only. M2 = the other three tabs on this shell. Do not hide the shell behind a different scene type in M2 — extra tabs plug into this visit. Do not invent M2 catalogs in the M1 Client.
+**LOCKED (Jonathan 2026-10-15):** M1 = materials only. M2 = the other three tabs on this shell. Do not hide the shell behind a different scene type in M2 — extra tabs plug into this visit. **M1 Client #45 must not grow these tabs** — M2 Client after this stamp.
 
 ---
 
 ## Owner power-up (gear / staff / items)
 
-**LOCKED — M1 vs M2 (Jonathan 2026-10-15).**
+**LOCKED — M1 vs M2 (Jonathan 2026-10-15 / Grimmjow M2 catalogs 2026-10-16).**
 
 | Already covered (do not invent a parallel) | Where |
 |---|---|
-| Owner **skills** (reroll, income floor, hand / storage) | [16](16-shop-owners.md) — player clothier kit. Phase-1 = `own_basic` (none). Other owners Later |
+| Owner **skills** (reroll, income floor, hand / storage) | [16](16-shop-owners.md) — player clothier kit. Phase-1 = `own_basic` (none). Other owners Later. **M2 skill tab** sells the existing `sk_*` craft cards from [27](27-craft-mode-stamina.md) into that kit — not a second system |
 | Craft **enchantments / runes** (`enc_*`) | [10](10-catalog-overview.md) · [13](13-enchantments.md) · stamina hand (`27`) — **not** `mat_ench_*` |
-| **Material enchant** (`mat_ench_*`) | This doc — market action on the M1 materials tab. Distinct from craft `enc_*` |
-| **Staff-slot** raises to `max_materials` / `max_runes` | [12b](12b-craft-slots.md) (historical 2m1r; live craft is stamina — staff still Later unlock) |
+| **Material enchant** (`mat_ench_*`) | This doc — market action on the M1 materials tab **only**. Distinct from craft `enc_*`. Staff / skill / gear do **not** take `mat_ench_*` |
+| **Staff-slot** raises to `max_materials` / `max_runes` | [12b](12b-craft-slots.md) — **M2 live unlock** via `staff_*` below. Does **not** revive 2m1r slot-fill UI |
+| **Owner artifacts** (`artifact_*`) | **M2 catalog** below. Prefix locked `artifact_*` (not `gear_*` — `10` “Final gear” is the crafted garment) |
 
-**No** stamped equippable artifact / owner-gear market catalog exists. There is no `gear_*` / `artifact_*` offer list to wire.
+**M1 (LOCKED / shipped #45):** materials tab only. Do **not** reopen.
 
-**M1 (LOCKED):** market tab stays **materials only** (buy / sell / refresh / **enchant** `mat_*`). Do **not** add market-sold staffs, skill cards, or equippable owner artifacts this stamp. Do **not** sell runes on the C1 shelf (`19` optional 6th enc slot stays Later / M2). Do **not** invent staff / skill / gear enchant this stamp.
+**M2 (this stamp):** catalogs + tab law below. Forbidden rooms / `$5` mats stay out (Later). Do **not** invent staff / skill / gear enchant. Do **not** sell `enc_*` runes on these tabs (`19` optional 6th enc slot stays Later).
 
-**M2 (LOCKED as the milestone):** Staffs / skill cards / gear·artifact tabs on the **same market shell**, with catalogs stamped then. Forbidden rooms / `$5` mats stay out of M1 (may ride M2 or a later stamp).
+---
+
+## Market M2 — Staffs / Skills / Gear
+
+**Status:** Grimmjow Design 2026-10-16. Ready for Jonathan stamp. Same visit, same shell, same `kind=shop` / `day_action=shop` / one gold purse / Exit-resolves-node as M1. New tabs only.
+
+### Shared M2 market laws (inherit M1)
+
+| Rule | M2 |
+|---|---|
+| Enter | Current node `kind=shop` only. Display **market**. Wire `day_action=shop` |
+| Shell | One screen. Tab strip **Materials \| Staffs \| Skills \| Gear** |
+| Gold | The **one** run purse. Floor 0. No debt |
+| Buy | Pay catalog `$` if `gold ≥ price` and `qty_offered > 0` (plus unique-owned checks below). No debt |
+| Sell | Remove one owned copy; gain **⌊`$` / 2⌋**, **min 1**, from that row’s catalog `$`. **No** ≥3 material floor on these tabs (that floor is materials only) |
+| Refresh | **Materials shelf only.** Staff / skill / gear banks do **not** redraw mid-visit. Refresh cost / count unchanged |
+| Enchant | **Materials tab only.** Staff / skill / gear do **not** take `mat_ench_*`. No shiny on these cards |
+| Shiny | Code-only Client tint / shader on **enchanted material** card art. **No** PixelLab shiny overlay gens. M2 cards are not enchanted → not shiny |
+| Exit | Still the only action that resolves the node. Buy / sell / equip / refresh / enchant do **not** exit |
+| Banks | Chapter-shared. **Do not deplete** on buy (same as `market_bank_c1`). Each visit shows the **full** M2 bank for that tab (`qty_offered` **1** per row — Test knob). No first-draw seeds (catalogs are small) |
+| M1 tab | Unchanged. Do not reopen materials / refresh / enchant / `evt_*` |
+
+### Run kit vs run deck
+
+| What | Where it lives | Craft session? |
+|---|---|---|
+| `mat_*` / bought `sk_*` | Between-beats **run deck** (`WagonStock` / `27`) | Yes — shuffle into hand. `type=material` / `type=skill` |
+| `staff_*` / `artifact_*` | **Run kit** (owned list + equip slots). **Not** the craft deck. Do **not** invent a second deck type | **No** — never `cards_played`. Staff raises caps; artifacts apply owner utility |
+
+`own_basic` starts with **empty** staff / artifact kit and **0** `sk_*` ([16](16-shop-owners.md) / [19](19-own-basic-starter.md)).
+
+### Enchant cut (M2 restated)
+
+**LOCKED.** Enchant (Thrift / Heavy) = materials only. Staff / skill / gear tabs have **no** Enchant button, accept **no** `mat_ench_*`, and do **not** stamp `shiny`. Separate gear-upgrade systems = Later if needed. Not an open question.
+
+### Shiny (M2 restated)
+
+Already M1 law; restated so M2 card art does not grow a second shine pipeline. Enchanted **materials** may show code-only tint. No shiny PixelLab assets / overlay gens for staff, skill, or gear — and those cards are not enchanted anyway.
+
+---
+
+### Staffs tab
+
+**Job:** sell / buy **staff** items that plug into craft **staff-slot** law in [12b](12b-craft-slots.md) — raises `max_materials` / `max_runes` while assigned.
+
+Investigated: `12b` names staff skills **Apprentice Hands** (+1 `max_materials`) and **Rune Desk** (+1 `max_runes`). No `staff_*` ids existed. `10` / `16` mention staff only as that Later unlock. Live craft is stamina (`27`); 2m1r slot-fill UI stays superseded. M2 staff is the unlock that makes the 12b numbers **move**.
+
+#### Equip rule (M2 — pick locked)
+
+**One staff equipped.** Buy adds the `staff_id` to the **run kit** (owned). Equip / unequip / swap from the **Staffs tab** (same visit — no separate inventory scene). Buy does **not** auto-equip. Unequip → default caps. Selling an equipped staff **unequips first**, then sells.
+
+#### Cap law (12b plug-in)
+
+| Field | Default (`own_basic`, no staff) | With staff |
+|---|---:|---|
+| `player.max_materials` | **2** | 2 + equipped staff’s `Δ_materials` |
+| `player.max_runes` | **1** | 1 + equipped staff’s `Δ_runes` |
+
+- Live craft stays stamina (`27`). Do **not** revive 2m1r slot-fill UI.
+- **M2 Client craft:** per-zone bag respects the caps (`len(materials) ≤ max_materials`, `len(runes) ≤ max_runes`). Stamina still gates. 27’s “no hard material-slot cap” was the **M1-until-staff** gap — not a forever law once a staff can raise the number.
+- M1 Client #45 may keep ignoring these fields until the M2 Client lands.
+- Cairnplate / any unique that needs `max_materials ≥ 3` ([12b](12b-craft-slots.md)) becomes legal with a staff that raises materials to ≥ 3.
+- Owner-skill Extra Seam / Second Rune stay **Later** (other owners / later stamp). Do **not** also sell them on the Skills tab this pass — slot raises come from staff.
+
+#### Staff catalog (`market_staff_bank_c1`) — **5** ids
+
+Prices are **Test knobs**. All ids are new this stamp. Nnoitra arts these after lock.
+
+| `staff_id` | Label | 12b skill | `Δ_materials` | `Δ_runes` | `$` |
+|---|---|---|---:|---:|---:|
+| `staff_apprentice` | Apprentice | Apprentice Hands | +1 | 0 | **4** |
+| `staff_rune_desk` | Rune Desk | Rune Desk | 0 | +1 | **5** |
+| `staff_loom_pair` | Loom Pair | both | +1 | +1 | **8** |
+| `staff_third_seam` | Third Seam | Apprentice Hands ×2 | +2 | 0 | **7** |
+| `staff_rune_pair` | Rune Pair | Rune Desk ×2 | 0 | +2 | **8** |
+
+**5 rows.** Full bank = the shelf every visit. `qty_offered` **1**. Bank does not deplete.
+
+| Rule | M2 |
+|---|---|
+| Unique | **One owned copy per `staff_id`.** Already owned → Buy refused (grey / ignore). Sell, then you may buy it again later |
+| Stack | Equipped staff’s Δ only. Do **not** stack two staffs (one slot) |
+| Sell | ⌊`$` / 2⌋ min 1. Unequip if equipped |
+| Enchant / shiny | **No** |
+| Craft deck | **No** — never `type=staff` in `cards_played` |
+
+Worked caps (default 2 / 1 + Δ):
+
+| Equipped | `max_materials` | `max_runes` |
+|---|---:|---:|
+| *(none)* | 2 | 1 |
+| `staff_apprentice` | 3 | 1 |
+| `staff_rune_desk` | 2 | 2 |
+| `staff_loom_pair` | 3 | 2 |
+| `staff_third_seam` | 4 | 1 |
+| `staff_rune_pair` | 2 | 3 |
+
+#### Ugly Staffs UI
+
+```
+market · N2
+gold 12
+[Materials] [Staffs] [Skills] [Gear]
+
+SHELF
+  staff_apprentice    $4   Δm+1        [Buy]
+  staff_rune_desk     $5   Δr+1        [Buy]
+  staff_loom_pair     $8   Δm+1 Δr+1   [Buy]
+  staff_third_seam    $7   Δm+2        [Buy]
+  staff_rune_pair     $8   Δr+2        [Buy]
+
+KIT  equipped: staff_apprentice    max_m 3  max_r 1
+  staff_apprentice    equipped   [Unequip]  sell +2   [Sell]
+
+[Exit]
+```
+
+Labels = ids + `$` + Δ + equipped mark. No Refresh / Enchant on this tab. No owner chrome.
+
+---
+
+### Skill cards tab
+
+**Job:** market offers for owner **skill cards** tied to `16` / `27` (`sk_*`). Phase-1 player is `own_basic` (starts with **none**). Other owners Later.
+
+Investigated: [16](16-shop-owners.md) is the owner-skill **law** (kit on the clothier) but has **no** `sk_*` ids. [27](27-craft-mode-stamina.md) already stamped six draft `sk_*` (session cards, stamina cost). [29](29-adventurer-catalog.md) / [10](10-catalog-overview.md): `sk_*` = owner craft skills; `ask_*` = adventurer battle skills. Do **not** invent a second skill system.
+
+#### Kit rule (M2 — pick locked)
+
+**Buy into the run kit** (run-long). Matches `16` “permanent or run-long kit.” **Not** one-shot burn (day-generated consumables stay Later in `20` / `27`).
+
+On success: pay `$`; append **one** `type=skill` copy (`sk_*`) to the **run deck** (`WagonStock` / `27`). Next craft session shuffles it into draw like any other deck card. Play → discard → reshuffle (`27`). Selling removes one owned copy from the deck.
+
+`own_basic` may buy these extras without unlocking other owners. [16](16-shop-owners.md) owner-locked passives (broker free-reroll, tithe income, packrat hand) stay **Later** as other-owner kit — M2 income / storage / soft utility is the **Gear** tab, not a parallel `sk_*` set.
+
+#### Skill catalog (`market_skill_bank_c1`) — **6** ids
+
+**Existing** `27` ids. Do not rename. Gold `$` is a **Test knob**, scaled from that card’s stamina cost (1 → **3**, 2 → **5**, 3 → **7**). Effects stay the `27` draft lines.
+
+| `skill_id` | Stamina (27) | `$` | Effect (from `27`) |
+|---|---:|---:|---|
+| `sk_next_mat_free` | 1 | **3** | Next material play costs 0 stamina |
+| `sk_touch_up` | 1 | **3** | +1 to one chosen stat on one already-played material in the **target zone** |
+| `sk_steady_hand` | 1 | **3** | Ignore first negative synergy roll hint this **target** piece (does **not** skip rarity rules) |
+| `sk_metal_str_double` | 2 | **5** | Double STR contribution from Metal-tagged materials already in the **target** piece |
+| `sk_wild_to_earth` | 2 | **5** | Consume 1 Wild material in session → add 1 random Earth material into hand |
+| `sk_deep_dig` | 3 | **7** | Refresh hand; draw +1 extra |
+
+**6 rows.** Full bank = the shelf every visit. `qty_offered` **1**. Bank does not deplete.
+
+| Rule | M2 |
+|---|---|
+| Duplicates | **Allowed** — these are deck cards. Second buy of the same `sk_*` adds a second copy |
+| Sell | ⌊`$` / 2⌋ min 1. No ≥3 floor (skills do not count toward the material floor) |
+| Enchant / shiny | **No** |
+| Equip | **None** — ownership = deck membership |
+| Other `sk_*` | Do not invent Extra Seam / Second Rune / broker-reroll cards this stamp |
+
+#### Ugly Skills UI
+
+```
+market · N2
+gold 12
+[Materials] [Staffs] [Skills] [Gear]
+
+SHELF
+  sk_next_mat_free      $3   [Buy]
+  sk_touch_up           $3   [Buy]
+  sk_steady_hand        $3   [Buy]
+  sk_metal_str_double   $5   [Buy]
+  sk_wild_to_earth      $5   [Buy]
+  sk_deep_dig           $7   [Buy]
+
+DECK (skills)
+  sk_next_mat_free      own 1   sell +1   [Sell]
+
+[Exit]
+```
+
+---
+
+### Gear / artifact tab
+
+**Job:** new stamped catalog. Power the **owner** (not craft mats): income, storage, soft utility. No craft-session use. Nnoitra arts these ids after stamp.
+
+**Prefix lock:** `artifact_*`. Tab display name = **Gear**. Do **not** use `gear_*` — [10](10-catalog-overview.md) “Final gear” is the crafted garment.
+
+#### Equip rule (M2 — pick locked)
+
+**2 gear slots.** Buy adds the `artifact_id` to the **run kit**. Equip / unequip / swap from the **Gear tab**. Buy does **not** auto-equip. Up to **two** different artifacts equipped. Selling an equipped artifact **unequips that slot**, then sells. Empty slots are legal.
+
+#### Artifact catalog (`market_artifact_bank_c1`) — **8** ids
+
+Prices are **Test knobs**. All ids are new this stamp. Effects apply **while equipped** (unequip → lose the bonus).
+
+| `artifact_id` | Label | Effect (Design) | `$` |
+|---|---|---|---:|
+| `artifact_coin_purse` | Tithe Purse | +1 gold on every order / mission payout this run | **5** |
+| `artifact_ledger_clip` | Ledger Clip | +1 gold when **entering** a market visit | **4** |
+| `artifact_pack_strap` | Pack Strap | +1 `hand_size` (5 → 6) | **6** |
+| `artifact_needle_tin` | Needle Tin | `dig_refresh_cost` −1 (min **1**) | **6** |
+| `artifact_wagon_hook` | Wagon Hook | Material **sell** gain +1 (still min 1; still from **base** `$`; ignore thrift/heavy) | **5** |
+| `artifact_stamp_case` | Stamp Case | +1 reps when an order rates **S** or **A** | **6** |
+| `artifact_road_charm` | Road Charm | Event gold **losses** reduced by 1 (min 0 applied loss) | **4** |
+| `artifact_oil_rag` | Oil Rag | +2 `stamina_start` per craft session (not × N) | **5** |
+
+**8 rows.** Full bank = the shelf every visit. `qty_offered` **1**. Bank does not deplete.
+
+These are the M2 stand-ins for `16` tithe / packrat-style utility so `own_basic` can buy them without unlocking other owners. They are **not** `sk_*` and **not** staff-slot raises.
+
+| Rule | M2 |
+|---|---|
+| Unique | **One owned copy per `artifact_id`.** Already owned → Buy refused |
+| Slots | **2.** Cannot equip the same id twice (only one copy exists) |
+| Craft | **No** — never `cards_played`. Do not sew artifacts into a garment |
+| Enchant / shiny | **No** |
+| Sell | ⌊`$` / 2⌋ min 1. Unequip if equipped |
+| Stack | Two **different** artifacts stack. Staff Δ + artifact utility stack (different systems) |
+
+#### Ugly Gear UI
+
+```
+market · N2
+gold 12
+[Materials] [Staffs] [Skills] [Gear]
+
+SHELF
+  artifact_coin_purse    $5   [Buy]
+  artifact_ledger_clip   $4   [Buy]
+  artifact_pack_strap    $6   [Buy]
+  artifact_needle_tin    $6   [Buy]
+  artifact_wagon_hook    $5   [Buy]
+  artifact_stamp_case    $6   [Buy]
+  artifact_road_charm    $4   [Buy]
+  artifact_oil_rag       $5   [Buy]
+
+KIT  slots 1/2
+  artifact_pack_strap    slot 1   [Unequip]  sell +3   [Sell]
+
+[Exit]
+```
+
+---
+
+### Nnoitra art ids (stable — lock before gens)
+
+Ping **Harribel** before PixelLab / chrome gens. Material icons stay 1:1. No shiny overlay gens.
+
+**Staffs (5):** `staff_apprentice` · `staff_rune_desk` · `staff_loom_pair` · `staff_third_seam` · `staff_rune_pair`
+
+**Gear (8):** `artifact_coin_purse` · `artifact_ledger_clip` · `artifact_pack_strap` · `artifact_needle_tin` · `artifact_wagon_hook` · `artifact_stamp_case` · `artifact_road_charm` · `artifact_oil_rag`
+
+**Skills (6, existing):** `sk_next_mat_free` · `sk_touch_up` · `sk_steady_hand` · `sk_metal_str_double` · `sk_wild_to_earth` · `sk_deep_dig` — card art Later if needed; do not invent a second id.
+
+Owner chrome / shopkeeper portraits stay **out** (non-goal).
 
 ---
 
@@ -449,7 +713,38 @@ Extend [20](20-harness-stamp.md). Keep route-map keys from #40/#41 intact (`rout
 
 **Card / deck representation:** enchanted copies in `WagonStock` / dump carry `mat_enchant_id` (+ optional `shiny: true`). Client may dump `shiny` or derive it from `mat_enchant_id != null`.
 
-Null the market block when `day_action` is not `shop`. **Reshape is Later** — do not emit a reshape field. Do not emit owner-gear / staff / skill-card offer fields on M1. Do not emit staff/skill/gear enchant fields.
+Null the market block when `day_action` is not `shop`. **Reshape is Later** — do not emit a reshape field. Do not emit staff/skill/gear enchant fields.
+
+### Market M2 tabs (when `day_action=shop` — M2 Client; M1 #45 may omit)
+
+Emit on enter and after each buy/sell/equip/exit on these tabs. Materials keys above stay Required.
+
+| Field | Type | Notes |
+|---|---|---|
+| `market_tab` | enum | `materials` \| `staffs` \| `skills` \| `gear` — current tab. Optional on M1 dumps |
+| `market_staff_bank_id` | string | C1 = **`market_staff_bank_c1`** |
+| `market_staff_stock` | object[] | `{ staff_id, price, qty_offered }[]`. Length **5**. Every `staff_id` ∈ staff catalog. `price` = catalog `$` |
+| `market_staff_buys` | object[] | `{ staff_id, price }[]` this visit. `[]` if none |
+| `market_staff_sells` | object[] | `{ staff_id, gold_gained }[]` this visit. `[]` if none |
+| `staff_owned` | string[] | Owned `staff_id`s this run (unique) |
+| `staff_equipped_id` | string\|null | The one equipped staff, or null |
+| `max_materials` | int | **2** + equipped staff `Δ_materials` |
+| `max_runes` | int | **1** + equipped staff `Δ_runes` |
+| `market_skill_bank_id` | string | C1 = **`market_skill_bank_c1`** |
+| `market_skill_stock` | object[] | `{ skill_id, price, qty_offered }[]`. Length **6**. Every `skill_id` ∈ `27` table above |
+| `market_skill_buys` | object[] | `{ skill_id, price }[]` this visit. `[]` if none |
+| `market_skill_sells` | object[] | `{ skill_id, gold_gained }[]` this visit. `[]` if none |
+| `deck_skill_count` | int | `type=skill` cards in the run deck after the last action |
+| `market_artifact_bank_id` | string | C1 = **`market_artifact_bank_c1`** |
+| `market_artifact_stock` | object[] | `{ artifact_id, price, qty_offered }[]`. Length **8**. Every `artifact_id` ∈ artifact catalog |
+| `market_artifact_buys` | object[] | `{ artifact_id, price }[]` this visit. `[]` if none |
+| `market_artifact_sells` | object[] | `{ artifact_id, gold_gained }[]` this visit. `[]` if none |
+| `artifact_owned` | string[] | Owned `artifact_id`s this run (unique) |
+| `artifact_equipped_ids` | string[] | Length **0..2**. Distinct ids ⊆ `artifact_owned` |
+
+`gold` / `gold_before` / `gold_after` / `gold_delta` already cover M2 spends. `deck_material_count` unchanged (skills / staff / artifacts do not count).
+
+M1 Client #45 that omits the M2 block is still legal. M2 Client **must** emit it on `day_action=shop`.
 
 ### Event (when `day_action=event` — after the choice)
 
@@ -489,6 +784,19 @@ Docs only this stamp — sketch for the **next** Client PR. No `src/` here. Hold
 13. Starting `gold` = **12** (knob). Floor 0. One purse. Refresh knobs base **2** / step **2**. Enchant fees **2** (Thrift) / **3** (Heavy).
 14. M1 copy = display type **market** + id + catalog labels. Fancy titles / art **Later**. Shiny overlay = ugly tint M1.
 
+### Client needs (Ulquiorra) — M2 tabs
+
+Docs only this stamp — sketch for the **M2 Client PR**. No `src/` here. **Hold until Jonathan stamps this revision.** Do not grow #45.
+
+15. **Same shell.** Tab strip Materials | Staffs | Skills | Gear. Enter still only from `kind=shop`. `day_action=shop`. Exit still resolves the node.
+16. **Do not** put Enchant or Refresh on Staffs / Skills / Gear. Refresh still redraws **materials** only. Enchant still materials only (`mat_ench_*`). No `mat_ench_*` / `shiny` on staff, skill, or artifact instances.
+17. **Staffs:** load `market_staff_bank_c1` (5 rows). Buy → run kit (not `WagonStock`). Refuse if already owned or `gold < price`. Sell ⌊$/2⌋ min 1; unequip if equipped. **One** `staff_equipped_id`. Equip / unequip from this tab; buy does not auto-equip. Dump `max_materials` / `max_runes` = 2/1 + Δ.
+18. **M2 craft:** per-zone bag `len(materials) ≤ max_materials`, `len(runes) ≤ max_runes`. Do not revive 2m1r slot UI. Stamina still gates.
+19. **Skills:** load `market_skill_bank_c1` (6 existing `sk_*`). Buy → one `type=skill` copy on `WagonStock`. Duplicates legal. Sell removes one copy. No equip. Next craft shuffles them (`27`).
+20. **Gear:** load `market_artifact_bank_c1` (8 `artifact_*`). Buy → run kit. Refuse if already owned. **2** slots (`artifact_equipped_ids`). Equip from this tab. Apply listed owner utility **while equipped** only. Never `cards_played`.
+21. Dump the M2 keys above **without SCRIPT ERROR**. Keep M1 `market_*` / event keys. Gold is the one purse.
+22. Ugly ids + `$` + owned / equipped marks. No owner chrome, no PixelLab icons this Client. Nnoitra after stamp; Harribel before gens.
+
 ---
 
 ## Test logs (Szayelaporro)
@@ -507,6 +815,9 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 | `event_id` / `event_choice_id` / `event_deltas` / `event_resolved` | Event pick |
 | `reps_before` / `reps_after` / `reps_delta` | Event with reps Δ |
 | `route_path` / `current_node_id` / `route_nodes` | Unchanged law (`22` / `20`) |
+| `market_tab` / `market_staff_*` / `staff_owned` / `staff_equipped_id` / `max_materials` / `max_runes` | M2 Staffs tab |
+| `market_skill_*` / `deck_skill_count` | M2 Skills tab |
+| `market_artifact_*` / `artifact_owned` / `artifact_equipped_ids` | M2 Gear tab |
 
 **Asserts (market + event)** — no SCRIPT ERROR path beyond existing smoke.
 
@@ -523,14 +834,22 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 11. Gold never < 0. Illegal pay-gold event / refresh / buy / enchant choices do not apply.
 12. Enchant: `gold_after == gold_before - fee`; that deck copy has `mat_enchant_id` set (+ `shiny` true or derived); `market_enchants` contains `{ mat_id, mat_enchant_id, fee }`. `mat_enchant_id` ∈ {`mat_ench_thrift`, `mat_ench_heavy`}. Refused if already enchanted / `gold < fee` / not a material (gold and stamp unchanged). Enchant does **not** resolve the day / append `route_path`. No staff / skill / gear enchant field.
 
+**Asserts (M2 tabs)** — M2 Client only. #45 may omit the M2 block.
+
+13. `market_staff_stock` length **5**; every `staff_id` ∈ the staff catalog; price matches `$`. Unique: a second buy of an owned `staff_id` is refused. `staff_equipped_id` is null or ∈ `staff_owned`. `max_materials` / `max_runes` match default 2/1 + equipped Δ. Refresh does **not** change staff stock.
+14. `market_skill_stock` length **6**; every `skill_id` ∈ the `27` six. Buy appends `type=skill` and `deck_skill_count` +1. Duplicates legal. Sell −1. Skills do not change `deck_material_count` / ≥3 floor.
+15. `market_artifact_stock` length **8**; every `artifact_id` ∈ the artifact catalog. Unique owned. `len(artifact_equipped_ids) ∈ 0..2` and all distinct ⊆ `artifact_owned`. Refresh does **not** change artifact stock.
+16. Sell gold on these tabs = `max(1, floor($/2))` from catalog `$`. Gold never < 0. Equip / buy / sell do **not** append `route_path` or resolve the day.
+17. No `mat_enchant_id` / `shiny` on staff, skill, or artifact instances. No `enc_*` sold on these tabs.
+
 ---
 
 ## Explicit non-goals
 
 - Reshape (free remove / transform without buy)
 - Frozen per-node-only 4–6 lists as sole stock law
-- Market-sold staff / skill-card / `gear_*` catalogs in **M1** (those are **M2**)
-- Staff / skill-card / gear tabs as live **M1** catalogs
+- Reopening M1 materials / refresh / enchant / `evt_*` (shipped #45)
+- Staff / skill / gear tabs in the **M1** Client (#45 must stay materials-only)
 - Shop-owner / market-keeper chrome (`16`)
 - `own_broker` free reroll as the M1 refresh (Later owner skill)
 - Forbidden unlock rooms
@@ -553,24 +872,33 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 - Overwrite / multi-stack mat enchants M1
 - Nnoitra / PixelLab shine blocking M1 Client (ugly tint is enough)
 - Staff / skill / gear enchant this stamp
+- A second skill system parallel to `16` / `27` `sk_*`
+- `gear_*` ids (prefix is `artifact_*`)
+- PixelLab shiny overlays / shiny gens for M2 cards
+- Refreshing staff / skill / gear banks mid-visit
+- Owner chrome / shopkeeper portraits
+- Client `src/` / Godot this PR
+- Elite N5 telegraph, adventurer catalog, battle playback
+- Merging craft `enc_*` runes into market mat enchant
+- Selling Extra Seam / Second Rune as `sk_*` this pass (slot raises = staff)
+- Auto-equip on buy
+- More than one staff equipped (M2 default = 1)
+- More than two gear slots (M2 default = 2)
+- Craft-session use of staff / artifacts
 
 ---
 
-## Later / M2
-
-**M2 (named milestone — Jonathan 2026-10-15):**
-
-- **Staffs / skill cards / gear·artifact** tabs on the same market shell + catalogs
-
-**Later (not the M2 market-tab lock):**
+## Later (not this M2 tab lock)
 
 - Owner roster (`16`) and owner-weighted stock
 - `own_broker` free reroll (do not replace the paid refresh curve unless stamped)
+- Owner-skill Extra Seam / Second Rune as buyable `sk_*`
 - Forbidden unlock rooms / $5 mats in the bank
 - Reshape
-- Unique stock UI / fancy titles / PixelLab icons (Nnoitra parallel)
-- Nnoitra shiny overlay polish (M1 ugly tint stays legal)
+- Unique stock UI / fancy titles / PixelLab icons (Nnoitra parallel — after stamp + Harribel)
+- Nnoitra shiny overlay polish (ugly tint stays legal)
 - Overwrite / multi-stack mat enchants
+- Separate gear-upgrade / enchant systems
 - Event art, branching trees, run-kill rows
 - Prep-craft / rest-dig nodes (`22`)
 - Enchantment / rune market offers (`19` optional 6th slot) — still **not** `mat_ench_*`
@@ -579,10 +907,10 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 
 ## Open questions (Jonathan)
 
-None this pass. Jonathan locked **M1 = materials tab only** and **M2 = staffs / skill cards / gear·artifact tabs** on this shell — this add-on does **not** reopen that split. Material enchant (`mat_ench_thrift` / `mat_ench_heavy`) + shiny overlay is **LOCKED** as an M1 materials-tab action. Market name (wire `shop` kept), refresh curve, chapter bank, shared gold purse, sell rate, and C1 `evt_*` rows stay **locked as M1 defaults**. Gold start **12**, refresh **base 2 / step 2**, sell **⌊base $ / 2⌋ min 1**, enchant fees **2 / 3**, shelf size 4–6, and bank ids inside `11` (excluded list held) are **Test knobs** — retune without blocking Ulquiorra.
+None this pass. M1 stays closed. Enchant cut (materials only) is locked. Catalogs, one-staff / two-gear, buy-into-kit skills, `artifact_*` prefix, and refresh=materials-only are Grimmjow locks for stamp. Gold prices and Δ ints are **Test knobs**.
 
 ---
 
 ## Pointers
 
-`22` route map · `20` harness · `11` materials · `19` starter deck + gold 12 + excluded list · `27` run deck / `WagonStock` · `14` synergy bag-count · `13` craft `enc_*` (distinct) · `25` reps · `16` owner skills · `10` / `12b` enc + staff-slot · `01` loop · `21` historical opening-shop · `pm/phase-1-plan` · `STAMP`
+`22` route map · `20` harness · `11` materials · `19` starter deck + gold 12 + excluded list · `27` run deck / `sk_*` · `14` synergy bag-count · `13` craft `enc_*` (distinct) · `25` reps · `16` owner skills · `10` / `12b` enc + staff-slot · `01` loop · `21` historical opening-shop · `pm/phase-1-plan` · `STAMP`

@@ -12,7 +12,7 @@ Jonathan lock (2026-09-21, corrected): an **owner is the player character** — 
 - Pool owners (all current drafts) define starting deck filters + shop stock weights from **their** family list.
 - Skills are on the **player** (rerolls, income floor, hand size) — not a separate vendor visit.
 - Unlockable owners extend play hours / fantasy without needing more Client loop systems.
-- Market UI exists (buy/sell mats) but it is **your** atelier stock, gated by the active owner’s pool. **M1 route-node visit** (enter from `kind=shop`, display **Market**, chapter bank + refresh + **material enchant**, materials tab only) = **[32](32-shop-and-events.md)**. **M2** = staff / skill / gear tabs on that shell. This roster is Later for owner-weighted stock. Do not invent owner NPCs on C1 markets.
+- Market UI exists (buy/sell mats) but it is **your** atelier stock, gated by the active owner’s pool. **M1 route-node visit** (enter from `kind=shop`, display **Market**, chapter bank + refresh + **material enchant**, materials tab only) = **[32](32-shop-and-events.md)**. **M2** = Staffs / Skills / Gear tabs on that shell. Skills tab sells existing `sk_*` from [27](27-craft-mode-stamina.md) into the `own_basic` **run kit** (run-long, not one-shot). Do **not** invent a second skill system. Owner-locked passives (broker reroll, tithe income, packrat hand) stay Later on this roster — M2 income / storage / soft utility is `artifact_*` on the Gear tab. This roster is Later for owner-weighted stock. Do not invent owner NPCs on C1 markets.
 
 ## Owner roster (draft)
 
@@ -65,4 +65,4 @@ Some already exist in `11`; this owner weights them up and adds skins:
 
 - Stamp `player_owner_id` on runs / dumps (Phase-1 always `own_basic`).
 - Pool filter = active owner’s allowed `mat_*` set (or family weights).
-- Player skills modify shop/craft economy — not a second encounter type.
+- Player skills modify shop/craft economy — not a second encounter type. M2 market Skills tab: [32](32-shop-and-events.md).

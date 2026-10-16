@@ -486,3 +486,32 @@ None of the 2026-10-15 market-tab locks. Adds enchant **on** the materials tab.
 ## Open questions
 
 None. Enchant fees **2 / 3** are Test knobs.
+
+---
+
+# Grimmjow stamp — 2026-10-16 (market M2 — Staffs / Skills / Gear)
+
+Docs only. Extends #44 / `32` after Client #45. **Does not** reopen M1 (materials + refresh + bank + mat Enchant + shiny + `evt_*` stay closed). Ulquiorra **holds the M2 Client** until Jonathan stamps. Aizen merges **after** stamp. Nnoitra chrome / icons + `staff_*` / `artifact_*` art after ids lock — ping **Harribel before gens**.
+
+## Locked (docs only)
+
+1. Same market shell. Tab strip **Materials | Staffs | Skills | Gear**. Enter `kind=shop` / `day_action=shop`. One gold purse. Exit resolves the node. Refresh = **materials shelf only**.
+2. **Enchant (Thrift / Heavy) = materials only.** Staff / skill / gear tabs do **not** take `mat_ench_*`. No shiny PixelLab gens. Code-only tint on enchanted **materials** only.
+3. **Staffs (5):** `staff_apprentice` · `staff_rune_desk` · `staff_loom_pair` · `staff_third_seam` · `staff_rune_pair`. Plug into `12b` (raise `max_materials` / `max_runes` while equipped). **One** staff equipped. Buy → run kit. Equip from the Staffs tab.
+4. **Skills (6):** existing `27` `sk_*` sold into the `own_basic` run deck (buy-into-kit, run-long). Not a second skill system. Not one-shot burn. `16` other-owner passives stay Later.
+5. **Gear (8):** `artifact_*` (not `gear_*`). **2** slots. Owner utility (income / storage / soft). No craft-session use. Unique owned.
+6. Dump keys + Client needs + ugly sketches in `32` / `20`. Gold prices Test knobs.
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Revise** — M2 section (catalogs, equip, dump, Client, Test) |
+| `docs/20-harness-stamp.md` | M2 dump keys + asserts 29–32 |
+| `docs/12b-craft-slots.md` · `16` · `10` · `27` | Staff / `sk_*` / `artifact_*` pointers |
+| `docs/README.md` · `00` · `01` · `03` · `04` · `11` · `19` · `21` · `22` · `pm` | Pointers |
+| `docs/STAMP.md` | This note |
+
+## Open questions
+
+None.
