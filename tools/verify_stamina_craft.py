@@ -99,14 +99,14 @@ def check_source_symbols(blob: str) -> None:
     banned = [
         "lineup_card_ids",
         "picked_card_id",
-        "max_materials",
-        "max_runes",
         "craft_task",
         "StampPhase.SHOP",
         "awaiting_next_piece",
         "open_piece_session",
         "Sew next piece",
     ]
+    if "construction.material_slots" in code_only:
+        fail("do not revive construction.material_slots as a runtime cap")
     for token in banned:
         if token in code_only:
             fail(f"superseded token present: {token}")

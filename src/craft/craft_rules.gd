@@ -51,7 +51,10 @@ static func can_play(
 	var target := zone_index if zone_index > 0 else session.selected_zone_index
 	if not session.is_legal_zone(target):
 		return false
-	var cost := CraftCatalog.play_cost(session.hand[hand_index], next_mat_free)
+	var card: HandCard = session.hand[hand_index]
+	if not _zone_accepts(session, target, card.type):
+		return false
+	var cost := CraftCatalog.play_cost(card, next_mat_free)
 	return cost <= session.stamina_remaining
 
 
@@ -61,6 +64,32 @@ static func can_dig(session: CraftStaminaSession, _stock: WagonStock = null) -> 
 	if session.stamina_remaining < session.dig_refresh_cost:
 		return false
 	return session.run_deck_count() > 0
+
+
+static func zone_type_count(
+	session: CraftStaminaSession,
+	zone_index: int,
+	card_type: GameEnums.HandCardType
+) -> int:
+	if session == null:
+		return 0
+	var n := 0
+	for played in session.cards_played:
+		if played != null and played.zone_index == zone_index and played.type == card_type:
+			n += 1
+	return n
+
+
+static func _zone_accepts(
+	session: CraftStaminaSession,
+	zone_index: int,
+	card_type: GameEnums.HandCardType
+) -> bool:
+	if card_type == GameEnums.HandCardType.MATERIAL:
+		return zone_type_count(session, zone_index, card_type) < session.max_materials
+	if card_type == GameEnums.HandCardType.RUNE:
+		return zone_type_count(session, zone_index, card_type) < session.max_runes
+	return true
 
 
 static func burns_on_play(type: GameEnums.HandCardType) -> bool:

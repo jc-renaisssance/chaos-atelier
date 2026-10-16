@@ -1,6 +1,7 @@
 class_name MarketScreen
 extends Control
-## Ugly M1 market shell — materials tab only (docs/32). Staffs / skills / gear = M2.
+## Ugly M2 market shell — Materials / Staffs / Skills / Gear (docs/32).
+## Enchant + refresh stay materials-only. Shiny tint stays on enchanted mats.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -11,10 +12,14 @@ const PANEL := Color(0.165, 0.129, 0.094)
 const BORDER := Color(0.239, 0.204, 0.173)
 const SHINE := Color(0.95, 0.82, 0.22, 0.38)
 const CHIP := Color(0.227, 0.173, 0.094)
+const TAB_ON := Color(0.35, 0.28, 0.1)
 
 var _title: Label
 var _meta: Label
 var _note: Label
+var _tab_btns: Dictionary = {}
+var _shelf_caption: Label
+var _deck_caption: Label
 var _shelf_box: VBoxContainer
 var _deck_box: VBoxContainer
 var _refresh_btn: Button
@@ -60,11 +65,19 @@ func _build() -> void:
 	_meta = _label("gold 0   ·   refresh next $2", 15, INK)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_meta)
-	_note = _label("Materials tab. Staffs / skill cards / gear = M2.", 13, MUTED)
+	_note = _label("Materials | Staffs | Skills | Gear", 13, MUTED)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_note)
 
-	root.add_child(_caption("TAB  ·  Materials (M1 live)  ·  Staffs / Skills / Gear parked M2"))
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 6)
+	root.add_child(tabs)
+	_tab_btns.clear()
+	for tab in MarketCatalog.tab_ids():
+		var tab_id := String(tab)
+		var btn := _btn(_tab_label(tab_id), _on_tab.bind(tab_id))
+		tabs.add_child(btn)
+		_tab_btns[tab_id] = btn
 
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override("separation", 12)
@@ -77,7 +90,8 @@ func _build() -> void:
 	shelf_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shelf_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(shelf_wrap)
-	shelf_wrap.add_child(_caption("SHELF  ·  buy from market_bank_c1"))
+	_shelf_caption = _caption("SHELF")
+	shelf_wrap.add_child(_shelf_caption)
 	var shelf_panel := _panel()
 	shelf_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shelf_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -97,7 +111,8 @@ func _build() -> void:
 	deck_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	deck_wrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(deck_wrap)
-	deck_wrap.add_child(_caption("DECK  ·  sell / enchant owned mat_*"))
+	_deck_caption = _caption("DECK")
+	deck_wrap.add_child(_deck_caption)
 	var deck_panel := _panel()
 	deck_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	deck_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -118,7 +133,7 @@ func _build() -> void:
 	_refresh_btn = _btn("Refresh $2", _on_refresh)
 	actions.add_child(_refresh_btn)
 	actions.add_child(_btn("Exit", _on_exit))
-	var hint := _label("Refresh / Enchant do not resolve the day. Exit does.", 12, MUTED)
+	var hint := _label("Refresh / Enchant = materials only. Exit resolves the day.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	actions.add_child(hint)
@@ -140,20 +155,30 @@ func _sync_header() -> void:
 		node_id = "—"
 	_title.text = "market · %s" % node_id
 	var next_cost := MarketCatalog.refresh_cost(AtelierSession.market_refresh_count)
+	var tab := AtelierSession.market_tab
 	_meta.text = (
-		"gold %d   ·   refresh next $%d   ·   count %d   ·   mats %d   ·   bank %s"
+		"gold %d   ·   refresh next $%d   ·   count %d   ·   mats %d   ·   skills %d   ·   max_m %d  max_r %d   ·   gear %d/2"
 		% [
 			AtelierSession.gold,
 			next_cost,
 			AtelierSession.market_refresh_count,
 			AtelierSession.stock.material_count() if AtelierSession.stock != null else 0,
-			MarketCatalog.bank_id(),
+			AtelierSession.stock.skill_count() if AtelierSession.stock != null else 0,
+			AtelierSession.live_max_materials(),
+			AtelierSession.live_max_runes(),
+			AtelierSession.artifact_equipped_ids.size(),
 		]
 	)
 	_note.text = AtelierSession.last_note
 	if _refresh_btn != null:
 		_refresh_btn.text = "Refresh $%d" % next_cost
 		_refresh_btn.disabled = not AtelierSession.can_refresh_market()
+		_refresh_btn.visible = tab == GameConstants.MARKET_TAB_MATERIALS
+	for tab_id in _tab_btns.keys():
+		var btn: Button = _tab_btns[tab_id]
+		var on := String(tab_id) == tab
+		btn.disabled = on
+		btn.modulate = Color(1.08, 1.04, 0.82) if on else Color.WHITE
 
 
 func _rebuild_lists() -> void:
@@ -167,9 +192,28 @@ func _rebuild_shelf() -> void:
 		return
 	for child in _shelf_box.get_children():
 		child.queue_free()
-	for item in AtelierSession.market_stock:
-		if item is Dictionary:
-			_shelf_box.add_child(_shelf_row(item as Dictionary))
+	var tab := AtelierSession.market_tab
+	match tab:
+		GameConstants.MARKET_TAB_STAFFS:
+			_shelf_caption.text = "SHELF  ·  market_staff_bank_c1  ·  unique owned"
+			for item in AtelierSession.market_staff_stock:
+				if item is Dictionary:
+					_shelf_box.add_child(_staff_shelf_row(item as Dictionary))
+		GameConstants.MARKET_TAB_SKILLS:
+			_shelf_caption.text = "SHELF  ·  market_skill_bank_c1  ·  buy into own_basic kit"
+			for item in AtelierSession.market_skill_stock:
+				if item is Dictionary:
+					_shelf_box.add_child(_skill_shelf_row(item as Dictionary))
+		GameConstants.MARKET_TAB_GEAR:
+			_shelf_caption.text = "SHELF  ·  market_artifact_bank_c1  ·  unique owned"
+			for item in AtelierSession.market_artifact_stock:
+				if item is Dictionary:
+					_shelf_box.add_child(_artifact_shelf_row(item as Dictionary))
+		_:
+			_shelf_caption.text = "SHELF  ·  buy from market_bank_c1"
+			for item in AtelierSession.market_stock:
+				if item is Dictionary:
+					_shelf_box.add_child(_mat_shelf_row(item as Dictionary))
 
 
 func _rebuild_deck() -> void:
@@ -177,16 +221,50 @@ func _rebuild_deck() -> void:
 		return
 	for child in _deck_box.get_children():
 		child.queue_free()
-	if AtelierSession.stock == null:
-		return
-	for i in range(AtelierSession.stock.cards.size()):
-		var card: HandCard = AtelierSession.stock.cards[i]
-		if card == null or card.type != GameEnums.HandCardType.MATERIAL:
-			continue
-		_deck_box.add_child(_deck_row(i, card))
+	var tab := AtelierSession.market_tab
+	match tab:
+		GameConstants.MARKET_TAB_STAFFS:
+			var equipped := AtelierSession.staff_equipped_id
+			var eq_bit := equipped if not equipped.is_empty() else "none"
+			_deck_caption.text = (
+				"KIT  equipped: %s    max_m %d  max_r %d"
+				% [eq_bit, AtelierSession.live_max_materials(), AtelierSession.live_max_runes()]
+			)
+			if AtelierSession.staff_owned.is_empty():
+				_deck_box.add_child(_label("No staff owned.", 13, MUTED))
+			for staff_id in AtelierSession.staff_owned:
+				_deck_box.add_child(_staff_kit_row(String(staff_id)))
+		GameConstants.MARKET_TAB_SKILLS:
+			_deck_caption.text = "DECK (skills)  ·  sell copies  ·  no equip"
+			if AtelierSession.stock == null:
+				return
+			var any := false
+			for i in range(AtelierSession.stock.cards.size()):
+				var card: HandCard = AtelierSession.stock.cards[i]
+				if card == null or card.type != GameEnums.HandCardType.SKILL:
+					continue
+				any = true
+				_deck_box.add_child(_skill_deck_row(i, card))
+			if not any:
+				_deck_box.add_child(_label("No skill cards in the run kit.", 13, MUTED))
+		GameConstants.MARKET_TAB_GEAR:
+			_deck_caption.text = "KIT  slots %d/2" % AtelierSession.artifact_equipped_ids.size()
+			if AtelierSession.artifact_owned.is_empty():
+				_deck_box.add_child(_label("No artifacts owned.", 13, MUTED))
+			for artifact_id in AtelierSession.artifact_owned:
+				_deck_box.add_child(_artifact_kit_row(String(artifact_id)))
+		_:
+			_deck_caption.text = "DECK  ·  sell / enchant owned mat_*"
+			if AtelierSession.stock == null:
+				return
+			for i in range(AtelierSession.stock.cards.size()):
+				var card: HandCard = AtelierSession.stock.cards[i]
+				if card == null or card.type != GameEnums.HandCardType.MATERIAL:
+					continue
+				_deck_box.add_child(_mat_deck_row(i, card))
 
 
-func _shelf_row(offer: Dictionary) -> Control:
+func _mat_shelf_row(offer: Dictionary) -> Control:
 	var mat_id := String(offer.get("mat_id", ""))
 	var price := int(offer.get("price", 0))
 	var qty := int(offer.get("qty_offered", 0))
@@ -205,13 +283,13 @@ func _shelf_row(offer: Dictionary) -> Control:
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
-	var buy := _btn("Buy", _on_buy.bind(mat_id))
+	var buy := _btn("Buy", _on_buy_mat.bind(mat_id))
 	buy.disabled = not AtelierSession.can_buy_market(mat_id)
 	box.add_child(buy)
 	return row
 
 
-func _deck_row(index: int, card: HandCard) -> Control:
+func _mat_deck_row(index: int, card: HandCard) -> Control:
 	var row := _chip(card.is_enchanted())
 	if card.is_enchanted():
 		row.modulate = Color(1.08, 1.04, 0.82)
@@ -224,7 +302,7 @@ func _deck_row(index: int, card: HandCard) -> Control:
 		bar.custom_minimum_size = Vector2(0, 8)
 		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		box.add_child(bar)
-	var gain := MarketCatalog.sell_gain(card.id)
+	var gain := AtelierSession.material_sell_gain(card.id)
 	var shiny_bit := ""
 	if card.is_enchanted():
 		shiny_bit = "   shiny %s" % card.mat_enchant_id
@@ -234,7 +312,7 @@ func _deck_row(index: int, card: HandCard) -> Control:
 	var btns := HBoxContainer.new()
 	btns.add_theme_constant_override("separation", 6)
 	box.add_child(btns)
-	var sell := _btn("Sell +%d" % gain, _on_sell.bind(index))
+	var sell := _btn("Sell +%d" % gain, _on_sell_mat.bind(index))
 	sell.disabled = not AtelierSession.can_sell_market(index)
 	btns.add_child(sell)
 	for ench_id in MarketCatalog.enchant_ids():
@@ -246,16 +324,220 @@ func _deck_row(index: int, card: HandCard) -> Control:
 	return row
 
 
-func _on_buy(mat_id: String) -> void:
+func _staff_shelf_row(offer: Dictionary) -> Control:
+	var staff_id := String(offer.get("staff_id", ""))
+	var price := int(offer.get("price", 0))
+	var row := _chip()
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	row.add_child(box)
+	var own_bit := "owned" if AtelierSession.owns_staff(staff_id) else "own 0"
+	var lab := _label(
+		"%s     $%d   %s   %s" % [staff_id, price, MarketCatalog.staff_delta_bit(staff_id), own_bit],
+		13,
+		INK
+	)
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var buy := _btn("Buy", _on_buy_staff.bind(staff_id))
+	buy.disabled = not AtelierSession.can_buy_staff(staff_id)
+	box.add_child(buy)
+	return row
+
+
+func _staff_kit_row(staff_id: String) -> Control:
+	var equipped := AtelierSession.staff_equipped_id == staff_id
+	var row := _chip(equipped)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	row.add_child(box)
+	var mark := "equipped" if equipped else "owned"
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.staff_price(staff_id))
+	var lab := _label(
+		"%s     %s   %s   sell +%d" % [staff_id, mark, MarketCatalog.staff_delta_bit(staff_id), gain],
+		13,
+		INK
+	)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 6)
+	box.add_child(btns)
+	if equipped:
+		var uneq := _btn("Unequip", _on_unequip_staff)
+		uneq.disabled = not AtelierSession.can_unequip_staff()
+		btns.add_child(uneq)
+	else:
+		var eq := _btn("Equip", _on_equip_staff.bind(staff_id))
+		eq.disabled = not AtelierSession.can_equip_staff(staff_id)
+		btns.add_child(eq)
+	var sell := _btn("Sell +%d" % gain, _on_sell_staff.bind(staff_id))
+	sell.disabled = not AtelierSession.can_sell_staff(staff_id)
+	btns.add_child(sell)
+	return row
+
+
+func _skill_shelf_row(offer: Dictionary) -> Control:
+	var skill_id := String(offer.get("skill_id", ""))
+	var price := int(offer.get("price", 0))
+	var own := 0
+	if AtelierSession.stock != null:
+		own = AtelierSession.stock.owned_count(skill_id)
+	var row := _chip()
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	row.add_child(box)
+	var lab := _label(
+		"%s     $%d   own %d   %s" % [skill_id, price, own, CraftCatalog.skill_blurb(skill_id)],
+		13,
+		INK
+	)
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var buy := _btn("Buy", _on_buy_skill.bind(skill_id))
+	buy.disabled = not AtelierSession.can_buy_skill(skill_id)
+	box.add_child(buy)
+	return row
+
+
+func _skill_deck_row(index: int, card: HandCard) -> Control:
+	var row := _chip()
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	row.add_child(box)
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.skill_price(card.id))
+	var lab := _label("%s     sell +%d" % [card.id, gain], 13, INK)
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var sell := _btn("Sell +%d" % gain, _on_sell_skill.bind(index))
+	sell.disabled = not AtelierSession.can_sell_skill(index)
+	box.add_child(sell)
+	return row
+
+
+func _artifact_shelf_row(offer: Dictionary) -> Control:
+	var artifact_id := String(offer.get("artifact_id", ""))
+	var price := int(offer.get("price", 0))
+	var row := _chip()
+	var box := HBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	row.add_child(box)
+	var own_bit := "owned" if AtelierSession.owns_artifact(artifact_id) else "own 0"
+	var lab := _label(
+		"%s     $%d   %s   %s" % [artifact_id, price, MarketCatalog.artifact_label(artifact_id), own_bit],
+		13,
+		INK
+	)
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var buy := _btn("Buy", _on_buy_artifact.bind(artifact_id))
+	buy.disabled = not AtelierSession.can_buy_artifact(artifact_id)
+	box.add_child(buy)
+	return row
+
+
+func _artifact_kit_row(artifact_id: String) -> Control:
+	var equipped := AtelierSession.artifact_is_equipped(artifact_id)
+	var row := _chip(equipped)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	row.add_child(box)
+	var mark := "equipped" if equipped else "owned"
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.artifact_price(artifact_id))
+	var lab := _label(
+		"%s     %s   %s   sell +%d" % [artifact_id, mark, MarketCatalog.artifact_label(artifact_id), gain],
+		13,
+		INK
+	)
+	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(lab)
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 6)
+	box.add_child(btns)
+	if equipped:
+		var uneq := _btn("Unequip", _on_unequip_artifact.bind(artifact_id))
+		uneq.disabled = not AtelierSession.can_unequip_artifact(artifact_id)
+		btns.add_child(uneq)
+	else:
+		var eq := _btn("Equip", _on_equip_artifact.bind(artifact_id))
+		eq.disabled = not AtelierSession.can_equip_artifact(artifact_id)
+		btns.add_child(eq)
+	var sell := _btn("Sell +%d" % gain, _on_sell_artifact.bind(artifact_id))
+	sell.disabled = not AtelierSession.can_sell_artifact(artifact_id)
+	btns.add_child(sell)
+	return row
+
+
+func _tab_label(tab: String) -> String:
+	match tab:
+		GameConstants.MARKET_TAB_STAFFS:
+			return "Staffs"
+		GameConstants.MARKET_TAB_SKILLS:
+			return "Skills"
+		GameConstants.MARKET_TAB_GEAR:
+			return "Gear"
+		_:
+			return "Materials"
+
+
+func _on_tab(tab: String) -> void:
+	AtelierSession.set_market_tab(tab)
+
+
+func _on_buy_mat(mat_id: String) -> void:
 	AtelierSession.buy_market(mat_id)
 
 
-func _on_sell(index: int) -> void:
+func _on_sell_mat(index: int) -> void:
 	AtelierSession.sell_market(index)
 
 
 func _on_enchant(index: int, enchant_id: String) -> void:
 	AtelierSession.enchant_market(index, enchant_id)
+
+
+func _on_buy_staff(staff_id: String) -> void:
+	AtelierSession.buy_staff(staff_id)
+
+
+func _on_sell_staff(staff_id: String) -> void:
+	AtelierSession.sell_staff(staff_id)
+
+
+func _on_equip_staff(staff_id: String) -> void:
+	AtelierSession.equip_staff(staff_id)
+
+
+func _on_unequip_staff() -> void:
+	AtelierSession.unequip_staff()
+
+
+func _on_buy_skill(skill_id: String) -> void:
+	AtelierSession.buy_skill(skill_id)
+
+
+func _on_sell_skill(index: int) -> void:
+	AtelierSession.sell_skill(index)
+
+
+func _on_buy_artifact(artifact_id: String) -> void:
+	AtelierSession.buy_artifact(artifact_id)
+
+
+func _on_sell_artifact(artifact_id: String) -> void:
+	AtelierSession.sell_artifact(artifact_id)
+
+
+func _on_equip_artifact(artifact_id: String) -> void:
+	AtelierSession.equip_artifact(artifact_id)
+
+
+func _on_unequip_artifact(artifact_id: String) -> void:
+	AtelierSession.unequip_artifact(artifact_id)
 
 
 func _on_refresh() -> void:
@@ -297,7 +579,7 @@ func _chip(shiny: bool = false) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.35, 0.28, 0.1) if shiny else CHIP
+	sb.bg_color = TAB_ON if shiny else CHIP
 	sb.set_corner_radius_all(6)
 	sb.set_border_width_all(2 if shiny else 1)
 	sb.border_color = GOLD if shiny else BORDER

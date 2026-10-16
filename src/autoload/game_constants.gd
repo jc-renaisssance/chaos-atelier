@@ -67,6 +67,13 @@ const REPS_GATE_STUB := 0
 const GOLD_START := 12 ## Test knob
 const GOLD_FLOOR := 0
 const MARKET_BANK_ID := "market_bank_c1"
+const MARKET_STAFF_BANK_ID := "market_staff_bank_c1"
+const MARKET_SKILL_BANK_ID := "market_skill_bank_c1"
+const MARKET_ARTIFACT_BANK_ID := "market_artifact_bank_c1"
+const MARKET_TAB_MATERIALS := "materials"
+const MARKET_TAB_STAFFS := "staffs"
+const MARKET_TAB_SKILLS := "skills"
+const MARKET_TAB_GEAR := "gear"
 const MARKET_SHELF_SIZE := 5 ## Test knob; live draw clamped to 4–6
 const MARKET_SHELF_MIN := 4
 const MARKET_SHELF_MAX := 6
@@ -78,6 +85,9 @@ const MAT_ENCH_THRIFT := "mat_ench_thrift"
 const MAT_ENCH_HEAVY := "mat_ench_heavy"
 const MAT_ENCH_THRIFT_FEE := 2 ## Test knob
 const MAT_ENCH_HEAVY_FEE := 3 ## Test knob
+const DEFAULT_MAX_MATERIALS := 2 ## docs/12b + 32 — staff-raised cap
+const DEFAULT_MAX_RUNES := 1
+const ARTIFACT_GEAR_SLOTS := 2
 
 ## Newspaper / letter chrome ids (docs/26, 23). Copy tables Later; ids stable for harness.
 const HEADLINE_BOSS_ANNOUNCE := "hd_boss_announce"

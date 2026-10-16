@@ -76,6 +76,20 @@ var market_sells: Array = []
 var market_refresh_count: int = 0
 var market_refreshes: Array = []
 var market_enchants: Array = []
+var market_tab: String = GameConstants.MARKET_TAB_MATERIALS
+var market_staff_stock: Array = []
+var market_staff_buys: Array = []
+var market_staff_sells: Array = []
+var staff_owned: Array = []
+var staff_equipped_id: String = ""
+var market_skill_stock: Array = []
+var market_skill_buys: Array = []
+var market_skill_sells: Array = []
+var market_artifact_stock: Array = []
+var market_artifact_buys: Array = []
+var market_artifact_sells: Array = []
+var artifact_owned: Array = []
+var artifact_equipped_ids: Array = []
 var visit_gold_before: int = 0
 var visit_gold_after: int = 0
 var event_id: String = ""
@@ -122,6 +136,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	chapter_piece_results.clear()
 	_reset_craft_state()
 	gold = GameConstants.GOLD_START
+	_clear_run_kit()
 	_clear_market_visit()
 	_clear_event_visit()
 	market_open = false
@@ -302,7 +317,7 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 				last_event = {
 					"id": node.node_id,
 					"title": "market · %s" % node.node_id,
-					"blurb": "Market visit %s. Materials tab. Refresh / Enchant stay in the visit." % node.node_id,
+					"blurb": "Market visit %s. Materials / Staffs / Skills / Gear. Refresh stays materials-only." % node.node_id,
 				}
 		_:
 			pass
@@ -360,6 +375,7 @@ func _begin_craft(order: ClientOrder) -> bool:
 func _open_session() -> void:
 	next_mat_free = false
 	craft_session = craft_order.open_session()
+	_apply_session_kit(craft_session)
 	CraftRules.opening_draw(craft_session, stock, rng)
 	last_stamp = _make_craft_stamp()
 	var names: PackedStringArray = PackedStringArray()
@@ -502,9 +518,11 @@ func _return_to_schedule() -> void:
 	var apply_order_reps := craft_order != null and craft_order.mission_kind == GameEnums.MissionKind.ORDER
 	if apply_order_reps:
 		_apply_reps(mission, craft_order.card_difficulty)
+		_apply_stamp_case(mission)
 		if not bool(mission.get("cleared", false)):
 			last_newspaper_event = GameEnums.NewspaperEvent.MID_FAIL
 			last_headline_id = GameConstants.HEADLINE_MID_FAIL
+	_apply_mission_payout()
 	last_resolve = ScheduleRules.build_mission_return(craft_order, mission, piece_results)
 	craft_open = false
 	order_craft_done = false
@@ -664,6 +682,7 @@ func _run_boss() -> void:
 	var fought := profile.note_enemy_fought(threat_id)
 	last_dex_enemy_seen_new = Array(fought.get("dex_enemy_seen_new", []))
 	last_dex_enemy_fought_new = Array(fought.get("dex_enemy_fought_new", []))
+	_apply_mission_payout()
 	last_stamp = _make_boss_stamp(mission)
 	planned_build = null
 	last_note = (
@@ -965,6 +984,13 @@ func _make_end_stamp() -> HarnessStamp:
 	return stamp
 
 
+func _clear_run_kit() -> void:
+	staff_owned.clear()
+	staff_equipped_id = ""
+	artifact_owned.clear()
+	artifact_equipped_ids.clear()
+
+
 func _clear_market_visit() -> void:
 	market_node_id = ""
 	market_bank_id = ""
@@ -974,6 +1000,16 @@ func _clear_market_visit() -> void:
 	market_refresh_count = 0
 	market_refreshes.clear()
 	market_enchants.clear()
+	market_tab = GameConstants.MARKET_TAB_MATERIALS
+	market_staff_stock.clear()
+	market_staff_buys.clear()
+	market_staff_sells.clear()
+	market_skill_stock.clear()
+	market_skill_buys.clear()
+	market_skill_sells.clear()
+	market_artifact_stock.clear()
+	market_artifact_buys.clear()
+	market_artifact_sells.clear()
 	visit_gold_before = gold
 	visit_gold_after = gold
 
@@ -1009,9 +1045,17 @@ func _begin_market(node: RouteNode) -> bool:
 	market_node_id = node.node_id
 	market_bank_id = MarketCatalog.bank_id()
 	market_stock = MarketCatalog.draw_shelf(rng, node.node_id, true)
+	market_tab = GameConstants.MARKET_TAB_MATERIALS
+	market_staff_stock = MarketCatalog.staff_stock()
+	market_skill_stock = MarketCatalog.skill_stock()
+	market_artifact_stock = MarketCatalog.artifact_stock()
 	visit_gold_before = gold
+	if artifact_is_equipped("artifact_ledger_clip"):
+		_set_gold(gold + 1)
+		last_note = "Market %s — Ledger Clip +1 gold. Tabs: Materials / Staffs / Skills / Gear." % node.node_id
+	else:
+		last_note = "Market %s — Materials / Staffs / Skills / Gear. Refresh stays materials-only." % node.node_id
 	visit_gold_after = gold
-	last_note = "Market %s — buy / sell / refresh / enchant. Exit resolves the day." % node.node_id
 	last_stamp = _make_schedule_stamp()
 	board_changed.emit()
 	return true
@@ -1089,7 +1133,7 @@ func sell_market(stock_index: int) -> bool:
 	var card := stock.remove_at(stock_index)
 	if card == null:
 		return false
-	var gain := MarketCatalog.sell_gain(card.id)
+	var gain := material_sell_gain(card.id)
 	_set_gold(gold + gain)
 	market_sells.append({"mat_id": card.id, "gold_gained": gain})
 	last_note = "Sold %s for %d gold." % [card.id, gain]
@@ -1161,15 +1205,22 @@ func exit_market() -> bool:
 		"day_action": "shop",
 		"title": "market · %s" % market_node_id,
 		"body": (
-			"Market closed. buys %d · sells %d · refreshes %d · enchants %d · gold %d→%d · mats %d."
+			"Market closed. mats buy/sell %d/%d · staff %d/%d · skills %d/%d · gear %d/%d · refreshes %d · enchants %d · gold %d→%d · mats %d · skills %d."
 			% [
 				market_buys.size(),
 				market_sells.size(),
+				market_staff_buys.size(),
+				market_staff_sells.size(),
+				market_skill_buys.size(),
+				market_skill_sells.size(),
+				market_artifact_buys.size(),
+				market_artifact_sells.size(),
 				market_refreshes.size(),
 				market_enchants.size(),
 				visit_gold_before,
 				visit_gold_after,
 				stock.material_count() if stock != null else 0,
+				stock.skill_count() if stock != null else 0,
 			]
 		),
 		"stub": "market",
@@ -1184,13 +1235,289 @@ func exit_market() -> bool:
 	return true
 
 
+func set_market_tab(tab: String) -> bool:
+	if not market_open or not MarketCatalog.is_tab(tab):
+		return false
+	if market_tab == tab:
+		return true
+	market_tab = tab
+	last_note = "Market tab %s." % tab
+	last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+	return true
+
+
+func live_max_materials() -> int:
+	return MarketCatalog.max_materials_for(staff_equipped_id)
+
+
+func live_max_runes() -> int:
+	return MarketCatalog.max_runes_for(staff_equipped_id)
+
+
+func owns_staff(staff_id: String) -> bool:
+	return staff_id in staff_owned
+
+
+func owns_artifact(artifact_id: String) -> bool:
+	return artifact_id in artifact_owned
+
+
+func artifact_is_equipped(artifact_id: String) -> bool:
+	return artifact_id in artifact_equipped_ids
+
+
+func can_buy_staff(staff_id: String) -> bool:
+	if not market_open or not MarketCatalog.is_staff(staff_id) or owns_staff(staff_id):
+		return false
+	return gold >= MarketCatalog.staff_price(staff_id)
+
+
+func buy_staff(staff_id: String) -> bool:
+	if not can_buy_staff(staff_id):
+		last_note = "Cannot buy %s." % staff_id
+		board_changed.emit()
+		return false
+	var price := MarketCatalog.staff_price(staff_id)
+	_set_gold(gold - price)
+	staff_owned.append(staff_id)
+	market_staff_buys.append({"staff_id": staff_id, "price": price})
+	last_note = "Bought %s for %d gold. Equip from the Staffs tab." % [staff_id, price]
+	_touch_visit_gold()
+	return true
+
+
+func can_sell_staff(staff_id: String) -> bool:
+	return market_open and owns_staff(staff_id)
+
+
+func sell_staff(staff_id: String) -> bool:
+	if not can_sell_staff(staff_id):
+		last_note = "Cannot sell %s." % staff_id
+		board_changed.emit()
+		return false
+	if staff_equipped_id == staff_id:
+		staff_equipped_id = ""
+	staff_owned.erase(staff_id)
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.staff_price(staff_id))
+	_set_gold(gold + gain)
+	market_staff_sells.append({"staff_id": staff_id, "gold_gained": gain})
+	last_note = "Sold %s for %d gold." % [staff_id, gain]
+	_touch_visit_gold()
+	return true
+
+
+func can_equip_staff(staff_id: String) -> bool:
+	return market_open and owns_staff(staff_id) and staff_equipped_id != staff_id
+
+
+func equip_staff(staff_id: String) -> bool:
+	if not can_equip_staff(staff_id):
+		last_note = "Cannot equip %s." % staff_id
+		board_changed.emit()
+		return false
+	staff_equipped_id = staff_id
+	last_note = "Equipped %s. max_m %d  max_r %d." % [
+		staff_id,
+		live_max_materials(),
+		live_max_runes(),
+	]
+	_touch_visit_gold()
+	return true
+
+
+func can_unequip_staff() -> bool:
+	return market_open and not staff_equipped_id.is_empty()
+
+
+func unequip_staff() -> bool:
+	if not can_unequip_staff():
+		return false
+	var was := staff_equipped_id
+	staff_equipped_id = ""
+	last_note = "Unequipped %s. Caps back to %d / %d." % [
+		was,
+		live_max_materials(),
+		live_max_runes(),
+	]
+	_touch_visit_gold()
+	return true
+
+
+func can_buy_skill(skill_id: String) -> bool:
+	if not market_open or not MarketCatalog.is_skill(skill_id):
+		return false
+	return gold >= MarketCatalog.skill_price(skill_id)
+
+
+func buy_skill(skill_id: String) -> bool:
+	if not can_buy_skill(skill_id):
+		last_note = "Cannot buy %s." % skill_id
+		board_changed.emit()
+		return false
+	var price := MarketCatalog.skill_price(skill_id)
+	_set_gold(gold - price)
+	stock.add_skill(skill_id)
+	market_skill_buys.append({"skill_id": skill_id, "price": price})
+	last_note = "Bought %s into the run kit for %d gold." % [skill_id, price]
+	_touch_visit_gold()
+	return true
+
+
+func can_sell_skill(stock_index: int) -> bool:
+	if not market_open or stock == null:
+		return false
+	if stock_index < 0 or stock_index >= stock.cards.size():
+		return false
+	var card: HandCard = stock.cards[stock_index]
+	return card != null and card.type == GameEnums.HandCardType.SKILL and MarketCatalog.is_skill(card.id)
+
+
+func sell_skill(stock_index: int) -> bool:
+	if not can_sell_skill(stock_index):
+		last_note = "Cannot sell that skill."
+		board_changed.emit()
+		return false
+	var card := stock.remove_at(stock_index)
+	if card == null:
+		return false
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.skill_price(card.id))
+	_set_gold(gold + gain)
+	market_skill_sells.append({"skill_id": card.id, "gold_gained": gain})
+	last_note = "Sold %s for %d gold." % [card.id, gain]
+	_touch_visit_gold()
+	return true
+
+
+func can_buy_artifact(artifact_id: String) -> bool:
+	if not market_open or not MarketCatalog.is_artifact(artifact_id) or owns_artifact(artifact_id):
+		return false
+	return gold >= MarketCatalog.artifact_price(artifact_id)
+
+
+func buy_artifact(artifact_id: String) -> bool:
+	if not can_buy_artifact(artifact_id):
+		last_note = "Cannot buy %s." % artifact_id
+		board_changed.emit()
+		return false
+	var price := MarketCatalog.artifact_price(artifact_id)
+	_set_gold(gold - price)
+	artifact_owned.append(artifact_id)
+	market_artifact_buys.append({"artifact_id": artifact_id, "price": price})
+	last_note = "Bought %s for %d gold. Equip from the Gear tab." % [artifact_id, price]
+	_touch_visit_gold()
+	return true
+
+
+func can_sell_artifact(artifact_id: String) -> bool:
+	return market_open and owns_artifact(artifact_id)
+
+
+func sell_artifact(artifact_id: String) -> bool:
+	if not can_sell_artifact(artifact_id):
+		last_note = "Cannot sell %s." % artifact_id
+		board_changed.emit()
+		return false
+	artifact_equipped_ids.erase(artifact_id)
+	artifact_owned.erase(artifact_id)
+	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.artifact_price(artifact_id))
+	_set_gold(gold + gain)
+	market_artifact_sells.append({"artifact_id": artifact_id, "gold_gained": gain})
+	last_note = "Sold %s for %d gold." % [artifact_id, gain]
+	_touch_visit_gold()
+	return true
+
+
+func can_equip_artifact(artifact_id: String) -> bool:
+	if not market_open or not owns_artifact(artifact_id) or artifact_is_equipped(artifact_id):
+		return false
+	return artifact_equipped_ids.size() < GameConstants.ARTIFACT_GEAR_SLOTS
+
+
+func equip_artifact(artifact_id: String) -> bool:
+	if not can_equip_artifact(artifact_id):
+		last_note = "Cannot equip %s — own it and keep a free slot (2)." % artifact_id
+		board_changed.emit()
+		return false
+	artifact_equipped_ids.append(artifact_id)
+	last_note = "Equipped %s. Gear slots %d/2." % [artifact_id, artifact_equipped_ids.size()]
+	_touch_visit_gold()
+	return true
+
+
+func can_unequip_artifact(artifact_id: String) -> bool:
+	return market_open and artifact_is_equipped(artifact_id)
+
+
+func unequip_artifact(artifact_id: String) -> bool:
+	if not can_unequip_artifact(artifact_id):
+		return false
+	artifact_equipped_ids.erase(artifact_id)
+	last_note = "Unequipped %s. Gear slots %d/2." % [artifact_id, artifact_equipped_ids.size()]
+	_touch_visit_gold()
+	return true
+
+
+func material_sell_gain(mat_id: String) -> int:
+	var gain := MarketCatalog.sell_gain(mat_id)
+	if artifact_is_equipped("artifact_wagon_hook"):
+		gain += 1
+	return gain
+
+
+func _event_gold_delta(raw: int) -> int:
+	if raw >= 0:
+		return raw
+	if not artifact_is_equipped("artifact_road_charm"):
+		return raw
+	return mini(0, raw + 1)
+
+
+func _event_gold_cost(ch: Dictionary) -> int:
+	var applied := _event_gold_delta(int(ch.get("gold", 0)))
+	if applied < 0:
+		return -applied
+	return 0
+
+
+func _apply_session_kit(session: CraftStaminaSession) -> void:
+	if session == null:
+		return
+	session.max_materials = live_max_materials()
+	session.max_runes = live_max_runes()
+	if artifact_is_equipped("artifact_pack_strap"):
+		session.hand_size = GameConstants.HAND_SIZE + 1
+	if artifact_is_equipped("artifact_needle_tin"):
+		session.dig_refresh_cost = maxi(1, GameConstants.DIG_REFRESH_COST - 1)
+	if artifact_is_equipped("artifact_oil_rag"):
+		session.stamina_start += 2
+		session.stamina_remaining = session.stamina_start
+
+
+func _apply_stamp_case(mission: Dictionary) -> void:
+	if not artifact_is_equipped("artifact_stamp_case"):
+		return
+	var rating: Variant = mission.get("rating", GameEnums.Rating.NONE)
+	if rating != GameEnums.Rating.S and rating != GameEnums.Rating.A:
+		return
+	reps = maxi(0, reps + 1)
+	if mission.has("reps_after"):
+		mission["reps_after"] = reps
+		mission["reps_delta"] = reps - int(mission.get("reps_before", reps))
+
+
+func _apply_mission_payout() -> void:
+	if artifact_is_equipped("artifact_coin_purse"):
+		_set_gold(gold + 1)
+
+
 func can_pick_event_choice(choice_id: String) -> bool:
 	if not event_open or event_resolved:
 		return false
 	var ch := EventCatalog.choice(event_id, choice_id)
 	if ch.is_empty():
 		return false
-	var cost := EventCatalog.gold_cost(ch)
+	var cost := _event_gold_cost(ch)
 	if cost > 0 and gold < cost:
 		return false
 	return true
@@ -1202,7 +1529,7 @@ func pick_event_choice(choice_id: String) -> bool:
 		board_changed.emit()
 		return false
 	var ch := EventCatalog.choice(event_id, choice_id)
-	var gold_delta := int(ch.get("gold", 0))
+	var gold_delta := _event_gold_delta(int(ch.get("gold", 0)))
 	var reps_delta := int(ch.get("reps", 0))
 	var mat_add := String(ch.get("mat_add", ""))
 	var mat_remove := String(ch.get("mat_remove", ""))
@@ -1279,6 +1606,26 @@ func _apply_market_event_logs(stamp: HarnessStamp) -> void:
 	stamp.market_refresh_cost_next = MarketCatalog.refresh_cost(market_refresh_count)
 	stamp.market_refreshes = market_refreshes.duplicate(true)
 	stamp.market_enchants = market_enchants.duplicate(true)
+	stamp.market_tab = market_tab
+	stamp.market_staff_bank_id = MarketCatalog.staff_bank_id()
+	stamp.market_staff_stock = MarketCatalog.staff_stock_rows(market_staff_stock)
+	stamp.market_staff_buys = market_staff_buys.duplicate(true)
+	stamp.market_staff_sells = market_staff_sells.duplicate(true)
+	stamp.staff_owned = staff_owned.duplicate(true)
+	stamp.staff_equipped_id = staff_equipped_id
+	stamp.max_materials = live_max_materials()
+	stamp.max_runes = live_max_runes()
+	stamp.market_skill_bank_id = MarketCatalog.skill_bank_id()
+	stamp.market_skill_stock = MarketCatalog.skill_stock_rows(market_skill_stock)
+	stamp.market_skill_buys = market_skill_buys.duplicate(true)
+	stamp.market_skill_sells = market_skill_sells.duplicate(true)
+	stamp.deck_skill_count = stock.skill_count() if stock != null else 0
+	stamp.market_artifact_bank_id = MarketCatalog.artifact_bank_id()
+	stamp.market_artifact_stock = MarketCatalog.artifact_stock_rows(market_artifact_stock)
+	stamp.market_artifact_buys = market_artifact_buys.duplicate(true)
+	stamp.market_artifact_sells = market_artifact_sells.duplicate(true)
+	stamp.artifact_owned = artifact_owned.duplicate(true)
+	stamp.artifact_equipped_ids = artifact_equipped_ids.duplicate(true)
 	stamp.event_id = event_id
 	stamp.event_choice_id = event_choice_id
 	stamp.event_deltas = event_deltas.duplicate(true)

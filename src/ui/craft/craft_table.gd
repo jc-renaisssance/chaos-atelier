@@ -356,7 +356,7 @@ func _refresh() -> void:
 		]
 	)
 	_stam_label.text = (
-		"Stamina %d / %d   ·   12 × %d   ·   spent %d   ·   digs %d   ·   dig costs %d (not × N)"
+		"Stamina %d / %d   ·   12 × %d   ·   spent %d   ·   digs %d   ·   dig costs %d (not × N)   ·   bag max_m %d  max_r %d"
 		% [
 			session.stamina_remaining,
 			session.stamina_start,
@@ -364,6 +364,8 @@ func _refresh() -> void:
 			session.stamina_spent,
 			session.dig_count,
 			session.dig_refresh_cost,
+			session.max_materials,
+			session.max_runes,
 		]
 	)
 	_stam_bar.max_value = session.stamina_start

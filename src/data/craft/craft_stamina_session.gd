@@ -18,8 +18,10 @@ extends Resource
 @export var hand: Array[HandCard] = [] ## mats + runes + skills; no auto-refill
 @export var draw_pile: Array[HandCard] = [] ## run deck remainder this session (docs/27)
 @export var discard_pile: Array[HandCard] = [] ## play + dig dump; reshuffles into draw
-@export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
-@export var dig_count: int = 0
+	@export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
+	@export var max_materials: int = GameConstants.DEFAULT_MAX_MATERIALS ## docs/32 staff-raised per-zone bag
+	@export var max_runes: int = GameConstants.DEFAULT_MAX_RUNES
+	@export var dig_count: int = 0
 @export var cards_played: Array[PlayedCard] = []
 @export var early_finish: bool = false
 @export var finish_reason: GameEnums.FinishReason = GameEnums.FinishReason.NONE
@@ -39,6 +41,8 @@ func apply_order(order: ClientOrder) -> void:
 	stamina_spent = 0
 	hand_size = GameConstants.HAND_SIZE
 	dig_refresh_cost = GameConstants.DIG_REFRESH_COST
+	max_materials = GameConstants.DEFAULT_MAX_MATERIALS
+	max_runes = GameConstants.DEFAULT_MAX_RUNES
 	dig_count = 0
 	early_finish = false
 	finish_reason = GameEnums.FinishReason.NONE
@@ -137,12 +141,16 @@ func schema_errors() -> PackedStringArray:
 	if stamina_remaining < 0:
 		errs.append("stamina_remaining < 0")
 	var expect_start := GameConstants.session_stamina_start(piece_count)
-	if stamina_start != expect_start:
-		errs.append("stamina_start %d != 12 * piece_count %d (Phase-1 draft)" % [stamina_start, expect_start])
-	if hand_size != GameConstants.HAND_SIZE:
-		errs.append("hand_size %d != 5 (Phase-1 draft)" % hand_size)
-	if dig_refresh_cost != GameConstants.DIG_REFRESH_COST:
-		errs.append("dig_refresh_cost %d != 2 (Phase-1 draft)" % dig_refresh_cost)
+	if stamina_start < expect_start:
+		errs.append("stamina_start %d < 12 * piece_count %d" % [stamina_start, expect_start])
+	if hand_size < GameConstants.HAND_SIZE:
+		errs.append("hand_size %d < %d" % [hand_size, GameConstants.HAND_SIZE])
+	if dig_refresh_cost < 1:
+		errs.append("dig_refresh_cost %d < 1" % dig_refresh_cost)
+	if max_materials < GameConstants.DEFAULT_MAX_MATERIALS:
+		errs.append("max_materials %d below default %d" % [max_materials, GameConstants.DEFAULT_MAX_MATERIALS])
+	if max_runes < GameConstants.DEFAULT_MAX_RUNES:
+		errs.append("max_runes %d below default %d" % [max_runes, GameConstants.DEFAULT_MAX_RUNES])
 	if hand.size() > hand_size:
 		errs.append("hand size %d exceeds hand_size %d" % [hand.size(), hand_size])
 	for card in hand:

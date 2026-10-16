@@ -1,7 +1,7 @@
 class_name MarketCatalog
 extends RefCounted
-## Chapter-shared market bank + M1 material enchant catalog (docs/32).
-## Wire stays kind=shop. Display name is market. No staff / skill / gear tabs here.
+## Chapter-shared market banks (docs/32). M1 materials + M2 staff / skill / artifact.
+## Wire stays kind=shop. Display name is market.
 
 const BANK_C1 := [
 	"mat_hemp_plain",
@@ -41,6 +41,63 @@ const ENCHANTS := {
 	"mat_ench_thrift": {"id": "mat_ench_thrift", "label": "Thrift", "fee": 2},
 	"mat_ench_heavy": {"id": "mat_ench_heavy", "label": "Heavy", "fee": 3},
 }
+
+## docs/32 M2 — full bank = the shelf every visit. Prices are Test knobs.
+const STAFFS := {
+	"staff_apprentice": {"label": "Apprentice", "delta_materials": 1, "delta_runes": 0, "dollar": 4},
+	"staff_rune_desk": {"label": "Rune Desk", "delta_materials": 0, "delta_runes": 1, "dollar": 5},
+	"staff_loom_pair": {"label": "Loom Pair", "delta_materials": 1, "delta_runes": 1, "dollar": 8},
+	"staff_third_seam": {"label": "Third Seam", "delta_materials": 2, "delta_runes": 0, "dollar": 7},
+	"staff_rune_pair": {"label": "Rune Pair", "delta_materials": 0, "delta_runes": 2, "dollar": 8},
+}
+
+const SKILLS := {
+	"sk_next_mat_free": {"dollar": 3},
+	"sk_touch_up": {"dollar": 3},
+	"sk_steady_hand": {"dollar": 3},
+	"sk_metal_str_double": {"dollar": 5},
+	"sk_wild_to_earth": {"dollar": 5},
+	"sk_deep_dig": {"dollar": 7},
+}
+
+const ARTIFACTS := {
+	"artifact_coin_purse": {"label": "Tithe Purse", "dollar": 5},
+	"artifact_ledger_clip": {"label": "Ledger Clip", "dollar": 4},
+	"artifact_pack_strap": {"label": "Pack Strap", "dollar": 6},
+	"artifact_needle_tin": {"label": "Needle Tin", "dollar": 6},
+	"artifact_wagon_hook": {"label": "Wagon Hook", "dollar": 5},
+	"artifact_stamp_case": {"label": "Stamp Case", "dollar": 6},
+	"artifact_road_charm": {"label": "Road Charm", "dollar": 4},
+	"artifact_oil_rag": {"label": "Oil Rag", "dollar": 5},
+}
+
+const STAFF_ORDER := [
+	"staff_apprentice",
+	"staff_rune_desk",
+	"staff_loom_pair",
+	"staff_third_seam",
+	"staff_rune_pair",
+]
+
+const SKILL_ORDER := [
+	"sk_next_mat_free",
+	"sk_touch_up",
+	"sk_steady_hand",
+	"sk_metal_str_double",
+	"sk_wild_to_earth",
+	"sk_deep_dig",
+]
+
+const ARTIFACT_ORDER := [
+	"artifact_coin_purse",
+	"artifact_ledger_clip",
+	"artifact_pack_strap",
+	"artifact_needle_tin",
+	"artifact_wagon_hook",
+	"artifact_stamp_case",
+	"artifact_road_charm",
+	"artifact_oil_rag",
+]
 
 
 static func bank_id() -> String:
@@ -164,6 +221,213 @@ static func stock_rows(stock: Array) -> Array:
 			var row: Dictionary = item
 			out.append({
 				"mat_id": String(row.get("mat_id", "")),
+				"price": int(row.get("price", 0)),
+				"qty_offered": int(row.get("qty_offered", 0)),
+			})
+	return out
+
+
+static func tab_ids() -> Array:
+	return [
+		GameConstants.MARKET_TAB_MATERIALS,
+		GameConstants.MARKET_TAB_STAFFS,
+		GameConstants.MARKET_TAB_SKILLS,
+		GameConstants.MARKET_TAB_GEAR,
+	]
+
+
+static func is_tab(tab: String) -> bool:
+	return tab in tab_ids()
+
+
+static func kit_sell_gain(price: int) -> int:
+	return maxi(1, price / 2)
+
+
+static func staff_bank_id() -> String:
+	return GameConstants.MARKET_STAFF_BANK_ID
+
+
+static func skill_bank_id() -> String:
+	return GameConstants.MARKET_SKILL_BANK_ID
+
+
+static func artifact_bank_id() -> String:
+	return GameConstants.MARKET_ARTIFACT_BANK_ID
+
+
+static func staff_ids() -> Array:
+	return STAFF_ORDER.duplicate()
+
+
+static func skill_ids() -> Array:
+	return SKILL_ORDER.duplicate()
+
+
+static func artifact_ids() -> Array:
+	return ARTIFACT_ORDER.duplicate()
+
+
+static func is_staff(staff_id: String) -> bool:
+	return STAFFS.has(staff_id)
+
+
+static func is_skill(skill_id: String) -> bool:
+	return SKILLS.has(skill_id)
+
+
+static func is_artifact(artifact_id: String) -> bool:
+	return ARTIFACTS.has(artifact_id)
+
+
+static func staff_row(staff_id: String) -> Dictionary:
+	var found: Variant = STAFFS.get(staff_id, {})
+	if found is Dictionary:
+		return (found as Dictionary).duplicate(true)
+	return {}
+
+
+static func skill_row(skill_id: String) -> Dictionary:
+	var found: Variant = SKILLS.get(skill_id, {})
+	if found is Dictionary:
+		return (found as Dictionary).duplicate(true)
+	return {}
+
+
+static func artifact_row(artifact_id: String) -> Dictionary:
+	var found: Variant = ARTIFACTS.get(artifact_id, {})
+	if found is Dictionary:
+		return (found as Dictionary).duplicate(true)
+	return {}
+
+
+static func staff_label(staff_id: String) -> String:
+	return String(staff_row(staff_id).get("label", staff_id))
+
+
+static func artifact_label(artifact_id: String) -> String:
+	return String(artifact_row(artifact_id).get("label", artifact_id))
+
+
+static func staff_delta_materials(staff_id: String) -> int:
+	return int(staff_row(staff_id).get("delta_materials", 0))
+
+
+static func staff_delta_runes(staff_id: String) -> int:
+	return int(staff_row(staff_id).get("delta_runes", 0))
+
+
+static func staff_price(staff_id: String) -> int:
+	return int(staff_row(staff_id).get("dollar", 0))
+
+
+static func skill_price(skill_id: String) -> int:
+	return int(skill_row(skill_id).get("dollar", 0))
+
+
+static func artifact_price(artifact_id: String) -> int:
+	return int(artifact_row(artifact_id).get("dollar", 0))
+
+
+static func staff_delta_bit(staff_id: String) -> String:
+	var bits: Array = []
+	var dm := staff_delta_materials(staff_id)
+	var dr := staff_delta_runes(staff_id)
+	if dm != 0:
+		bits.append("Δm+%d" % dm)
+	if dr != 0:
+		bits.append("Δr+%d" % dr)
+	if bits.is_empty():
+		return "Δ0"
+	return " ".join(bits)
+
+
+static func max_materials_for(staff_id: String) -> int:
+	return GameConstants.DEFAULT_MAX_MATERIALS + staff_delta_materials(staff_id)
+
+
+static func max_runes_for(staff_id: String) -> int:
+	return GameConstants.DEFAULT_MAX_RUNES + staff_delta_runes(staff_id)
+
+
+static func make_staff_offer(staff_id: String) -> Dictionary:
+	return {
+		"staff_id": staff_id,
+		"price": staff_price(staff_id),
+		"qty_offered": GameConstants.MARKET_QTY_OFFERED,
+	}
+
+
+static func make_skill_offer(skill_id: String) -> Dictionary:
+	return {
+		"skill_id": skill_id,
+		"price": skill_price(skill_id),
+		"qty_offered": GameConstants.MARKET_QTY_OFFERED,
+	}
+
+
+static func make_artifact_offer(artifact_id: String) -> Dictionary:
+	return {
+		"artifact_id": artifact_id,
+		"price": artifact_price(artifact_id),
+		"qty_offered": GameConstants.MARKET_QTY_OFFERED,
+	}
+
+
+static func staff_stock() -> Array:
+	var out: Array = []
+	for staff_id in STAFF_ORDER:
+		out.append(make_staff_offer(String(staff_id)))
+	return out
+
+
+static func skill_stock() -> Array:
+	var out: Array = []
+	for skill_id in SKILL_ORDER:
+		out.append(make_skill_offer(String(skill_id)))
+	return out
+
+
+static func artifact_stock() -> Array:
+	var out: Array = []
+	for artifact_id in ARTIFACT_ORDER:
+		out.append(make_artifact_offer(String(artifact_id)))
+	return out
+
+
+static func staff_stock_rows(stock: Array) -> Array:
+	var out: Array = []
+	for item in stock:
+		if item is Dictionary:
+			var row: Dictionary = item
+			out.append({
+				"staff_id": String(row.get("staff_id", "")),
+				"price": int(row.get("price", 0)),
+				"qty_offered": int(row.get("qty_offered", 0)),
+			})
+	return out
+
+
+static func skill_stock_rows(stock: Array) -> Array:
+	var out: Array = []
+	for item in stock:
+		if item is Dictionary:
+			var row: Dictionary = item
+			out.append({
+				"skill_id": String(row.get("skill_id", "")),
+				"price": int(row.get("price", 0)),
+				"qty_offered": int(row.get("qty_offered", 0)),
+			})
+	return out
+
+
+static func artifact_stock_rows(stock: Array) -> Array:
+	var out: Array = []
+	for item in stock:
+		if item is Dictionary:
+			var row: Dictionary = item
+			out.append({
+				"artifact_id": String(row.get("artifact_id", "")),
 				"price": int(row.get("price", 0)),
 				"qty_offered": int(row.get("qty_offered", 0)),
 			})
