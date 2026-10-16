@@ -58,12 +58,12 @@ This is **not**:
 | Kind | Dump / M1 type | What it does |
 |---|---|---|
 | **adventurer** | `adventurer` | Walk-in / listed order that day (`adv_*` on the row). |
-| **shop** | `shop` | Buy / sell / reshape material deck (stock rotates with travel). |
+| **shop** | `shop` | **Display: Market.** Buy / sell / **refresh** from the **chapter-shared bank** — **[32](32-shop-and-events.md)**. Wire `kind` stays `shop`. **M1 tab = materials. M2 = staff / skill / gear tabs.** Reshape Later. |
 | **appointment** | `appointment` | Named / important order. **StS-elite analog.** Scrap Duelist stays here. **Not** Dex Adventurers. |
-| **event** | `event` | Travel / road event. |
+| **event** | `event` | Travel / road **text resolve** — **[32](32-shop-and-events.md)**. `ref_id` → `evt_*`. No craft session. |
 | **reserved** | `reserved` | Last-2 only (travel / final prep + boss approach). Not player-picked. |
 
-Keep **`adv_*` / `appt_*`** on the row when they exist. **M1:** show **type + id** only — e.g. `shop · N2`. Fancy titles **Later**. Do **not** invent title copy.
+Keep **`adv_*` / `appt_*` / `evt_*`** on the row when they exist. Market shelf is drawn from `market_bank_c1` (`ref_id` null) — [32](32-shop-and-events.md). **M1:** show **type + id** with display type **market** — e.g. `market · N2` (wire `kind=shop`). Fancy titles **Later**. Do **not** invent title copy.
 
 Prep craft / rest-dig are **Later** node kinds — **not** on the C1 sample map. Phase-1: **one** primary action per day, from the current node.
 
@@ -106,7 +106,7 @@ Played days are frozen. The player cannot move a resolved node, cannot un-pick a
 
 ### Shop visits 1–3
 
-Count `shop` nodes on the **complete path** D1..(N−2) (reserved last-2 do not count). Authored so **every** full path has **1–3** shops. Client does **not** grey-out shop because `shops_taken == 3`. A path with 0 shops or 4 shops is a **map bug**, not a UI rule.
+Count `shop` nodes on the **complete path** D1..(N−2) (reserved last-2 do not count). Authored so **every** full path has **1–3** shops. Client does **not** grey-out shop because `shops_taken == 3`. A path with 0 shops or 4 shops is a **map bug**, not a UI rule. What a market **does** when entered = [32](32-shop-and-events.md) (buy/sell/refresh/**enchant** from the chapter bank; display Market; reshape Later).
 
 ### `map.day_count`
 
@@ -200,22 +200,22 @@ N1 adv ─┬───► N2 shop ──────► N5 elite ───┬─
 | id | Day | Kind | Ref | Notes |
 |---|---|---|---|---|
 | **N1** | D1 | adventurer | `adv_halden_rook` | Fixed first-customer. Corridor into Fork 1. |
-| **N2** | D2 | shop | — | Fork 1 option |
+| **N2** | D2 | shop | — | Fork 1 option. Shelf from `market_bank_c1` ([32](32-shop-and-events.md)) |
 | **N3** | D2 | adventurer | `adv_vex_bramble` | Fork 1 option; then 2-exit onto N5 or N6 |
-| **N4** | D2 | event | — | Fork 1 option |
+| **N4** | D2 | event | `evt_c1_heat_mirage` | Fork 1 option. Resolve in [32](32-shop-and-events.md) |
 | **N5** | D3 | appointment | `appt_scrap_duelist` | **Elite analog.** From N2 (corridor) or N3. |
-| **N6** | D3 | event | — | From N3 or N4. |
-| **N7** | D4 | shop | — | **BIND start** `combo_market` |
+| **N6** | D3 | event | `evt_c1_ashfall` | From N3 or N4. Resolve in [32](32-shop-and-events.md) |
+| **N7** | D4 | shop | — | **BIND start** `combo_market`. Shelf from `market_bank_c1` ([32](32-shop-and-events.md)) |
 | **N8** | D5 | adventurer | `adv_quill_lumen` | Bound |
 | **N9** | D6 | adventurer | `adv_kite_thornreel` | Bound |
-| **N10** | D4 | event | — | Unbound fork option from N5 |
+| **N10** | D4 | event | `evt_c1_scrap_market` | Unbound fork option from N5. Resolve in [32](32-shop-and-events.md) |
 | **N11** | D4 | adventurer | `adv_tide_glass` | From N5 or N6; then corridor N16→N17 |
-| **N12** | D5 | shop | — | Unbound pick from N10 |
+| **N12** | D5 | shop | — | Unbound pick from N10. Shelf from `market_bank_c1` ([32](32-shop-and-events.md)) |
 | **N13** | D5 | adventurer | `adv_quill_lumen` | Unbound pick from N10 |
 | **N14** | D6 | adventurer | `adv_kite_thornreel` | Corridor from N12 |
-| **N15** | D6 | shop | — | Corridor from N13 |
-| **N16** | D5 | shop | — | Corridor from N11 |
-| **N17** | D6 | event | — | Corridor from N16 |
+| **N15** | D6 | shop | — | Corridor from N13. Shelf from `market_bank_c1` ([32](32-shop-and-events.md)) |
+| **N16** | D5 | shop | — | Corridor from N11. Shelf from `market_bank_c1` ([32](32-shop-and-events.md)) |
+| **N17** | D6 | event | `evt_c1_salt_spray` | Corridor from N16. Resolve in [32](32-shop-and-events.md) |
 | **R7** | D7 | reserved | — | Travel / final prep — all paths |
 | **R8** | D8 | reserved | — | Boss approach — all paths |
 
@@ -276,7 +276,7 @@ Labels are **D1..DN** — never R1. The live board is the **authored route graph
 
 | State | Options panel | What the board shows |
 |---|---|---|
-| **Fork** (2–4 next, **current**) | **Yes** — those next nodes, type + id (`shop · N7`). Keep `adv_*` / `appt_*` on the row. | Current node live; outgoing edges offered |
+| **Fork** (2–4 next, **current**) | **Yes** — those next nodes, type + id (`shop · N7`). Keep `adv_*` / `appt_*` / `evt_*` on the row. | Current node live; outgoing edges offered |
 | **Corridor** (exactly one next) | **No** | Next node pinned, type + id |
 | **Bound** (inside `combo_market`) | **No** | Remaining bind nodes **pinned / frozen** (not drafts) |
 | **Reserved** | **No** | D7 travel / final prep · D8 boss approach |
@@ -286,7 +286,7 @@ Labels are **D1..DN** — never R1. The live board is the **authored route graph
 
 **No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1 / draft-only future.
 
-**M1 copy:** type + id only. Type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph.
+**M1 copy:** type + id only. Wire type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. **Display** `shop` as **market** (`market · N2`). Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph.
 
 ### Mid-chapter
 
@@ -323,7 +323,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
 4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp.
 5. **Route graph data.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
-6. **Options panel only at a current choice.** Fork or unbound remaining picks **on the current day**: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past, draft-only future).
+6. **Options panel only at a current choice.** Fork or unbound remaining picks **on the current day**: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` / `evt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past, draft-only future).
 7. **Draft future.** Player may ghost a legal unbound path. Draft is **not** a confirm. Confirm when that day is current. Do not write drafts into `route_path`.
 8. **Binds.** Entering N7 pins N8 and N9. Bound days are frozen — not drafts, not re-pickable.
 9. **Frozen past.** Played nodes cannot be moved.
@@ -331,6 +331,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 11. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
 12. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
 13. Dump `phase=schedule` **kept** (on the graph board). Do not invent `phase=planner` / `phase=route` this stamp.
+14. **Market visit + event resolve ([32](32-shop-and-events.md)).** When current `kind=shop`: enter ugly **market** shell (display Market; dump `day_action=shop`); buy/sell/**refresh**/**enchant** from `market_bank_c1` (**M1 tab = materials only**; **M2** = staff / skill / gear tabs — do not reopen). Enchant stamps `mat_enchant_id` + shiny overlay on one owned `mat_*` copy. Exit resolves the day; dump `market_*` / `market_enchants` / gold / `deck_material_count`. When current `kind=event`: enter text resolve from `ref_id` → `evt_*`; one choice; dump `event_id` / `event_choice_id` / `event_deltas`. Do **not** grey-out market picks. Do **not** invent reshape / M2 tabs / owners / art in the M1 Client. Hold Client until Jonathan stamps the **revised** `32`.
 
 ## Test logs (Szayelaporro)
 
@@ -341,7 +342,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 | `CHAPTER_DAY_COUNT` | = `map.day_count` (current map **8**) |
 | `day_index` / `days_left` | Live day; remaining including reserved |
 | `route_map_id` | `map_m1` on current wagon |
-| `route_nodes` | `{ node_id, day_index, kind, ref_id, bound_block_id }` |
+| `route_nodes` | `{ node_id, day_index, kind, ref_id, bound_block_id }` — `ref_id` = `adv_*` / `appt_*` / `evt_*` / null. Market shelf is **not** `ref_id` — `market_bank_c1` ([32](32-shop-and-events.md)). Wire `kind=shop` = display Market |
 | `route_edges` | `{ from, to }[]` |
 | `route_path` | Node ids **confirmed**, in order (includes reserved R7/R8 once reached). Never drafts. |
 | `draft_path` | Ghosted future node ids (optional). Not Required. Must not overlap frozen past / entered bind. |
@@ -351,7 +352,8 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 | `day_action` | Current node kind (`adventurer` \| `shop` \| `appointment` \| `event` \| `reserved`) — null before D1 play / on newspaper |
 | `crafts_done_this_chapter` | Unbounded piece counter (optional telemetry) |
 | `cant_craft` | Only true session-open fail — **never** because of piece count |
-| `appt_*` / `adv_*` | On the node row; Scrap Duelist is `appt_*` |
+| `appt_*` / `adv_*` / `evt_*` | On the node row; Scrap Duelist is `appt_*`; C1 events in [32](32-shop-and-events.md) |
+| `market_*` / `gold` / `event_*` | Market visit + event resolve dumps — [32](32-shop-and-events.md) / [20](20-harness-stamp.md). Includes `market_enchants`. `day_action=shop` is the wire |
 
 **Do not emit as live law:** windowed `event_pool` (`E*` + `windows` + `fixed`) and free `day_assignments` `{ day_index, event_id }` from the #36/#37 board.
 
@@ -407,4 +409,4 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 
 ## Pointers
 
-`20` stamps · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `00` vision (display name **Wombaste**)
+`20` stamps · `32` market visit + event resolve · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `00` vision (display name **Wombaste**)

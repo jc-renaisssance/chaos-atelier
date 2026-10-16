@@ -43,9 +43,10 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 - Interactive-order slices 1–3: `30`
 - Dex (profile collection): `31`
 - Missions before boss: `22` (route map, `N*` nodes; free `E*` board superseded)
+- Market visit + event resolve: `32` (display Market; wire `kind=shop`; M1 materials / M2 staff-skill-gear; material enchant `mat_ench_*`; `evt_*` catalog)
 - Mission report + letter: `23`
 - App pseudocode: `21`
 
 ## ID conventions
 
-`mat_*` · `con_*` · `enc_*` · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` · **`N*`** (route-map nodes, `22`; windowed **`E*`** superseded) · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*` · `ask_*` (adventurer battle / estimate skill — **new** in `29`; distinct from `sk_*` owner craft skills)
+`mat_*` · `con_*` · `enc_*` (craft runes, `13`) · **`mat_ench_*`** (material enchant on the M1 market tab — [32](32-shop-and-events.md); **not** `enc_*`) · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` (M1 catalog in `32`; node `ref_id`) · **`N*`** (route-map nodes, `22`; windowed **`E*`** superseded) · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*` · `ask_*` (adventurer battle / estimate skill — **new** in `29`; distinct from `sk_*` owner craft skills) · `choice_*` (event picks, `32`)

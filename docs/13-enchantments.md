@@ -28,3 +28,5 @@ Layer 3 — **Enchantment**. Phase-1: **0 or 1** enchantment per craft.
 - Cost paid in shop / atelier budget (exact economy TBD).
 - Sigils ($5) are **rare**; do not flood Phase-1 starter tables.
 - Enchantment without matching material tags still adds its tags — “wrong” mixes are allowed and should produce readable report lines.
+
+**Not this catalog:** market **material enchant** (`mat_ench_*` — Thrift / Heavy on owned `mat_*` copies) lives in [32](32-shop-and-events.md). Do **not** merge `enc_*` runes into `mat_ench_*`.

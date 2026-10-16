@@ -375,3 +375,114 @@ Follow-up on the route-map stamp (same day). Docs only. Same PR.
 | `docs/20-harness-stamp.md` | Optional `draft_path`; confirm ≠ draft |
 | `docs/01-core-loop.md` | Draft-only + graph board pointer |
 | `docs/STAMP.md` | This note |
+
+---
+
+# Grimmjow stamp — 2026-10-13 (shop visit + event resolve M1)
+
+Docs only. Ready for **Jonathan to stamp**. Ulquiorra **holds**. Szayelaporro after the shop/event Client PR. Elite telegraph N5 and adventurer catalog stay parked. Material icons stay Nnoitra 1:1.
+
+## Locked (docs only — Grimmjow intent)
+
+1. **Enter shop** only from current route node `kind=shop`. No auto opening-shop (`21` shell is historical).
+2. **M1 actions = Buy + Sell only.** Reshape = **Later**.
+3. **Stock** = authored 4–6 `mat_*` from `11` per shop node on `map_m1` (N2, N7, N12, N15, N16). Rotate by travel fiction, not a live ban.
+4. **Buy:** pay `$` from `11`; add one copy to the run deck (`WagonStock` / `27`). **Sell:** ⌊$ / 2⌋ min 1; soft floor **≥ 3** material cards after sell.
+5. **Exit** with no buy is legal. Day resolves like other primary actions.
+6. Shop visits **1–3** stay **graph law** (`22`). Client must **not** grey-out shop picks.
+7. **Enter event** from current `kind=event`. M1 = text resolve. Catalog `evt_*` with `ref_id` on C1 nodes N4 / N6 / N10 / N17. Outcomes: ±gold / ±1 mat / small reps. No craft. No run-kill.
+8. **One gold purse** (start 12 from `19` — Test knob). Ugly UI only. Dump keys in `20` / `32`.
+9. **Later:** shop owners (`16`), forbidden rooms, reshape, unique stock UI, PixelLab icons (Nnoitra parallel), event art / trees.
+
+## Files in this drop
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Add** — canonical shop-visit + event-resolve M1 |
+| `docs/22-chapter-schedule.md` | Shop/event “what it does” → `32`; C1 `evt_*` refs; Client need 14 |
+| `docs/20-harness-stamp.md` | Shop / event / gold dump keys + asserts 24–26 |
+| `docs/01-core-loop.md` · `21-app-flow.md` · `24-win-conditions.md` | Pointers; `21` opening-shop = historical |
+| `docs/11-materials.md` · `25-reps-meter.md` · `10` · `19` · `16` · `03` · `04` · `27` | Shop / event / deck pointers |
+| `docs/README.md` · `00-doc-categories.md` · `pm/phase-1-plan.md` | Index `32`; PM = Design in this PR, Ulquiorra holds |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- “Shop systems and events are not done yet” as the live hole (`STAMP` / PM 2026-10-05) — Design now in `32` (Jonathan stamp pending; Client still holds)
+- Auto opening-shop / last-shop-before-boss as live M1 (`21` shell)
+- Weighted roll-5 atelier shop (`19`) as the live route-node visit
+- Sell-back “$1 scraps → 0 gold” (`19`) — M1 sell is ⌊$ / 2⌋ min 1
+- Old `22-chapter-flow` event-pool outcomes as live law (ids may be reused)
+
+## Open questions (Jonathan)
+
+None this pass. Sell rate, shared gold, and C1 stock / `evt_*` rows are M1 defaults / Test knobs.
+
+---
+
+# Grimmjow stamp — 2026-10-15 (market visit revise — refresh + bank + name)
+
+Docs only. Revises #44 / `32` before Jonathan stamp. Ulquiorra **holds**. Aizen merges **after** stamp.
+
+## Locked (docs only)
+
+1. **Name:** Design / UI = **market**. Wire stays `kind=shop` + dump `day_action=shop` (Client graph already ships). New visit dump keys = `market_*`.
+2. **Refresh** on the market visit. Cost curve Test knobs: base **2**, step **2** → **2, 4, 6, 8…**. Count resets each visit. No debt. Does not resolve the day.
+3. **Chapter-shared bank** `market_bank_c1` (**22** `mat_*` from `11`) for all C1 market nodes. Shelf 4–6. Frozen per-node-only lists demoted to first-draw hints. Includes deferred-value mats. No `$5` / sci-fi / voodoo.
+4. **M1 tab = materials only** (Jonathan 2026-10-15). **M2** = staffs / skill cards / gear·artifact tabs on the same market shell. Owner power-up M1 = `16` skills + `10`/`12b` enc/staff. No stamped artifact catalog for sale in M1.
+5. Buy / sell / one purse / sell ⌊$ / 2⌋ min 1 / ≥3 floor / text events / graph 1–3 **unchanged**.
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Revise** — market name, bank, refresh, tabs, owner-gear |
+| `docs/20-harness-stamp.md` | `market_*` dump keys + asserts 24–27 |
+| `docs/22-chapter-schedule.md` | Display Market; Client need 14 |
+| `docs/README.md` · `11` · `19` · `16` · `01` · `21` · `04` · `03` · `00` · `pm` | Pointers |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+- Frozen per-node 4–6-only stock as sole law (`32` 2026-10-13)
+- Design/UI name **shop** for the visit (wire `shop` kept)
+- M1 shop-sold owner artifacts
+
+## Open questions
+
+None. **M1 = materials.** **M2 = staffs / skill cards / gear·artifact** on this shell (Jonathan 2026-10-15).
+
+---
+
+# Grimmjow stamp — 2026-10-15 (material enchant add-on)
+
+Docs only. Adds **one** mechanism onto #44 / `32` before Jonathan stamp. **Does not** reopen M1 tab scope (still materials only; M2 staff/skill/artifact unchanged). Ulquiorra **holds**. Aizen merges **after** stamp.
+
+## Locked (docs only)
+
+1. **Enchant** is a materials-tab market action beside Buy / Sell / Refresh / Exit. Not a craft session, not a new tab, not a new day beat. Does **not** resolve the day (same as Refresh).
+2. Player picks **one owned** `mat_*` copy from `WagonStock` + **one** `mat_enchant_id`; pays the fee from the one gold purse; stamps `mat_enchant_id` + `shiny=true` on that copy.
+3. **M1 catalog:** `mat_ench_thrift` (Thrift — effective `$` = ⌊$/2⌋ min 1; tags unchanged; fee **2**) and `mat_ench_heavy` (Heavy — effective `$` = 2× base; tag / synergy contribution doubles; fee **3**). Fees are Test knobs.
+4. **Cost** = mat `$` when Client/craft reads it for spend. **Stat** / tag contribution = existing craft bag-count (`10` / `11` / `14` / `27`). Do not invent a new combat system.
+5. Materials only. One enchant per copy — already enchanted → refuse. Cannot if `gold < fee`. Sell still uses **base** `$` (ignore thrift/heavy M1). Enchant is not a bank offer.
+6. **Shiny overlay** is a Design lock. M1 Client ugly tint / modulate / `shiny` flag = OK. Nnoitra / PixelLab = Later. Do not block Client on art.
+7. Distinct from craft `enc_*` runes. Dump `market_enchants` + card `mat_enchant_id` / `shiny`.
+
+## Files
+
+| File | Action |
+|---|---|
+| `docs/32-shop-and-events.md` | **Revise** — Enchant locks, catalog, shiny, dump, Client, Test |
+| `docs/20-harness-stamp.md` | `market_enchants` + assert 28 |
+| `docs/22-chapter-schedule.md` | Client need 14 + visit pointer |
+| `docs/10` · `11` · `13` · `27` · `01` · `04` · `16` | Prefix / one-liners |
+| `docs/README.md` · `00` · `pm` | Index |
+| `docs/STAMP.md` | This note |
+
+## Supersedes
+
+None of the 2026-10-15 market-tab locks. Adds enchant **on** the materials tab.
+
+## Open questions
+
+None. Enchant fees **2 / 3** are Test knobs.

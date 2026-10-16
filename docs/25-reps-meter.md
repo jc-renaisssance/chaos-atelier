@@ -35,7 +35,7 @@ else:
 reps = max(0, reps + Δreps)
 ```
 
-Always `apply_reps` after an order mission (including cant_craft from **other** session-open fails). `cant_craft` at piece-cap does **not** exist (`crafts_max` GONE). Events may apply smaller Δ per event table.
+Always `apply_reps` after an order mission (including cant_craft from **other** session-open fails). `cant_craft` at piece-cap does **not** exist (`crafts_max` GONE). **Route-map events** apply smaller Δ from the M1 catalog — **[32](32-shop-and-events.md)** (typically ±1; floor `reps` at 0). Not the order rating formula. No run-kill from a single M1 event pick.
 
 ## Gates
 
