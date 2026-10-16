@@ -1,6 +1,6 @@
 # Wombaste — Bible
 
-Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` — **superseded 2026-10-13** by the **route map with forks** (free per-day `E*` board from #36/#37 is not live). **2026-10-15:** market visit + event resolve M1 Design — [32](32-shop-and-events.md) (refresh + chapter bank + **material enchant**; M1 materials tab / **M2** staff-skill-gear tabs; Jonathan stamp pending on #44). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
+Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` — **superseded 2026-10-13** by the **route map with forks** (free per-day `E*` board from #36/#37 is not live). **2026-10-15:** market visit + event resolve M1 — [32](32-shop-and-events.md) (refresh + chapter bank + **material enchant**; Client #45). **2026-10-16:** **M2** Staffs / Skills / Gear tabs + catalogs in the same `32` (Jonathan stamp pending). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
 
 | Doc | Topic |
 |---|---|
@@ -37,6 +37,6 @@ Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM ro
 | [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
 | [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
 | [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
-| [32-shop-and-events](32-shop-and-events.md) | **Market visit + event resolve M1** — display Market (wire `kind=shop`); materials tab + refresh + chapter bank + **material enchant** / shiny; **M2** staff/skill/gear tabs; text `evt_*` (Jonathan stamp pending on #44) |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-15** market visit revise; route map with forks locked) |
+| [32-shop-and-events](32-shop-and-events.md) | **Market visit + event resolve** — display Market (wire `kind=shop`); M1 materials + refresh + bank + **material enchant**; **M2** Staffs (`staff_*`) / Skills (`sk_*`) / Gear (`artifact_*`) tabs; text `evt_*` |
+| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-16** market M2 tabs; M1 market + route map locked) |
 | [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |

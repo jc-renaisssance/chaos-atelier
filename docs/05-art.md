@@ -23,3 +23,5 @@
 
 ## Out of scope for Phase-1 art
 Boss full sets, multi-owner atelier sets, full 408-cell matrix, everyday Encyclopedia illos.
+
+**M2 market (after Jonathan stamp):** Nnoitra chrome / icons + `staff_*` / `artifact_*` card art from the locked ids in [32](32-shop-and-events.md). Ping **Harribel before gens**. No shiny PixelLab overlay gens (code-only tint on enchanted materials only). Owner chrome / shopkeeper portraits stay out.
