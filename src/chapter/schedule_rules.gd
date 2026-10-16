@@ -149,15 +149,15 @@ static func build_resolve(
 				+ "Same stamina session as a live order."
 			)
 		GameEnums.RoundAction.WAGON_SHOP:
-			stub = "shop"
-			title = String(event_row.get("title", "shop"))
+			stub = "market"
+			title = String(event_row.get("title", "market"))
 			if title.is_empty():
-				title = "shop"
-			body = String(event_row.get("blurb", "Event path — stock rotates with the road. Shop UI is not this slice."))
+				title = "market"
+			body = String(event_row.get("blurb", "Event path — market visit. Materials tab. Wire day_action=shop."))
 		GameEnums.RoundAction.WAGON_EVENT:
 			stub = "event"
-			title = String(event_row.get("title", "Wagon event"))
-			body = String(event_row.get("blurb", "Travel / road event. No craft unless an event later says so."))
+			title = String(event_row.get("title", "event"))
+			body = String(event_row.get("blurb", "Travel / road event. Text resolve. No craft unless an event later says so."))
 		GameEnums.RoundAction.REST_DIG:
 			stub = "rest"
 			title = "Rest / dig"

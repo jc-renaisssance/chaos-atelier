@@ -7,16 +7,21 @@ extends Resource
 @export var cost: int = 0 ## ≥ 0 after modifiers
 @export var zone_index: int = 1 ## 1-based ∈ 1..zone_count
 @export var construction_id: String = "" ## construction_ids[zone_index-1]
+@export var mat_enchant_id: String = ""
 
 
 func to_dict() -> Dictionary:
-	return {
+	var out := {
 		"id": id,
 		"type": GameEnums.hand_card_type_wire(type),
 		"cost": cost,
 		"zone_index": zone_index,
 		"construction_id": construction_id,
 	}
+	if not mat_enchant_id.is_empty():
+		out["mat_enchant_id"] = mat_enchant_id
+		out["shiny"] = true
+	return out
 
 
 func schema_errors() -> PackedStringArray:

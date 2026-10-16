@@ -64,7 +64,7 @@ func bind(
 	var ink := Color(0.91, 0.835, 0.69)
 	var muted := Color(0.71, 0.643, 0.541)
 	_id_lab.text = node.node_id
-	_kind_lab.text = node.kind
+	_kind_lab.text = node.display_kind()
 	_ref_lab.text = node.ref_id
 	_ref_lab.visible = not node.ref_id.is_empty()
 	if is_current:

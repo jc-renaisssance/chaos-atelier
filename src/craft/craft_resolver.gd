@@ -81,7 +81,12 @@ static func tag_counts(
 	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.SKILL:
 			continue
+		var copies := 1
+		if card.type == GameEnums.HandCardType.MATERIAL:
+			copies = CraftCatalog.tag_copies(card.mat_enchant_id)
 		_add_tags(bag, CraftCatalog.tags_of(card.id, card.type))
+		if copies > 1:
+			_add_tags(bag, CraftCatalog.tags_of(card.id, card.type))
 	return bag
 
 
@@ -138,7 +143,10 @@ static func craft_rarity(
 	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.MATERIAL:
 			stack_n += 1
-			max_mat = maxi(max_mat, CraftCatalog.shop_dollar(card.id, card.type))
+			max_mat = maxi(
+				max_mat,
+				CraftCatalog.effective_dollar_of(card.id, card.type, card.mat_enchant_id)
+			)
 		elif card.type == GameEnums.HandCardType.RUNE:
 			enc_cost = maxi(enc_cost, CraftCatalog.shop_dollar(card.id, card.type))
 	if max_mat >= 5 or (max_mat >= 4 and enc_cost >= 4):
@@ -209,7 +217,12 @@ static func resolve(
 	for card in zone_played:
 		if card.type == GameEnums.HandCardType.SKILL:
 			continue
+		var copies := 1
+		if card.type == GameEnums.HandCardType.MATERIAL:
+			copies = CraftCatalog.tag_copies(card.mat_enchant_id)
 		stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
+		if copies > 1:
+			stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
 	var played_n := zone_played.size()
 	return {
 		"tag_counts": bag,

@@ -98,6 +98,7 @@ static func play(
 	played.cost = cost
 	played.zone_index = target
 	played.construction_id = session.construction_id_for_zone(target)
+	played.mat_enchant_id = card.mat_enchant_id
 	session.cards_played.append(played)
 	var flag := next_mat_free
 	if card.type == GameEnums.HandCardType.MATERIAL and next_mat_free:

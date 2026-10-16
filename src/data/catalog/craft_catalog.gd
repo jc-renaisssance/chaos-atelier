@@ -203,6 +203,29 @@ static func shop_dollar(id: String, type: GameEnums.HandCardType) -> int:
 			return 0
 
 
+static func effective_dollar(card: HandCard) -> int:
+	if card == null:
+		return 0
+	return effective_dollar_of(card.id, card.type, card.mat_enchant_id)
+
+
+static func effective_dollar_of(id: String, type: GameEnums.HandCardType, mat_enchant_id: String) -> int:
+	var base := shop_dollar(id, type)
+	if type != GameEnums.HandCardType.MATERIAL or mat_enchant_id.is_empty():
+		return base
+	if mat_enchant_id == GameConstants.MAT_ENCH_THRIFT:
+		return maxi(1, base / 2)
+	if mat_enchant_id == GameConstants.MAT_ENCH_HEAVY:
+		return base * 2
+	return base
+
+
+static func tag_copies(mat_enchant_id: String) -> int:
+	if mat_enchant_id == GameConstants.MAT_ENCH_HEAVY:
+		return 2
+	return 1
+
+
 ## Play-cost rarity from shop $ (docs/27 knobs 1 / 2 / 3). $1–2 common, $3 uncommon, $4–5 rare.
 static func dollar_to_play_rarity(dollar: int) -> GameEnums.CraftRarity:
 	if dollar >= 4:
@@ -223,7 +246,7 @@ static func play_cost(card: HandCard, next_mat_free: bool) -> int:
 		_:
 			if next_mat_free:
 				return 0
-			return GameConstants.material_play_cost(dollar_to_play_rarity(shop_dollar(card.id, card.type)))
+			return GameConstants.material_play_cost(dollar_to_play_rarity(effective_dollar(card)))
 
 
 static func type_label(type: GameEnums.HandCardType) -> String:

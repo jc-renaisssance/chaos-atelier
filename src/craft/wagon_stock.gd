@@ -29,7 +29,50 @@ func add(card: HandCard) -> void:
 func add_copy(card: HandCard) -> void:
 	if card == null:
 		return
-	cards.append(HandCard.make(card.id, card.type))
+	cards.append(card.duplicate_live())
+
+
+func add_material(mat_id: String) -> HandCard:
+	var card := HandCard.make(mat_id, GameEnums.HandCardType.MATERIAL)
+	add(card)
+	return card
+
+
+func material_count() -> int:
+	var n := 0
+	for card in cards:
+		if card != null and card.type == GameEnums.HandCardType.MATERIAL:
+			n += 1
+	return n
+
+
+func owned_count(card_id: String) -> int:
+	var n := 0
+	for card in cards:
+		if card != null and card.id == card_id:
+			n += 1
+	return n
+
+
+func can_remove_material() -> bool:
+	return material_count() > GameConstants.MARKET_MATERIAL_FLOOR
+
+
+func remove_at(index: int) -> HandCard:
+	if index < 0 or index >= cards.size():
+		return null
+	var card: HandCard = cards[index]
+	cards.remove_at(index)
+	return card
+
+
+func remove_one_material(mat_id: String) -> HandCard:
+	for i in range(cards.size()):
+		var card: HandCard = cards[i]
+		if card != null and card.type == GameEnums.HandCardType.MATERIAL and card.id == mat_id:
+			cards.remove_at(i)
+			return card
+	return null
 
 
 func take_all() -> Array[HandCard]:
