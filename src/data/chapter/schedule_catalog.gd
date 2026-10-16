@@ -19,8 +19,8 @@ const BOSS_TITLES := {
 const ROUND_ACTION_TITLE := {
 	GameEnums.RoundAction.APPOINTMENT: "Appointment",
 	GameEnums.RoundAction.WALK_IN: "Walk-in",
-	GameEnums.RoundAction.WAGON_SHOP: "Wagon shop",
-	GameEnums.RoundAction.WAGON_EVENT: "Wagon event",
+	GameEnums.RoundAction.WAGON_SHOP: "Market",
+	GameEnums.RoundAction.WAGON_EVENT: "Event",
 	GameEnums.RoundAction.PREP_CRAFT: "Prep craft",
 	GameEnums.RoundAction.REST_DIG: "Rest / dig",
 }

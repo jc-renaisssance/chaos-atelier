@@ -63,6 +63,22 @@ const OWNER_SKILL_DRAFT_COSTS := {
 const REPS_START := 0
 const REPS_GATE_STUB := 0
 
+## docs/32 + 19 — one gold purse. Market / event / (later) mission spend the same int.
+const GOLD_START := 12 ## Test knob
+const GOLD_FLOOR := 0
+const MARKET_BANK_ID := "market_bank_c1"
+const MARKET_SHELF_SIZE := 5 ## Test knob; live draw clamped to 4–6
+const MARKET_SHELF_MIN := 4
+const MARKET_SHELF_MAX := 6
+const MARKET_QTY_OFFERED := 1 ## Test knob
+const MARKET_REFRESH_BASE := 2 ## Test knob — costs 2, 4, 6…
+const MARKET_REFRESH_STEP := 2 ## Test knob
+const MARKET_MATERIAL_FLOOR := 3 ## sell / event-remove refuse below this
+const MAT_ENCH_THRIFT := "mat_ench_thrift"
+const MAT_ENCH_HEAVY := "mat_ench_heavy"
+const MAT_ENCH_THRIFT_FEE := 2 ## Test knob
+const MAT_ENCH_HEAVY_FEE := 3 ## Test knob
+
 ## Newspaper / letter chrome ids (docs/26, 23). Copy tables Later; ids stable for harness.
 const HEADLINE_BOSS_ANNOUNCE := "hd_boss_announce"
 const HEADLINE_MID_FAIL := "hd_mid_fail"

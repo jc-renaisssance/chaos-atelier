@@ -30,9 +30,16 @@ func is_bound() -> bool:
 	return not bound_block_id.is_empty()
 
 
+func display_kind() -> String:
+	## Wire kind stays shop. UI / panel type is market (docs/32).
+	if kind == "shop":
+		return "market"
+	return kind
+
+
 func panel_line() -> String:
-	## M1: type + id only. Keep adv_* / appt_* on the row when present.
-	var line := "%s · %s" % [kind, node_id]
+	## M1: type + id only. Display shop as market. Keep adv_* / appt_* / evt_* on the row.
+	var line := "%s · %s" % [display_kind(), node_id]
 	if not ref_id.is_empty():
 		line += "  %s" % ref_id
 	return line
@@ -77,4 +84,6 @@ func schema_errors(day_count: int) -> PackedStringArray:
 		errs.append("%s adventurer ref_id must be adv_*" % node_id)
 	if kind == "appointment" and ref_id.begins_with("adv_"):
 		errs.append("%s appointment must not use adv_* (Scrap Duelist stays appt_*)" % node_id)
+	if kind == "event" and not ref_id.is_empty() and not ref_id.begins_with("evt_"):
+		errs.append("%s event ref_id must be evt_*" % node_id)
 	return errs

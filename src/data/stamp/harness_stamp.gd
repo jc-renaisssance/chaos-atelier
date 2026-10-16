@@ -90,6 +90,29 @@ var estimate_punish_hits: Variant = "?"
 var estimate_skill_fired: Variant = "?"
 var estimate_neg_warnings: Variant = "?"
 
+## docs/32 market / event visit logs. Null the unused block in to_dict.
+var gold: int = 0
+var gold_before: int = GameConstants.NULL_INT
+var gold_after: int = GameConstants.NULL_INT
+var deck_material_count: int = GameConstants.NULL_INT
+var market_node_id: String = ""
+var market_bank_id: String = ""
+var market_stock: Array = []
+var market_buys: Array = []
+var market_sells: Array = []
+var market_refresh_base: int = GameConstants.NULL_INT
+var market_refresh_step: int = GameConstants.NULL_INT
+var market_refresh_count: int = 0
+var market_refresh_cost_next: int = GameConstants.NULL_INT
+var market_refreshes: Array = []
+var market_enchants: Array = []
+var event_id: String = ""
+var event_choice_id: String = ""
+var event_deltas: Dictionary = {}
+var event_resolved: bool = false
+var event_result_line: String = ""
+var event_mat_skipped: bool = false
+
 
 func emit_mission() -> bool:
 	return phase == GameEnums.StampPhase.CRAFT or phase == GameEnums.StampPhase.BOSS
@@ -101,6 +124,14 @@ func emit_session() -> bool:
 
 func emit_resolver() -> bool:
 	return emit_mission() and rating != GameEnums.Rating.NONE
+
+
+func _emit_market() -> bool:
+	return day_action == GameEnums.RoundAction.WAGON_SHOP
+
+
+func _emit_event() -> bool:
+	return day_action == GameEnums.RoundAction.WAGON_EVENT and event_id.begins_with("evt_")
 
 
 func apply_schedule(board: ChapterSchedule) -> void:
@@ -378,6 +409,56 @@ func to_dict() -> Dictionary:
 		dump["outcome"] = null
 		dump["favor_tags_hit"] = []
 		dump["punish_tags_hit"] = []
+	dump["gold"] = gold
+	dump["deck_material_count"] = _null_int(deck_material_count)
+	if _emit_market():
+		dump["gold_before"] = gold_before
+		dump["gold_after"] = gold_after
+		dump["gold_delta"] = gold_after - gold_before
+		dump["market_node_id"] = _null_str(market_node_id)
+		dump["market_bank_id"] = _null_str(market_bank_id)
+		dump["market_stock"] = market_stock.duplicate(true)
+		dump["market_buys"] = market_buys.duplicate(true)
+		dump["market_sells"] = market_sells.duplicate(true)
+		dump["market_refresh_base"] = market_refresh_base
+		dump["market_refresh_step"] = market_refresh_step
+		dump["market_refresh_count"] = market_refresh_count
+		dump["market_refresh_cost_next"] = market_refresh_cost_next
+		dump["market_refreshes"] = market_refreshes.duplicate(true)
+		dump["market_enchants"] = market_enchants.duplicate(true)
+	else:
+		dump["gold_before"] = null
+		dump["gold_after"] = null
+		dump["gold_delta"] = null
+		dump["market_node_id"] = null
+		dump["market_bank_id"] = null
+		dump["market_stock"] = null
+		dump["market_buys"] = null
+		dump["market_sells"] = null
+		dump["market_refresh_base"] = null
+		dump["market_refresh_step"] = null
+		dump["market_refresh_count"] = null
+		dump["market_refresh_cost_next"] = null
+		dump["market_refreshes"] = null
+		dump["market_enchants"] = null
+	if _emit_event():
+		if not _emit_market():
+			dump["gold_before"] = gold_before
+			dump["gold_after"] = gold_after
+			dump["gold_delta"] = gold_after - gold_before
+		dump["event_id"] = _null_str(event_id)
+		dump["event_choice_id"] = _null_str(event_choice_id)
+		dump["event_deltas"] = event_deltas.duplicate(true)
+		dump["event_resolved"] = event_resolved
+		dump["event_result_line"] = _null_str(event_result_line)
+		dump["event_mat_skipped"] = event_mat_skipped
+	else:
+		dump["event_id"] = null
+		dump["event_choice_id"] = null
+		dump["event_deltas"] = null
+		dump["event_resolved"] = null
+		dump["event_result_line"] = null
+		dump["event_mat_skipped"] = null
 	return dump
 
 

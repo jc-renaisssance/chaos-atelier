@@ -31,6 +31,8 @@ var _schedule_root: Control
 var _body_scroll: ScrollContainer
 var _craft_table: CraftTable
 var _dex_screen: DexScreen
+var _market_screen: MarketScreen
+var _event_screen: EventScreen
 var _dex_open: bool = false
 
 
@@ -192,7 +194,7 @@ func _build() -> void:
 	demo.add_child(_btn("Dex", _on_dex))
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("Dex · shop / menu collection list. own_basic loop: newspaper → route graph → craft → boss-client sew → fight. Shop UI / portraits Later.", 12, MUTED)
+	var hint := _label("Dex · shop / menu collection list. Market on kind=shop. Text events on N4/N6/N10/N17. Staffs / skills / gear = M2.", 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -208,6 +210,16 @@ func _build() -> void:
 	_dex_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_dex_screen.closed.connect(_on_dex_closed)
 	add_child(_dex_screen)
+
+	_market_screen = MarketScreen.new()
+	_market_screen.visible = false
+	_market_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_market_screen)
+
+	_event_screen = EventScreen.new()
+	_event_screen.visible = false
+	_event_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_event_screen)
 
 
 func _caption(text: String) -> Label:
@@ -246,17 +258,29 @@ func _btn(text: String, cb: Callable) -> Button:
 
 func _redraw() -> void:
 	var in_craft := AtelierSession.craft_open
-	if in_craft:
+	var in_market := AtelierSession.market_open
+	var in_event := AtelierSession.event_open
+	if in_craft or in_market or in_event:
 		_dex_open = false
 	if _dex_screen != null:
-		_dex_screen.visible = _dex_open and not in_craft
+		_dex_screen.visible = _dex_open and not in_craft and not in_market and not in_event
 	if _schedule_root != null:
-		_schedule_root.visible = not in_craft and not _dex_open
+		_schedule_root.visible = not in_craft and not _dex_open and not in_market and not in_event
 	if _craft_table != null:
 		_craft_table.visible = in_craft
 		if in_craft:
 			_craft_table.refresh()
+	if _market_screen != null:
+		_market_screen.visible = in_market
+		if in_market:
+			_market_screen.refresh()
+	if _event_screen != null:
+		_event_screen.visible = in_event
+		if in_event:
+			_event_screen.refresh()
 	if in_craft:
+		return
+	if in_market or in_event:
 		return
 	if _dex_open:
 		if _dex_screen != null:
@@ -270,7 +294,7 @@ func _redraw() -> void:
 	_title.text = "WOMBASTE  ·  travelling wagon  ·  %s" % board.player_owner_id
 	_planner_caption.text = "ROUTE GRAPH  ·  %s  ·  %d days (map.day_count)  ·  last 2 reserved  ·  nodes + edges" % [board.map_id, n]
 	_meta.text = (
-		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
+		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   gold %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
 		% [
 			board.chapter_id,
 			GameConstants.CHAPTERS_PER_RUN,
@@ -281,6 +305,7 @@ func _redraw() -> void:
 			board.days_left,
 			board.current_node_id if not board.current_node_id.is_empty() else "—",
 			board.crafts_done,
+			AtelierSession.gold,
 			AtelierSession.reps,
 			GameConstants.REPS_GATE_STUB,
 			"used" if board.appt_decline_used else "open (once / chapter)",
@@ -390,7 +415,7 @@ func _rebuild_actions() -> void:
 			_today_title.text = "Reserved D%d — travel / final prep. Not player-pickable." % board.day_index
 			_take_btn.text = "Resolve reserved day"
 	elif node != null:
-		_today_title.text = "Current node %s. Take it. Shop 1–3 is graph law — not a UI ban." % node.panel_line()
+		_today_title.text = "Current node %s. Take it. Market 1–3 is graph law — not a UI ban." % node.panel_line()
 		_take_btn.text = "Take node"
 	else:
 		_today_title.text = "Confirm today's node, then take it."
@@ -418,7 +443,7 @@ func _refresh_resolve() -> void:
 				"Walk the authored graph. Confirm a live fork when that day is current. "
 				+ "Draft future is ghost only — not route_path. "
 				+ "Order path: appointment / adventurer → stamina craft. "
-				+ "Event path: shop / event / reserved stay phase=schedule. "
+				+ "Event path: market (wire shop) / event / reserved stay phase=schedule. "
 				+ "After the day budget: shared-pool boss-client sew, then that adventurer fights."
 			)
 		return
@@ -460,7 +485,7 @@ func _on_continue() -> void:
 
 
 func _on_dex() -> void:
-	if AtelierSession.craft_open:
+	if AtelierSession.craft_open or AtelierSession.market_open or AtelierSession.event_open:
 		return
 	_dex_open = true
 	if _dex_screen != null:

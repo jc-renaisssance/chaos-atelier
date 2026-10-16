@@ -64,6 +64,28 @@ var last_dex_enemy_fought_new: Array = []
 ## Slice 2 intent (docs/30). Estimate-only. Null until the player clicks a planner chip.
 var planned_build: Variant = null
 
+## docs/32 — one gold purse + market visit + text events. Display Market; wire shop.
+var gold: int = GameConstants.GOLD_START
+var market_open: bool = false
+var event_open: bool = false
+var market_node_id: String = ""
+var market_bank_id: String = ""
+var market_stock: Array = []
+var market_buys: Array = []
+var market_sells: Array = []
+var market_refresh_count: int = 0
+var market_refreshes: Array = []
+var market_enchants: Array = []
+var visit_gold_before: int = 0
+var visit_gold_after: int = 0
+var event_id: String = ""
+var event_choice_id: String = ""
+var event_deltas: Dictionary = {}
+var event_resolved: bool = false
+var event_result_line: String = ""
+var event_mat_skipped: bool = false
+var visit_reps_before: int = 0
+
 
 func _ready() -> void:
 	profile.load_from_disk()
@@ -99,6 +121,11 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	unlocked_outlooks = PackedStringArray(["plain"])
 	chapter_piece_results.clear()
 	_reset_craft_state()
+	gold = GameConstants.GOLD_START
+	_clear_market_visit()
+	_clear_event_visit()
+	market_open = false
+	event_open = false
 	## Dex / unlocked_builds stay on profile — do not clear on new run / death / run_over.
 	profile.note_new_run()
 	stock = WagonStock.new()
@@ -141,11 +168,15 @@ func _reset_craft_state() -> void:
 func legal_actions() -> Array[GameEnums.RoundAction]:
 	if craft_open or newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return []
+	if market_open or event_open:
+		return []
 	return ScheduleRules.legal_actions(board, declined_this_day)
 
 
 func can_confirm_node(node_id: String) -> bool:
 	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	if market_open or event_open:
 		return false
 	if resolve_open:
 		return false
@@ -154,6 +185,8 @@ func can_confirm_node(node_id: String) -> bool:
 
 func confirm_node(node_id: String) -> bool:
 	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	if market_open or event_open:
 		return false
 	if resolve_open:
 		return false
@@ -169,6 +202,8 @@ func confirm_node(node_id: String) -> bool:
 
 func can_draft_node(node_id: String) -> bool:
 	if board == null or craft_open or newspaper_open or boss_open or chapter_over or run_over:
+		return false
+	if market_open or event_open:
 		return false
 	return board.can_draft_node(node_id)
 
@@ -194,6 +229,8 @@ func take_day() -> bool:
 func can_decline() -> bool:
 	if board == null or resolve_open or craft_open or board.appt_decline_used:
 		return false
+	if market_open or event_open:
+		return false
 	if newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return false
 	return board.current_pin() != null and not board.is_current_resolved()
@@ -213,6 +250,8 @@ func decline_appointment() -> bool:
 func pick_action(action: GameEnums.RoundAction) -> bool:
 	if board == null or resolve_open or craft_open:
 		return false
+	if market_open or event_open:
+		return false
 	if newspaper_open or awaiting_boss or boss_open or chapter_over or run_over:
 		return false
 	if not ScheduleRules.is_legal(board, action, declined_this_day):
@@ -225,7 +264,12 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 		reps = maxi(0, reps + DECLINE_REPS_STUB)
 		last_note = "Pinned appointment skipped — decline used (−reps stub %d)." % DECLINE_REPS_STUB
 	var order_id := ""
-	var event_id := node.node_id if node != null else ""
+	var event_wire := ""
+	if node != null:
+		if node.kind == "event" and not node.ref_id.is_empty():
+			event_wire = node.ref_id
+		else:
+			event_wire = node.node_id
 	pending_order = null
 	last_event = {}
 	match action:
@@ -245,10 +289,11 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			order_id = pending_order.order_id
 		GameEnums.RoundAction.WAGON_EVENT:
 			if node != null and node.kind == "event":
+				var evt_id := node.ref_id if not node.ref_id.is_empty() else node.node_id
 				last_event = {
-					"id": node.node_id,
+					"id": evt_id,
 					"title": "event · %s" % node.node_id,
-					"blurb": "Wagon event %s. No craft unless an event later says so." % node.node_id,
+					"blurb": EventCatalog.blurb(evt_id),
 				}
 			else:
 				last_event = ScheduleCatalog.pick_wagon_event(rng)
@@ -256,13 +301,17 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			if node != null and node.kind == "shop":
 				last_event = {
 					"id": node.node_id,
-					"title": "shop · %s" % node.node_id,
-					"blurb": "Wagon shop %s. Stock rotates with the road. Shop UI is not this slice." % node.node_id,
+					"title": "market · %s" % node.node_id,
+					"blurb": "Market visit %s. Materials tab. Refresh / Enchant stay in the visit." % node.node_id,
 				}
 		_:
 			pass
-	if not board.set_primary_action(action, order_id, event_id):
+	if not board.set_primary_action(action, order_id, event_wire):
 		return false
+	if action == GameEnums.RoundAction.WAGON_SHOP and node != null and node.kind == "shop":
+		return _begin_market(node)
+	if action == GameEnums.RoundAction.WAGON_EVENT and node != null and node.kind == "event":
+		return _begin_event(node)
 	last_resolve = ScheduleRules.build_resolve(action, pending_order, last_event)
 	if ScheduleRules.is_order_class(action):
 		if not _begin_craft(pending_order):
@@ -492,7 +541,7 @@ func _emit_cant_craft(order: ClientOrder) -> void:
 
 
 func acknowledge_resolve() -> void:
-	if not resolve_open or craft_open:
+	if not resolve_open or craft_open or market_open or event_open:
 		return
 	if newspaper_open:
 		newspaper_open = false
@@ -812,6 +861,7 @@ func _base_stamp() -> HarnessStamp:
 		stamp.apply_schedule(board)
 	_apply_run_meta(stamp)
 	_apply_profile_logs(stamp)
+	_apply_market_event_logs(stamp)
 	return stamp
 
 
@@ -913,3 +963,330 @@ func _make_end_stamp() -> HarnessStamp:
 		stamp.newspaper_headline_id = GameConstants.HEADLINE_CHAPTER_RESULT
 	stamp.session = null
 	return stamp
+
+
+func _clear_market_visit() -> void:
+	market_node_id = ""
+	market_bank_id = ""
+	market_stock.clear()
+	market_buys.clear()
+	market_sells.clear()
+	market_refresh_count = 0
+	market_refreshes.clear()
+	market_enchants.clear()
+	visit_gold_before = gold
+	visit_gold_after = gold
+
+
+func _clear_event_visit() -> void:
+	event_id = ""
+	event_choice_id = ""
+	event_deltas = {}
+	event_resolved = false
+	event_result_line = ""
+	event_mat_skipped = false
+	visit_reps_before = reps
+	visit_gold_before = gold
+	visit_gold_after = gold
+
+
+func _touch_visit_gold() -> void:
+	visit_gold_after = gold
+	last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+
+
+func _set_gold(value: int) -> void:
+	gold = maxi(GameConstants.GOLD_FLOOR, value)
+
+
+func _begin_market(node: RouteNode) -> bool:
+	if node == null:
+		return false
+	_clear_market_visit()
+	market_open = true
+	resolve_open = false
+	market_node_id = node.node_id
+	market_bank_id = MarketCatalog.bank_id()
+	market_stock = MarketCatalog.draw_shelf(rng, node.node_id, true)
+	visit_gold_before = gold
+	visit_gold_after = gold
+	last_note = "Market %s — buy / sell / refresh / enchant. Exit resolves the day." % node.node_id
+	last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+	return true
+
+
+func _begin_event(node: RouteNode) -> bool:
+	if node == null:
+		return false
+	_clear_event_visit()
+	event_open = true
+	resolve_open = false
+	event_id = node.ref_id if not node.ref_id.is_empty() else EventCatalog.event_for_node(node.node_id)
+	visit_gold_before = gold
+	visit_gold_after = gold
+	visit_reps_before = reps
+	last_note = "Event %s — pick one choice." % event_id
+	last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+	return true
+
+
+func can_buy_market(mat_id: String) -> bool:
+	if not market_open or mat_id.is_empty():
+		return false
+	for item in market_stock:
+		if not (item is Dictionary):
+			continue
+		var row: Dictionary = item
+		if String(row.get("mat_id", "")) != mat_id:
+			continue
+		var price := int(row.get("price", 0))
+		var qty := int(row.get("qty_offered", 0))
+		return qty > 0 and gold >= price
+	return false
+
+
+func buy_market(mat_id: String) -> bool:
+	if not can_buy_market(mat_id):
+		last_note = "Cannot buy %s." % mat_id
+		board_changed.emit()
+		return false
+	for item in market_stock:
+		if not (item is Dictionary):
+			continue
+		var row: Dictionary = item
+		if String(row.get("mat_id", "")) != mat_id:
+			continue
+		var price := int(row.get("price", 0))
+		row["qty_offered"] = int(row.get("qty_offered", 0)) - 1
+		_set_gold(gold - price)
+		stock.add_material(mat_id)
+		market_buys.append({"mat_id": mat_id, "price": price})
+		last_note = "Bought %s for %d gold." % [mat_id, price]
+		_touch_visit_gold()
+		return true
+	return false
+
+
+func can_sell_market(stock_index: int) -> bool:
+	if not market_open or stock == null:
+		return false
+	if stock_index < 0 or stock_index >= stock.cards.size():
+		return false
+	var card: HandCard = stock.cards[stock_index]
+	if card == null or card.type != GameEnums.HandCardType.MATERIAL:
+		return false
+	return stock.can_remove_material()
+
+
+func sell_market(stock_index: int) -> bool:
+	if not can_sell_market(stock_index):
+		last_note = "Cannot sell — material floor is %d." % GameConstants.MARKET_MATERIAL_FLOOR
+		board_changed.emit()
+		return false
+	var card := stock.remove_at(stock_index)
+	if card == null:
+		return false
+	var gain := MarketCatalog.sell_gain(card.id)
+	_set_gold(gold + gain)
+	market_sells.append({"mat_id": card.id, "gold_gained": gain})
+	last_note = "Sold %s for %d gold." % [card.id, gain]
+	_touch_visit_gold()
+	return true
+
+
+func can_refresh_market() -> bool:
+	if not market_open:
+		return false
+	return gold >= MarketCatalog.refresh_cost(market_refresh_count)
+
+
+func refresh_market() -> bool:
+	if not can_refresh_market():
+		last_note = "Cannot refresh — short gold."
+		board_changed.emit()
+		return false
+	var cost := MarketCatalog.refresh_cost(market_refresh_count)
+	_set_gold(gold - cost)
+	market_refresh_count += 1
+	market_refreshes.append({"n": market_refresh_count, "cost": cost})
+	market_stock = MarketCatalog.draw_shelf(rng, market_node_id, false)
+	last_note = "Refresh %d paid %d gold." % [market_refresh_count, cost]
+	_touch_visit_gold()
+	return true
+
+
+func can_enchant_market(stock_index: int, enchant_id: String) -> bool:
+	if not market_open or stock == null or not MarketCatalog.is_enchant(enchant_id):
+		return false
+	if stock_index < 0 or stock_index >= stock.cards.size():
+		return false
+	var card: HandCard = stock.cards[stock_index]
+	if card == null or card.type != GameEnums.HandCardType.MATERIAL:
+		return false
+	if card.is_enchanted():
+		return false
+	return gold >= MarketCatalog.enchant_fee(enchant_id)
+
+
+func enchant_market(stock_index: int, enchant_id: String) -> bool:
+	if not can_enchant_market(stock_index, enchant_id):
+		last_note = "Cannot enchant — already stamped, short gold, or not a material."
+		board_changed.emit()
+		return false
+	var card: HandCard = stock.cards[stock_index]
+	var fee := MarketCatalog.enchant_fee(enchant_id)
+	_set_gold(gold - fee)
+	card.mat_enchant_id = enchant_id
+	card.shiny = true
+	market_enchants.append({
+		"mat_id": card.id,
+		"mat_enchant_id": enchant_id,
+		"fee": fee,
+	})
+	last_note = "Enchanted %s with %s for %d gold." % [card.id, enchant_id, fee]
+	_touch_visit_gold()
+	return true
+
+
+func exit_market() -> bool:
+	if not market_open:
+		return false
+	market_open = false
+	visit_gold_after = gold
+	last_resolve = {
+		"resolve_class": "event",
+		"day_action": "shop",
+		"title": "market · %s" % market_node_id,
+		"body": (
+			"Market closed. buys %d · sells %d · refreshes %d · enchants %d · gold %d→%d · mats %d."
+			% [
+				market_buys.size(),
+				market_sells.size(),
+				market_refreshes.size(),
+				market_enchants.size(),
+				visit_gold_before,
+				visit_gold_after,
+				stock.material_count() if stock != null else 0,
+			]
+		),
+		"stub": "market",
+		"phase": "schedule",
+		"event_id": market_node_id,
+	}
+	resolve_open = true
+	last_note = "Left market %s. Continue to the next graph day." % market_node_id
+	last_stamp = _make_schedule_stamp()
+	resolve_started.emit(last_resolve)
+	board_changed.emit()
+	return true
+
+
+func can_pick_event_choice(choice_id: String) -> bool:
+	if not event_open or event_resolved:
+		return false
+	var ch := EventCatalog.choice(event_id, choice_id)
+	if ch.is_empty():
+		return false
+	var cost := EventCatalog.gold_cost(ch)
+	if cost > 0 and gold < cost:
+		return false
+	return true
+
+
+func pick_event_choice(choice_id: String) -> bool:
+	if not can_pick_event_choice(choice_id):
+		last_note = "Cannot pick %s." % choice_id
+		board_changed.emit()
+		return false
+	var ch := EventCatalog.choice(event_id, choice_id)
+	var gold_delta := int(ch.get("gold", 0))
+	var reps_delta := int(ch.get("reps", 0))
+	var mat_add := String(ch.get("mat_add", ""))
+	var mat_remove := String(ch.get("mat_remove", ""))
+	var applied_add: Variant = null
+	var applied_remove: Variant = null
+	event_mat_skipped = false
+	if gold_delta != 0:
+		_set_gold(gold + gold_delta)
+	if reps_delta != 0:
+		reps = maxi(0, reps + reps_delta)
+	if not mat_add.is_empty():
+		stock.add_material(mat_add)
+		applied_add = mat_add
+	if not mat_remove.is_empty():
+		var can_remove := stock.owned_count(mat_remove) > 0 and stock.can_remove_material()
+		if can_remove:
+			stock.remove_one_material(mat_remove)
+			applied_remove = mat_remove
+		else:
+			event_mat_skipped = true
+	event_choice_id = choice_id
+	event_resolved = true
+	event_deltas = {
+		"gold": gold_delta,
+		"mat_add": applied_add,
+		"mat_remove": applied_remove,
+		"reps": reps_delta,
+	}
+	var line := String(ch.get("result", ""))
+	if event_mat_skipped:
+		line += " (mat skip — missing or floor)"
+	event_result_line = line
+	visit_gold_after = gold
+	last_note = "Picked %s. %s" % [choice_id, event_result_line]
+	last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+	return true
+
+
+func finish_event() -> bool:
+	if not event_open or not event_resolved:
+		return false
+	event_open = false
+	last_resolve = {
+		"resolve_class": "event",
+		"day_action": "event",
+		"title": "event · %s" % event_id,
+		"body": event_result_line,
+		"stub": "event",
+		"phase": "schedule",
+		"event_id": event_id,
+	}
+	resolve_open = true
+	last_note = "Event %s resolved. Continue to the next graph day." % event_id
+	last_stamp = _make_schedule_stamp()
+	resolve_started.emit(last_resolve)
+	board_changed.emit()
+	return true
+
+
+func _apply_market_event_logs(stamp: HarnessStamp) -> void:
+	stamp.gold = gold
+	stamp.gold_before = visit_gold_before
+	stamp.gold_after = visit_gold_after
+	stamp.deck_material_count = stock.material_count() if stock != null else 0
+	stamp.market_node_id = market_node_id
+	stamp.market_bank_id = market_bank_id
+	stamp.market_stock = MarketCatalog.stock_rows(market_stock)
+	stamp.market_buys = market_buys.duplicate(true)
+	stamp.market_sells = market_sells.duplicate(true)
+	stamp.market_refresh_base = GameConstants.MARKET_REFRESH_BASE
+	stamp.market_refresh_step = GameConstants.MARKET_REFRESH_STEP
+	stamp.market_refresh_count = market_refresh_count
+	stamp.market_refresh_cost_next = MarketCatalog.refresh_cost(market_refresh_count)
+	stamp.market_refreshes = market_refreshes.duplicate(true)
+	stamp.market_enchants = market_enchants.duplicate(true)
+	stamp.event_id = event_id
+	stamp.event_choice_id = event_choice_id
+	stamp.event_deltas = event_deltas.duplicate(true)
+	stamp.event_resolved = event_resolved
+	stamp.event_result_line = event_result_line
+	stamp.event_mat_skipped = event_mat_skipped
+	if event_resolved and int(event_deltas.get("reps", 0)) != 0:
+		stamp.reps_before = visit_reps_before
+		stamp.reps_after = reps
+		stamp.reps_delta = reps - visit_reps_before
+
