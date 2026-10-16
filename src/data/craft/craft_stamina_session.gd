@@ -18,10 +18,10 @@ extends Resource
 @export var hand: Array[HandCard] = [] ## mats + runes + skills; no auto-refill
 @export var draw_pile: Array[HandCard] = [] ## run deck remainder this session (docs/27)
 @export var discard_pile: Array[HandCard] = [] ## play + dig dump; reshuffles into draw
-	@export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
-	@export var max_materials: int = GameConstants.DEFAULT_MAX_MATERIALS ## docs/32 staff-raised per-zone bag
-	@export var max_runes: int = GameConstants.DEFAULT_MAX_RUNES
-	@export var dig_count: int = 0
+@export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
+@export var max_materials: int = GameConstants.DEFAULT_MAX_MATERIALS ## docs/32 staff-raised per-zone bag
+@export var max_runes: int = GameConstants.DEFAULT_MAX_RUNES
+@export var dig_count: int = 0
 @export var cards_played: Array[PlayedCard] = []
 @export var early_finish: bool = false
 @export var finish_reason: GameEnums.FinishReason = GameEnums.FinishReason.NONE
