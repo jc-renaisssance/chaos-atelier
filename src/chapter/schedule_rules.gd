@@ -153,7 +153,7 @@ static func build_resolve(
 			title = String(event_row.get("title", "market"))
 			if title.is_empty():
 				title = "market"
-			body = String(event_row.get("blurb", "Event path — market visit. Materials tab. Wire day_action=shop."))
+			body = String(event_row.get("blurb", "Event path — market visit. Materials / Staffs / Skills / Gear. Wire day_action=shop."))
 		GameEnums.RoundAction.WAGON_EVENT:
 			stub = "event"
 			title = String(event_row.get("title", "event"))

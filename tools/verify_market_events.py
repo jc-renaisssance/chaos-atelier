@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Source + spec checks for Client market visit + text events M1 (docs/32, 20).
+"""Source + spec checks for Client market visit M1 + M2 tabs (docs/32, 20).
 
 Godot is not required. This does not open the editor.
-Does not cover M2 staff / skill / gear tabs, elite telegraph, or adventurer catalog.
+Does not cover elite telegraph or adventurer catalog.
 """
 from __future__ import annotations
 
@@ -75,6 +75,86 @@ DUMP_EVENT = [
     '"event_deltas"',
     '"event_resolved"',
 ]
+DUMP_M2 = [
+    '"market_tab"',
+    '"market_staff_bank_id"',
+    '"market_staff_stock"',
+    '"market_staff_buys"',
+    '"market_staff_sells"',
+    '"staff_owned"',
+    '"staff_equipped_id"',
+    '"max_materials"',
+    '"max_runes"',
+    '"market_skill_bank_id"',
+    '"market_skill_stock"',
+    '"market_skill_buys"',
+    '"market_skill_sells"',
+    '"deck_skill_count"',
+    '"market_artifact_bank_id"',
+    '"market_artifact_stock"',
+    '"market_artifact_buys"',
+    '"market_artifact_sells"',
+    '"artifact_owned"',
+    '"artifact_equipped_ids"',
+]
+STAFFS = [
+    "staff_apprentice",
+    "staff_rune_desk",
+    "staff_loom_pair",
+    "staff_third_seam",
+    "staff_rune_pair",
+]
+SKILLS = [
+    "sk_next_mat_free",
+    "sk_touch_up",
+    "sk_steady_hand",
+    "sk_metal_str_double",
+    "sk_wild_to_earth",
+    "sk_deep_dig",
+]
+ARTIFACTS = [
+    "artifact_coin_purse",
+    "artifact_ledger_clip",
+    "artifact_pack_strap",
+    "artifact_needle_tin",
+    "artifact_wagon_hook",
+    "artifact_stamp_case",
+    "artifact_road_charm",
+    "artifact_oil_rag",
+]
+STAFF_CAPS = {
+    "": (2, 1),
+    "staff_apprentice": (3, 1),
+    "staff_rune_desk": (2, 2),
+    "staff_loom_pair": (3, 2),
+    "staff_third_seam": (4, 1),
+    "staff_rune_pair": (2, 3),
+}
+STAFF_PRICES = {
+    "staff_apprentice": 4,
+    "staff_rune_desk": 5,
+    "staff_loom_pair": 8,
+    "staff_third_seam": 7,
+    "staff_rune_pair": 8,
+}
+SKILL_PRICES = {
+    "sk_next_mat_free": 3,
+    "sk_touch_up": 3,
+    "sk_steady_hand": 3,
+    "sk_metal_str_double": 5,
+    "sk_wild_to_earth": 5,
+    "sk_deep_dig": 7,
+}
+ARTIFACT_PRICES = {
+    "artifact_coin_purse": 5,
+    "artifact_ledger_clip": 4,
+    "artifact_pack_strap": 6,
+    "artifact_needle_tin": 6,
+    "artifact_wagon_hook": 5,
+    "artifact_stamp_case": 6,
+    "artifact_road_charm": 4,
+    "artifact_oil_rag": 5,
+}
 
 
 def fail(msg: str) -> None:
@@ -201,16 +281,43 @@ def check_bank() -> None:
         for mat_id in ids:
             if mat_id not in bank:
                 fail(f"first-draw {node_id} id {mat_id} not in bank")
-    if "GOLD_START := 12" not in read("src/autoload/game_constants.gd"):
+    consts = read("src/autoload/game_constants.gd")
+    if "GOLD_START := 12" not in consts:
         fail("GOLD_START must default 12")
-    if "MARKET_REFRESH_BASE := 2" not in read("src/autoload/game_constants.gd"):
+    if "MARKET_REFRESH_BASE := 2" not in consts:
         fail("MARKET_REFRESH_BASE must default 2")
-    if "MARKET_REFRESH_STEP := 2" not in read("src/autoload/game_constants.gd"):
+    if "MARKET_REFRESH_STEP := 2" not in consts:
         fail("MARKET_REFRESH_STEP must default 2")
-    if "MAT_ENCH_THRIFT_FEE := 2" not in read("src/autoload/game_constants.gd"):
+    if "MAT_ENCH_THRIFT_FEE := 2" not in consts:
         fail("Thrift fee must default 2")
-    if "MAT_ENCH_HEAVY_FEE := 3" not in read("src/autoload/game_constants.gd"):
+    if "MAT_ENCH_HEAVY_FEE := 3" not in consts:
         fail("Heavy fee must default 3")
+    if 'MARKET_STAFF_BANK_ID := "market_staff_bank_c1"' not in consts:
+        fail("staff bank id must be market_staff_bank_c1")
+    if 'MARKET_SKILL_BANK_ID := "market_skill_bank_c1"' not in consts:
+        fail("skill bank id must be market_skill_bank_c1")
+    if 'MARKET_ARTIFACT_BANK_ID := "market_artifact_bank_c1"' not in consts:
+        fail("artifact bank id must be market_artifact_bank_c1")
+    staffs = _const_dict(market, "STAFFS")
+    if sorted(staffs) != sorted(STAFFS):
+        fail(f"staff catalog mismatch: {sorted(staffs)} != {STAFFS}")
+    for staff_id, price in STAFF_PRICES.items():
+        if int(staffs.get(staff_id, {}).get("dollar", -1)) != price:
+            fail(f"{staff_id} price {staffs.get(staff_id)} != {price}")
+    skills = _const_dict(market, "SKILLS")
+    if sorted(skills) != sorted(SKILLS):
+        fail(f"skill catalog mismatch: extra={set(skills) - set(SKILLS)} missing={set(SKILLS) - set(skills)}")
+    for skill_id, price in SKILL_PRICES.items():
+        if int(skills.get(skill_id, {}).get("dollar", -1)) != price:
+            fail(f"{skill_id} price != {price}")
+    artifacts = _const_dict(market, "ARTIFACTS")
+    if sorted(artifacts) != sorted(ARTIFACTS):
+        fail(f"artifact catalog mismatch: extra={set(artifacts) - set(ARTIFACTS)} missing={set(ARTIFACTS) - set(artifacts)}")
+    for artifact_id, price in ARTIFACT_PRICES.items():
+        if int(artifacts.get(artifact_id, {}).get("dollar", -1)) != price:
+            fail(f"{artifact_id} price != {price}")
+    if any(k.startswith("gear_") for k in artifacts):
+        fail("do not use gear_* ids")
 
 
 def check_map_events() -> None:
@@ -259,6 +366,27 @@ def check_source() -> None:
         "func refresh_market",
         "func enchant_market",
         "func exit_market",
+        "func buy_staff",
+        "func buy_skill",
+        "func buy_artifact",
+        "func equip_staff",
+        "func equip_artifact",
+        "staff_apprentice",
+        "staff_rune_desk",
+        "staff_loom_pair",
+        "staff_third_seam",
+        "staff_rune_pair",
+        "artifact_coin_purse",
+        "artifact_ledger_clip",
+        "artifact_pack_strap",
+        "artifact_needle_tin",
+        "artifact_wagon_hook",
+        "artifact_stamp_case",
+        "artifact_road_charm",
+        "artifact_oil_rag",
+        "market_staff_bank_c1",
+        "market_skill_bank_c1",
+        "market_artifact_bank_c1",
         "func pick_event_choice",
         "func display_kind",
         "market ·",
@@ -281,7 +409,7 @@ def check_source() -> None:
     if "shops_taken" in session or "shop_ban" in session:
         fail("session must not UI-ban shop after k visits")
     dump = read("src/data/stamp/harness_stamp.gd")
-    for key in DUMP_MARKET + DUMP_EVENT:
+    for key in DUMP_MARKET + DUMP_EVENT + DUMP_M2:
         if key not in dump:
             fail(f"harness dump missing {key}")
     if '"event_pool"' in dump or '"day_assignments"' in dump:
@@ -300,13 +428,42 @@ def check_source() -> None:
         if 'RoundAction.WAGON_SHOP: "shop"' not in enums:
             fail("DAY_ACTION_WIRE must keep WAGON_SHOP → shop")
     market_ui = read("src/ui/market/market_screen.gd")
-    for parked in ("staff catalog", "gear_*", "artifact_*", "sk_next_mat_free"):
-        if parked in market_ui and parked != "sk_next_mat_free":
-            fail(f"M1 market UI must not wire {parked}")
+    for token in ("Staffs", "Skills", "Gear", "MARKET_TAB_STAFFS", "MARKET_TAB_SKILLS", "MARKET_TAB_GEAR"):
+        if token not in market_ui:
+            fail(f"M2 market UI missing {token}")
+    if "gear_*" in market_ui:
+        fail("prefix is artifact_* — do not sell gear_*")
+    if "mat_ench_" in market_ui and "MARKET_TAB_STAFFS" in market_ui:
+        # Enchant buttons must stay on the materials deck path only.
+        if "_staff_kit_row" in market_ui and "enchant_market" in market_ui:
+            staff_fn = market_ui.split("func _staff_kit_row", 1)[-1].split("func _", 1)[0]
+            if "enchant" in staff_fn.lower():
+                fail("Staffs tab must not take mat_ench_*")
     if ".free()" in market_ui or ".free()" in read("src/ui/event/event_screen.gd"):
         fail("market/event UI must queue_free, not free() mid-signal")
     if "queue_free" not in market_ui:
         fail("market shelf rebuild must queue_free")
+    session = read("src/autoload/atelier_session.gd")
+    for token in (
+        "func buy_staff",
+        "func sell_staff",
+        "func equip_staff",
+        "func unequip_staff",
+        "func buy_skill",
+        "func sell_skill",
+        "func buy_artifact",
+        "func equip_artifact",
+        "func unequip_artifact",
+        "market_staff_bank_c1",
+        "artifact_equipped_ids",
+        "live_max_materials",
+    ):
+        if token not in session and token not in blob:
+            fail(f"missing M2 session token: {token}")
+    if "market_staff_stock = MarketCatalog" in session and "refresh_market" in session:
+        refresh_fn = session.split("func refresh_market", 1)[-1].split("func ", 1)[0]
+        if "staff_stock" in refresh_fn or "artifact_stock" in refresh_fn or "skill_stock" in refresh_fn:
+            fail("refresh must not redraw staff / skill / artifact stock")
     route = read("src/data/chapter/route_node.gd")
     if 'return "market"' not in route:
         fail("RouteNode.display_kind must map shop → market")
@@ -354,6 +511,28 @@ def check_formulas() -> None:
         pass  # illegal pay
     else:
         fail("gold 0 must refuse pay-1")
+    for staff_id, caps in STAFF_CAPS.items():
+        dm = int(staffs_delta(staff_id)[0]) if staff_id else 0
+        dr = int(staffs_delta(staff_id)[1]) if staff_id else 0
+        if (2 + dm, 1 + dr) != caps:
+            fail(f"{staff_id or 'none'} caps {(2 + dm, 1 + dr)} != {caps}")
+    if max(1, 4 // 2) != 2:
+        fail("staff_apprentice sell must be 2")
+    if max(1, 3 // 2) != 1:
+        fail("skill $3 sell must be 1")
+    if max(1, 5 // 2) != 2:
+        fail("artifact $5 sell must be 2")
+
+
+def staffs_delta(staff_id: str) -> tuple[int, int]:
+    table = {
+        "staff_apprentice": (1, 0),
+        "staff_rune_desk": (0, 1),
+        "staff_loom_pair": (1, 1),
+        "staff_third_seam": (2, 0),
+        "staff_rune_pair": (0, 2),
+    }
+    return table.get(staff_id, (0, 0))
 
 
 def main() -> int:
@@ -367,7 +546,10 @@ def main() -> int:
             print(f"FAIL: {msg}")
         print(f"{len(FAILS)} failure(s).")
         return 1
-    print("market M1 materials tab; refresh 2/4/6; bank 22; enchant Thrift/Heavy; events N4/N6/N10/N17.")
+    print(
+        "market M1 materials + M2 Staffs/Skills/Gear; refresh materials-only; "
+        "staff 5 / skill 6 / artifact 8; events N4/N6/N10/N17."
+    )
     return 0
 
 

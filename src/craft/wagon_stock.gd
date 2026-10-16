@@ -38,10 +38,24 @@ func add_material(mat_id: String) -> HandCard:
 	return card
 
 
+func add_skill(skill_id: String) -> HandCard:
+	var card := HandCard.make(skill_id, GameEnums.HandCardType.SKILL)
+	add(card)
+	return card
+
+
 func material_count() -> int:
 	var n := 0
 	for card in cards:
 		if card != null and card.type == GameEnums.HandCardType.MATERIAL:
+			n += 1
+	return n
+
+
+func skill_count() -> int:
+	var n := 0
+	for card in cards:
+		if card != null and card.type == GameEnums.HandCardType.SKILL:
 			n += 1
 	return n
 
