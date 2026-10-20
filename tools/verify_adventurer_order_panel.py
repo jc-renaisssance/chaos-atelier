@@ -10,6 +10,7 @@ import ast
 import pathlib
 import random
 import re
+import struct
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -271,10 +272,84 @@ def check_draw_and_jobs() -> None:
         fail("walk-in path must resolve named people from the 12")
 
 
+PORTRAIT_IDS = [
+    "adv_halden_rook",
+    "adv_vex_bramble",
+    "adv_solenne_ward",
+    "adv_quill_lumen",
+    "adv_neri_paleink",
+    "adv_marrowveil",
+    "adv_kite_thornreel",
+    "adv_mask_circlet",
+    "adv_whisper_hem",
+    "adv_tide_glass",
+    "adv_brine_latch",
+    "adv_rime_peddler",
+]
+
+
+def _fn_body(text: str, name: str) -> str:
+    marker = f"func {name}"
+    if marker not in text:
+        fail(f"missing {marker}")
+        return ""
+    return text.split(marker, 1)[-1].split("\nfunc ", 1)[0]
+
+
+def check_portraits() -> None:
+    """Order-detail socket loads the 12 stamped busts. Missing texture keeps name + job."""
+    table = (SRC / "ui" / "craft" / "craft_table.gd").read_text(encoding="utf-8")
+    if "TextureRect" not in table:
+        fail("order portrait socket must use TextureRect")
+    if "res://assets/adv/" not in table:
+        fail("order portrait must preload res://assets/adv/<adv_id>.png")
+    if "TEXTURE_FILTER_NEAREST" not in table:
+        fail("order portrait must use nearest-neighbor filter")
+    if "PORTRAIT_PX := 96" not in table:
+        fail("order portrait socket must be 96×96")
+    bind = _fn_body(table, "_bind_order_portrait")
+    if "AdventurerCatalog.resolve_id" not in bind:
+        fail("portrait lookup must resolve job-stub aliases onto the named row")
+    if "visible = tex != null" not in bind:
+        fail("missing portrait must hide the socket and leave name + job text")
+    refresh = _fn_body(table, "_refresh")
+    if "_bind_order_portrait" not in refresh:
+        fail("order refresh must bind the portrait socket")
+    if "_order_title.text" not in refresh:
+        fail("display name + job must stay on the order panel when the texture is missing")
+    brief = _fn_body(table, "_refresh_brief_and_estimate")
+    if "TextureRect" in brief or "assets/adv/" in brief:
+        fail("guild-quest brief stays text — no adventurer bust on the enemy brief")
+    for stub in ("adv_knight", "adv_mage", "adv_blade_dancer", "adv_lagoon"):
+        if f"res://assets/adv/{stub}.png" in table:
+            fail(f"job stub {stub} must not grow its own portrait file")
+    if "appt_" in _fn_body(table, "_portrait_socket") or "assets/adv/appt_" in table:
+        fail("Scrap Duelist / appt_* must not get a portrait")
+    icon_dir = ROOT / "assets" / "adv"
+    for adv_id in PORTRAIT_IDS:
+        rel = f"res://assets/adv/{adv_id}.png"
+        if rel not in table:
+            fail(f"order panel missing preload {rel}")
+        path = icon_dir / f"{adv_id}.png"
+        if not path.is_file():
+            fail(f"missing {path.relative_to(ROOT)}")
+            continue
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n":
+            fail(f"{adv_id}.png is not a PNG")
+            continue
+        if len(data) < 24:
+            fail(f"{adv_id}.png is truncated")
+            continue
+        width, height = struct.unpack(">II", data[16:24])
+        if (width, height) != (96, 96):
+            fail(f"{adv_id}.png is {width}x{height}, want 96x96")
+    for sidecar in icon_dir.glob("*.import"):
+        fail(f"do not commit Godot import sidecar {sidecar.name}")
+
+
 def check_panel_and_dump() -> None:
     table = (SRC / "ui" / "craft" / "craft_table.gd").read_text(encoding="utf-8")
-    if "TextureRect" in table:
-        fail("order panel must not use TextureRect / portraits")
     if "adventurer order detail" not in table:
         fail("upper-left caption should name adventurer order detail")
     for token in (
@@ -396,6 +471,7 @@ def run_spec() -> None:
 def main() -> int:
     check_catalog()
     check_draw_and_jobs()
+    check_portraits()
     check_panel_and_dump()
     check_godot_47()
     run_spec()
