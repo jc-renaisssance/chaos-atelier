@@ -1,3 +1,9 @@
+# Live status
+
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-20** against `dev` tip **`b540f51`**). Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note as current law. `main` is not promoted.
+
+---
+
 # Jonathan stamp — 2026-09-28 (Chaos Atelier)
 
 ## Locked

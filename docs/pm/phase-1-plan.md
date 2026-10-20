@@ -1,8 +1,10 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-16** after Grimmjow **market M2** Design ([32](../32-shop-and-events.md) — Staffs / Skills / Gear catalogs; Jonathan stamp pending). M1 market + events Design #44 + Client #45 stay closed. Prior 2026-10-13 route-map stamp (**route map with forks**; free per-day `E*` board from #36/#37 superseded) still holds. Prior 2026-10-05 stamp (M1 ugly full-experience Client + M2 Steam demo + **adventurers** terminology) still holds. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
+Updated **2026-10-20** against `origin/dev` tip **`b540f51`**. **M1 ugly full-experience is operationally exit-ready** at that tip. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf stays text `sk_*`. Shiny stays code-only. Tab chrome was skipped. **`main` is not promoted** (`353f1d4`, README seed only).
 
-See also: [STAMP](../STAMP.md), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
+Prior stamps still hold as history: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 superseded); **2026-10-05** M1 / M2 framing + **adventurers** terminology. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
+
+See also: [STAMP](../STAMP.md) (historical record; live law is this file), [00-doc-categories](../00-doc-categories.md), [README](../README.md).
 
 ---
 
@@ -12,13 +14,26 @@ Call shop / walk-in / appointment / boss-pool people **adventurers**. Do **not**
 
 **Client** = the Godot **Client** seat / codebase only.
 
-This PR locks the term in PM + STAMP. It does **not** mass-rename historical bible docs. Grimmjow owns deeper bible renames Later. One-line pointers: [03](../03-clients-and-adventure.md), [28](../28-boss-client-pool.md).
+The 2026-10-05 stamp locks the term in PM + STAMP. It does **not** mass-rename historical bible docs. Grimmjow owns deeper bible renames Later. One-line pointers: [03](../03-clients-and-adventure.md), [28](../28-boss-client-pool.md).
 
 ---
 
 ## Already on `dev`
 
-As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
+Tip **`b540f51`** (`origin/dev`). `main` stays at `353f1d4`.
+
+### Shipped PR track (closed — do not re-queue)
+
+| Track | PRs | On tip |
+|--------|-----|--------|
+| Market + events M1 (materials, refresh, chapter bank, material enchant, text `evt_*`) | #44 Design / #45 Client | Shipped |
+| Market M2 tabs Staffs / Skills / Gear | #46 Design / #47 Client | Shipped. Catalog law in [32](../32-shop-and-events.md) |
+| 13 stamped `staff_*` + `artifact_*` icons | #48 art / #49 Client wire | Shipped. Skills shelf still **text** `sk_*`. Shiny **code-only**. Tab chrome **skipped** |
+| Route-graph Client (ugly nodes + edges) | #40 Design / #41 Client | Shipped. Mid-pick card fix #43. Board **art** is not this track |
+| Interactive-order slices **1–3** + Dex | Design #28 · stamp #29 · Client #30 (slice 1) · #31 (Dex save) · #33 (slices 2–3) · #35 (Dex list) | Shipped ugly / text-first |
+| Adventurer catalog Design **4×3** | #28 · [29](../29-adventurer-catalog.md) | Design shipped (Knight, Mage, Blade Dancer, Lagoon × 3). Portraits are not this track |
+
+Earlier systems still on this tip (through `1082ef5` and the route-map rewrite):
 
 | Landed | Where |
 |--------|--------|
@@ -33,7 +48,7 @@ As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 | Owner = player clothier; Phase-1 = `own_basic` | `16` / `19` |
 | Win-con / reps / newspaper / mission report (docs) | `24` / `25` / `26` / `23` |
 
-**Jonathan confirmed 2026-10-05:** C1 **craft path works**. Shop systems and events were **not done yet** — Design now in [32](../32-shop-and-events.md) (this PR; **market** visit). Client still holds.
+**History (2026-10-05):** Jonathan confirmed C1 **craft path works**. Shop systems and events were not done yet **then**. That hole is closed on this tip (market M1 + M2 tabs above). Do not read “Client still holds” from the 2026-10-05 note.
 
 **Superseded (history only):** 1-of-3 card lineup, `CHAPTER_NODE_BUDGET=3` shop↔craft clock, default 2m1r slot UI, construction picker in craft, sequential per-piece stamina, auto-finish on `stamina_0`, fixed-client-per-boss, Round / schedule board as live UX (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8), `crafts_max=4` / cant_craft-at-max, free per-day `E*` options board (#36/#37), “hold Client until Cursor monthly reset.”
 
@@ -41,56 +56,81 @@ As of tip `1082ef5` (Client + Design stamps through 2026-10-02):
 
 ## Milestone 1 — Ugly full-experience Client (limited options)
 
-Fully developed **ugly** Client that ships the **full experience** with **limited content options**.
+**Exit:** operationally **ready** at `b540f51`. Fully developed **ugly** Client that ships the **full experience** with **limited content options**. No open M1 Design or M1 Client hold.
 
 | Lock | Note |
 |------|------|
-| Limited **adventurer jobs** | **LOCKED (Jonathan 2026-10-08):** M1 draw = **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). Wizard / Hexer / Outrider / Oathbound stay Later/M2. |
+| Limited **adventurer jobs** | **LOCKED (Jonathan 2026-10-08):** M1 draw = **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). Wizard / Hexer / Outrider / Oathbound stay Later until Jonathan opens an M2 catalog expansion. |
 | Limited **enemy types** | Same — Design stamps the cut. |
-| Shop adventurers | **More than one adventurer per job/class.** |
-| Catalog before wire | Define **stats / skills / requirement tags** first. Design catalog lands before Client wires people. |
-| Market + events | **M1 shipped** (#44 Design / #45 Client) — materials tab + refresh + chapter bank + **material enchant**. **M2 Design in this PR** — [32](../32-shop-and-events.md) Staffs / Skills / Gear catalogs (`staff_*` / `sk_*` / `artifact_*`). Jonathan stamp pending. **Ulquiorra holds the M2 Client** until that stamp. Szayelaporro after the M2 Client. Elite telegraph N5 + adventurer catalog stay parked. |
-| Art | Panels / partial armor fallbacks OK for M1. |
+| Shop adventurers | **More than one adventurer per job/class.** Met by the 4×3 catalog in `29`. |
+| Catalog before wire | Define **stats / skills / requirement tags** first. M1 catalog is [29](../29-adventurer-catalog.md). Client wires people from that catalog. |
+| Market + events | **Shipped.** M1 #44 / #45 — materials tab + refresh + chapter bank + **material enchant** + text `evt_*`. M2 tabs #46 / #47 — Staffs / Skills / Gear (`staff_*` / `sk_*` / `artifact_*`). Shelf icons #48 / #49 — 13 stamped `staff_*` + `artifact_*` only. |
+| Art | Panels / partial armor fallbacks OK for M1. M2 art leftovers are the Steam-demo queue below, not M1 blockers. |
 | Demo seed | Pinned demo seed = **optional**. |
 
 ### Interactive order pack (2026-10-05, text-first)
 
-| Slice | What |
-|------:|------|
-| 1 | Adventurer **stats/skills panel** on the order |
-| 2 | **Unlocked syn-target draft** under that panel — persist unlocks **across runs** |
-| 3 | **Enemy quest brief** + estimate/outcome window (extends Current/Potential; unlocked items shown, `?` if locked) |
-| 4 | After-craft **battle playback** (deterministic from mission resolver) then **posture art slots** — can follow 1–3 |
+| Slice | What | Tip |
+|------:|------|-----|
+| 1 | Adventurer **stats/skills panel** on the order | Shipped (Client #30) |
+| 2 | **Unlocked syn-target draft** under that panel — persist unlocks **across runs** | Shipped (Client #33; Dex save #31) |
+| 3 | **Enemy quest brief** + estimate/outcome window (extends Current/Potential; unlocked items shown, `?` if locked) | Shipped (Client #33) |
+| 4 | After-craft **battle playback** (deterministic from mission resolver) then **posture art slots** | **Parked.** Not an M1 blocker |
 
-Slices 1–3 are Design-then-Client. Slice 4 art (postures/posters) waits for Jonathan to open that lane for M1 **or** defer it to M2.
+Slices 1–3 are Design-then-Client and are on `dev`. Slice 4 waits until Jonathan opens that lane.
+
+### Parked — not M1 blockers
+
+- **Elite telegraph N5** — M1 graph stays type + id. Not required to call M1 exit-ready.
+- **Interactive-order slice 4** — battle playback + posture slots. Not required to call M1 exit-ready.
 
 ---
 
 ## Milestone 2 — Steam demo
 
-| Lock | Note |
+Ugly full-experience M1 is the base. Steam demo is **not** a new gameplay system. **Not** shipping the full game. PixelLab / Cursor treated as **fine** for this plan. Harribel watches burn.
+
+### Open queue (until M2)
+
+Document only. Do not invent catalogs, tabs, or mechanics beyond what is already stamped.
+
+| Item | Note |
 |------|------|
-| Ugly UI | Replaced / handled |
-| Art | Adventurer (and related Client) arts **mostly done** |
-| Remaining | Stat / event **tuning** + art gen **fill** |
-| Ship scope | **Not** shipping the full game this month |
-| Budget | PixelLab / Cursor treated as **fine** for this plan. Harribel watches burn. |
+| Market leftover art | **Tab chrome** and/or **6× `sk_*` icons**. Staff + artifact shelf icons already shipped (#48 / #49). Skills shelf stays text until this art lands. Shiny stays **code-only** — no shiny asset gens. |
+| Adventurer portraits / related Client arts | 4×3 people in `29` are Design-only on the page. Portraits and the Client arts that hang off them are this queue. |
+| Route-graph board art / Dex art | **Later** unless Jonathan pulls them up. Ugly graph (#41) and ugly Dex list (#35) already run. |
+| Stat / event tuning | After the playable M2 surface (tabs + leftover art above). Knobs stay knobs until a stamp says otherwise. |
+| M2 four-job catalog expansion | Wizard / Hexer / Outrider / Oathbound **only if Jonathan opens** it. Grimmjow does not start that Design unprompted. |
 
 ---
 
-## Sequence after this stamp merges
+## Sequence (until M2)
 
-1. **Grimmjow** — Design docs: limited M1 job set + multi-adventurer-per-job catalog (stats / skills / requirement tags) + interactive-order docs for slices **1–3**. **Landed:** [29-adventurer-catalog](../29-adventurer-catalog.md) · [30-interactive-order](../30-interactive-order.md) · [31-dex](../31-dex.md). **2026-10-08:** M1 4-job draw + estimate S–F bands-as-knobs stamped — PR #28 open questions closed. **2026-10-15:** market visit + event resolve M1 — [32](../32-shop-and-events.md) (#44 / Client #45). **2026-10-16:** market M2 tabs + catalogs — same `32` (this PR; Jonathan stamp pending).
-2. **Ulquiorra** — Client PRs **after** those Design stamps land. Do not invent catalog in Client. M1 market/event Client **#45 landed**. **Hold M2 tab Client** until Jonathan stamps this `32` revision. Do **not** invent reshape / owners / art / elite telegraph / staff-skill-gear enchant.
-3. **Szayelaporro** — Godot re-smoke **each** Client land. Market/event asserts after the market/event Client PR (sketch in `32` / `20`).
-4. **Slice 4 art** (postures/posters) — when Jonathan opens that lane for M1, or defers to M2.
+**Aizen** owns the until-M2 queue.
 
-This stamp is **docs only**. No game Client code in this drop.
+Jonathan stamps art and mechanism **1:1** (one stamp, one change).
+
+Seat order for each open item:
+
+1. **Grimmjow** — Design
+2. **Jonathan** — stamp
+3. **Nnoitra** — art (**Harribel** soft-gate before gens)
+4. **Ulquiorra** — Client
+5. **Szayelaporro** — smoke
+6. **Aizen** — merge
+
+Already through that lane on this tip (do not re-hold): market M1 #44 → #45; market M2 tabs #46 → #47; `staff_*` / `artifact_*` icons #48 → #49. Ulquiorra does **not** hold the M2 tab Client.
+
+This refresh is **docs only**. No game Client code in this drop.
 
 ---
 
 ## Park / Later (not M1 exit)
 
+- Elite telegraph N5
+- Interactive-order slice 4 (battle playback + posture art)
+- Route-graph board art / Dex art, unless Jonathan pulls them into the M2 queue
+- M2 four-job catalog (Wizard / Hexer / Outrider / Oathbound) until Jonathan opens it
 - Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
 - Full game ship (beyond Steam demo)
 - Grimmjow deeper bible “client” → adventurer renames
