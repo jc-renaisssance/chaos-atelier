@@ -1,7 +1,7 @@
 class_name DexScreen
 extends Control
 ## Ugly Dex list (docs/31). Shop / menu overlay. Read-only of the profile / meta save.
-## Tabs: Builds | Crafts | Adventurers | Enemies. No portraits, no lore, no write paths.
+## Tabs: Builds | Crafts | Adventurers | Enemies. Tab chips + met/seen row icons. No lore, no write paths.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -12,6 +12,44 @@ const PANEL := Color(0.165, 0.129, 0.094)
 const BORDER := Color(0.239, 0.204, 0.173)
 const TABS := ["Builds", "Crafts", "Adventurers", "Enemies"]
 const UNKNOWN := "?"
+const TAB_PX := 96
+const ROW_PX := 96
+## Market chrome A selected tint. One frame per tab; selected modulates it.
+const TAB_HOT := Color(1.08, 1.04, 0.82)
+## Stamped Dex tab faces (art #58). Missing preload → text button as #35.
+const TAB_ICONS := {
+	"Builds": preload("res://assets/dex/tab_builds.png"),
+	"Crafts": preload("res://assets/dex/tab_crafts.png"),
+	"Adventurers": preload("res://assets/dex/tab_adventurers.png"),
+	"Enemies": preload("res://assets/dex/tab_enemies.png"),
+}
+## Same busts as CraftTable.PORTRAITS. No second portrait set. No appt_* file.
+const PORTRAITS := {
+	"adv_halden_rook": preload("res://assets/adv/adv_halden_rook.png"),
+	"adv_vex_bramble": preload("res://assets/adv/adv_vex_bramble.png"),
+	"adv_solenne_ward": preload("res://assets/adv/adv_solenne_ward.png"),
+	"adv_quill_lumen": preload("res://assets/adv/adv_quill_lumen.png"),
+	"adv_neri_paleink": preload("res://assets/adv/adv_neri_paleink.png"),
+	"adv_marrowveil": preload("res://assets/adv/adv_marrowveil.png"),
+	"adv_kite_thornreel": preload("res://assets/adv/adv_kite_thornreel.png"),
+	"adv_mask_circlet": preload("res://assets/adv/adv_mask_circlet.png"),
+	"adv_whisper_hem": preload("res://assets/adv/adv_whisper_hem.png"),
+	"adv_tide_glass": preload("res://assets/adv/adv_tide_glass.png"),
+	"adv_brine_latch": preload("res://assets/adv/adv_brine_latch.png"),
+	"adv_rime_peddler": preload("res://assets/adv/adv_rime_peddler.png"),
+}
+## Enemy stamp A. Shown only when the row is already seen or fought.
+const BOSS_ICONS := {
+	"boss_ash_drake": preload("res://assets/dex/boss_ash_drake.png"),
+	"boss_salt_widow": preload("res://assets/dex/boss_salt_widow.png"),
+	"boss_rust_knave": preload("res://assets/dex/boss_rust_knave.png"),
+	"boss_mire_bride": preload("res://assets/dex/boss_mire_bride.png"),
+	"boss_bog_king": preload("res://assets/dex/boss_bog_king.png"),
+	"boss_pale_choir": preload("res://assets/dex/boss_pale_choir.png"),
+	"boss_gilded_warden": preload("res://assets/dex/boss_gilded_warden.png"),
+	"boss_ivory_judge": preload("res://assets/dex/boss_ivory_judge.png"),
+	"boss_sunspear_captain": preload("res://assets/dex/boss_sunspear_captain.png"),
+}
 
 signal closed
 
@@ -56,7 +94,7 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 8)
 	root.add_child(head)
-	_title = _label("DEX  ·  ugly list  ·  profile / meta  ·  no art", 22, GOLD)
+	_title = _label("DEX  ·  ugly list  ·  profile / meta", 22, GOLD)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_title)
 	head.add_child(_btn("Close", _on_close))
@@ -79,6 +117,7 @@ func _build() -> void:
 	for tab in TABS:
 		var tab_name := String(tab)
 		var chip := _btn(tab_name, _on_tab.bind(tab_name))
+		_apply_tab_icon(chip, tab_name)
 		_tab_row.add_child(chip)
 		_tab_buttons[tab_name] = chip
 
@@ -93,6 +132,7 @@ func _build() -> void:
 	_list = ItemList.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_list.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	list_panel.add_child(_list)
 
 
@@ -113,7 +153,9 @@ func refresh() -> void:
 func _refresh_tabs() -> void:
 	for tab in _tab_buttons.keys():
 		var chip: Button = _tab_buttons[tab]
-		chip.disabled = String(tab) == _tab
+		var on := String(tab) == _tab
+		chip.disabled = on
+		chip.modulate = TAB_HOT if on else Color.WHITE
 
 
 func _source_line() -> String:
@@ -134,12 +176,25 @@ func _rebuild_list() -> void:
 	if _list == null:
 		return
 	_list.clear()
+	## Row icons are 96 only on the tabs that have them. Builds / Crafts stay text-height.
+	if _tab == "Adventurers" or _tab == "Enemies":
+		_list.fixed_icon_size = Vector2(ROW_PX, ROW_PX)
+	else:
+		_list.fixed_icon_size = Vector2.ZERO
 	var lines: PackedStringArray = _lines_for_tab(_tab)
+	var icons: Array = _icons_for_tab(_tab)
 	if lines.is_empty():
 		_list.add_item(UNKNOWN)
 		return
-	for line in lines:
-		_list.add_item(String(line))
+	for i in lines.size():
+		var tex: Texture2D = null
+		if i < icons.size():
+			var found: Variant = icons[i]
+			tex = found as Texture2D
+		if tex != null:
+			_list.add_item(String(lines[i]), tex)
+		else:
+			_list.add_item(String(lines[i]))
 
 
 func _lines_for_tab(tab: String) -> PackedStringArray:
@@ -289,6 +344,69 @@ func _enemy_row(threat_id: String) -> Dictionary:
 		if String(item.get("threat_id", "")) == threat_id:
 			return item
 	return {}
+
+
+func _icons_for_tab(tab: String) -> Array:
+	match tab:
+		"Adventurers":
+			return _adventurer_icons()
+		"Enemies":
+			return _enemy_icons()
+		_:
+			## Builds and Crafts rows stay text. No outlook / con_* icon.
+			return []
+
+
+func _adventurer_icons() -> Array:
+	var icons: Array = []
+	var ids := AdventurerCatalog.all_named_ids()
+	for raw in ids:
+		var adv_id := String(raw)
+		if adv_id.is_empty() or adv_id.begins_with("appt_"):
+			continue
+		icons.append(_adventurer_icon(adv_id, _adventurer_row(adv_id)))
+	return icons
+
+
+func _adventurer_icon(adv_id: String, row: Dictionary) -> Texture2D:
+	## Unmet stays ? with no bust. Missing png on a met row → text line only.
+	if adv_id.is_empty() or adv_id.begins_with("appt_"):
+		return null
+	if row.is_empty() or not bool(row.get("met", false)):
+		return null
+	var found: Variant = PORTRAITS.get(adv_id)
+	return found as Texture2D
+
+
+func _enemy_icons() -> Array:
+	var icons: Array = []
+	for raw in ThreatCatalog.BOSSES.keys():
+		var threat_id := String(raw)
+		if threat_id.is_empty() or not ThreatCatalog.is_boss(threat_id):
+			continue
+		icons.append(_enemy_icon(threat_id, _enemy_row(threat_id)))
+	return icons
+
+
+func _enemy_icon(threat_id: String, row: Dictionary) -> Texture2D:
+	## Stamp A: icon only when the row already shows a name (seen or fought).
+	var seen := bool(row.get("seen", false))
+	var fought := bool(row.get("fought", false))
+	if not seen and not fought:
+		return null
+	var found: Variant = BOSS_ICONS.get(threat_id)
+	return found as Texture2D
+
+
+func _apply_tab_icon(chip: Button, tab_name: String) -> void:
+	chip.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var found: Variant = TAB_ICONS.get(tab_name)
+	var tex: Texture2D = found as Texture2D
+	if tex == null:
+		return
+	chip.icon = tex
+	chip.expand_icon = false
+	chip.add_theme_constant_override("icon_max_width", TAB_PX)
 
 
 func _label(text: String, size: int, color: Color) -> Label:

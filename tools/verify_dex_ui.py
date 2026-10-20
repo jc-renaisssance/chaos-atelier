@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import pathlib
 import re
+import struct
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -209,8 +210,9 @@ def check_source() -> None:
         fail("TABS must be an array-literal const (Godot 4.7)")
     if "ItemList" not in dex:
         fail("Dex must use a scroll list (ItemList) — keep it ugly")
-    if "TextureRect" in dex or "TextureRect" in tscn:
-        fail("Dex must not use TextureRect / portraits")
+    if "TextureRect" in tscn:
+        fail("dex scene must stay the Control script — row art uses ItemList icons")
+    check_dex_art(dex)
     if "Fashion Encyclopedia" in dex or "Fashion Encyclopedia" in board:
         fail("Fashion Encyclopedia chrome is M2 — not this PR")
     if "profile.unlocked_builds" not in dex or "PlannerCatalog.list_lines" not in dex:
@@ -316,6 +318,78 @@ def check_variant_infer() -> None:
                     f"{rel}:{i} var x := …() infers Variant — Godot 4.7.2 warning-as-error "
                     "(use var x: Variant = …)"
                 )
+
+
+def check_dex_art(dex: str) -> None:
+    """Tab chips, met adv busts, and seen/fought enemy icons on the #35 list."""
+    for slug in ("builds", "crafts", "adventurers", "enemies"):
+        rel = f"res://assets/dex/tab_{slug}.png"
+        if rel not in dex:
+            fail(f"Dex tab missing preload {rel}")
+    if "TAB_PX := 96" not in dex or "ROW_PX := 96" not in dex:
+        fail("Dex tab and row icons must be 96×96")
+    if "TEXTURE_FILTER_NEAREST" not in dex:
+        fail("Dex icons must use nearest-neighbor filter")
+    if "chip.icon" not in dex:
+        fail("tab texture must sit on the existing tab button")
+    tabs = dex.split("func _refresh_tabs", 1)[-1].split("\nfunc ", 1)[0]
+    if "modulate" not in tabs:
+        fail("selected Dex tab must modulate the one texture")
+    if "disabled" not in tabs:
+        fail("selected tab must keep the existing disabled treatment")
+    if "func _adventurer_icon(" not in dex or "func _enemy_icon(" not in dex:
+        fail("Dex row icons need _adventurer_icon and _enemy_icon")
+    adv_icon = dex.split("func _adventurer_icon(", 1)[-1].split("\nfunc ", 1)[0]
+    before_bust = adv_icon.split("PORTRAITS.get", 1)[0]
+    if "return null" not in before_bust or 'not bool(row.get("met"' not in before_bust:
+        fail("unmet adventurer rows must stay text with no bust")
+    if 'begins_with("appt_")' not in adv_icon:
+        fail("Scrap Duelist / appt_* must not get a Dex bust")
+    if "res://assets/adv/appt_" in dex:
+        fail("do not preload an appt_* bust")
+    for adv_id in PEOPLE:
+        rel = f"res://assets/adv/{adv_id}.png"
+        if rel not in dex:
+            fail(f"met adventurer row must reuse {rel}")
+    enemy_icon = dex.split("func _enemy_icon(", 1)[-1].split("\nfunc ", 1)[0]
+    before_boss = enemy_icon.split("BOSS_ICONS.get", 1)[0]
+    if "not seen and not fought" not in before_boss or "return null" not in before_boss:
+        fail("unseen enemy rows must stay ? with no icon")
+    for boss_id in BOSSES:
+        rel = f"res://assets/dex/{boss_id}.png"
+        if rel not in dex:
+            fail(f"enemy row missing preload {rel}")
+    icons_fn = dex.split("func _icons_for_tab", 1)[-1].split("\nfunc ", 1)[0]
+    if "return []" not in icons_fn:
+        fail("Builds and Crafts rows must stay text")
+    build_fn = dex.split("func _build_lines", 1)[-1].split("\nfunc ", 1)[0]
+    craft_fn = dex.split("func _craft_lines", 1)[-1].split("\nfunc ", 1)[0]
+    for body, name in ((build_fn, "Builds"), (craft_fn, "Crafts")):
+        if "PORTRAITS" in body or "BOSS_ICONS" in body or "assets/" in body:
+            fail(f"{name} rows must not grow icons")
+    if "Fashion Encyclopedia" in dex:
+        fail("Fashion Encyclopedia chrome is M2 — not this PR")
+    dex_dir = ROOT / "assets" / "dex"
+    for name in (
+        "tab_builds",
+        "tab_crafts",
+        "tab_adventurers",
+        "tab_enemies",
+        *BOSSES,
+    ):
+        path = dex_dir / f"{name}.png"
+        if not path.is_file():
+            fail(f"missing {path.relative_to(ROOT)}")
+            continue
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n" or len(data) < 24:
+            fail(f"{name}.png is not a PNG")
+            continue
+        width, height = struct.unpack(">II", data[16:24])
+        if (width, height) != (96, 96):
+            fail(f"{name}.png is {width}x{height}, want 96x96")
+    for sidecar in dex_dir.glob("*.import"):
+        fail(f"do not commit Godot import sidecar {sidecar.name}")
 
 
 def check_spec() -> None:
