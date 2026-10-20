@@ -1,8 +1,9 @@
 class_name MarketScreen
 extends Control
 ## Ugly M2 market shell — Materials / Staffs / Skills / Gear (docs/32).
-## Staffs and Gear shelves show stamped assets/m2-market icons. Skills stay sk_* text.
-## Enchant + refresh stay materials-only. Shiny tint stays on enchanted mats.
+## Staffs, Skills, and Gear shelves show stamped assets/m2-market icons.
+## Skill deck rows stay sk_* text. Enchant + refresh stay materials-only.
+## Shiny tint stays on enchanted mats.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -15,7 +16,7 @@ const SHINE := Color(0.95, 0.82, 0.22, 0.38)
 const CHIP := Color(0.227, 0.173, 0.094)
 const TAB_ON := Color(0.35, 0.28, 0.1)
 const SHELF_ICON_PX := 96
-## Stamped Pro Flash icons (assets PR #48). PNG-only; Godot imports locally.
+## Stamped Pro Flash icons (staff/artifact #48, skills #52). PNG-only; Godot imports locally.
 const SHELF_ICONS := {
 	"staff_apprentice": preload("res://assets/m2-market/staff_apprentice.png"),
 	"staff_rune_desk": preload("res://assets/m2-market/staff_rune_desk.png"),
@@ -30,6 +31,12 @@ const SHELF_ICONS := {
 	"artifact_stamp_case": preload("res://assets/m2-market/artifact_stamp_case.png"),
 	"artifact_road_charm": preload("res://assets/m2-market/artifact_road_charm.png"),
 	"artifact_oil_rag": preload("res://assets/m2-market/artifact_oil_rag.png"),
+	"sk_next_mat_free": preload("res://assets/m2-market/sk_next_mat_free.png"),
+	"sk_touch_up": preload("res://assets/m2-market/sk_touch_up.png"),
+	"sk_steady_hand": preload("res://assets/m2-market/sk_steady_hand.png"),
+	"sk_metal_str_double": preload("res://assets/m2-market/sk_metal_str_double.png"),
+	"sk_wild_to_earth": preload("res://assets/m2-market/sk_wild_to_earth.png"),
+	"sk_deep_dig": preload("res://assets/m2-market/sk_deep_dig.png"),
 }
 
 var _title: Label
@@ -407,6 +414,7 @@ func _skill_shelf_row(offer: Dictionary) -> Control:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
+	box.add_child(_shelf_icon(skill_id))
 	var lab := _label(
 		"%s     $%d   own %d   %s" % [skill_id, price, own, CraftCatalog.skill_blurb(skill_id)],
 		13,
