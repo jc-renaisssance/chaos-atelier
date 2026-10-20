@@ -1,6 +1,8 @@
 # M1 adventurer catalog
 
-**Doc id: `29`.** Design only — no Client / Godot / art this stamp. Grimmjow 2026-10-05. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
+**Status:** Portrait sockets **Design-ready** for Jonathan stamp (2026-10-20). The **12** named M1 people stay the 2026-10-05 / 2026-10-08 roster — no new people this revision. Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it.
+
+**Doc id: `29`.** Grimmjow 2026-10-05. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Internal ids stay (`boss_client_id`, `con_*`, `appt_*`, `adv_*`, `ord_*`, `job_*`) so saves and Test smokes do not churn. Do not mass-rename existing ids. Scrap Duelist stays `appt_*`.
 
@@ -390,7 +392,72 @@ Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field —
 
 ## Ugly-Client
 
-No portraits, no poster art, no posture sheets this stamp. Names + job + stats + skill line + tag line + `boss_*` brief id are enough. Slice UI: [30](30-interactive-order.md).
+Text-first stays legal. Names + job + stats + skill line + tag line + `boss_*` brief id are enough until a portrait file exists. Slice UI stays [30](30-interactive-order.md) — do not invent interactive-order beyond that ugly panel. No poster art. No posture sheets.
+
+Portrait sockets (one per surface that already shows a person) are [below](#portrait-sockets-2026-10-20).
+
+---
+
+## Portrait sockets (2026-10-20)
+
+**Status:** Grimmjow brief for Jonathan stamp. No new people, no new jobs, no gens in this PR. First wave is the **12** named M1 `adv_*` already in this catalog. Job stubs and M2 jobs are not a wave.
+
+### Socket count
+
+**One portrait socket** on each adventurer UI surface that shows a person. Same `adv_id` file fills whichever of these is on screen. Do not add a gallery, a second bust, or a new screen.
+
+| Surface | Where the person already shows | Socket |
+|---|---|---|
+| Order detail | [30](30-interactive-order.md) slice 1 order panel | One bust of the adventurer on the order |
+| Boss brief | Boss-beat panel of the drawn named `adv_*` (this catalog’s draw / `30`) | One bust of **that adventurer**. The boss they fight stays [17](17-chapter-bosses.md) — no boss portrait this stamp |
+| Shop walk-in | A walk-in order that shows one of the 12 | One bust of that adventurer |
+
+Text-first UI on these surfaces stays legal until the file exists.
+
+### First wave — these 12 only
+
+Not the job stubs (`adv_knight`, `adv_mage`, `adv_blade_dancer`, `adv_lagoon`). Not Wizard / Hexer / Outrider / Oathbound. Not Scrap Duelist (`appt_scrap_duelist`).
+
+| Job | `adv_id` | Display |
+|---|---|---|
+| Knight | `adv_halden_rook` | Ser Halden Rook |
+| Knight | `adv_vex_bramble` | Vex Bramble |
+| Knight | `adv_solenne_ward` | Dame Solenne Ward |
+| Mage | `adv_quill_lumen` | Quill Lumen |
+| Mage | `adv_neri_paleink` | Neri Pale-Ink |
+| Mage | `adv_marrowveil` | Sister Marrowveil |
+| Blade Dancer | `adv_kite_thornreel` | Kite Thornreel |
+| Blade Dancer | `adv_mask_circlet` | Mask Circlet |
+| Blade Dancer | `adv_whisper_hem` | Whisper Hem |
+| Lagoon | `adv_tide_glass` | Tide Glass |
+| Lagoon | `adv_brine_latch` | Brine Latch |
+| Lagoon | `adv_rime_peddler` | Rime Peddler |
+
+### Art cut — Design default for stamp
+
+Same PixelLab grain as the stamped market shelf icons and the armor packs: **Pro Flash, soft-stipple, one 96×96 canvas**. A bust uses that canvas (head and shoulders, one front view) so this wave does not open a second size. Jonathan stamps this default, or writes a different canvas on the stamp line. This PR does not gen.
+
+| | |
+|---|---|
+| Tool / grain | PixelLab **Pro Flash 96×96 soft-stipple** portrait bust |
+| Subject | Head and shoulders, one front view, of that named person |
+| Leave out of the PNG | Card frame. Shiny overlay. Posture sheet. Direction sheet. Outfit-transfer sheet |
+| Path | `assets/adv/<adv_id>.png` |
+| Wire path | `res://assets/adv/<adv_id>.png` |
+
+### Wire contract (Ulquiorra — after stamp, not this PR)
+
+Placeholder on each socket = **display name + job** (already on the ugly panel). When `res://assets/adv/<adv_id>.png` exists, show it in a `TextureRect` on that socket. Missing file → text only. Do not require the png for the panel to function. Do not invent interactive-order beyond the existing ugly UI. Job-stub ids do not grow their own files; the alias still resolves to the named row (`adv_knight` → `adv_halden_rook`, and the same for the other three jobs).
+
+### Explicit non-goals (this stamp)
+
+- Posture sheets
+- Battle playback art (`30` slice 4 stays Later)
+- Named people for Wizard / Hexer / Outrider / Oathbound, and any portrait for those jobs
+- Scrap Duelist portraits (or any `appt_*`)
+- Portraits for job stubs (`adv_knight` and the other aliases)
+- Boss / enemy portraits
+- Gens, Client, or Godot in this Design PR
 
 ---
 
@@ -400,9 +467,10 @@ No portraits, no poster art, no posture sheets this stamp. Names + job + stats +
 - Scrap Duelist (or any `appt_*`) as a boss-pool adventurer
 - Inventing `con_*` or a fifth M1 job
 - Wiring catalog in Client this PR
-- Slice 4 battle playback / posture art (`30` Later)
+- Slice 4 battle playback / posture art (`30` Later) — portrait sockets above are one bust, not playback
 - Named people for Wizard / Hexer / Outrider / Oathbound
 - Drawing Wizard / Hexer / Outrider / Oathbound in M1 (or 8-job draw + job-stub fallback) — **LOCKED** out (Jonathan 2026-10-08)
+- Scrap Duelist or job-stub portraits (first wave = the 12 named `adv_*` only)
 
 ---
 
@@ -418,3 +486,5 @@ No portraits, no poster art, no posture sheets this stamp. Names + job + stats +
 - Craft Finish: [27-craft-mode-stamina](27-craft-mode-stamina.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
 - PM: [pm/phase-1-plan](pm/phase-1-plan.md)
+- Market (closed M1; skills icons + tab chrome live there): [32-shop-and-events](32-shop-and-events.md)
+- Art pointer: [05-art](05-art.md)
