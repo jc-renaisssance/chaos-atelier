@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-20** against `origin/dev` tip **`b540f51`**. **M1 ugly full-experience is operationally exit-ready** at that tip. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf stays text `sk_*`. Shiny stays code-only. Tab chrome was skipped. **`main` is not promoted** (`353f1d4`, README seed only).
+Updated **2026-10-20** against `origin/dev` tip **`9aaeee3`**. **M1 ugly full-experience is operationally exit-ready** at that tip. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only).
 
 Prior stamps still hold as history: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 superseded); **2026-10-05** M1 / M2 framing + **adventurers** terminology. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
@@ -20,7 +20,7 @@ The 2026-10-05 stamp locks the term in PM + STAMP. It does **not** mass-rename h
 
 ## Already on `dev`
 
-Tip **`b540f51`** (`origin/dev`). `main` stays at `353f1d4`.
+Tip **`9aaeee3`** (`origin/dev`). `main` stays at `353f1d4`.
 
 ### Shipped PR track (closed — do not re-queue)
 
@@ -28,10 +28,12 @@ Tip **`b540f51`** (`origin/dev`). `main` stays at `353f1d4`.
 |--------|-----|--------|
 | Market + events M1 (materials, refresh, chapter bank, material enchant, text `evt_*`) | #44 Design / #45 Client | Shipped |
 | Market M2 tabs Staffs / Skills / Gear | #46 Design / #47 Client | Shipped. Catalog law in [32](../32-shop-and-events.md) |
-| 13 stamped `staff_*` + `artifact_*` icons | #48 art / #49 Client wire | Shipped. Skills shelf still **text** `sk_*`. Shiny **code-only**. Tab chrome **skipped** |
+| 13 stamped `staff_*` + `artifact_*` icons | #48 art / #49 Client wire | Shipped. Shiny **code-only** |
+| Skills shelf (`sk_*` faces) | #51 Design / #52 art / #53 Client | Shipped. Tab chrome stamped **A** (no gens) |
+| Adventurer portraits (12 M1 `adv_*`) | #54 art / #55 Client | Shipped |
 | Route-graph Client (ugly nodes + edges) | #40 Design / #41 Client | Shipped. Mid-pick card fix #43. Board **art** is not this track |
 | Interactive-order slices **1–3** + Dex | Design #28 · stamp #29 · Client #30 (slice 1) · #31 (Dex save) · #33 (slices 2–3) · #35 (Dex list) | Shipped ugly / text-first |
-| Adventurer catalog Design **4×3** | #28 · [29](../29-adventurer-catalog.md) | Design shipped (Knight, Mage, Blade Dancer, Lagoon × 3). Portraits are not this track |
+| Adventurer catalog Design **4×3** | #28 · [29](../29-adventurer-catalog.md) | Design shipped (Knight, Mage, Blade Dancer, Lagoon × 3). Portraits are the #54 / #55 track |
 
 Earlier systems still on this tip (through `1082ef5` and the route-map rewrite):
 
@@ -56,7 +58,7 @@ Earlier systems still on this tip (through `1082ef5` and the route-map rewrite):
 
 ## Milestone 1 — Ugly full-experience Client (limited options)
 
-**Exit:** operationally **ready** at `b540f51`. Fully developed **ugly** Client that ships the **full experience** with **limited content options**. No open M1 Design or M1 Client hold.
+**Exit:** operationally **ready** at `9aaeee3`. Fully developed **ugly** Client that ships the **full experience** with **limited content options**. No open M1 Design or M1 Client hold.
 
 | Lock | Note |
 |------|------|
@@ -64,8 +66,8 @@ Earlier systems still on this tip (through `1082ef5` and the route-map rewrite):
 | Limited **enemy types** | Same — Design stamps the cut. |
 | Shop adventurers | **More than one adventurer per job/class.** Met by the 4×3 catalog in `29`. |
 | Catalog before wire | Define **stats / skills / requirement tags** first. M1 catalog is [29](../29-adventurer-catalog.md). Client wires people from that catalog. |
-| Market + events | **Shipped.** M1 #44 / #45 — materials tab + refresh + chapter bank + **material enchant** + text `evt_*`. M2 tabs #46 / #47 — Staffs / Skills / Gear (`staff_*` / `sk_*` / `artifact_*`). Shelf icons #48 / #49 — 13 stamped `staff_*` + `artifact_*` only. |
-| Art | Panels / partial armor fallbacks OK for M1. M2 art leftovers are the Steam-demo queue below, not M1 blockers. |
+| Market + events | **Shipped.** M1 #44 / #45 — materials tab + refresh + chapter bank + **material enchant** + text `evt_*`. M2 tabs #46 / #47 — Staffs / Skills / Gear (`staff_*` / `sk_*` / `artifact_*`). Shelf icons #48 / #49 — 13 stamped `staff_*` + `artifact_*`. Skills shelf #51 / #52 / #53. Tab chrome stamped **A** (no gens). |
+| Art | Panels / partial armor fallbacks OK for M1. Skills shelf and adventurer portraits shipped (#51–#55; chrome **A**). Remaining M2 art is the Steam-demo queue below, not an M1 blocker. |
 | Demo seed | Pinned demo seed = **optional**. |
 
 ### Interactive order pack (2026-10-05, text-first)
@@ -96,10 +98,8 @@ Document only. Do not invent catalogs, tabs, or mechanics beyond what is already
 
 | Item | Note |
 |------|------|
-| Market leftover art | **Tab chrome** and/or **6× `sk_*` icons**. Staff + artifact shelf icons already shipped (#48 / #49). Skills shelf stays text until this art lands. Shiny stays **code-only** — no shiny asset gens. |
-| Adventurer portraits / related Client arts | 4×3 people in `29` are Design-only on the page. Portraits and the Client arts that hang off them are this queue. |
-| Route-graph board art / Dex art | **Later** unless Jonathan pulls them up. Ugly graph (#41) and ugly Dex list (#35) already run. |
-| Stat / event tuning | After the playable M2 surface (tabs + leftover art above). Knobs stay knobs until a stamp says otherwise. |
+| Route-graph board art + Dex art | **Open** (Aizen, 2026-10-20). Grimmjow Design in flight. Ugly graph (#41) and ugly Dex list (#35) already run. |
+| Stat / event tuning | Knobs stay knobs until a stamp says otherwise. |
 | M2 four-job catalog expansion | Wizard / Hexer / Outrider / Oathbound **only if Jonathan opens** it. Grimmjow does not start that Design unprompted. |
 
 ---
@@ -119,7 +119,7 @@ Seat order for each open item:
 5. **Szayelaporro** — smoke
 6. **Aizen** — merge
 
-Already through that lane on this tip (do not re-hold): market M1 #44 → #45; market M2 tabs #46 → #47; `staff_*` / `artifact_*` icons #48 → #49. Ulquiorra does **not** hold the M2 tab Client.
+Already through that lane on this tip (do not re-hold): market M1 #44 → #45; market M2 tabs #46 → #47; `staff_*` / `artifact_*` icons #48 → #49; skills shelf #51 → #52 → #53; adventurer portraits #54 → #55 (tab chrome stamped **A**, no gens). Ulquiorra does **not** hold the M2 tab Client. **Open:** route-graph board art + Dex art (Aizen 2026-10-20; Grimmjow Design in flight).
 
 This refresh is **docs only**. No game Client code in this drop.
 
@@ -129,7 +129,6 @@ This refresh is **docs only**. No game Client code in this drop.
 
 - Elite telegraph N5
 - Interactive-order slice 4 (battle playback + posture art)
-- Route-graph board art / Dex art, unless Jonathan pulls them into the M2 queue
 - M2 four-job catalog (Wizard / Hexer / Outrider / Oathbound) until Jonathan opens it
 - Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
 - Full game ship (beyond Steam demo)
