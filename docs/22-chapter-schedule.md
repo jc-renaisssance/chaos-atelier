@@ -1,6 +1,6 @@
 # Chapter route map — travelling atelier (Jonathan stamp 2026-10-13)
 
-**Status:** Design stamped. **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`).
+**Status:** Design stamped. **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). **Route-graph board art (2026-10-20)** below opens kind-face sockets on that board. It does not add a screen and does not answer the elite-telegraph question.
 
 **Supersedes** the free per-day **`E*` options board** from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) (preview every windowed event per day, assign D1..(N−2) from an identical-shaped list). **Still superseded:** 2026-09-28 Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`); 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)).
 
@@ -286,7 +286,7 @@ Labels are **D1..DN** — never R1. The live board is the **authored route graph
 
 **No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1 / draft-only future.
 
-**M1 copy:** type + id only. Wire type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. **Display** `shop` as **market** (`market · N2`). Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph.
+**M1 copy:** type + id only. Wire type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. **Display** `shop` as **market** (`market · N2`). Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph. Kind-face sockets (one chip per kind, not an elite marker) are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20).
 
 ### Mid-chapter
 
@@ -310,7 +310,7 @@ Phase-1: **one** primary action per day.
 - Pool is **shared across all bosses / chapters**, by **job title**. Draw is **independent** of `chapter_boss_id`. Order constructions are the listed `con_*` for that job.
 - Boss fail (boss-client / adventurer dead / hard loss): **`run_over`**, no retry (Phase-1 hardcore).
 - **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client. Do not pin Scrap Duelist to reserved days or the boss beat. Do **not** put `appt_*` on the Dex Adventurers tab (`31`).
-- Portraits / UI widgets = **Later**. Job catalog is stamped in `28` — do not invent Godot scenes or art.
+- Boss-fight portraits and extra battle widgets stay **Later**. Named adventurer busts already landed (`assets/adv/`, #54 / #55) — do not reopen them and do not put those busts on route nodes. Kind-face sockets are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20). Job catalog stays `28`.
 
 ---
 
@@ -321,7 +321,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 1. **No piece cap.** Do not block craft when `crafts_done` is high. Do not show a 4/4 garments meter. Do not emit `crafts_max`. Do not fire `cant_craft` because of piece count.
 2. **Day labels.** Timeline says **D1..DN** (N = `map.day_count`). Never R1. Current map N=8.
 3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
-4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp.
+4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp. **Shipped:** ugly layout Client #41 (`144c151`). Kind-face sockets for that layout are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20). Wire them only after Jonathan stamps. Do not build a second board.
 5. **Route graph data.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
 6. **Options panel only at a current choice.** Fork or unbound remaining picks **on the current day**: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` / `evt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past, draft-only future).
 7. **Draft future.** Player may ghost a legal unbound path. Draft is **not** a confirm. Confirm when that day is current. Do not write drafts into `route_path`.
@@ -390,7 +390,8 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 - Prep-craft / rest-dig nodes on the C1 sample
 - Pre-assigning the whole chapter at start from a pool
 - Treating a drafted future node as confirmed (`route_path` / `day_action`)
-- Day-strip-only M1 board (graph layout is required; art Later)
+- Day-strip-only M1 board (graph layout is required; kind-face sockets are the 2026-10-20 section, not a new board)
+- Edge-texture gens, painted per-state frames, elite-telegraph art, named busts on nodes (see the art section)
 
 ## Supersedes
 
@@ -401,11 +402,76 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 - `crafts_max=4` garments / chapter; `cant_craft` when `crafts_done == crafts_max`
 - 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)) — still history
 
+## Route-graph board art (2026-10-20)
+
+**Status:** Grimmjow Design-ready for Jonathan stamp. Docs only. No `src/` / Godot / art gens in this PR. Ugly graph already shipped (Client #41, `144c151`): columns by day, one card per authored node, edges as `draw_line`. This section opens **kind-face sockets on that card**. It does not add a screen, a day strip, or a second graph.
+
+Market leftovers stay **closed**. Tab chrome **A** (text strip), six `sk_*`, and the twelve `assets/adv/` busts have landed. Do not reopen them here.
+
+`20` is unchanged. No new dump keys. A missing png keeps the ugly card (type + id + `ref_id`).
+
+### What the shipped card already is
+
+`RouteNodeView` minimum **108×72**. Three text lines: `node_id`, display kind, `ref_id` when set. `display_kind()` returns **market** when wire `kind=shop`, otherwise the wire kind. State is a `StyleBoxFlat` plus ink color. Flags passed today: current, past (on `route_path`, not current), draft, cut, fork (offered next), bound (`bound_block_id` set), and reserved kind. Edges (`RouteGraphView._draw`): idle, on-path, draft, bind pair, cut — color and width only.
+
+C1 reserved nodes **R7** / **R8** are real `kind=reserved` cards. Day-column headers (`D1` … `D8  boss approach`) stay text.
+
+### Kind faces — lock
+
+**Five** files. One language for every node of that kind. Generic marks. Not named people, not event illustrations, not the market shelf.
+
+| Wire `kind` | Display (`display_kind()`) | File | Subject |
+|---|---|---|---|
+| `shop` | market | `assets/route/kind_market.png` | Wagon-counter / stall mark. No shopkeeper |
+| `adventurer` | adventurer | `assets/route/kind_adventurer.png` | Generic traveler mark. Not a named bust |
+| `appointment` | appointment | `assets/route/kind_appointment.png` | Sealed-appointment mark. Not Scrap Duelist. Not an elite telegraph |
+| `event` | event | `assets/route/kind_event.png` | Wayside-sign mark. Not an `evt_*` illustration |
+| `reserved` | reserved | `assets/route/kind_reserved.png` | Closed-road mark for R7 / R8 |
+
+Leave out of every PNG: node id, day number, `ref_id`, card frame, state border, shiny, portrait, elite skull.
+
+Wire path: `res://assets/route/kind_<display_kind()>.png`. There is no `kind_shop.png`.
+
+**Canvas — Jonathan writes A or B** (also on the [STAMP](STAMP.md) card). House grain stays Pro Flash soft-stipple.
+
+- **A (Design default).** Pro Flash **96×96**. Same canvas as shelf icons and `assets/adv/` busts. Client **scales** the texture into the existing 108×72 card. No second PixelLab size.
+- **B.** A second size: Pro Flash **48×48** kind chips, one frame, meant to sit in that 108×72 card without scaling a 96. **Silence is not B.**
+
+Type + id + `ref_id` **stay**. Fancy titles stay Later. The chip does not replace the label.
+
+### State chrome — accept the default
+
+**One painted frame per kind.** Current, draft, frozen, cut, and fork are **Client modulate** on that frame, plus the borders the ugly board already draws. Same pattern as market tab chrome **A** (selected = modulate, no second painted frame).
+
+Frozen on this board is the flags the ugly card already receives: **past** (on `route_path`, not current) and **bound** (`bound_block_id` set). Do not add a `frozen` enum or a new dump key.
+
+Silence keeps modulate. Painted per-state frames (a second file per flag) are not a socket in this packet.
+
+### Edges — accept the default
+
+No edge png. Keep `draw_line`. Path, draft, bind, cut, and idle stay color and width. Silence keeps lines.
+
+### Wire contract (Ulquiorra — after stamp, not this PR)
+
+On each existing `RouteNodeView`, when `res://assets/route/kind_<display_kind()>.png` is present, show it in a `TextureRect` on that card. Keep the three text lines. Missing file → card as shipped in #41. Scale (size **A**) or place the 48×48 (size **B**) inside the card. Modulate the one texture with the flags `bind()` already receives. Do not add a texture per flag. Do not load `assets/adv/` onto a node. Do not add an elite marker on **N5**. Edges stay `draw_line`.
+
+### Explicit non-goals (this section)
+
+- A new board, day strip, or map screen
+- Named `adv_*` busts on nodes (those files stay the order socket and, when met, the Dex row)
+- Scrap Duelist portrait, owner chrome, shopkeeper portrait
+- Elite telegraph art for N5 — open question below stays **open**
+- Edge textures; painted current / draft / frozen / cut / fork frames
+- Market tab chrome, `sk_*` shelf faces, portrait regen
+- Posture sheets, interactive-order slice 4, M2 four-job people
+- Shiny gens
+- Gens, Client, or Godot in this Design PR
+
 ## Open questions (Jonathan)
 
 ≤2. **Closed this pass:** future unbound days are **draft only** (real pick when current; past / entered binds frozen) — LOCKED 2026-10-13.
 
-1. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current? M1 ships type + id on the graph until this is stamped.
+1. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current? M1 ships type + id on the graph until this is stamped. **The 2026-10-20 board-art packet does not answer this.** The appointment kind face is not a telegraph.
 
 ## Pointers
 

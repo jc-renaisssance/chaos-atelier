@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-20** against `dev` tip **`9aaeee3`**). Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Do not read “Jonathan stamp pending”, “Design-ready for Jonathan stamp”, or “Ulquiorra holds the M2 Client” in the notes below as current law. `main` is not promoted.
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-20** against `dev` tip **`9aaeee3`**). Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Do not reopen market chrome or portraits. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, or the 2026-10-20 visual-leftovers card below, as current law. The open Design stamp is the route-board + Dex art card at the end of this file. `main` is not promoted.
 
 ---
 
@@ -551,3 +551,44 @@ None.
 ## Blocks stamp
 
 An unanswered tab-chrome line (**A** or **B**). Skills icons and portrait sockets are not blocked by chrome. Picking **A** still stamps the six `sk_*` faces and the portrait brief. Nothing else blocks.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-20 (route-board + Dex art)
+
+Docs only. Off `dev` tip **`9aaeee3`**. Ugly route graph shipped (#41 @ `144c151`). Ugly Dex list shipped (#35). Market leftovers are **closed** — chrome **A**, six `sk_*` (#52 / #53), twelve `adv_*` busts (#54 / #55). Do not reopen them. No `src/` / Godot / art gens. `20` unchanged (no new dump keys; missing png keeps the text already on screen). Aizen merges only after Jonathan stamps. Harribel soft-gate before Nnoitra gens (note only — do not ping from this seat). Ulquiorra wires after gens. Szayelaporro smokes after the wire.
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/22-chapter-schedule.md` | **Route-graph board art (2026-10-20)** — five kind faces on the shipped graph. Elite telegraph question under it stays open |
+| `docs/31-dex.md` | **Dex art sockets (2026-10-20)** — four tab chips, adventurer rows reuse `assets/adv/`, enemy icons A/B |
+| `docs/05-art.md` | Pointer only |
+| `docs/17-chapter-bosses.md` | Phase-1 art pointer only — full boss portraits stay Later |
+| `docs/pm/phase-1-plan.md` | Queue pointer only |
+| `docs/README.md` | Tip pointer only (`9aaeee3`; market leftovers closed) |
+| `docs/STAMP.md` | This card |
+
+## Decisions
+
+1. **Route node canvas — A or B.** The shipped card is 108×72 with type + id + `ref_id` still on it. **A (Design default):** five kind faces, Pro Flash **96×96 soft-stipple**, Client scales them into that card. No second size. Files `assets/route/kind_market.png` (wire `shop`), `kind_adventurer.png`, `kind_appointment.png`, `kind_event.png`, `kind_reserved.png`. **B:** same five files at Pro Flash **48×48**, a second canvas that sits in the card unscaled. Write **A** or **B**. Silence is not **B**.
+2. **Dex enemy row icons — A or B.** Tabs and adventurer reuse are not this fork. **A (Design default):** lock nine `boss_*` list icons from `17`, Pro Flash **96×96 soft-stipple**, `assets/dex/<boss_id>.png`, shown only on rows that already reveal the name (`seen` or `fought`). **B:** enemy rows stay the #35 text / `?` placeholders. No boss pngs. Write **A** or **B**. Silence is not **A** (nine gens). Design recommends **A**.
+3. **State chrome — accept the default.** One painted frame per kind. Current / draft / frozen (existing past + bound flags) / cut / fork = Client modulate. No second painted frames. Silence keeps modulate.
+4. **Edges — accept the default.** No edge png. Shipped `draw_line` (path, draft, bind, cut, idle) stays. Silence keeps lines.
+5. **Dex tab canvas — accept the default.** Four tab faces, Pro Flash **96×96 soft-stipple**, `assets/dex/tab_builds.png`, `tab_crafts.png`, `tab_adventurers.png`, `tab_enemies.png`. Client scales into the existing tab buttons. Selected = modulate. A 16×16 Dex chip is not offered. Silence keeps 96×96.
+6. **Adventurer rows — accept the default.** Met rows reuse `assets/adv/<adv_id>.png` when the file is there. Unmet stays `?` with no bust. No second portrait set. Silence keeps reuse.
+
+These are locks once the two letters above are written, not extra forks: generic kind marks (no named bust on a node, no Scrap Duelist face, appointment chip is not an elite telegraph); Builds and Crafts rows stay text; lore pages and the Fashion Encyclopedia stay Later.
+
+## Questions
+
+None. Elite telegraph for appointment **N5** stays the open question already in `22`. This card does not ask it again and does not gen a telegraph.
+
+## Blocks stamp
+
+An unanswered route-canvas line (**A** or **B**). Silence is not **B**.
+
+An unanswered enemy-icon line (**A** or **B**). Silence is not **A**.
+
+State chrome, edges, Dex tab size, and adventurer-row reuse do not block. Writing route **A** or **B** still stamps the five kind faces at that size. Writing enemy **B** still stamps the four Dex tab faces and the bust reuse. Nothing else blocks.

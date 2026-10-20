@@ -101,7 +101,7 @@ function pick_boss_client(seed):
 
 ## Phase-1 art
 
-Boss portraits Later. Newspaper chrome can share atelier grain when 1C opens. Client / job portraits Later (`28`).
+Full boss portraits stay Later. Newspaper chrome stays Later. The twelve named adventurer busts landed at `assets/adv/<adv_id>.png` (#54 / #55) — Dex may reuse those files; do not gen a second set ([29](29-adventurer-catalog.md), [31](31-dex.md)). Dex enemy **row icons**, if Jonathan stamps that line, are list sockets in [31](31-dex.md) — not a boss portrait and not a posture sheet.
 
 ## Pointers
 
