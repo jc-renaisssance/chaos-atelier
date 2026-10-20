@@ -1,6 +1,6 @@
 # Market visit + event resolve (M1 + M2 tabs)
 
-**Status:** **M2 Design-ready** for Jonathan stamp (2026-10-16). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. Docs only — no `src/` / Godot / art this stamp. Ulquiorra holds the **M2 Client** until Jonathan stamps **this revision**. Aizen merges only after stamp. Nnoitra chrome / icons + `staff_*` / `artifact_*` art after ids lock; ping **Harribel before gens** (PR note — do not ping from this seat). Elite telegraph (N5) and adventurer catalog stay parked.
+**Status:** **M2 visual leftovers Design-ready** for Jonathan stamp (2026-10-20). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. **M1 market is closed.** M2 catalogs and the Staffs / Gear shelf-icon wire already landed (#46 Design, #47 Client, #48 art, #49 icon wire). This revision locks the **skills shelf icon** cut and the **tab chrome A/B** (default **A** — skip chrome). Adventurer portrait sockets are [29](29-adventurer-catalog.md), not a market catalog. Docs only — no `src/` / Godot / art gens. Aizen merges only after stamp. After stamp, Nnoitra gens **only the stamped slices** (the six `sk_*` faces always; tab chips only if chrome **B**); ping **Harribel before gens** (PR note — do not ping from this seat). Elite telegraph (N5) stays parked.
 
 **M1 is closed.** Materials tab + refresh + `market_bank_c1` + mat Enchant (`mat_ench_*`) + code-only shiny + text `evt_*` stay as stamped in #44 / shipped Client #45. Do **not** reopen M1.
 
@@ -309,7 +309,7 @@ The market is where the owner looks for **materials, staffs, skill cards, or gea
 
 ## Market M2 — Staffs / Skills / Gear
 
-**Status:** Grimmjow Design 2026-10-16. Ready for Jonathan stamp. Same visit, same shell, same `kind=shop` / `day_action=shop` / one gold purse / Exit-resolves-node as M1. New tabs only.
+**Status:** Grimmjow Design 2026-10-16. Catalog landed with #46 (Client #47, staff / artifact icons #48 / #49). Same visit, same shell, same `kind=shop` / `day_action=shop` / one gold purse / Exit-resolves-node as M1. Do **not** reopen this catalog. Visual leftovers for the 2026-10-20 stamp are [below](#m2-visual-leftovers-2026-10-20).
 
 ### Shared M2 market laws (inherit M1)
 
@@ -477,6 +477,7 @@ SHELF
   sk_metal_str_double   $5   [Buy]
   sk_wild_to_earth      $5   [Buy]
   sk_deep_dig           $7   [Buy]
+  (shelf face: assets/m2-market/<skill_id>.png when present; else this id label)
 
 DECK (skills)
   sk_next_mat_free      own 1   sell +1   [Sell]
@@ -557,9 +558,70 @@ Ping **Harribel** before PixelLab / chrome gens. Material icons stay 1:1. No shi
 
 **Gear (8):** `artifact_coin_purse` · `artifact_ledger_clip` · `artifact_pack_strap` · `artifact_needle_tin` · `artifact_wagon_hook` · `artifact_stamp_case` · `artifact_road_charm` · `artifact_oil_rag`
 
-**Skills (6, existing):** `sk_next_mat_free` · `sk_touch_up` · `sk_steady_hand` · `sk_metal_str_double` · `sk_wild_to_earth` · `sk_deep_dig` — card art Later if needed; do not invent a second id.
+**Skills (6, existing):** `sk_next_mat_free` · `sk_touch_up` · `sk_steady_hand` · `sk_metal_str_double` · `sk_wild_to_earth` · `sk_deep_dig` — shelf-face cut is locked in [M2 visual leftovers](#m2-visual-leftovers-2026-10-20). Do not invent a second id. No shiny gens.
+
+**Tab chrome:** stamp **A or B** in that section. Default **A** = keep the text strip; no chrome gens.
 
 Owner chrome / shopkeeper portraits stay **out** (non-goal).
+
+---
+
+## M2 visual leftovers (2026-10-20)
+
+**Status:** Grimmjow Design-ready for Jonathan stamp. Docs only. Does **not** reopen M1 (materials tab, refresh, `market_bank_c1`, mat Enchant, code-only shiny, text `evt_*`). Does **not** invent a new `sk_*`, staff, artifact, or tab. Staff / artifact 96×96 faces already on disk (`assets/m2-market/`, #48 / #49) stay the art language for the skills faces below.
+
+Shiny stays **code-only** on enchanted **materials**. Skills, staffs, and gear never take `mat_ench_*` and never get a shiny PixelLab overlay.
+
+### Skills shelf icons — lock
+
+Exactly these six, already the Skills tab / [27](27-craft-mode-stamina.md) catalog. Do not rename. Do not add a seventh.
+
+| `skill_id` | Stamina (27) | `$` (Test knob) |
+|---|---:|---:|
+| `sk_next_mat_free` | 1 | **3** |
+| `sk_touch_up` | 1 | **3** |
+| `sk_steady_hand` | 1 | **3** |
+| `sk_metal_str_double` | 2 | **5** |
+| `sk_wild_to_earth` | 2 | **5** |
+| `sk_deep_dig` | 3 | **7** |
+
+Effects stay the `27` lines in the Skills catalog above. Gold `$` stays a Test knob.
+
+**Art cut** (match stamped staff / artifact shelf faces and the armor Pro Flash grain):
+
+| | |
+|---|---|
+| Tool / grain | PixelLab **Pro Flash 96×96 soft-stipple** |
+| Subject | Item / skill-card **face only** |
+| Leave out of the PNG | Card chrome frame. Shiny overlay. A second, smaller tag-chip |
+| Path | `assets/m2-market/<skill_id>.png` (same folder as `staff_*` / `artifact_*`) |
+| Wire path | `res://assets/m2-market/<skill_id>.png` |
+
+**Wire contract (Ulquiorra — after stamp, not this PR).** Skills shelf rows that today show the text `sk_*` use a `TextureRect` (or the same control Staffs / Gear already use for `assets/m2-market`) loading that path **when the file is present**. Missing file → keep the id label. Price, owned count, Buy, and Sell stay. Skills stay **deck cards** (buy into the run deck). **No** equip UI. **No** Enchant on the Skills tab. Do **not** invent a second icon size, and do **not** gen a 16×16 tag-chip for these six.
+
+Kit / deck rows may stay text. This stamp is the **shelf face** only.
+
+### Tab chrome — Jonathan stamps A or B
+
+Today the Client tab strip is text: **Materials | Staffs | Skills | Gear**. Fancy chrome was Later. This stamp picks whether it stays Later for this wave.
+
+**A — Skip chrome this wave (Design default).** Keep the Client text strip. No tab-chip gens. Nnoitra stays idle on chrome. Skills faces and the [29](29-adventurer-catalog.md) portrait brief still proceed.
+
+**B — Ship chrome.** Nnoitra gens after stamp (Harribel soft-gate first). Brief only — do not gen in this PR:
+
+| | |
+|---|---|
+| Chips | **4.** Materials · Staffs · Skills · Gear. No fifth tab. No portraits, no owner chrome, no event art |
+| Ids / paths | `tab_materials` · `tab_staffs` · `tab_skills` · `tab_gear` → `assets/m2-market/tab_<name>.png` |
+| Size / grain | **Flat 16×16 Pro Flash.** Same small-chip language as the stamped monostack **tag chips**, not the 96×96 shelf icons. A 96×96 tab would be a second shelf icon sitting in the strip |
+| Selected vs idle | **One frame each. Selected = Client modulate** (same family as the text tab’s selected tint). Not a second painted frame. Four files, not eight |
+| Wire | Existing tab control shows the 16×16 chip. Word labels may stay beside the chip. Missing file → text label, as today |
+
+Jonathan writes **A** or **B** on the stamp. **A** does not authorize chrome gens. Silence is not **B**.
+
+### Not in this section
+
+Adventurer portraits: [29](29-adventurer-catalog.md) **Portrait sockets**. Owner / shopkeeper chrome stays out. Event art stays Later. Material icons stay Nnoitra 1:1.
 
 ---
 
@@ -786,7 +848,7 @@ Docs only this stamp — sketch for the **next** Client PR. No `src/` here. Hold
 
 ### Client needs (Ulquiorra) — M2 tabs
 
-Docs only this stamp — sketch for the **M2 Client PR**. No `src/` here. **Hold until Jonathan stamps this revision.** Do not grow #45.
+Catalog + tab shell shipped (#47). Staff / artifact shelf icons shipped (#49). The **next** wire is [M2 visual leftovers](#m2-visual-leftovers-2026-10-20): skills shelf `TextureRect`s, and tab chips **only if** Jonathan stamps chrome **B**. Do not grow #45. Do not reopen M1.
 
 15. **Same shell.** Tab strip Materials | Staffs | Skills | Gear. Enter still only from `kind=shop`. `day_action=shop`. Exit still resolves the node.
 16. **Do not** put Enchant or Refresh on Staffs / Skills / Gear. Refresh still redraws **materials** only. Enchant still materials only (`mat_ench_*`). No `mat_ench_*` / `shiny` on staff, skill, or artifact instances.
@@ -795,7 +857,7 @@ Docs only this stamp — sketch for the **M2 Client PR**. No `src/` here. **Hold
 19. **Skills:** load `market_skill_bank_c1` (6 existing `sk_*`). Buy → one `type=skill` copy on `WagonStock`. Duplicates legal. Sell removes one copy. No equip. Next craft shuffles them (`27`).
 20. **Gear:** load `market_artifact_bank_c1` (8 `artifact_*`). Buy → run kit. Refuse if already owned. **2** slots (`artifact_equipped_ids`). Equip from this tab. Apply listed owner utility **while equipped** only. Never `cards_played`.
 21. Dump the M2 keys above **without SCRIPT ERROR**. Keep M1 `market_*` / event keys. Gold is the one purse.
-22. Ugly ids + `$` + owned / equipped marks. No owner chrome, no PixelLab icons this Client. Nnoitra after stamp; Harribel before gens.
+22. Ugly ids + `$` + owned / equipped marks. No owner chrome. Staff / artifact shelf icons are the #49 wire. Skills shelf faces, and tab chips **only if** chrome **B** is stamped, are the 2026-10-20 wire ([M2 visual leftovers](#m2-visual-leftovers-2026-10-20)). Harribel before further gens.
 
 ---
 
@@ -907,7 +969,9 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 
 ## Open questions (Jonathan)
 
-None this pass. M1 stays closed. Enchant cut (materials only) is locked. Catalogs, one-staff / two-gear, buy-into-kit skills, `artifact_*` prefix, and refresh=materials-only are Grimmjow locks for stamp. Gold prices and Δ ints are **Test knobs**.
+None on the M2 catalogs (2026-10-16). Those locks shipped with #46–#49. M1 stays closed. Enchant cut (materials only) stays locked. Gold prices and Δ ints stay **Test knobs**.
+
+**2026-10-20 visual leftovers:** one stamp decision — tab chrome **A or B** (default **A**). The six skills-icon cut and the [29](29-adventurer-catalog.md) portrait default are locks in those sections, not open questions.
 
 ---
 

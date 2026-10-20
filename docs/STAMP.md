@@ -521,3 +521,33 @@ Docs only. Extends #44 / `32` after Client #45. **Does not** reopen M1 (material
 ## Open questions
 
 None.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-20 (M2 visual leftovers)
+
+Docs only. Off `dev` after #46 / #47 / #48 / #49. **Does not** reopen M1 market law. No `src/` / Godot / art gens. Aizen merges only after Jonathan stamps. Harribel soft-gate before Nnoitra gens (note only — do not ping from this seat). Ulquiorra wires after gens. Szayelaporro smokes after the wire. `20` is unchanged (no new dump keys; a missing png falls back to text).
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/32-shop-and-events.md` | **M2 visual leftovers (2026-10-20)** — six `sk_*` shelf faces + tab chrome **A or B** |
+| `docs/29-adventurer-catalog.md` | **Portrait sockets (2026-10-20)** — the existing 12 named `adv_*` |
+| `docs/05-art.md` | Pointer only |
+| `docs/STAMP.md` | This card |
+
+## Decisions
+
+1. **Tab chrome — A or B.** **A (default):** keep the text strip **Materials \| Staffs \| Skills \| Gear**; no gens; Nnoitra idle on chrome. **B:** four flat **16×16 Pro Flash** chips (`tab_materials` / `tab_staffs` / `tab_skills` / `tab_gear`), one frame each, selected = Client modulate. No portraits on the chips. Write **A** or **B**. Silence is not **B**.
+2. **Portrait canvas — accept the default or write another size.** Default: Pro Flash **96×96 soft-stipple** head-and-shoulders bust, one front view, `assets/adv/<adv_id>.png`. Same canvas as the stamped shelf icons so this wave does not open a second size.
+
+The six skills faces are a lock, not a fork: existing ids, 96×96 Pro Flash soft-stipple, face only, `assets/m2-market/<skill_id>.png`, no card frame, no shiny gen.
+
+## Questions
+
+None.
+
+## Blocks stamp
+
+An unanswered tab-chrome line (**A** or **B**). Skills icons and portrait sockets are not blocked by chrome. Picking **A** still stamps the six `sk_*` faces and the portrait brief. Nothing else blocks.
