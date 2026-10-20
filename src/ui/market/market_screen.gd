@@ -1,6 +1,7 @@
 class_name MarketScreen
 extends Control
 ## Ugly M2 market shell — Materials / Staffs / Skills / Gear (docs/32).
+## Staffs and Gear shelves show stamped assets/m2-market icons. Skills stay sk_* text.
 ## Enchant + refresh stay materials-only. Shiny tint stays on enchanted mats.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
@@ -13,6 +14,23 @@ const BORDER := Color(0.239, 0.204, 0.173)
 const SHINE := Color(0.95, 0.82, 0.22, 0.38)
 const CHIP := Color(0.227, 0.173, 0.094)
 const TAB_ON := Color(0.35, 0.28, 0.1)
+const SHELF_ICON_PX := 96
+## Stamped Pro Flash icons (assets PR #48). PNG-only; Godot imports locally.
+const SHELF_ICONS := {
+	"staff_apprentice": preload("res://assets/m2-market/staff_apprentice.png"),
+	"staff_rune_desk": preload("res://assets/m2-market/staff_rune_desk.png"),
+	"staff_loom_pair": preload("res://assets/m2-market/staff_loom_pair.png"),
+	"staff_third_seam": preload("res://assets/m2-market/staff_third_seam.png"),
+	"staff_rune_pair": preload("res://assets/m2-market/staff_rune_pair.png"),
+	"artifact_coin_purse": preload("res://assets/m2-market/artifact_coin_purse.png"),
+	"artifact_ledger_clip": preload("res://assets/m2-market/artifact_ledger_clip.png"),
+	"artifact_pack_strap": preload("res://assets/m2-market/artifact_pack_strap.png"),
+	"artifact_needle_tin": preload("res://assets/m2-market/artifact_needle_tin.png"),
+	"artifact_wagon_hook": preload("res://assets/m2-market/artifact_wagon_hook.png"),
+	"artifact_stamp_case": preload("res://assets/m2-market/artifact_stamp_case.png"),
+	"artifact_road_charm": preload("res://assets/m2-market/artifact_road_charm.png"),
+	"artifact_oil_rag": preload("res://assets/m2-market/artifact_oil_rag.png"),
+}
 
 var _title: Label
 var _meta: Label
@@ -331,6 +349,7 @@ func _staff_shelf_row(offer: Dictionary) -> Control:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
+	box.add_child(_shelf_icon(staff_id))
 	var own_bit := "owned" if AtelierSession.owns_staff(staff_id) else "own 0"
 	var lab := _label(
 		"%s     $%d   %s   %s" % [staff_id, price, MarketCatalog.staff_delta_bit(staff_id), own_bit],
@@ -425,6 +444,7 @@ func _artifact_shelf_row(offer: Dictionary) -> Control:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
+	box.add_child(_shelf_icon(artifact_id))
 	var own_bit := "owned" if AtelierSession.owns_artifact(artifact_id) else "own 0"
 	var lab := _label(
 		"%s     $%d   %s   %s" % [artifact_id, price, MarketCatalog.artifact_label(artifact_id), own_bit],
@@ -546,6 +566,20 @@ func _on_refresh() -> void:
 
 func _on_exit() -> void:
 	AtelierSession.exit_market()
+
+
+func _shelf_icon(item_id: String) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(SHELF_ICON_PX, SHELF_ICON_PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var found: Variant = SHELF_ICONS.get(item_id)
+	var tex: Texture2D = found as Texture2D
+	icon.texture = tex
+	return icon
 
 
 func _caption(text: String) -> Label:
