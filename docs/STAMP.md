@@ -567,6 +567,7 @@ Docs only. Off `dev` tip **`9aaeee3`**. Ugly route graph shipped (#41 @ `144c151
 | `docs/05-art.md` | Pointer only |
 | `docs/17-chapter-bosses.md` | Phase-1 art pointer only — full boss portraits stay Later |
 | `docs/pm/phase-1-plan.md` | Queue pointer only |
+| `docs/README.md` | Tip pointer only (`9aaeee3`; market leftovers closed) |
 | `docs/STAMP.md` | This card |
 
 ## Decisions
