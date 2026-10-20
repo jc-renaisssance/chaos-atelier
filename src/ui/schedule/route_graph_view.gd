@@ -1,6 +1,7 @@
 class_name RouteGraphView
 extends Control
-## Ugly M1 route graph: nodes + edges, columns by day (docs/22). Art Later.
+## Ugly M1 route graph: nodes + edges, columns by day (docs/22).
+## Kind chips sit on RouteNodeView. Edges stay draw_line.
 
 signal node_picked(node_id: String)
 

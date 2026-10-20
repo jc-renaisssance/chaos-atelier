@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import pathlib
 import re
+import struct
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -526,6 +527,60 @@ def check_board_scroll() -> None:
         fail("no choice → no options panel (hide fork panel when empty)")
 
 
+KIND_CHIPS = ("market", "adventurer", "appointment", "event", "reserved")
+
+
+def check_route_kind_icons() -> None:
+    """Kind chips on the shipped RouteNodeView. Edges stay draw_line. No adv busts."""
+    view = (SRC / "ui" / "schedule" / "route_node_view.gd").read_text(encoding="utf-8")
+    graph = (SRC / "ui" / "schedule" / "route_graph_view.gd").read_text(encoding="utf-8")
+    if "TextureRect" not in view:
+        fail("route cards must use TextureRect for the kind chip")
+    if "TEXTURE_FILTER_NEAREST" not in view:
+        fail("route kind chips must use nearest-neighbor filter")
+    if "KIND_PX := 48" not in view:
+        fail("route kind chips must be 48×48")
+    if "display_kind()" not in view:
+        fail("kind chip path must use display_kind()")
+    if "res://assets/route/kind_shop.png" in view:
+        fail("there is no kind_shop.png — wire shop displays as market")
+    if "assets/adv/" in view:
+        fail("do not load assets/adv busts onto a route node")
+    if re.search(r"\belite\b", view, re.I):
+        fail("do not add an elite telegraph on the route card")
+    bind = view.split("func _bind_kind_icon", 1)[-1].split("func ", 1)[0]
+    if "KIND_ICONS.get" not in bind or "display_kind()" not in bind:
+        fail("kind chip lookup must key off display_kind()")
+    if "visible = tex != null" not in bind:
+        fail("missing kind texture must hide the chip and keep the text card")
+    if "_kind_lab.text = node.display_kind()" not in view:
+        fail("kind text line must stay when the chip is missing")
+    if "modulate" not in bind:
+        fail("one kind texture is modulated from the bind() flags")
+    if "draw_line" not in graph:
+        fail("route edges must stay draw_line")
+    if "TextureRect" in graph or "assets/route/" in graph:
+        fail("edge view must not grow a texture")
+    icon_dir = ROOT / "assets" / "route"
+    for kind in KIND_CHIPS:
+        rel = f"res://assets/route/kind_{kind}.png"
+        if rel not in view:
+            fail(f"route card missing preload {rel}")
+        path = icon_dir / f"kind_{kind}.png"
+        if not path.is_file():
+            fail(f"missing {path.relative_to(ROOT)}")
+            continue
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n" or len(data) < 24:
+            fail(f"kind_{kind}.png is not a PNG")
+            continue
+        width, height = struct.unpack(">II", data[16:24])
+        if (width, height) != (48, 48):
+            fail(f"kind_{kind}.png is {width}x{height}, want 48x48")
+    for sidecar in icon_dir.glob("*.import"):
+        fail(f"do not commit Godot import sidecar {sidecar.name}")
+
+
 def main() -> int:
     blob = src_text()
     check_project_godot()
@@ -536,6 +591,7 @@ def main() -> int:
     check_light_route_sim()
     check_no_free_mid_signal()
     check_board_scroll()
+    check_route_kind_icons()
     if FAILS:
         print("FAIL")
         for item in FAILS:

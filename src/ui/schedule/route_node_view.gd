@@ -1,10 +1,25 @@
 class_name RouteNodeView
 extends PanelContainer
-## Ugly M1 graph node: type + id only (docs/22). Art Later.
+## Ugly M1 graph node (docs/22). Three text lines stay.
+## Kind chip: res://assets/route/kind_<display_kind()>.png at 48×48 when preloaded.
+## Missing texture keeps the #41 text card. One texture, modulated by bind() flags.
 
 signal picked(node_id: String)
 
+const KIND_PX := 48
+## Stamped route chips (art #58, size B). Wire shop → display_kind() market. No kind_shop.png.
+const KIND_ICONS := {
+	"market": preload("res://assets/route/kind_market.png"),
+	"adventurer": preload("res://assets/route/kind_adventurer.png"),
+	"appointment": preload("res://assets/route/kind_appointment.png"),
+	"event": preload("res://assets/route/kind_event.png"),
+	"reserved": preload("res://assets/route/kind_reserved.png"),
+}
+## Market chrome A selected tint. Hot route flags reuse it; no second painted frame.
+const CHIP_HOT := Color(1.08, 1.04, 0.82)
+
 var _style: StyleBoxFlat
+var _kind_icon: TextureRect
 var _id_lab: Label
 var _kind_lab: Label
 var _ref_lab: Label
@@ -23,22 +38,26 @@ func _ready() -> void:
 	_style.content_margin_bottom = 6
 	add_theme_stylebox_override("panel", _style)
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	add_child(row)
+	_kind_icon = _kind_socket()
+	row.add_child(_kind_icon)
+	## Ellipsis labels report a 1px min width, so the 48 chip stays inside 108×72.
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 2)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(box)
-	_id_lab = Label.new()
-	_id_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_id_lab.add_theme_font_size_override("font_size", 16)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(box)
+	_id_lab = _line(16)
 	box.add_child(_id_lab)
-	_kind_lab = Label.new()
-	_kind_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_kind_lab.add_theme_font_size_override("font_size", 12)
+	_kind_lab = _line(12)
 	box.add_child(_kind_lab)
-	_ref_lab = Label.new()
-	_ref_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ref_lab.add_theme_font_size_override("font_size", 10)
-	_ref_lab.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_ref_lab = _line(10)
 	box.add_child(_ref_lab)
 
 
@@ -106,3 +125,75 @@ func bind(
 	_id_lab.add_theme_color_override("font_color", ink)
 	_kind_lab.add_theme_color_override("font_color", ink)
 	_ref_lab.add_theme_color_override("font_color", muted)
+	_bind_kind_icon(node, is_current, is_past, is_draft, is_cut, is_fork, is_bound)
+
+
+func _kind_socket() -> TextureRect:
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(KIND_PX, KIND_PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.visible = false
+	return icon
+
+
+func _bind_kind_icon(
+	node: RouteNode,
+	is_current: bool,
+	is_past: bool,
+	is_draft: bool,
+	is_cut: bool,
+	is_fork: bool,
+	is_bound: bool
+) -> void:
+	## display_kind() is the file id (shop → market). Unknown kind → text only.
+	var found: Variant = KIND_ICONS.get(node.display_kind())
+	var tex: Texture2D = found as Texture2D
+	_kind_icon.texture = tex
+	_kind_icon.visible = tex != null
+	if tex == null:
+		return
+	_kind_icon.modulate = _kind_modulate(
+		is_current, is_past, is_draft, is_cut, is_fork, is_bound, node.is_reserved()
+	)
+
+
+func _kind_modulate(
+	is_current: bool,
+	is_past: bool,
+	is_draft: bool,
+	is_cut: bool,
+	is_fork: bool,
+	is_bound: bool,
+	reserved: bool
+) -> Color:
+	## Same flag order as the StyleBox above. One chip, no per-flag texture.
+	if is_current:
+		return CHIP_HOT
+	if is_past:
+		return Color(0.62, 0.58, 0.52)
+	if is_cut:
+		return Color(0.4, 0.36, 0.32)
+	if is_fork:
+		return CHIP_HOT
+	if is_draft:
+		return Color(0.8, 0.76, 0.64)
+	if is_bound:
+		return Color(0.95, 0.78, 0.86)
+	if reserved:
+		return Color(0.62, 0.58, 0.52)
+	return Color.WHITE
+
+
+func _line(size: int) -> Label:
+	var lab := Label.new()
+	lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lab.add_theme_font_size_override("font_size", size)
+	lab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lab.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	lab.clip_text = true
+	return lab
