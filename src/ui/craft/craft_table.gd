@@ -2,6 +2,9 @@ class_name CraftTable
 extends Control
 ## Dedicated stamina craft screen (docs/27). Not the route-graph board.
 ## Lower: hand + actions. Upper left: order detail. Upper right: ≤4 drop zones.
+## Order-detail portrait socket (docs/29): one 96×96 bust for the adventurer on
+## this order (walk-in, appointment person, or boss-beat draw). Name + job stay
+## if the texture is missing. Guild-quest brief stays text.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
 const INK := Color(0.91, 0.835, 0.69)
@@ -10,9 +13,27 @@ const GOLD := Color(0.788, 0.635, 0.153)
 const WOOD := Color(0.102, 0.078, 0.063)
 const PANEL := Color(0.165, 0.129, 0.094)
 const BORDER := Color(0.239, 0.204, 0.173)
+const PORTRAIT_PX := 96
+## Stamped Pro Flash busts (art #54). PNG-only; Godot imports locally.
+## Job stubs have no file — resolve_id maps them onto these named rows.
+const PORTRAITS := {
+	"adv_halden_rook": preload("res://assets/adv/adv_halden_rook.png"),
+	"adv_vex_bramble": preload("res://assets/adv/adv_vex_bramble.png"),
+	"adv_solenne_ward": preload("res://assets/adv/adv_solenne_ward.png"),
+	"adv_quill_lumen": preload("res://assets/adv/adv_quill_lumen.png"),
+	"adv_neri_paleink": preload("res://assets/adv/adv_neri_paleink.png"),
+	"adv_marrowveil": preload("res://assets/adv/adv_marrowveil.png"),
+	"adv_kite_thornreel": preload("res://assets/adv/adv_kite_thornreel.png"),
+	"adv_mask_circlet": preload("res://assets/adv/adv_mask_circlet.png"),
+	"adv_whisper_hem": preload("res://assets/adv/adv_whisper_hem.png"),
+	"adv_tide_glass": preload("res://assets/adv/adv_tide_glass.png"),
+	"adv_brine_latch": preload("res://assets/adv/adv_brine_latch.png"),
+	"adv_rime_peddler": preload("res://assets/adv/adv_rime_peddler.png"),
+}
 
 var _title: Label
 var _note: Label
+var _order_portrait: TextureRect
 var _order_title: Label
 var _order_stats: Label
 var _order_skill: Label
@@ -94,11 +115,22 @@ func _build() -> void:
 	left_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	left_scroll.add_child(left_box)
 	left_box.add_child(_caption("UPPER LEFT  ·  adventurer order detail"))
+	var order_head := HBoxContainer.new()
+	order_head.add_theme_constant_override("separation", 8)
+	order_head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_box.add_child(order_head)
+	_order_portrait = _portrait_socket()
+	order_head.add_child(_order_portrait)
+	var order_text := VBoxContainer.new()
+	order_text.add_theme_constant_override("separation", 4)
+	order_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	order_head.add_child(order_text)
 	_order_title = _label("No order", 16, GOLD)
-	left_box.add_child(_order_title)
+	_order_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	order_text.add_child(_order_title)
 	_order_stats = _label("", 13, INK)
 	_order_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	left_box.add_child(_order_stats)
+	order_text.add_child(_order_stats)
 	_order_skill = _label("", 12, MUTED)
 	_order_skill.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_order_skill)
@@ -232,6 +264,28 @@ func _build() -> void:
 	scroll.add_child(_stamp)
 
 
+func _portrait_socket() -> TextureRect:
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(PORTRAIT_PX, PORTRAIT_PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.visible = false
+	return icon
+
+
+func _bind_order_portrait(adv_id: String) -> void:
+	## Alias resolves to the named file (adv_knight → adv_halden_rook). No stub PNG.
+	var named := AdventurerCatalog.resolve_id(adv_id)
+	var found: Variant = PORTRAITS.get(named)
+	var tex: Texture2D = found as Texture2D
+	_order_portrait.texture = tex
+	## Missing preload → hide the socket. Display name + job stay on the panel.
+	_order_portrait.visible = tex != null
+
+
 func _caption(text: String) -> Label:
 	return _label(text, 11, GOLD)
 
@@ -303,6 +357,7 @@ func _refresh() -> void:
 	var order: ClientOrder = AtelierSession.craft_order
 	if session == null or order == null:
 		_title.text = "CRAFT  ·  dedicated table"
+		_bind_order_portrait("")
 		_order_title.text = "No session."
 		_order_stats.text = ""
 		_order_skill.text = ""
@@ -316,6 +371,7 @@ func _refresh() -> void:
 	_title.text = "CRAFT  ·  %s  ·  own_basic  ·  one session" % order.order_id
 	_note.text = AtelierSession.last_note
 	var adv_id := AdventurerCatalog.order_adventurer_id(order)
+	_bind_order_portrait(adv_id)
 	var person := AdventurerCatalog.row_resolved(adv_id)
 	if not person.is_empty():
 		_order_title.text = "%s  ·  %s  ·  %s" % [

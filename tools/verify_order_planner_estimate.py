@@ -311,8 +311,12 @@ def check_source() -> None:
         fail("craft table must host the syn-target planner under the order panel")
     if "guild-quest brief" not in table:
         fail("craft table must host the guild-quest brief")
-    if "TextureRect" in table:
-        fail("planner / brief must not use TextureRect / portraits")
+    brief = table.split("func _refresh_brief_and_estimate", 1)[-1].split("\nfunc ", 1)[0]
+    planner = table.split("func _refresh_planner", 1)[-1].split("\nfunc ", 1)[0]
+    if "TextureRect" in brief or "assets/adv/" in brief:
+        fail("guild-quest brief must stay text — no portrait on the enemy brief")
+    if "TextureRect" in planner or "assets/adv/" in planner:
+        fail("syn-target planner must stay text — no portraits")
     if "click_planner_tag" not in session or "click_planner_tag" not in table:
         fail("tag chips must set planned_build via click_planner_tag")
     if "construction_ids" in session.split("func click_planner_tag", 1)[-1].split("func _note_order_brief", 1)[0]:
