@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import pathlib
 import re
+import struct
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -471,6 +472,71 @@ def check_source() -> None:
         fail("wire kind shop must remain")
 
 
+SHELF_ICON_IDS = [
+    "staff_apprentice",
+    "staff_rune_desk",
+    "staff_loom_pair",
+    "staff_third_seam",
+    "staff_rune_pair",
+    "artifact_coin_purse",
+    "artifact_ledger_clip",
+    "artifact_pack_strap",
+    "artifact_needle_tin",
+    "artifact_wagon_hook",
+    "artifact_stamp_case",
+    "artifact_road_charm",
+    "artifact_oil_rag",
+]
+
+
+def _fn_body(text: str, name: str) -> str:
+    marker = f"func {name}"
+    if marker not in text:
+        fail(f"missing {marker}")
+        return ""
+    return text.split(marker, 1)[-1].split("\nfunc ", 1)[0]
+
+
+def check_shelf_icons() -> None:
+    """Staffs + Gear shelves load the stamped 96×96 PNGs. Skills stay text."""
+    market_ui = read("src/ui/market/market_screen.gd")
+    if "TextureRect" not in market_ui:
+        fail("Staffs / Gear shelves must use TextureRect")
+    if "res://assets/m2-market/" not in market_ui:
+        fail("shelves must preload res://assets/m2-market/<id>.png")
+    staff_shelf = _fn_body(market_ui, "_staff_shelf_row")
+    gear_shelf = _fn_body(market_ui, "_artifact_shelf_row")
+    if "_shelf_icon(" not in staff_shelf:
+        fail("Staffs shelf must show the stamped icon")
+    if "_shelf_icon(" not in gear_shelf:
+        fail("Gear shelf must show the stamped icon")
+    for name in ("_skill_shelf_row", "_skill_deck_row"):
+        body = _fn_body(market_ui, name)
+        if "_shelf_icon" in body or "m2-market" in body or "TextureRect" in body:
+            fail(f"{name} must stay sk_* text — no skill card art")
+    icon_dir = ROOT / "assets" / "m2-market"
+    for item_id in SHELF_ICON_IDS:
+        rel = f"res://assets/m2-market/{item_id}.png"
+        if rel not in market_ui:
+            fail(f"market screen missing preload {rel}")
+        path = icon_dir / f"{item_id}.png"
+        if not path.is_file():
+            fail(f"missing {path.relative_to(ROOT)}")
+            continue
+        data = path.read_bytes()
+        if data[:8] != b"\x89PNG\r\n\x1a\n":
+            fail(f"{item_id}.png is not a PNG")
+            continue
+        if len(data) < 24:
+            fail(f"{item_id}.png is truncated")
+            continue
+        width, height = struct.unpack(">II", data[16:24])
+        if (width, height) != (96, 96):
+            fail(f"{item_id}.png is {width}x{height}, want 96x96")
+    for sidecar in icon_dir.glob("*.import"):
+        fail(f"do not commit Godot import sidecar {sidecar.name}")
+
+
 def check_formulas() -> None:
     """Mirror docs/32 Test knobs without Godot."""
     gold = 12
@@ -540,6 +606,7 @@ def main() -> int:
     check_bank()
     check_map_events()
     check_source()
+    check_shelf_icons()
     check_formulas()
     if FAILS:
         for msg in FAILS:
@@ -548,7 +615,7 @@ def main() -> int:
         return 1
     print(
         "market M1 materials + M2 Staffs/Skills/Gear; refresh materials-only; "
-        "staff 5 / skill 6 / artifact 8; events N4/N6/N10/N17."
+        "staff 5 / skill 6 / artifact 8; Staffs/Gear shelf icons; events N4/N6/N10/N17."
     )
     return 0
 
