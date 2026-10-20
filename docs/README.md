@@ -1,6 +1,6 @@
 # Wombaste — Bible
 
-Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM roadmap: **2026-10-05** Jonathan stamp (M1 / M2 + **adventurers** terminology) — [pm/phase-1-plan](pm/phase-1-plan.md) · [STAMP](STAMP.md). **2026-10-08:** M1 4-job draw + estimate S–F bands stay Test knobs. **2026-10-12:** Day planner + drop `crafts_max` — **superseded 2026-10-13** by the **route map with forks** (free per-day `E*` board from #36/#37 is not live). **2026-10-15:** market visit + event resolve M1 — [32](32-shop-and-events.md) (refresh + chapter bank + **material enchant**; Client #45). **2026-10-16:** **M2** Staffs / Skills / Gear tabs + catalogs in the same `32` (Jonathan stamp pending). Design locks through 2026-10-08 still hold unless a later stamp says otherwise.
+Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM roadmap: [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-20** against `dev` tip **`b540f51`**) · [STAMP](STAMP.md) (historical stamps). **M1 ugly full-experience is operationally exit-ready** at that tip. Shipped: market + events M1 (#44 / #45); Market M2 Staffs / Skills / Gear (#46 / #47); 13 stamped `staff_*` + `artifact_*` icons (#48 / #49) — Skills shelf still text `sk_*`, shiny code-only, tab chrome skipped. Route-graph Client, interactive-order slices 1–3 + Dex, and the 4×3 adventurer catalog in [29](29-adventurer-catalog.md) are on `dev`. **`main` is not promoted.** Prior locks still hold unless the PM plan says otherwise: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 is not live); **2026-10-08** M1 4-job draw + estimate S–F bands as Test knobs; **2026-10-05** **adventurers** terminology.
 
 | Doc | Topic |
 |---|---|
@@ -37,6 +37,6 @@ Docs-first. Product display name **Wombaste** (repo `chaos-atelier`). Live PM ro
 | [29-adventurer-catalog](29-adventurer-catalog.md) | **M1 adventurer catalog** — 4 jobs × 3 named people (stats / `ask_*` / tags / briefs) |
 | [30-interactive-order](30-interactive-order.md) | **Interactive-order slices 1–3** — panel, syn-target planner + `unlocked_builds`, enemy brief / estimate |
 | [31-dex](31-dex.md) | **Dex** — profile collection (Builds = `unlocked_builds`; Crafts / Adventurers / Enemies) |
-| [32-shop-and-events](32-shop-and-events.md) | **Market visit + event resolve** — display Market (wire `kind=shop`); M1 materials + refresh + bank + **material enchant**; **M2** Staffs (`staff_*`) / Skills (`sk_*`) / Gear (`artifact_*`) tabs; text `evt_*` |
-| [STAMP](STAMP.md) | Jonathan stamps (latest **2026-10-16** market M2 tabs; M1 market + route map locked) |
-| [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 ugly full-experience Client / M2 Steam demo |
+| [32-shop-and-events](32-shop-and-events.md) | **Market visit + event resolve** — display Market (wire `kind=shop`); M1 materials + refresh + bank + **material enchant** (#44 / #45); **M2** Staffs / Skills / Gear (#46 / #47) with `staff_*` + `artifact_*` icons (#48 / #49); Skills shelf still text `sk_*`; text `evt_*` |
+| [STAMP](STAMP.md) | Historical stamps. Live status → [pm/phase-1-plan](pm/phase-1-plan.md) (`dev` `b540f51`; M2 market Client shipped) |
+| [pm/phase-1-plan](pm/phase-1-plan.md) | **Live PM roadmap** — M1 exit-ready at `b540f51`; M2 Steam demo leftover queue |
