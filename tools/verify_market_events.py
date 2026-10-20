@@ -486,6 +486,12 @@ SHELF_ICON_IDS = [
     "artifact_stamp_case",
     "artifact_road_charm",
     "artifact_oil_rag",
+    "sk_next_mat_free",
+    "sk_touch_up",
+    "sk_steady_hand",
+    "sk_metal_str_double",
+    "sk_wild_to_earth",
+    "sk_deep_dig",
 ]
 
 
@@ -498,22 +504,26 @@ def _fn_body(text: str, name: str) -> str:
 
 
 def check_shelf_icons() -> None:
-    """Staffs + Gear shelves load the stamped 96×96 PNGs. Skills stay text."""
+    """Staffs, Skills, and Gear shelves load the stamped 96×96 PNGs. Skill deck stays text."""
     market_ui = read("src/ui/market/market_screen.gd")
     if "TextureRect" not in market_ui:
-        fail("Staffs / Gear shelves must use TextureRect")
+        fail("Staffs / Skills / Gear shelves must use TextureRect")
     if "res://assets/m2-market/" not in market_ui:
         fail("shelves must preload res://assets/m2-market/<id>.png")
     staff_shelf = _fn_body(market_ui, "_staff_shelf_row")
+    skill_shelf = _fn_body(market_ui, "_skill_shelf_row")
     gear_shelf = _fn_body(market_ui, "_artifact_shelf_row")
     if "_shelf_icon(" not in staff_shelf:
         fail("Staffs shelf must show the stamped icon")
+    if "_shelf_icon(" not in skill_shelf:
+        fail("Skills shelf must show the stamped icon")
     if "_shelf_icon(" not in gear_shelf:
         fail("Gear shelf must show the stamped icon")
-    for name in ("_skill_shelf_row", "_skill_deck_row"):
-        body = _fn_body(market_ui, name)
-        if "_shelf_icon" in body or "m2-market" in body or "TextureRect" in body:
-            fail(f"{name} must stay sk_* text — no skill card art")
+    if "Equip" in skill_shelf or "enchant" in skill_shelf.lower():
+        fail("Skills shelf must not grow equip or Enchant")
+    deck = _fn_body(market_ui, "_skill_deck_row")
+    if "_shelf_icon" in deck or "m2-market" in deck or "TextureRect" in deck:
+        fail("_skill_deck_row must stay sk_* text — shelf faces only")
     icon_dir = ROOT / "assets" / "m2-market"
     for item_id in SHELF_ICON_IDS:
         rel = f"res://assets/m2-market/{item_id}.png"
@@ -615,7 +625,7 @@ def main() -> int:
         return 1
     print(
         "market M1 materials + M2 Staffs/Skills/Gear; refresh materials-only; "
-        "staff 5 / skill 6 / artifact 8; Staffs/Gear shelf icons; events N4/N6/N10/N17."
+        "staff 5 / skill 6 / artifact 8; Staffs/Skills/Gear shelf icons; events N4/N6/N10/N17."
     )
     return 0
 
