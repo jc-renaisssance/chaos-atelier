@@ -1,6 +1,6 @@
 # Market visit + event resolve (M1 + M2 tabs)
 
-**Status:** **M2 visual leftovers landed** (#51–#55; tab chrome stamped **A**, no gens). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. **M1 market is closed.** M2 catalogs and the Staffs / Gear shelf-icon wire already landed (#46 Design, #47 Client, #48 art, #49 icon wire). Skills shelf icons landed (#51 Design, #52 art, #53 Client). Adventurer portrait sockets are [29](29-adventurer-catalog.md) and landed (#54 art / #55 Client), not a market catalog. Elite telegraph (N5) stays parked.
+**Status:** **M2 visual leftovers landed** (#51–#55; tab chrome stamped **A**, no gens). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. **M1 market is closed.** M2 catalogs and the Staffs / Gear shelf-icon wire already landed (#46 Design, #47 Client, #48 art, #49 icon wire). Skills shelf icons landed (#51 Design, #52 art, #53 Client). Adventurer portrait sockets are [29](29-adventurer-catalog.md) and landed (#54 art / #55 Client), not a market catalog. Elite telegraph (N5) is the route-board badge in [22](22-chapter-schedule.md) — not a market socket.
 
 **M1 is closed.** Materials tab + refresh + `market_bank_c1` + mat Enchant (`mat_ench_*`) + code-only shiny + text `evt_*` stay as stamped in #44 / shipped Client #45. Do **not** reopen M1.
 
@@ -924,7 +924,7 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 - Craft session / battle inside event M1
 - Run-kill from a single event pick
 - Branching event trees / art
-- Elite telegraph on N5 (stays `22` open question)
+- Elite telegraph on N5 (route badge in [22](22-chapter-schedule.md); not a market socket)
 - Adventurer catalog / Dex work
 - A second deck type or a second gold purse
 - Greying-out market picks after k visits
@@ -940,7 +940,7 @@ Log on market enter, after each buy/sell/refresh/enchant, on market exit, and on
 - Refreshing staff / skill / gear banks mid-visit
 - Owner chrome / shopkeeper portraits
 - Client `src/` / Godot this PR
-- Elite N5 telegraph, adventurer catalog, battle playback
+- Elite N5 telegraph ([22](22-chapter-schedule.md)), adventurer catalog, battle playback
 - Merging craft `enc_*` runes into market mat enchant
 - Selling Extra Seam / Second Rune as `sk_*` this pass (slot raises = staff)
 - Auto-equip on buy

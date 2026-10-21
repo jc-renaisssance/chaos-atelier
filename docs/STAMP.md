@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; shipped `dev` tip still **`1765a29`**, branch base **`8b6e959`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed M1 portraits, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. The card after it is the **open** portrait-uniqueness stamp (hold on #63: Race + Character on all 24; REJECT art #62). #61 stays the locked roster. Landed M1 portrait files stay closed unless a separate regen stamp. `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; `dev` tip **`27df8cc`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. The **open** card is Elite telegraph N5 (below). `main` is not promoted (`353f1d4`).
 
 ---
 
@@ -655,3 +655,48 @@ None.
 ## Blocks stamp
 
 Decision 1. An ACCEPT, or a list of `adv_*` rows to rewrite, stamps the packet. #61 roster and draw B stay stamped. M1 roster stays stamped. Art #62 assets are not in this PR. M1 regen is not opened here. Nothing else blocks.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-21 (Elite telegraph N5)
+
+Docs only. Off `dev` tip **`27df8cc`** (art #65). Route map stays the 2026-10-13 lock. Kind faces stay the 2026-10-20 lock (canvas **B**, 48×48, #57–#59). `kind_appointment.png` stays a sealed letter. It is not this telegraph. Portrait redraws #64 / #65 stay landed. Do not regen them. Do not revive #62. No `src/` / Godot / art gens. `20` unchanged under the Design default (no `elite` key). Aizen merges only after Jonathan stamps. Harribel soft-gate before the one Nnoitra gen (note only — do not ping from this seat). Ulquiorra wires the overlay after the gen. Szayelaporro smokes after the wire. This card does not open interactive-order slice 4, an M2 Client, or a stat retune.
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/22-chapter-schedule.md` | **Elite telegraph (2026-10-21)** — proposed law, Marker, Scope, ahead-of-time vs current, art socket, Client wire. Open question at the bottom is replaced by this card |
+| `docs/20-harness-stamp.md` | Pointer only — badge is not a column unless Scope **C** |
+| `docs/05-art.md` | Pointer only — one later file `assets/route/elite_mark.png`; no gen here |
+| `docs/pm/phase-1-plan.md` | Queue: this Design is item 2. Next after stamp: slice 4, then stat/event last |
+| `docs/README.md` | Index pointer |
+| `docs/STAMP.md` | This card |
+
+`01`, `03`, `00`, `29`, `31`, `32` carry one-line pointers. They do not add a second mechanism.
+
+## Decisions
+
+1. **Marker — A or B.** **A (Design default):** a distinct ahead-of-time badge on the route card from chapter start, and on a live fork row when the next node is in scope. The badge stays when the node is current. Type + id stays. The kind face stays. File `assets/route/elite_mark.png`, separate from `kind_appointment.png`. **B:** no badge. Type + id on the graph is the telegraph. No socket, no Client overlay, no gen. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+2. **Scope — A, B, or C. Only if Decision 1 is A.** **A (Design default):** every `kind=appointment`. C1 shows it on **N5** only, because N5 is the only appointment. No new field. A later appointment inherits the badge. **B:** `ref_id == appt_scrap_duelist` only. A later appointment does not inherit. Do not key the predicate on node id `N5`. **C:** row flag `elite: true`. C1 sets it on N5. Adds `route_nodes[].elite` before Client. Write **A**, **B**, or **C**. Silence is not **A**. Design recommends **A**. If Decision 1 is **B**, leave this line blank.
+
+3. **Canvas — accept the default.** Pro Flash **48×48 soft-stipple**, one frame, same canvas as the kind chips. Subject: horned skull-seal (bone, dull gold horn, flat dark ground). No letter, no scroll, no Scrap Duelist face, no text. Client overlays it at **20×20** on the top-right of the existing 108×72 card, and at **16×16** on the options row. Nearest filter. One texture, modulated with the flags the card already has. Missing png → no badge. Silence keeps this table. Void if Decision 1 is **B**.
+
+These are locks once the letters above are written, not extra forks: entering N5 stays take-appointment → stamina craft; decline once per chapter stays; the newspaper boss announce stays a different telegraph; the badge does not sit on R7 / R8; fancy titles stay Later.
+
+## Questions
+
+None.
+
+## Blocks stamp
+
+An unanswered Marker line (**A** or **B**). Silence is not **A**.
+
+Decision 1 = **A** and an unanswered Scope line (**A**, **B**, or **C**). Silence is not scope **A**.
+
+Canvas does not block. Harribel’s soft-gate is before the gen, not before this docs stamp.
+
+If Scope is **C**, `route_nodes[].elite` is a Client precondition. This Design does not add the key to `20`. Writing **C** still stamps the mechanism. The key lands with the Client stamp. It is not a second open question.
+
+Nothing else blocks. #62 is not in this PR. Slice 4 is not in this PR.

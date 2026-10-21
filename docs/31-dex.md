@@ -242,7 +242,7 @@ Do not add a lore page, a second portrait, or a write path.
 - A second `adv_*` portrait set, or busts on unmet rows
 - Builds / Crafts row icons
 - Owner chrome, posture sheets, interactive-order slice 4
-- Elite N5 telegraph (open question stays in [22](22-chapter-schedule.md))
+- Elite N5 telegraph (law is [22](22-chapter-schedule.md) Elite telegraph — not a Dex socket)
 - Market chrome, `sk_*` regen, portrait regen
 - M2 four-job people (Wizard / Hexer / Outrider / Oathbound)
 - Shiny gens
@@ -300,7 +300,7 @@ Log after the matching trigger (and on a cross-run load):
 - Builds / Crafts row-icon matrix (outlook × tier × `con_*`)
 - Wiping the Dex on death
 - Making Dex a `20` Required run stamp
-- Owner chrome, posture sheets, elite N5 telegraph, market reopen (those are outside this file; see the art section)
+- Owner chrome, posture sheets, elite N5 telegraph ([22](22-chapter-schedule.md)), market reopen (those are outside this file)
 
 ---
 
