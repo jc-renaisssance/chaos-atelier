@@ -2,7 +2,7 @@
 
 **Terminology (2026-10-05):** people in this pool are **adventurers**. **Client** = Godot Client seat / codebase. Filename / `boss_client_id` stay until Grimmjow’s bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
 
-Jonathan lock (2026-10-02). **M1 4-job draw LOCKED (Jonathan 2026-10-08).** **M2 / Steam-demo draw = all 8 jobs** once `29` names people (Grimmjow 2026-10-21 — Jonathan stamp pending). That pool does not rewrite the M1 filter. **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
+Jonathan lock (2026-10-02). **M1 4-job draw LOCKED (Jonathan 2026-10-08):** Knight, Mage, Blade Dancer, Lagoon. **M2 / Steam-demo draw LOCKED (Jonathan 2026-10-21, draw B):** Wizard, Hexer, Outrider, Oathbound only. The two pools are **disjoint**. **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
 
 ## Pool law
 
@@ -10,9 +10,9 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 
 - Organized by **job title** (knight, mage, lagoon, wizard, blade dancer, …).
 - At the **boss beat**, draw **one** adventurer from this pool (seeded). That draw is **independent** of which chapter boss was announced (`17`).
-- **Catalog vs filter.** The table below is the **8-job catalog** (order constructions). Draws are filters over it. Do not delete rows to express a smaller pool.
+- **Catalog vs filter.** The table below is the **construction catalog** (every job’s order). A draw is a filter over it. Do not delete a row to express a pool, and do not draw every row at once.
 - **M1 draw filter — LOCKED (Jonathan 2026-10-08):** `M1_JOB_POOL` is **4 jobs only** — Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound on M1 content or historical smokes. Do **not** stub-fallback.
-- **M2 / Steam-demo filter (Grimmjow 2026-10-21):** `M2_JOB_POOL` (= `STEAM_DEMO_JOB_POOL`) is **all 8** jobs in this catalog, then one of that job’s 3 named people in [29](29-adventurer-catalog.md). Boss beat and shop walk-in. Does not unlock the four inside M1.
+- **M2 / Steam-demo filter — LOCKED (Jonathan 2026-10-21, draw B):** `M2_JOB_POOL` (= `STEAM_DEMO_JOB_POOL`) is **4 jobs only** — Wizard, Hexer, Outrider, Oathbound. Then one of that job’s 3 named people in [29](29-adventurer-catalog.md). Boss beat and shop walk-in on M2 content. Does **not** include the M1 four. The pools stay disjoint.
 - The drawn adventurer’s **order constructions** (`con_*`) **+ requirement tags** are what the player crafts for.
 - The drawn adventurer **fights** the announced chapter boss. Player is the clothier, not the fighter.
 - Mid-chapter appointments / walk-ins (`appt_*`, route map `22`) are **not** this pool. Scrap Duelist stays an **appointment** (C1 elite node) — never the boss-client, never Dex Adventurers; do not pin to reserved **days** or the boss beat.
@@ -23,16 +23,17 @@ Named people (3 per job, M1 and M2) supersede job-title-only identity: **[29-adv
 
 ## Draw
 
-**LOCKED (Jonathan 2026-10-08):** M1 boss-draw pool = **4 jobs only**. Closes PR #28 open question 1 (restrict to 4 vs keep 8-job draw + job-stub fallback).
+**LOCKED (Jonathan 2026-10-08):** M1 boss-draw pool = **4 jobs only**. Closes PR #28 open question 1 (restrict to 4 vs keep a draw of every construction row plus job-stub fallback). **LOCKED (Jonathan 2026-10-21, draw B):** M2 does not revive a union of both fours. `M2_JOB_POOL` is Wizard, Hexer, Outrider, Oathbound only.
 
 ```
-# catalog (8 jobs) stays below — a draw is a filter, not a delete
+# construction rows stay below — each draw is one 4-job pool
 M1_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon
 # LOCKED Jonathan 2026-10-08. M1 content / historical smokes. Unchanged.
 
-M2_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon, job_wizard, job_hexer, job_outrider, job_oathbound
+M2_JOB_POOL = job_wizard, job_hexer, job_outrider, job_oathbound
 # STEAM_DEMO_JOB_POOL = M2_JOB_POOL
-# M2 / Steam-demo boss beat + shop walk-in. Not an M1 rewrite.
+# LOCKED Jonathan 2026-10-21 — draw B.
+# Disjoint from M1_JOB_POOL. Do not union the two lists.
 
 function pick_boss_client(seed):
   job = seeded_choice(M1_JOB_POOL, seed)
@@ -43,20 +44,20 @@ function pick_boss_client(seed):
 function pick_boss_client_m2(seed):
   job = seeded_choice(M2_JOB_POOL, seed)
   # do not pass chapter_boss_id
-  # named person: 29 (one of that job's 3) — stubs are aliases, not extra people
+  # named person: 29 (one of that M2 job's 3) — stubs are aliases, not extra people
   return job
 ```
 
 | Rule | M1 (`M1_JOB_POOL`) | M2 / Steam demo (`M2_JOB_POOL`) |
 |---|---|---|
 | When | Boss beat (after reserved last-2 **days** / final prep) — not chapter-start newspaper. M1 shop / walk-in uses the M1 12 | Same boss beat **and** shop / walk-in, when the content is M2 / Steam demo |
-| What | One `job_*` from **4 jobs** → named `adv_*` from that job (`29`) + that job’s **order constructions** | One `job_*` from **8 jobs** → named `adv_*` from that job’s 3 + the same job constructions |
+| What | One `job_*` from **Knight, Mage, Blade Dancer, Lagoon** → named `adv_*` from that job (`29`) + that job’s **order constructions** | One `job_*` from **Wizard, Hexer, Outrider, Oathbound** → named `adv_*` from that job’s 3 + the same job constructions |
 | Vs boss | Independent of `chapter_boss_id` | Independent of `chapter_boss_id` |
 | Repeat | Same job may recur across chapters | Same |
 | Unique-per-run | Later | Later |
 | Telegraph job before beat | Later | Later |
 | Newspaper | Announces the **boss** (`26`), not the adventurer | Same |
-| Wizard / Hexer / Outrider / Oathbound | **Out of the M1 draw (LOCKED).** Do not draw; do not stub-fallback | **In the pool.** Draw a named person from `29`, never the stub as a person |
+| The other four | **Out of this pool (LOCKED).** Do not draw; do not stub-fallback | **Out of this pool (LOCKED, draw B).** Do not draw the M1 four here |
 
 ## Job catalog
 
@@ -181,7 +182,7 @@ On `mission_kind=boss` (`20`):
 |---|---|
 | `chapter_boss_id` | Announced pool draw (`17`) |
 | `boss_pool_id` | Pool the boss was drawn from |
-| `boss_client_id` | `adv_*` from this catalog. **M1:** one of the 12 named people or an M1 job alias (`29`). **M2 / Steam demo:** one of the 24 named people or any of the 8 job aliases (`29`) |
+| `boss_client_id` | `adv_*` from this catalog. **M1:** one of the 12 M1 named people or an M1 job alias (`29`). **M2 / Steam demo:** one of the 12 M2 named people or an M2 job alias (`adv_wizard`, `adv_hexer`, `adv_outrider`, `adv_oathbound`) |
 | `boss_job_id` | matching `job_*` |
 | `order_id` | that job’s `ord_*` |
 | `construction_ids` | **that job’s order constructions** (listed `con_*`, in sequence) |
@@ -199,7 +200,10 @@ M1 portraits have landed (`29`). M2 portraits, extra Client widgets for the new 
 - Inventing `con_*`, Godot scenes, or portraits
 - Per-chapter client pools for the **boss** beat (mid-chapter people stay route-map nodes / appointments)
 - Flavor-only job rows with no order constructions
-- Drawing Wizard / Hexer / Outrider / Oathbound in **M1** (or 8-job draw + job-stub fallback on an M1 smoke)
+- Drawing Wizard / Hexer / Outrider / Oathbound in **M1**
+- Drawing Knight / Mage / Blade Dancer / Lagoon in **M2**
+- Merging the two pools into one draw
+- Job-stub fallback on either smoke
 - Treating `M2_JOB_POOL` as a rewrite of the locked M1 filter
 
 ## Pointers

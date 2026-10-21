@@ -39,7 +39,7 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 
 - Boss pools 3×3 → 27 paths: `17`
 - Shared boss-client / job pool: `28`
-- Named adventurers: `29` — M1 **12** (4 jobs) + M2 **12** (Wizard / Hexer / Outrider / Oathbound). `M1_JOB_POOL` stays 4 jobs. `M2_JOB_POOL` is the 8-job Steam-demo draw
+- Named adventurers: `29` — M1 **12** (Knight, Mage, Blade Dancer, Lagoon) + M2 **12** (Wizard, Hexer, Outrider, Oathbound). `M1_JOB_POOL` and `M2_JOB_POOL` are **disjoint** 4-job locks. Steam-demo draw is `M2_JOB_POOL` only
 - Interactive-order slices 1–3: `30`
 - Dex (profile collection): `31`
 - Missions before boss: `22` (route map, `N*` nodes; free `E*` board superseded)

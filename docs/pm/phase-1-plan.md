@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-21**. Shipped tip on `dev` remains **`1765a29`** (this branch base **`8b6e959`**). **M1 ugly full-experience is operationally exit-ready** at that tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **Design in progress** in [29](../29-adventurer-catalog.md) — Jonathan stamp pending, not Client. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only).
+Updated **2026-10-21**. Shipped tip on `dev` remains **`1765a29`** (this branch base **`8b6e959`**). **M1 ugly full-experience is operationally exit-ready** at that tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **stamped** (Jonathan 2026-10-21, #61, draw B) in [29](../29-adventurer-catalog.md). `M2_JOB_POOL` is those four only, disjoint from `M1_JOB_POOL`. Not Client. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only).
 
 Prior stamps still hold as history: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 superseded); **2026-10-05** M1 / M2 framing + **adventurers** terminology. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
@@ -63,7 +63,7 @@ Earlier systems still on this tip (through `1082ef5` and the route-map rewrite):
 
 | Lock | Note |
 |------|------|
-| Limited **adventurer jobs** | **LOCKED (Jonathan 2026-10-08):** M1 draw = **`M1_JOB_POOL`**, **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). That lock does not move. M2 / Steam-demo draw is a **second** pool, `M2_JOB_POOL` (8 jobs), Design in `29`. |
+| Limited **adventurer jobs** | **LOCKED (Jonathan 2026-10-08):** M1 draw = **`M1_JOB_POOL`**, **4 jobs** — Knight, Mage, Blade Dancer, Lagoon (`28` / `29`). That lock does not move. **LOCKED (Jonathan 2026-10-21, draw B):** M2 / Steam-demo draw = **`M2_JOB_POOL`**, the other **4** — Wizard, Hexer, Outrider, Oathbound. The pools are disjoint. |
 | Limited **enemy types** | Same — Design stamps the cut. |
 | Shop adventurers | **More than one adventurer per job/class.** Met by the 4×3 catalog in `29`. |
 | Catalog before wire | Define **stats / skills / requirement tags** first. M1 catalog is [29](../29-adventurer-catalog.md). Client wires people from that catalog. |
@@ -99,7 +99,7 @@ Order is fixed. Do not pull a later row forward. Route-graph board art + Dex art
 
 | # | Item | Note |
 |---:|------|------|
-| 1 | M2 four-job catalog expansion | **In progress** (this Design). Wizard / Hexer / Outrider / Oathbound × 3 named in [29](../29-adventurer-catalog.md). `M1_JOB_POOL` stays locked. `M2_JOB_POOL` = 8 jobs for Steam-demo boss beat + shop walk-in. Jonathan stamp pending. No Client, no art gens |
+| 1 | M2 four-job catalog expansion | **Stamped** (Jonathan 2026-10-21, #61). Roster accepted. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (draw B), disjoint from `M1_JOB_POOL`. Boss beat and shop walk-in on M2 content use that pool, then 3 named people. Client and portraits still Later |
 | 2 | Elite telegraph N5 | Next after the catalog stamps. M1 graph stays type + id until then. Not this PR |
 | 3 | Interactive-order slice 4 | After N5. Battle playback + posture slots. Not this PR |
 | 4 | Stat / event tuning | **Last.** Knobs stay knobs until a stamp says otherwise |
@@ -123,7 +123,7 @@ Seat order for each open item:
 
 Already through that lane on this tip (do not re-hold): market M1 #44 → #45; market M2 tabs #46 → #47; `staff_*` / `artifact_*` icons #48 → #49; skills shelf #51 → #52 → #53; adventurer portraits #54 → #55 (tab chrome stamped **A**, no gens); route-board art + Dex art sockets #57 (`ddbe8b5`) → #58 (`d432fc2`) → #59 (`1765a29`). Ulquiorra does **not** hold a Client on that lane.
 
-**Open lane:** M2 four-job catalog. Grimmjow Design is in this drop. Jonathan stamps next. Nnoitra does **not** gen the new 12. Ulquiorra does **not** wire them. Szayelaporro does **not** smoke them until a Client PR exists. After that stamp, the queue continues **Elite N5 → interactive-order slice 4 → stat/event last**.
+**Catalog lane:** M2 four-job Design is **stamped** (roster accepted; draw B). Nnoitra does **not** gen the new 12 in this drop. Ulquiorra does **not** wire them. Szayelaporro does **not** smoke them until a Client PR exists. Next open item after merge: **Elite N5 → interactive-order slice 4 → stat/event last**.
 
 This drop is **docs only**. No game Client code.
 
@@ -133,7 +133,7 @@ This drop is **docs only**. No game Client code.
 
 - Elite telegraph N5
 - Interactive-order slice 4 (battle playback + posture art)
-- M2 four-job **art and Client** (people are named in `29`; portraits and wire stay Later until this Design stamps)
+- M2 four-job **art and Client** (people and draw B are stamped in `29`; portraits and wire stay Later)
 - Stat / event retune (last in the until-M2 queue — after catalog, Elite N5, and slice 4)
 - Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
 - Full game ship (beyond Steam demo)

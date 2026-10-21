@@ -1,6 +1,6 @@
 # M1 + M2 adventurer catalog
 
-**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **Design-ready** for Jonathan stamp (2026-10-21): Wizard, Hexer, Outrider, Oathbound × 3 = **12** new named `adv_*`. `M1_JOB_POOL` stays the locked 4-job draw. `M2_JOB_POOL` is the Steam-demo 8-job draw. Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. M1 portraits stay the landed 12 — do not regen them.
+**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. M1 portraits stay the landed 12 — do not regen them. M2 portraits stay Later.
 
 **Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
@@ -47,14 +47,14 @@ No new harness **person** field. `boss_client_id` = the drawn named `adv_*`. `bo
 
 **Boss beat stays `28`:** seeded, **independent** of `chapter_boss_id`. Player is the clothier; the drawn adventurer fights the announced boss.
 
-The **catalog** in `28` is 8 jobs (constructions). The **draw** is a filter over that catalog. Two filters. They do not replace each other.
+`28` still lists every job’s constructions. The **draw** is never that whole list. Two pools, both **4 jobs**, **disjoint**. Do not merge them.
 
 | Pool | Jobs | When it applies |
 |---|---|---|
 | `M1_JOB_POOL` | Knight, Mage, Blade Dancer, Lagoon (**4**) | **M1 content and historical / regression smokes.** LOCKED (Jonathan 2026-10-08). Unchanged |
-| `M2_JOB_POOL` | Those four **plus** Wizard, Hexer, Outrider, Oathbound (**8**) | **M2 / Steam-demo** boss beat **and** shop walk-in. Alias: `STEAM_DEMO_JOB_POOL` = `M2_JOB_POOL` |
+| `M2_JOB_POOL` | Wizard, Hexer, Outrider, Oathbound (**4**) | **M2 / Steam-demo** boss beat **and** shop walk-in on M2 content. Alias: `STEAM_DEMO_JOB_POOL` = `M2_JOB_POOL`. **LOCKED draw B** (Jonathan 2026-10-21) |
 
-`28` is not deleted down to 4 jobs. M1 does not become an 8-job draw.
+Knight, Mage, Blade Dancer, and Lagoon are not in `M2_JOB_POOL`. Wizard, Hexer, Outrider, and Oathbound are not in `M1_JOB_POOL`.
 
 ### M1 — `M1_JOB_POOL` (LOCKED)
 
@@ -84,29 +84,31 @@ function pick_boss_client(seed):
 
 ### M2 / Steam demo — `M2_JOB_POOL`
 
-Does **not** rewrite the M1 function above. M1 regression still calls `pick_boss_client(seed)` and stays on 4 jobs.
+Does **not** rewrite the M1 function above. M1 regression still calls `pick_boss_client(seed)` and stays on its own 4 jobs. This pool does not include them.
 
 ```
-M2_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon, job_wizard, job_hexer, job_outrider, job_oathbound
+M2_JOB_POOL = job_wizard, job_hexer, job_outrider, job_oathbound
 # STEAM_DEMO_JOB_POOL = M2_JOB_POOL
-# NOT a ninth job. NOT Scrap Duelist. NOT a stub standing in for a person.
+# LOCKED Jonathan 2026-10-21 — draw B. Disjoint from M1_JOB_POOL.
+# NOT: job_knight, job_mage, job_blade_dancer, job_lagoon
+# NOT a merged draw of every job in 28. NOT Scrap Duelist. NOT a stub as a person.
 
 function pick_boss_client_m2(seed):
   job = seeded_choice(M2_JOB_POOL, seed)
   # do not pass chapter_boss_id
-  # 3 named people for every job in the pool, including the original M1 four
+  # 3 named people for that M2 job only
   return seeded_choice(ADVENTURERS_BY_JOB[job], seed)
 ```
 
 | Rule | M2 / Steam demo |
 |---|---|
-| When | Boss beat (same beat as M1 — after reserved last-2 **days**) **and** shop / walk-in draw |
-| What | One `job_*` from the **8-job pool** → one named `adv_*` from that job’s **3** |
+| When | Boss beat (same beat as M1 — after reserved last-2 **days**) **and** shop / walk-in, when the content is M2 / Steam demo |
+| What | One `job_*` from these **4** → one named `adv_*` from that job’s **3** |
 | Vs boss | Independent of `chapter_boss_id` |
 | Order constructions | Still the **job** list from `28` |
 | Requirement tags | **Per adventurer** in this catalog |
 | `threat_id` on boss beat | Announced `chapter_boss_id` — catalog `target_threat_id` is the shop / brief default |
-| Shop / walk-in | The **24** named people (or a job’s 3 when a job is offered). Not the M1-only 12 |
+| Shop / walk-in | The **12** M2 named people (or a job’s 3 when a job is offered). Not the M1 12 |
 | M1 smokes | Keep calling `M1_JOB_POOL`. A Steam-demo seed is not an M1 regression seed |
 
 ---
@@ -670,7 +672,7 @@ Pure is a **starter tag**. This brief vs Sunspear Captain is the M2 **trap row**
 
 ## Harness (Test)
 
-Reuse `20` / `28`. **No** new person field. `20` assert 23 still describes the **M1** pool until a Client stamp edits it. The asserts below are the Design split. Do not run the 24-person assert on an M1 smoke, and do not run the 12-person assert on an M2 / Steam-demo smoke.
+Reuse `20` / `28`. **No** new person field. `20` assert 23 still describes the **M1** pool until a Client stamp edits it. The asserts below are the Design split. Each smoke checks **its own 12**. An M2 id fails an M1 smoke. An M1 id fails an M2 smoke.
 
 | Field | Value |
 |---|---|
@@ -683,7 +685,7 @@ Reuse `20` / `28`. **No** new person field. `20` assert 23 still describes the *
 
 **M1 pool active.** On `mission_kind=boss`, assert `23` from `20` **plus**: `boss_client_id` is one of the **12** M1 named people (or a job-default alias `adv_knight` / `adv_mage` / `adv_blade_dancer` / `adv_lagoon`); `boss_job_id` ∈ `{job_knight, job_mage, job_blade_dancer, job_lagoon}`; `construction_ids` still equals the **job** list (not a per-person invention). Wizard / Hexer / Outrider / Oathbound fail this assert.
 
-**M2 / Steam-demo pool active.** On `mission_kind=boss`, assert `23` from `20` **plus**: `boss_client_id` is one of the **24** named people (the M1 12 and the M2 12) or a job-default alias (`adv_knight` → `adv_halden_rook`, `adv_mage` → `adv_quill_lumen`, `adv_blade_dancer` → `adv_kite_thornreel`, `adv_lagoon` → `adv_tide_glass`, `adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`); `boss_job_id` matches that person’s job and is one of the **8**; `construction_ids` still equals the **job** list. `boss_client_id` is never an `appt_*`.
+**M2 / Steam-demo pool active.** On `mission_kind=boss`, assert `23` from `20` **plus**: `boss_client_id` is one of the **12** M2 named people or a job-default alias (`adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`); `boss_job_id` ∈ `{job_wizard, job_hexer, job_outrider, job_oathbound}`; `construction_ids` still equals the **job** list. Knight, Mage, Blade Dancer, and Lagoon fail this assert. `boss_client_id` is never an `appt_*`.
 
 Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field — it is meta (Dex Builds tab). Log keys live in [30](30-interactive-order.md) slice 2 and [31-dex](31-dex.md).
 
@@ -786,7 +788,9 @@ Not this PR. No PixelLab, no posture sheets, no second folder. When a later art 
 - Mass-renaming `boss_client_id` / `cli_*` / historical “client” prose
 - Scrap Duelist (or any `appt_*`) as a boss-pool adventurer
 - Inventing `con_*`, a ninth job, or a new `boss_*`
-- Putting Wizard / Hexer / Outrider / Oathbound into `M1_JOB_POOL`, or an 8-job draw + job-stub fallback on M1 smokes — **LOCKED** out (Jonathan 2026-10-08)
+- Putting Wizard / Hexer / Outrider / Oathbound into `M1_JOB_POOL` — **LOCKED** out (Jonathan 2026-10-08)
+- Putting Knight / Mage / Blade Dancer / Lagoon into `M2_JOB_POOL`, or merging the two pools into one draw — **LOCKED** out (Jonathan 2026-10-21, draw B)
+- Job-stub fallback on either smoke
 - Wiring this catalog in Client, Elite N5 telegraph, interactive-order slice 4, or a stat / event retune
 - Portrait gens or posture sheets for the M2 twelve (path reserved above; first wave stays the landed M1 12)
 - Scrap Duelist or job-stub portraits

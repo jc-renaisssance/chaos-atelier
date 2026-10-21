@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; shipped `dev` tip still **`1765a29`**, branch base **`8b6e959`**). The **M2 four-job catalog** stamp-ask at the end of this file is the open Jonathan card. Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, portraits, or that lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card at the end of this file **is** the open stamp-ask. `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; shipped `dev` tip still **`1765a29`**, branch base **`8b6e959`**). The **M2 four-job catalog** card at the end of this file is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, portraits, or that lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card at the end of this file is the **locked** draw-B record, not an open ask. `main` is not promoted (`353f1d4`).
 
 ---
 
@@ -595,29 +595,29 @@ State chrome, edges, Dex tab size, and adventurer-row reuse do not block. Writin
 
 ---
 
-# Grimmjow stamp-ask — 2026-10-21 (M2 four-job catalog)
+# Jonathan stamp — 2026-10-21 (M2 four-job catalog) — #61
 
-Docs only. Off `dev` tip **`8b6e959`**. M1 4-job draw stays **LOCKED** (Jonathan 2026-10-08). This card names the Later four. It does not wire Client, gen portraits, open Elite N5, open interactive-order slice 4, or retune stats. Market, chrome, M1 portraits, and route/Dex art stay closed. Aizen merges only after Jonathan stamps. Nnoitra does not gen. Ulquiorra does not wire. `20` assert 23 stays the M1 wording until a Client stamp; the M2 assert lives in `29`.
+Docs only. Off `dev` tip **`8b6e959`**. Grimmjow named the Later four. Jonathan stamped the card on #61. This note records that stamp. It does not wire Client, gen portraits, open Elite N5, open interactive-order slice 4, or retune stats. Market, chrome, M1 portraits, and route/Dex art stay closed. Nnoitra does not gen on this PR. Ulquiorra does not wire. `20` assert 23 stays the M1 wording until a Client stamp; the M2 assert lives in `29`.
 
 ## Review
 
 | File | Section |
 |---|---|
-| `docs/29-adventurer-catalog.md` | **M2 roster (12)** — Vesper Cant, Nyx Vellum, Orin Gold-Ink; Soot Cord, Tar Veil, Ashen Cowl; Harrow Gale, Flint Rime, Lark Mute; Aurel Vow, Clarion Mantle, Pell White. Draw pools. Harness split (12 vs 24). M2 portrait path Later |
-| `docs/28-boss-client-pool.md` | **Draw** — catalog stays 8 jobs; `M1_JOB_POOL` filter unchanged; `M2_JOB_POOL` = those 8. Alias arrows |
-| `docs/10-catalog-overview.md` | Roster count 12 + 12; `ask_*` × 24 |
-| `docs/pm/phase-1-plan.md` | Until-M2 order: catalog (in progress) → Elite N5 → IO slice 4 → stat/event last |
+| `docs/29-adventurer-catalog.md` | **M2 roster (12)** accepted as written. Draw pools are two disjoint 4-job locks. Harness: M1 asserts its 12; M2 asserts its 12. M2 portrait path Later |
+| `docs/28-boss-client-pool.md` | **Draw** — construction rows stay. `M1_JOB_POOL` unchanged. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only |
+| `docs/10-catalog-overview.md` | Roster count 12 + 12; `ask_*` × 24; pools disjoint |
+| `docs/pm/phase-1-plan.md` | Catalog stamped. Next: Elite N5 → IO slice 4 → stat/event last |
 | `docs/05-art.md` | M2 portrait wave = Later; path `assets/adv/<adv_id>.png`; no gens |
 | `docs/README.md` | Index line for `29` |
 | `docs/STAMP.md` | This card |
 
-M1 people, M1 constructions, and the nine `boss_*` are untouched. No new `con_*`. Scrap Duelist stays `appt_*`.
+M1 people, M1 constructions, and the nine `boss_*` are untouched. No new `con_*`. Scrap Duelist stays `appt_*`. People were not renamed.
 
-## Decisions
+## Locked
 
-1. **Roster — accept, or name the rows to rewrite.** Silence accepts all 12 names, knobs, `ask_*` lines, and briefs. That accept includes three gaps, written on the rows so they are not new outlooks: Hexer cross is Occult ∧ Sticky with **no** `syn_*` (`14` has neither `syn_sticky_occult` nor `syn_sticky_silent`; Snaretooth’s Sharp stays outside the hexer family). Outrider cross is Temper (`syn_fire_frost_clash`) because `14` has no `syn_wild_storm` and no `syn_storm_silent`. Oathbound cross is Dawn Vestment (`syn_solar_pure`) because `14` has no Solar ∧ Royal and no Solar ∧ Sharp. Pell White vs `boss_sunspear_captain` is the starter-tag trap (Pure mid). Job aliases: `adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`. To rewrite, name the `adv_*` and the replacement. Unnamed rows stay.
+1. **Roster — ACCEPT.** All 12 names, knobs, `ask_*` lines, and briefs, including the called gaps: Hexer cross is Occult ∧ Sticky with **no** `syn_*` (`14` has neither `syn_sticky_occult` nor `syn_sticky_silent`; Snaretooth’s Sharp stays outside the hexer family). Outrider cross is Temper (`syn_fire_frost_clash`) because `14` has no `syn_wild_storm` and no `syn_storm_silent`. Oathbound cross is Dawn Vestment (`syn_solar_pure`) because `14` has no Solar ∧ Royal and no Solar ∧ Sharp. Pell White vs `boss_sunspear_captain` is the starter-tag trap (Pure mid). Job aliases: `adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`.
 
-2. **Draw pool — A or B.** **A (Design default):** `M2_JOB_POOL` (= `STEAM_DEMO_JOB_POOL`) is all **8** jobs for the Steam-demo boss beat and the shop walk-in, then 3 named people per job. `M1_JOB_POOL` stays the locked 4 for M1 content and historical smokes. **B:** write a different pool shape (which `job_*` ids, and whether shop walk-in matches the boss beat). Silence is **A**. Silence is not a change to `M1_JOB_POOL`.
+2. **Draw — B, not A.** `M2_JOB_POOL` (= `STEAM_DEMO_JOB_POOL`) = **only** `job_wizard`, `job_hexer`, `job_outrider`, `job_oathbound`. M2 / Steam-demo boss beat and shop walk-in use that pool, then 3 named people per job. `M1_JOB_POOL` stays the locked 4 (Knight, Mage, Blade Dancer, Lagoon) for M1 content and historical smokes. The pools are **disjoint**. Do not union them.
 
 ## Questions
 
@@ -625,8 +625,4 @@ None.
 
 ## Blocks stamp
 
-Nothing, if decision 1 stands and the pool line is **A** (including by silence).
-
-A rewrite that names an `adv_*` and does not supply the replacement text blocks **that row only**.
-
-A pool shape other than the 8 jobs blocks until the `job_*` list is written. `M1_JOB_POOL` is not a block — it is already locked.
+None. Both lines are written. Roster accepted. Draw is B.
