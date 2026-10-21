@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-21**. Shipped tip on `dev` remains **`1765a29`** (this branch base **`8b6e959`**). **M1 ugly full-experience is operationally exit-ready** at that tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **stamped** (Jonathan 2026-10-21, #61, draw B) in [29](../29-adventurer-catalog.md). `M2_JOB_POOL` is those four only, disjoint from `M1_JOB_POOL`. Not Client. M2 **portrait uniqueness** for those 12 is an open Jonathan stamp in `29` (REJECT art #62 — same outlook). Nnoitra holds the redraw. That ask does not move the until-M2 queue. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only).
+Updated **2026-10-21**. Shipped tip on `dev` remains **`1765a29`** (this branch base **`8b6e959`**). **M1 ugly full-experience is operationally exit-ready** at that tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **stamped** (Jonathan 2026-10-21, #61, draw B) in [29](../29-adventurer-catalog.md). `M2_JOB_POOL` is those four only, disjoint from `M1_JOB_POOL`. Not Client. **Portrait uniqueness** for all 24 is an open Jonathan stamp in `29` (hold on #63: Race + Character; REJECT art #62). Nnoitra holds. ACCEPT soft-gates 12 M2 redraws only. M1 regen stays closed. That ask does not move the until-M2 queue. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only).
 
 Prior stamps still hold as history: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 superseded); **2026-10-05** M1 / M2 framing + **adventurers** terminology. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
@@ -99,7 +99,7 @@ Order is fixed. Do not pull a later row forward. Route-graph board art + Dex art
 
 | # | Item | Note |
 |---:|------|------|
-| 1 | M2 four-job catalog expansion | **Stamped** (Jonathan 2026-10-21, #61). Roster accepted. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (draw B), disjoint from `M1_JOB_POOL`. Boss beat and shop walk-in on M2 content use that pool, then 3 named people. Client still Later. Portrait uniqueness for the 12 is the open stamp in `29` (REJECT art #62). Nnoitra holds until Jonathan stamps those rows |
+| 1 | M2 four-job catalog expansion | **Stamped** (Jonathan 2026-10-21, #61). Roster accepted. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (draw B), disjoint from `M1_JOB_POOL`. Boss beat and shop walk-in on M2 content use that pool, then 3 named people. Client still Later. Portrait uniqueness for all 24 is the open stamp in `29` (hold on #63). Nnoitra holds. ACCEPT soft-gates 12 M2 redraws only |
 | 2 | Elite telegraph N5 | Next after the catalog stamps. M1 graph stays type + id until then. Not this PR |
 | 3 | Interactive-order slice 4 | After N5. Battle playback + posture slots. Not this PR |
 | 4 | Stat / event tuning | **Last.** Knobs stay knobs until a stamp says otherwise |
@@ -123,7 +123,7 @@ Seat order for each open item:
 
 Already through that lane on this tip (do not re-hold): market M1 #44 → #45; market M2 tabs #46 → #47; `staff_*` / `artifact_*` icons #48 → #49; skills shelf #51 → #52 → #53; adventurer portraits #54 → #55 (tab chrome stamped **A**, no gens); route-board art + Dex art sockets #57 (`ddbe8b5`) → #58 (`d432fc2`) → #59 (`1765a29`). Ulquiorra does **not** hold a Client on that lane.
 
-**Catalog lane:** M2 four-job Design is **stamped** (roster accepted; draw B). Portrait uniqueness for the 12 is a separate open stamp in `29` (REJECT art #62). Nnoitra does **not** gen the new 12 until Jonathan stamps those rows. Ulquiorra does **not** wire them. Szayelaporro does **not** smoke them until a Client PR exists. Next open item on the until-M2 queue stays **Elite N5 → interactive-order slice 4 → stat/event last**.
+**Catalog lane:** M2 four-job Design is **stamped** (roster accepted; draw B). Portrait uniqueness for all 24 is a separate open stamp in `29` (hold on #63). Nnoitra does **not** gen until Jonathan stamps. ACCEPT opens 12 M2 redraws only. M1 files stay landed. Ulquiorra does **not** wire them. Szayelaporro does **not** smoke them until a Client PR exists. Next open item on the until-M2 queue stays **Elite N5 → interactive-order slice 4 → stat/event last**.
 
 This drop is **docs only**. No game Client code.
 
@@ -133,7 +133,7 @@ This drop is **docs only**. No game Client code.
 
 - Elite telegraph N5
 - Interactive-order slice 4 (battle playback + posture art)
-- M2 four-job **Client** wire (people and draw B are stamped in `29`). Portrait gens wait on the open uniqueness stamp in `29`
+- M2 four-job **Client** wire (people and draw B are stamped in `29`). M2 portrait gens wait on the open uniqueness stamp in `29`. M1 regen is not that stamp
 - Stat / event retune (last in the until-M2 queue — after catalog, Elite N5, and slice 4)
 - Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
 - Full game ship (beyond Steam demo)
