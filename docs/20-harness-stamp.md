@@ -214,6 +214,8 @@ Day-generated **consumable** cards (Later; distinct type, **not** in this enum) 
 
 `rating_score` (0..100) is UI/debug only — **not** asserted (`23`).
 
+**Playback beats** ([30](30-interactive-order.md) slice 4) are **log-only** (`playback_played`, `playback_skipped`, `playback_beats`, `playback_actor_id`, plus the existing `piece_index`). Do not add them to Required. No new assert number under that Design default. Market and event stamps log `playback_played=false` only — they do not grow a mission playback.
+
 ## Asserts
 
 Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asserts.

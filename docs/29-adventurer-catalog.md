@@ -985,7 +985,7 @@ Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field —
 
 ## Ugly-Client
 
-Text-first stays legal. Names + job + stats + skill line + tag line + `boss_*` brief id are enough until a portrait file exists. Slice UI stays [30](30-interactive-order.md) — do not invent interactive-order beyond that ugly panel. No poster art. No posture sheets.
+Text-first stays legal. Names + job + stats + skill line + tag line + `boss_*` brief id are enough until a portrait file exists. Slice UI for slices 1–3 stays the ugly panel in [30](30-interactive-order.md). Posture stills and playback are that file’s slice 4 (open Design) — not a second portrait, and not this catalog’s gen list. No poster art.
 
 Portrait sockets (one per surface that already shows a person) are [below](#portrait-sockets-2026-10-20).
 
@@ -1045,7 +1045,7 @@ Placeholder on each socket = **display name + job** (already on the ugly panel).
 ### Explicit non-goals (this stamp)
 
 - Posture sheets
-- Battle playback art (`30` slice 4 stays Later)
+- Battle playback and posture stills — law is [30](30-interactive-order.md) slice 4. This portrait section does not gen them
 - M2 portrait gens in the 2026-10-20 wave. The redraw brief is [M2 portrait uniqueness](#m2-portrait-uniqueness). A Design PR still does not gen
 - Scrap Duelist portraits (or any `appt_*`)
 - Portraits for job stubs (`adv_knight` and the other aliases)
@@ -1147,8 +1147,8 @@ Nnoitra, after the stamp, and only for the busts that stamp opens:
 - Putting Wizard / Hexer / Outrider / Oathbound into `M1_JOB_POOL` — **LOCKED** out (Jonathan 2026-10-08)
 - Putting Knight / Mage / Blade Dancer / Lagoon into `M2_JOB_POOL`, or merging the two pools into one draw — **LOCKED** out (Jonathan 2026-10-21, draw B)
 - Job-stub fallback on either smoke
-- Wiring this catalog in Client, owning Elite N5 telegraph (that law is [22](22-chapter-schedule.md)), interactive-order slice 4, or a stat / event retune
-- M2 portrait gens, M1 regen, PNG edits, or posture sheets in this PR (uniqueness rows are the brief; path stays `assets/adv/<adv_id>.png`; the M1 twelve stay the landed files unless a later stamp opens regen)
+- Wiring this catalog in Client, reopening Elite N5 (shipped in [22](22-chapter-schedule.md)), owning slice 4 playback (law is [30](30-interactive-order.md)), or a stat / event retune
+- M2 portrait gens, M1 regen, PNG edits, or posture files in this catalog (uniqueness rows are the bust brief; bust path stays `assets/adv/<adv_id>.png`; posture path is slice 4 in `30`; the landed busts stay unless a later stamp opens regen)
 - One shared face or outlook across the M2 twelve (`adv_quill_lumen` is grain only)
 - Wizard hood-up (wizard order stays `con_robe` + `con_mantle`)
 - Scrap Duelist or job-stub portraits

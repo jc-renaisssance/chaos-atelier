@@ -53,4 +53,4 @@ function chapter_body(...):
 
 ## Review
 
-**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** route map ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)) · market visit + event resolve ([32](32-shop-and-events.md)). `cant_craft` at piece-cap is **GONE**. The 2026-10-12 free `E*` Day planner is **superseded**. Opening-shop in the pseudocode above is **not** live.
+**Historical review:** Card lineup (not map) · reps · newspaper · C1 diversity · cant_craft F/hp>0. **Live spine:** route map ([22](22-chapter-schedule.md)) · stamina craft ([27](27-craft-mode-stamina.md)) · market visit + event resolve ([32](32-shop-and-events.md)). `cant_craft` at piece-cap is **GONE**. The 2026-10-12 free `E*` Day planner is **superseded**. Opening-shop in the pseudocode above is **not** live. **Proposed** ([30](30-interactive-order.md) slice 4, awaiting stamp): on a Finish that already runs `run_mission`, play the timeline, then `ui.show_mission_result`. `cant_craft` still skips the timeline. This file’s pseudocode stays the historical shell.

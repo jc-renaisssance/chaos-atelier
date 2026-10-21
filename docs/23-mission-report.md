@@ -4,6 +4,8 @@ Jonathan lock (2026-09-22): the adventure report is a **mission result**, not on
 
 **Win / clear:** see **[24-win-conditions](24-win-conditions.md)** — one gate: `hp_remaining > 0` ∧ `rating ∈ {S,A,B,C}`.
 
+**Playback (proposed, [30](30-interactive-order.md) slice 4):** this card is unchanged. When a Finish runs the resolver, the proposed law plays a short timeline and then shows this card. Skip opens this card. Playback adds no column here. It reads `rating`, `favor_tags_hit`, `punish_tags_hit`, `skill_effectiveness`, `cleared`, `outcome`, and `hp_remaining`. It does not recompute them.
+
 ## Mission result card
 
 | Field | Type | Notes |

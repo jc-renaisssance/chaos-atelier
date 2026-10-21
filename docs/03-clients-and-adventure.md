@@ -3,7 +3,7 @@
 **Terminology (2026-10-05):** shop / walk-in / appointment / boss-pool people are **adventurers** — not “clients.” **Client** = Godot Client seat / codebase. Filename stays; Grimmjow owns deeper bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
 
 ## Clients & events
-Mid-chapter missions from **route-map nodes** on the **timetable** — live spine **[22-chapter-schedule](22-chapter-schedule.md)** (Days D1..DN; N = `map.day_count`; current map **8**; C1 sample graph with forks + bind). Appointments / walk-ins stay `appt_*` / `adv_*` on the node row. Appointment = **StS-elite analog**. Ahead-of-time badge: stamp card in [22](22-chapter-schedule.md) Elite telegraph (the kind face is not the badge). **`kind=event` text resolve** and **`kind=shop` market visit** (display Market; M1 materials + enchant / **M2** `staff_*` · `sk_*` · `artifact_*`) = **[32](32-shop-and-events.md)** (`evt_*` via node `ref_id`; no craft inside the event). Free per-day `E*` board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)), Round / schedule board, and 1-of-3 lineup ([22-chapter-flow](22-chapter-flow.md)) are **superseded**.
+Mid-chapter missions from **route-map nodes** on the **timetable** — live spine **[22-chapter-schedule](22-chapter-schedule.md)** (Days D1..DN; N = `map.day_count`; current map **8**; C1 sample graph with forks + bind). Appointments / walk-ins stay `appt_*` / `adv_*` on the node row. Appointment = **StS-elite analog**. Ahead-of-time badge: **shipped** in [22](22-chapter-schedule.md) Elite telegraph (#66 / #67 / #68, Marker A, Scope A; the kind face is not the badge). **`kind=event` text resolve** and **`kind=shop` market visit** (display Market; M1 materials + enchant / **M2** `staff_*` · `sk_*` · `artifact_*`) = **[32](32-shop-and-events.md)** (`evt_*` via node `ref_id`; no craft inside the event). Free per-day `E*` board ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)), Round / schedule board, and 1-of-3 lineup ([22-chapter-flow](22-chapter-flow.md)) are **superseded**.
 
 ## Chapter bosses
 **Pools of 3 per chapter**; one announced at chapter start — **[17-chapter-bosses](17-chapter-bosses.md)**. Full run → **27** boss combinations.
@@ -15,7 +15,7 @@ Mid-chapter missions from **route-map nodes** on the **timetable** — live spin
 Mid-chapter appointments (incl. Scrap Duelist) stay `appt_*` — they are **not** the boss-client and **not** Dex Adventurers ([31](31-dex.md)). Do not pin them to reserved last-2 days.
 
 ## Mission report
-Rating · HP remaining · damage aid % · skill effectiveness (≤5★) + optional adventurer letter — **[23-mission-report](23-mission-report.md)**.
+Rating · HP remaining · damage aid % · skill effectiveness (≤5★) + optional adventurer letter — **[23-mission-report](23-mission-report.md)**. **Proposed** ([30](30-interactive-order.md) slice 4): a short playback, then this card. The card fields do not change.
 
 ## Balance harness
 Stamp fields — **[20-harness-stamp](20-harness-stamp.md)**.
