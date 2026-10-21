@@ -39,7 +39,7 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 
 - Boss pools 3×3 → 27 paths: `17`
 - Shared boss-client / job pool: `28`
-- M1 named adventurers: `29`
+- Named adventurers: `29` — M1 **12** (4 jobs) + M2 **12** (Wizard / Hexer / Outrider / Oathbound). `M1_JOB_POOL` stays 4 jobs. `M2_JOB_POOL` is the 8-job Steam-demo draw
 - Interactive-order slices 1–3: `30`
 - Dex (profile collection): `31`
 - Missions before boss: `22` (route map, `N*` nodes; free `E*` board superseded)
@@ -49,4 +49,4 @@ Fire · Frost · Storm · Earth · Lunar · Solar · Royal · Silent · Sticky �
 
 ## ID conventions
 
-`mat_*` · `con_*` · `enc_*` (craft runes, `13`) · **`mat_ench_*`** (material enchant on the M1 market tab — [32](32-shop-and-events.md); **not** `enc_*`) · **`staff_*`** (M2 market Staffs tab — [32](32-shop-and-events.md); raises `max_materials` / `max_runes` per `12b`) · **`sk_*`** (owner craft skills, `27`; M2 Skills tab sells these into the `own_basic` kit) · **`artifact_*`** (M2 market Gear tab — owner utility; **not** `gear_*`; crafted garment “gear” below stays the resolver output) · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` (M1 catalog in `32`; node `ref_id`) · **`N*`** (route-map nodes, `22`; windowed **`E*`** superseded) · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*` · `ask_*` (adventurer battle / estimate skill — **new** in `29`; distinct from `sk_*` owner craft skills) · `choice_*` (event picks, `32`)
+`mat_*` · `con_*` · `enc_*` (craft runes, `13`) · **`mat_ench_*`** (material enchant on the M1 market tab — [32](32-shop-and-events.md); **not** `enc_*`) · **`staff_*`** (M2 market Staffs tab — [32](32-shop-and-events.md); raises `max_materials` / `max_runes` per `12b`) · **`sk_*`** (owner craft skills, `27`; M2 Skills tab sells these into the `own_basic` kit) · **`artifact_*`** (M2 market Gear tab — owner utility; **not** `gear_*`; crafted garment “gear” below stays the resolver output) · `syn_*` / `syn_neg_*` · `uniq_*` · `boss_*` · `cli_*` · `evt_*` (M1 catalog in `32`; node `ref_id`) · **`N*`** (route-map nodes, `22`; windowed **`E*`** superseded) · `look_*` · `job_*` · `adv_*` · `ord_*` · `appt_*` · `ask_*` (adventurer battle / estimate skill — one per named person in `29`, **24** total: 12 M1 + 12 M2; distinct from `sk_*` owner craft skills) · `choice_*` (event picks, `32`)

@@ -2,7 +2,7 @@
 
 **Terminology (2026-10-05):** people in this pool are **adventurers**. **Client** = Godot Client seat / codebase. Filename / `boss_client_id` stay until Grimmjow’s bible rename Later. See [STAMP](STAMP.md) · [pm/phase-1-plan](pm/phase-1-plan.md).
 
-Jonathan lock (2026-10-02). **M1 4-job draw LOCKED (Jonathan 2026-10-08).** **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
+Jonathan lock (2026-10-02). **M1 4-job draw LOCKED (Jonathan 2026-10-08).** **M2 / Steam-demo draw = all 8 jobs** once `29` names people (Grimmjow 2026-10-21 — Jonathan stamp pending). That pool does not rewrite the M1 filter. **Doc id: `28`.** Design only — no Client / Godot / art this stamp.
 
 ## Pool law
 
@@ -10,45 +10,57 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 
 - Organized by **job title** (knight, mage, lagoon, wizard, blade dancer, …).
 - At the **boss beat**, draw **one** adventurer from this pool (seeded). That draw is **independent** of which chapter boss was announced (`17`).
-- **M1 draw filter — LOCKED (Jonathan 2026-10-08):** pool for the draw is **4 jobs only** — Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Those four stay in this catalog as Later/M2 until their adventurer catalog exists ([29](29-adventurer-catalog.md)). Do **not** fall back to job-stubs for Later jobs.
+- **Catalog vs filter.** The table below is the **8-job catalog** (order constructions). Draws are filters over it. Do not delete rows to express a smaller pool.
+- **M1 draw filter — LOCKED (Jonathan 2026-10-08):** `M1_JOB_POOL` is **4 jobs only** — Knight, Mage, Blade Dancer, Lagoon. Do **not** draw Wizard / Hexer / Outrider / Oathbound on M1 content or historical smokes. Do **not** stub-fallback.
+- **M2 / Steam-demo filter (Grimmjow 2026-10-21):** `M2_JOB_POOL` (= `STEAM_DEMO_JOB_POOL`) is **all 8** jobs in this catalog, then one of that job’s 3 named people in [29](29-adventurer-catalog.md). Boss beat and shop walk-in. Does not unlock the four inside M1.
 - The drawn adventurer’s **order constructions** (`con_*`) **+ requirement tags** are what the player crafts for.
 - The drawn adventurer **fights** the announced chapter boss. Player is the clothier, not the fighter.
 - Mid-chapter appointments / walk-ins (`appt_*`, route map `22`) are **not** this pool. Scrap Duelist stays an **appointment** (C1 elite node) — never the boss-client, never Dex Adventurers; do not pin to reserved **days** or the boss beat.
 
 Example: C1 may draw Ash Drake as boss; C1 (or C2 / C3) may still draw a knight or a mage. Different jobs → different **order constructions** and different requirement tags. Knight orders armor + gauntlet; mage orders robe + hood. Ash Drake’s favor / punish (`17`) is the threat axis.
 
-Portraits / UI wire = **Later**. Named M1 people (3 per M1 job) supersede job-title-only identity: **[29-adventurer-catalog](29-adventurer-catalog.md)**.
+Named people (3 per job, M1 and M2) supersede job-title-only identity: **[29-adventurer-catalog](29-adventurer-catalog.md)**. M1 portrait files have landed. M2 portrait files are Later (`assets/adv/<adv_id>.png` when an art stamp opens).
 
 ## Draw
 
 **LOCKED (Jonathan 2026-10-08):** M1 boss-draw pool = **4 jobs only**. Closes PR #28 open question 1 (restrict to 4 vs keep 8-job draw + job-stub fallback).
 
 ```
-# catalog (8 jobs) stays below — M1 draw is a filter, not a delete
+# catalog (8 jobs) stays below — a draw is a filter, not a delete
 M1_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon
-# NOT in M1 draw (Later/M2): job_wizard, job_hexer, job_outrider, job_oathbound
+# LOCKED Jonathan 2026-10-08. M1 content / historical smokes. Unchanged.
+
+M2_JOB_POOL = job_knight, job_mage, job_blade_dancer, job_lagoon, job_wizard, job_hexer, job_outrider, job_oathbound
+# STEAM_DEMO_JOB_POOL = M2_JOB_POOL
+# M2 / Steam-demo boss beat + shop walk-in. Not an M1 rewrite.
 
 function pick_boss_client(seed):
   job = seeded_choice(M1_JOB_POOL, seed)
   # do not pass chapter_boss_id — draws are independent
   # named person: 29 (one of that job's 3)
   return job
+
+function pick_boss_client_m2(seed):
+  job = seeded_choice(M2_JOB_POOL, seed)
+  # do not pass chapter_boss_id
+  # named person: 29 (one of that job's 3) — stubs are aliases, not extra people
+  return job
 ```
 
-| Rule | Phase-1 / M1 |
-|---|---|
-| When | Boss beat (after reserved last-2 **days** / final prep) — not chapter-start newspaper |
-| What | One `job_*` from **`M1_JOB_POOL`** (4 jobs) → named `adv_*` from that job (`29`) + that job’s **order constructions** |
-| Vs boss | Independent of `chapter_boss_id` |
-| Repeat | Same job may recur across chapters |
-| Unique-per-run | Later |
-| Telegraph job before beat | Later |
-| Newspaper | Announces the **boss** (`26`), not the client |
-| Wizard / Hexer / Outrider / Oathbound | **Out of the M1 draw.** Job rows stay for M2. Do not draw; do not stub-fallback |
+| Rule | M1 (`M1_JOB_POOL`) | M2 / Steam demo (`M2_JOB_POOL`) |
+|---|---|---|
+| When | Boss beat (after reserved last-2 **days** / final prep) — not chapter-start newspaper. M1 shop / walk-in uses the M1 12 | Same boss beat **and** shop / walk-in, when the content is M2 / Steam demo |
+| What | One `job_*` from **4 jobs** → named `adv_*` from that job (`29`) + that job’s **order constructions** | One `job_*` from **8 jobs** → named `adv_*` from that job’s 3 + the same job constructions |
+| Vs boss | Independent of `chapter_boss_id` | Independent of `chapter_boss_id` |
+| Repeat | Same job may recur across chapters | Same |
+| Unique-per-run | Later | Later |
+| Telegraph job before beat | Later | Later |
+| Newspaper | Announces the **boss** (`26`), not the adventurer | Same |
+| Wizard / Hexer / Outrider / Oathbound | **Out of the M1 draw (LOCKED).** Do not draw; do not stub-fallback | **In the pool.** Draw a named person from `29`, never the stub as a person |
 
 ## Job catalog
 
-Ids: `job_*` = title in the pool. `adv_*` = adventurer / `boss_client_id` when that job is drawn. Default order id = `ord_<job slug>`.
+Ids: `job_*` = title in the pool. The `boss_client_id` cell in the table is the **job-default alias**. The drawn id is a named person in `29` (the alias resolves to that job’s monostack). Default order id = `ord_<job slug>`.
 
 **Order constructions are law.** Every job lists the exact `con_*` pieces the player must craft — not flavor, not a picker. Ids from [12-constructions](12-constructions.md) only; do not invent `con_*`. Multi-piece OK (Phase-1: **2** pieces, ≤4 per `27`). On the boss beat, `construction_ids` **equals** that job’s order-constructions list, in sequence.
 
@@ -69,13 +81,13 @@ Requirement tags = **order taste** (what this job wants on the garment). Not the
 
 N = 2 → one parallel session, `stamina_start = 12 * 2` (`27`). Finish-only / StS hand cycle unchanged. N > 4 = Later.
 
-**M1 draw (LOCKED Jonathan 2026-10-08):** Knight / Mage / Blade Dancer / Lagoon only. Wizard / Hexer / Outrider / Oathbound stay in this table for constructions — **out of `M1_JOB_POOL`** until `29` names people for them.
+**M1 draw (LOCKED Jonathan 2026-10-08):** Knight / Mage / Blade Dancer / Lagoon only. Wizard / Hexer / Outrider / Oathbound stay in this table for constructions. They are **out of `M1_JOB_POOL`**. They are **in `M2_JOB_POOL`**. Named people: `29`. `boss_client_id` on a job row above is the **alias**, not a fourth person.
 
 ### Per-job order (explicit)
 
 Each block is the **order**. Craft these constructions, in listed sequence (zone 1..N).
 
-**Knight** — `job_knight` / `adv_knight` / `ord_knight`
+**Knight** — `job_knight` / `adv_knight` → `adv_halden_rook` (`29`) / `ord_knight`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -84,7 +96,7 @@ Each block is the **order**. Craft these constructions, in listed sequence (zone
 
 Requirement tags: Metal, Sharp. Favor: hard clang and an edge; Soft reads as a squire. Flavor: oath steel — takes the field against whoever the paper named.
 
-**Mage** — `job_mage` / `adv_mage` / `ord_mage`
+**Mage** — `job_mage` / `adv_mage` → `adv_quill_lumen` (`29`) / `ord_mage`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -93,7 +105,7 @@ Requirement tags: Metal, Sharp. Favor: hard clang and an edge; Soft reads as a s
 
 Requirement tags: Silk, Pure, Lunar. Favor: flow and a clean hood; plate is the wrong brief. Flavor: scholar of the road — robe first, then the threat.
 
-**Lagoon** — `job_lagoon` / `adv_lagoon` / `ord_lagoon`
+**Lagoon** — `job_lagoon` / `adv_lagoon` → `adv_tide_glass` (`29`) / `ord_lagoon`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -102,7 +114,7 @@ Requirement tags: Silk, Pure, Lunar. Favor: flow and a clean hood; plate is the 
 
 Requirement tags: Frost, Sticky, Storm. Favor: brine-ready outer + footing; solar / dry cloth peel. Flavor: tide-hired — walks docks and mires the same. Jonathan-named title. Not an appointment; not Salt Widow.
 
-**Wizard** — `job_wizard` / `adv_wizard` / `ord_wizard`
+**Wizard** — `job_wizard` / `adv_wizard` → `adv_vesper_cant` (`29`) / `ord_wizard`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -111,7 +123,7 @@ Requirement tags: Frost, Sticky, Storm. Favor: brine-ready outer + footing; sola
 
 Requirement tags: Occult, Lunar, Royal. Favor: signed occult / lunar / court weight — not a mage’s study robe alone. Flavor: court-adjacent caster — signs the order in three inks.
 
-**Blade Dancer** — `job_blade_dancer` / `adv_blade_dancer` / `ord_blade_dancer`
+**Blade Dancer** — `job_blade_dancer` / `adv_blade_dancer` → `adv_kite_thornreel` (`29`) / `ord_blade_dancer`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -120,7 +132,7 @@ Requirement tags: Occult, Lunar, Royal. Favor: signed occult / lunar / court wei
 
 Requirement tags: Sharp, Silk, Silent. Favor: light body + flourish; will not wear plate. Flavor: edge and hem — moves like a cut.
 
-**Hexer** — `job_hexer` / `adv_hexer` / `ord_hexer`
+**Hexer** — `job_hexer` / `adv_hexer` → `adv_soot_cord` (`29`) / `ord_hexer`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -129,7 +141,7 @@ Requirement tags: Sharp, Silk, Silent. Favor: light body + flourish; will not we
 
 Requirement tags: Occult, Sticky, Silent. Favor: knots, veil, bind; Pure / solar wash the work out. Flavor: names and cords — the bog already knows them.
 
-**Outrider** — `job_outrider` / `adv_outrider` / `ord_outrider`
+**Outrider** — `job_outrider` / `adv_outrider` → `adv_harrow_gale` (`29`) / `ord_outrider`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -138,7 +150,7 @@ Requirement tags: Occult, Sticky, Silent. Favor: knots, veil, bind; Pure / solar
 
 Requirement tags: Wild, Storm, Silent. Favor: a road coat and boots; heavy armor is the wrong brief. Flavor: wagon-side sellsword — sleeps in the coat.
 
-**Oathbound** — `job_oathbound` / `adv_oathbound` / `ord_oathbound`
+**Oathbound** — `job_oathbound` / `adv_oathbound` → `adv_aurel_vow` (`29`) / `ord_oathbound`
 
 | # | `con_*` | Prose | Slot |
 |---:|---|---|---|
@@ -169,7 +181,7 @@ On `mission_kind=boss` (`20`):
 |---|---|
 | `chapter_boss_id` | Announced pool draw (`17`) |
 | `boss_pool_id` | Pool the boss was drawn from |
-| `boss_client_id` | `adv_*` from this catalog |
+| `boss_client_id` | `adv_*` from this catalog. **M1:** one of the 12 named people or an M1 job alias (`29`). **M2 / Steam demo:** one of the 24 named people or any of the 8 job aliases (`29`) |
 | `boss_job_id` | matching `job_*` |
 | `order_id` | that job’s `ord_*` |
 | `construction_ids` | **that job’s order constructions** (listed `con_*`, in sequence) |
@@ -177,7 +189,7 @@ On `mission_kind=boss` (`20`):
 
 `boss_client_id` is **never** an `appt_*`. Appointments use `appointment_id` on the route map (`22`).
 
-Portraits / Client widgets / extra UI = **Later**.
+M1 portraits have landed (`29`). M2 portraits, extra Client widgets for the new 12, and Godot = **Later**. Do not treat this doc as a Client wire.
 
 ## Explicit non-goals
 
@@ -187,7 +199,8 @@ Portraits / Client widgets / extra UI = **Later**.
 - Inventing `con_*`, Godot scenes, or portraits
 - Per-chapter client pools for the **boss** beat (mid-chapter people stay route-map nodes / appointments)
 - Flavor-only job rows with no order constructions
-- Drawing Wizard / Hexer / Outrider / Oathbound in M1 (or 8-job draw + job-stub fallback)
+- Drawing Wizard / Hexer / Outrider / Oathbound in **M1** (or 8-job draw + job-stub fallback on an M1 smoke)
+- Treating `M2_JOB_POOL` as a rewrite of the locked M1 filter
 
 ## Pointers
 
@@ -197,5 +210,5 @@ Portraits / Client widgets / extra UI = **Later**.
 - Constructions: [12-constructions](12-constructions.md)
 - Craft: [27-craft-mode-stamina](27-craft-mode-stamina.md)
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
-- Named M1 adventurers: [29-adventurer-catalog](29-adventurer-catalog.md)
+- Named adventurers (M1 12 + M2 12) and which pool is active: [29-adventurer-catalog](29-adventurer-catalog.md)
 - Interactive-order slices 1–3: [30-interactive-order](30-interactive-order.md)
