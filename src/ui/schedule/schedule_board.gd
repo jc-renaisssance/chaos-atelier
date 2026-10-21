@@ -346,6 +346,20 @@ func _rebuild_options() -> void:
 	for node in opts:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
+		## Live fork only. Same Scope A predicate as the card. Label stays panel_line().
+		if RouteNodeView.wears_elite_badge(node):
+			var tex := RouteNodeView.elite_mark_texture()
+			if tex != null:
+				var mark := TextureRect.new()
+				mark.name = "EliteMark"
+				mark.custom_minimum_size = Vector2(RouteNodeView.ELITE_ROW_PX, RouteNodeView.ELITE_ROW_PX)
+				mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				mark.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+				mark.texture = tex
+				row.add_child(mark)
 		var lab := _label(node.panel_line(), 14, INK)
 		lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(lab)

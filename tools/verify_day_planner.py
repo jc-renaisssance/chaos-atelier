@@ -546,8 +546,6 @@ def check_route_kind_icons() -> None:
         fail("there is no kind_shop.png — wire shop displays as market")
     if "assets/adv/" in view:
         fail("do not load assets/adv busts onto a route node")
-    if re.search(r"\belite\b", view, re.I):
-        fail("do not add an elite telegraph on the route card")
     bind = view.split("func _bind_kind_icon", 1)[-1].split("func ", 1)[0]
     if "KIND_ICONS.get" not in bind or "display_kind()" not in bind:
         fail("kind chip lookup must key off display_kind()")
@@ -581,6 +579,63 @@ def check_route_kind_icons() -> None:
         fail(f"do not commit Godot import sidecar {sidecar.name}")
 
 
+def check_elite_telegraph() -> None:
+    """Marker A + Scope A badge. Kind chip stays. Missing png fails soft."""
+    view = (SRC / "ui" / "schedule" / "route_node_view.gd").read_text(encoding="utf-8")
+    board = (SRC / "ui" / "schedule" / "schedule_board.gd").read_text(encoding="utf-8")
+    icons = view.split("const KIND_ICONS", 1)[-1].split("}", 1)[0]
+    if "elite_mark" in icons:
+        fail("elite_mark must stay out of KIND_ICONS")
+    if "res://assets/route/elite_mark.png" not in view:
+        fail("card must reference res://assets/route/elite_mark.png")
+    if "ELITE_CARD_PX := 20" not in view:
+        fail("appointment card badge must be 20×20")
+    if "ELITE_ROW_PX := 16" not in view:
+        fail("options-row badge size must be 16×16")
+    if "ELITE_INSET := 2" not in view:
+        fail("card badge inset must be 2px")
+    if "TEXTURE_FILTER_NEAREST" not in view:
+        fail("elite badge must use nearest filter")
+    if "EXPAND_IGNORE_SIZE" not in view or "STRETCH_KEEP_ASPECT_CENTERED" not in view:
+        fail("elite badge TextureRect must ignore texture size and keep aspect")
+    if 'node.kind == "appointment"' not in view:
+        fail("elite badge predicate is kind=appointment (Scope A), not node id N5")
+    if "func display_kind" in view:
+        fail("do not change display_kind() on the route card")
+    if "ResourceLoader.exists(ELITE_MARK_PATH)" not in view:
+        fail("missing elite_mark.png must fail soft (no badge, card stays)")
+    if "_elite_badge.visible = tex != null" not in view:
+        fail("null elite texture must hide the card badge")
+    if "row.add_child(_elite" in view:
+        fail("elite badge must overlay; it must not join the kind-chip HBox")
+    if "_kind_modulate(" not in view.split("func _bind_elite_badge", 1)[-1].split("func ", 1)[0]:
+        fail("card badge reuses _kind_modulate")
+    if "kind_appointment.png" not in view:
+        fail("kind_appointment.png stays the kind face")
+    rebuild = board.split("func _rebuild_options", 1)[-1].split("\nfunc ", 1)[0]
+    if "panel_line()" not in rebuild:
+        fail("options row label must stay panel_line()")
+    if "wears_elite_badge" not in rebuild or "elite_mark_texture" not in rebuild:
+        fail("options row must use the appointment predicate and the same texture")
+    if "ELITE_ROW_PX" not in rebuild:
+        fail("options row badge must be ELITE_ROW_PX (16)")
+    if "Take appointment" not in board or "Decline appointment" not in board:
+        fail("do not change take-appointment or decline copy")
+    if "Kingdom newspaper" not in board:
+        fail("do not change the newspaper boss announce")
+    path = ROOT / "assets" / "route" / "elite_mark.png"
+    if not path.is_file():
+        fail("assets/route/elite_mark.png missing")
+        return
+    data = path.read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n" or len(data) < 24:
+        fail("elite_mark.png is not a PNG")
+        return
+    width, height = struct.unpack(">II", data[16:24])
+    if (width, height) != (16, 16):
+        fail(f"elite_mark.png is {width}x{height}, art tip is 16x16")
+
+
 def main() -> int:
     blob = src_text()
     check_project_godot()
@@ -592,6 +647,7 @@ def main() -> int:
     check_no_free_mid_signal()
     check_board_scroll()
     check_route_kind_icons()
+    check_elite_telegraph()
     if FAILS:
         print("FAIL")
         for item in FAILS:
