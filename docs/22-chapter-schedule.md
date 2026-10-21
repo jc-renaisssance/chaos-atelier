@@ -1,6 +1,6 @@
 # Chapter route map — travelling atelier (Jonathan stamp 2026-10-13)
 
-**Status:** Design stamped. **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). **Route-graph board art (2026-10-20)** below opens kind-face sockets on that board. It does not add a screen and does not answer the elite-telegraph question.
+**Status:** Route map **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). Kind faces landed ([Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20), #57–#59). **Elite telegraph (2026-10-21)** below is Grimmjow Design-ready for Jonathan stamp. It answers the open elite question. It does not add a screen.
 
 **Supersedes** the free per-day **`E*` options board** from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) (preview every windowed event per day, assign D1..(N−2) from an identical-shaped list). **Still superseded:** 2026-09-28 Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`); 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)).
 
@@ -286,7 +286,7 @@ Labels are **D1..DN** — never R1. The live board is the **authored route graph
 
 **No choice → no options panel.** Do not open an empty “pick E*” drawer on corridor / bind / reserved / D1 / draft-only future.
 
-**M1 copy:** type + id only. Wire type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. **Display** `shop` as **market** (`market · N2`). Fancy titles **Later**. Elite telegraph (distinct StS-elite marker ahead of time) stays **open** — M1 default is type + id on the graph. Kind-face sockets (one chip per kind, not an elite marker) are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20).
+**M1 copy:** type + id only. Wire type ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}. **Display** `shop` as **market** (`market · N2`). Fancy titles **Later**. The ahead-of-time elite badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21) — a corner mark on the appointment card, not a title and not the kind face. Kind-face sockets (one chip per kind) stay [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20).
 
 ### Mid-chapter
 
@@ -331,7 +331,8 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 11. **Reserved last-2.** Current map: D7 travel / final prep, D8 boss approach. Relative to N on other maps.
 12. Scrap Duelist stays an appointment row on **N5** — not Dex Adventurers.
 13. Dump `phase=schedule` **kept** (on the graph board). Do not invent `phase=planner` / `phase=route` this stamp.
-14. **Market visit + event resolve ([32](32-shop-and-events.md)).** When current `kind=shop`: enter ugly **market** shell (display Market; dump `day_action=shop`); buy/sell/**refresh**/**enchant** from `market_bank_c1` (**M1 tab = materials only** — shipped #45; do not reopen). **M2** Staffs / Skills / Gear catalogs live in `32` — Ulquiorra holds the **M2 Client** until Jonathan stamps that revision. Enchant stamps `mat_enchant_id` + shiny overlay on one owned `mat_*` copy (materials only). Exit resolves the day; dump `market_*` / `market_enchants` / gold / `deck_material_count` (+ M2 staff/skill/artifact keys when that Client lands). When current `kind=event`: enter text resolve from `ref_id` → `evt_*`; one choice; dump `event_id` / `event_choice_id` / `event_deltas`. Do **not** grey-out market picks. Do **not** invent reshape / owners / art / M2 tabs in the M1 Client.
+14. **Market visit + event resolve ([32](32-shop-and-events.md)).** When current `kind=shop`: enter ugly **market** shell (display Market; dump `day_action=shop`); buy/sell/**refresh**/**enchant** from `market_bank_c1` (**M1 tab = materials only** — shipped #45; do not reopen). **M2** Staffs / Skills / Gear catalogs live in `32` — that Client has landed (#47 / #49 / #53). Do not reopen it from the elite packet. Enchant stamps `mat_enchant_id` + shiny overlay on one owned `mat_*` copy (materials only). Exit resolves the day; dump `market_*` / `market_enchants` / gold / `deck_material_count` (+ M2 staff/skill/artifact keys when that Client lands). When current `kind=event`: enter text resolve from `ref_id` → `evt_*`; one choice; dump `event_id` / `event_choice_id` / `event_deltas`. Do **not** grey-out market picks. Do **not** invent reshape / owners / art.
+15. **Elite badge — after the 2026-10-21 stamp, not this docs drop.** Wire sketch is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). Do not ship the overlay in the kind-face Client. Do not treat this docs PR as that wire.
 
 ## Test logs (Szayelaporro)
 
@@ -371,6 +372,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 10. D1 current-map: N1 only (`adv_halden_rook`).
 11. `appt_scrap_duelist` is never `boss_client_id` and never a Dex Adventurers `adv_*`.
 12. Do **not** assert “2–4 options on every assignable day” or “options = events whose window includes today.”
+13. Elite badge is not a dump field under the Design default (Marker **A**, Scope **A**). C1 has one appointment: N5 / `appt_scrap_duelist`. Do not emit `elite`. A `route_nodes[].elite` key exists only if the stamp writes Scope **C** — not in [20](20-harness-stamp.md) until that letter is written.
 
 ---
 
@@ -391,7 +393,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 - Pre-assigning the whole chapter at start from a pool
 - Treating a drafted future node as confirmed (`route_path` / `day_action`)
 - Day-strip-only M1 board (graph layout is required; kind-face sockets are the 2026-10-20 section, not a new board)
-- Edge-texture gens, painted per-state frames, elite-telegraph art, named busts on nodes (see the art section)
+- Edge-texture gens, painted per-state frames, named busts on nodes. The one elite badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). It is not a kind-face redraw and not a Scrap Duelist bust
 
 ## Supersedes
 
@@ -453,26 +455,130 @@ No edge png. Keep `draw_line`. Path, draft, bind, cut, and idle stay color and w
 
 ### Wire contract (Ulquiorra — after stamp, not this PR)
 
-On each existing `RouteNodeView`, when `res://assets/route/kind_<display_kind()>.png` is present, show it in a `TextureRect` on that card. Keep the three text lines. Missing file → card as shipped in #41. Scale (size **A**) or place the 48×48 (size **B**) inside the card. Modulate the one texture with the flags `bind()` already receives. Do not add a texture per flag. Do not load `assets/adv/` onto a node. Do not add an elite marker on **N5**. Edges stay `draw_line`.
+On each existing `RouteNodeView`, when `res://assets/route/kind_<display_kind()>.png` is present, show it in a `TextureRect` on that card. Keep the three text lines. Missing file → card as shipped in #41. Scale (size **A**) or place the 48×48 (size **B**) inside the card. Modulate the one texture with the flags `bind()` already receives. Do not add a texture per flag. Do not load `assets/adv/` onto a node. This 2026-10-20 wire does not add an elite marker. The later badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). Edges stay `draw_line`.
 
 ### Explicit non-goals (this section)
 
 - A new board, day strip, or map screen
 - Named `adv_*` busts on nodes (those files stay the order socket and, when met, the Dex row)
 - Scrap Duelist portrait, owner chrome, shopkeeper portrait
-- Elite telegraph art for N5 — open question below stays **open**
+- Elite telegraph art inside **this** 2026-10-20 packet. The badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). `kind_appointment.png` stays a kind face
 - Edge textures; painted current / draft / frozen / cut / fork frames
 - Market tab chrome, `sk_*` shelf faces, portrait regen
 - Posture sheets, interactive-order slice 4, M2 four-job people
 - Shiny gens
 - Gens, Client, or Godot in this Design PR
 
+## Elite telegraph (2026-10-21)
+
+**Status:** Grimmjow Design-ready for Jonathan stamp. Docs only. No `src/` / Godot / art gens in this PR. Replaces the open question left by the 2026-10-13 route stamp and left again by the 2026-10-20 kind-face packet.
+
+**Proposed law (Marker A, Scope A).** Other letters are on the [STAMP](STAMP.md) card. Silence does not stamp.
+
+An appointment node wears a **distinct ahead-of-time badge**, StS-elite style. The player sees the hard node on the graph before that day is current, and can draft a path through it or around it. On the C1 sample the node is **N5** (`appt_scrap_duelist`, D3). Type + id stays. The kind face stays. Arrival does not open a second screen.
+
+### Marker — A or B
+
+| Letter | Law |
+|---|---|
+| **A (Design default)** | Corner badge on the route card from chapter start, and on a live fork row when the next node is in scope. Still visible when that node is current. Separate file from `kind_appointment.png`. |
+| **B** | No badge. Type + id on the graph is the whole telegraph. No socket. No Client overlay. No gen. |
+
+Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+### Scope — A, B, or C (only if Marker is A)
+
+The 2026-10-13 lock already says **appointment = StS-elite analog**. C1 authors one appointment, and it is N5. This packet does not author a non-elite appointment.
+
+| Letter | Who wears the badge | C1 | New dump field |
+|---|---|---|---|
+| **A (Design default)** | Every `kind=appointment` row. A later map that authors an appointment inherits the badge. Predicate is the kind already on `route_nodes`. | N5, because it is the only appointment | No |
+| **B** | `ref_id == appt_scrap_duelist` only. A later appointment does not inherit. Node id `N5` is not the predicate (a later map may reuse the id). | N5 | No |
+| **C** | Row flag `elite: true` on appointment nodes. C1 sets it on N5 only. | N5 flagged | Yes — `route_nodes[].elite` (and the same bool on `fork_options` rows) |
+
+Write **A**, **B**, or **C**. Silence is not **A**. Design recommends **A**. If Marker is **B**, leave Scope blank.
+
+### Ahead of time vs current
+
+The graph is already visible from chapter start. The badge uses that visibility. It is not a reveal that waits until the node is current.
+
+| Moment | What the player sees |
+|---|---|
+| Chapter start, node not yet reached | Kind face + type + id + `ref_id` **and** the badge. On C1, N5 reads as the hard node on D3 while the player is still on D1. |
+| Draft ghost | Same badge, under the draft modulate the card already uses. The draft is still not `route_path`. |
+| Cut branch | Same badge, under the cut modulate. The elite the player walked away from stays readable. |
+| Live fork, options panel | When a next node is in scope, the row shows the badge beside the existing type + id line (`appointment · N5  appt_scrap_duelist`). Copy stays type + id. Fancy titles stay Later. |
+| Corridor / bind | Badge on the card. Still no options panel. |
+| **Current** | Badge **stays**. Current-ness stays the gold border and the kind-chip modulate already shipped. Take appointment → stamina craft ([27](27-craft-mode-stamina.md) / [30](30-interactive-order.md)). Decline once per chapter stays. |
+| Frozen past | Badge stays, past modulate. The path still shows that the elite was taken. |
+
+C1 path skill: from N1 the player can see N5 and take a line through it (sample paths A and B) or the event corridor that misses it (path C). Preparing the deck before D3 is the use. This packet does not add a prep node.
+
+Boss telegraph stays the newspaper announce ([26](26-newspaper.md)). The badge does not go on R7, R8, or a `boss_*`.
+
+### Kind face is not the telegraph
+
+`assets/route/kind_appointment.png` is the sealed letter / scroll (landed #58, canvas **B**, 48×48). It remains the appointment kind face. Do not redraw it. Do not paint a skull into it. Do not swap it for the badge. The five kind files stay closed.
+
+The telegraph is a **second texture**, overlaid on the same `RouteNodeView` (minimum **108×72**, three text lines, 48×48 kind chip in the row).
+
+### Art socket (Nnoitra later — Harribel soft-gate)
+
+One file. **Not generated in this PR.** Harribel soft-gates before the gen. This seat does not ping her.
+
+| | |
+|---|---|
+| File | `assets/route/elite_mark.png` |
+| Wire | `res://assets/route/elite_mark.png` |
+| Canvas | Pro Flash **48×48 soft-stipple**, one frame. Same canvas as the stamped kind chips (size **B**). No 96. No second PixelLab size. |
+| On the card | Client scales to **20×20**, nearest filter, **overlay** on the top-right of the 108×72 card, inset 2px. It does not join the chip’s HBox. It does not move the 48×48 kind chip. It does not change the three text lines. Card minimum stays 108×72. |
+| On the options row | Same file at **16×16**, nearest, in front of the type + id label. |
+| Subject | Horned skull-seal. StS elite read. Bone plus a dull gold horn, flat dark ground. Must read at 20×20. |
+| Leave out | Node id, day number, `ref_id`, card frame, state border, Scrap Duelist face, named bust, letter, scroll, wax-and-string (that silhouette is the kind face), wagon, text |
+| Missing file | No badge. Type + id still says `appointment`. The ugly card stays legal. |
+
+**One** painted badge. Current, draft, past, cut, fork, and bound reuse the modulate `RouteNodeView` already applies to the kind chip. No second file per flag.
+
+Canvas is accept-the-default once Marker is **A** (any scope letter). Silence keeps this table. Marker **B** gens nothing.
+
+### Client wire (Ulquiorra — after stamp, not this PR)
+
+Predicate under the Design default (Marker **A**, Scope **A**): `node.kind == "appointment"`. Scope **B:** `node.ref_id == "appt_scrap_duelist"`. Scope **C:** `node.elite == true` after the flag exists on the row.
+
+1. Preload `res://assets/route/elite_mark.png` beside `KIND_ICONS` in `route_node_view.gd`. Do not add it to `KIND_ICONS`. Do not change `display_kind()`.
+2. On `RouteNodeView`, a second `TextureRect`, 20×20, `EXPAND_IGNORE_SIZE`, `STRETCH_KEEP_ASPECT_CENTERED`, `TEXTURE_FILTER_NEAREST`, mouse ignore. Place it top-right of the card (inset 2), not inside the kind-chip HBox. Visible only when the predicate matches and the texture loaded.
+3. Modulate that rect with the same color `_kind_modulate` already returns. One texture. No per-flag file.
+4. In `schedule_board.gd` `_rebuild_options`, when the next node matches and the texture loaded, put a 16×16 `TextureRect` at the front of that row. The label stays `panel_line()`.
+5. Missing texture → both widgets hidden. The #41 / #59 card stays.
+6. Do not show the badge on the order panel, Dex, market, or newspaper.
+7. Do not edit `assets/route/kind_appointment.png` or `assets/adv/`.
+
+### Dump
+
+[20](20-harness-stamp.md) is unchanged under Marker **A** with Scope **A** or **B**. Do not emit `elite`, `elite_telegraph`, or a badge path. The predicate is `kind` (Scope **A**) or `ref_id` (Scope **B**), both already on `route_nodes` and `fork_options`.
+
+Scope **C** is the only letter that adds `route_nodes[].elite` (bool) and the same bool on each `fork_options` row. Do not add that key in this Design. If Jonathan writes **C**, the key lands with the Client stamp.
+
+Szayelaporro, after that Client PR: on `map_m1`, exactly one appointment node (N5 / `appt_scrap_duelist`). Sample paths A and B go through it; path C does not. No new assert number in `20` for the Design default.
+
+### Explicit non-goals (this section)
+
+- Posture sheets, interactive-order slice 4, battle playback
+- An M2 Client (catalog wire, market tabs, portrait wire)
+- PixelLab or any gen in this PR
+- Reviving #62, or replacing files under `assets/adv/`
+- Redrawing the five kind faces, including `kind_appointment.png`
+- A Scrap Duelist bust on the node
+- A sixth node kind, or a fancy title
+- Putting the badge on the boss approach or in the newspaper
+- A new [20](20-harness-stamp.md) key under the Design default
+- Edge textures, or a painted frame per board state
+- `src/` / Godot in this PR
+
 ## Open questions (Jonathan)
 
-≤2. **Closed this pass:** future unbound days are **draft only** (real pick when current; past / entered binds frozen) — LOCKED 2026-10-13.
-
-1. **Elite telegraph.** Does appointment-elite (**N5**) get a distinct ahead-of-time marker (StS elite icon / telegraph), or is M1 **type + id in the graph** enough until the node is current? M1 ships type + id on the graph until this is stamped. **The 2026-10-20 board-art packet does not answer this.** The appointment kind face is not a telegraph.
+The 2026-10-13 elite question is **replaced** by [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). Marker **A/B** and Scope **A/B/C** are the stamp card. They are not a second essay question in this file. Draft-future stays **LOCKED** 2026-10-13.
 
 ## Pointers
 
-`20` stamps · `32` market visit + event resolve · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `00` vision (display name **Wombaste**)
+`20` stamps (no new elite key under the Design default) · `32` market visit + event resolve · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper (boss telegraph, not this badge) · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `05` art socket pointer · `00` vision (display name **Wombaste**) · [STAMP](STAMP.md) card 2026-10-21

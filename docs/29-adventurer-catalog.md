@@ -1,8 +1,8 @@
 # M1 + M2 adventurer catalog
 
-**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. M1 portrait **files** stay the landed 12. Portrait uniqueness on all **24** (Race / Visual / Outfit / Character / Hook) is the open stamp after Jonathan **hold** on #63 and REJECT art #62. ACCEPT soft-gates **12 M2 redraws only**. An M1 regen needs a separate stamp. This file does not gen and does not replace PNGs. Nnoitra holds until that stamp.
+**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. Portrait uniqueness on all **24** (Race / Visual / Outfit / Character / Hook) is **stamped** (Jonathan ACCEPT on #63). M1 redraws landed (#64). M2 redraws landed (#65) and replace the held #62 outlook. Do not regen. Do not revive #62. Elite telegraph is [22](22-chapter-schedule.md), not this catalog.
 
-**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21; portrait uniqueness 2026-10-21 (hold on #63: Race + Character, all 24). Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
+**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21; portrait uniqueness 2026-10-21 (ACCEPT all 24 on #63; art #64 / #65). Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Internal ids stay (`boss_client_id`, `con_*`, `appt_*`, `adv_*`, `ord_*`, `job_*`) so saves and Test smokes do not churn. Do not mass-rename existing ids. Scrap Duelist stays `appt_*`.
 
@@ -993,7 +993,7 @@ Portrait sockets (one per surface that already shows a person) are [below](#port
 
 ## Portrait sockets (2026-10-20)
 
-**Status:** First wave **landed** (#54 art / #55 Client) — the **12** named M1 `adv_*`. Do not regen them. Job stubs are not a wave. The M2 twelve are named in the roster above. Uniqueness for all 24 is [M2 portrait uniqueness](#m2-portrait-uniqueness) (open stamp; hold on #63; REJECT art #62). No gens in this file. Landed M1 files stay. ACCEPT does not regen them.
+**Status:** First wave **landed** (#54 art / #55 Client) — the **12** named M1 `adv_*`. Do not regen them. Job stubs are not a wave. The M2 twelve are named in the roster above. Uniqueness for all 24 is stamped in [M2 portrait uniqueness](#m2-portrait-uniqueness) (ACCEPT #63; redraws #64 / #65). Do not regen. Do not revive #62.
 
 ### Socket count
 
@@ -1056,7 +1056,7 @@ Placeholder on each socket = **display name + job** (already on the ugly panel).
 
 ## M2 portrait uniqueness
 
-**Status:** Open stamp, rewritten after Jonathan **hold** on #63 (2026-10-21). REJECT art #62 still stands — the M2 twelve read as one outlook. Schema on every named `adv_*` (M1 12 + M2 12 = **24**): **Race | Visual | Outfit | Character | Hook**. This section does **not** change roster ids, display names, jobs, `ask_*`, stats, requirement tags, or `construction_ids` (#61 held; M1 roster held). It does **not** gen. It does **not** add or replace PNGs. Nnoitra holds until Jonathan stamps.
+**Status:** **Stamped** (Jonathan ACCEPT all 24 on #63). Redraws landed (#64 M1, #65 M2) and replace the held #62 outlook. Schema on every named `adv_*` (M1 12 + M2 12 = **24**): **Race | Visual | Outfit | Character | Hook**. This section does **not** change roster ids, display names, jobs, `ask_*`, stats, requirement tags, or `construction_ids` (#61 held; M1 roster held). Do not regen. Do not revive #62.
 
 After ACCEPT: Harribel soft-gate on the **12 M2 redraws only**, then Nnoitra reburn (replace the #62 assets). An M1 redraw is **not** opened by that ACCEPT. M1 regen needs a separate Jonathan stamp. The M1 rows are a docs lock on the landed files. Aizen owns the Jonathan 1:1.
 
@@ -1136,7 +1136,7 @@ Nnoitra, after the stamp, and only for the busts that stamp opens:
 
 ### Stamp line
 
-ACCEPT all Race / Character / Visual / Outfit / Hook rows for the **24**, or rewrite named rows (list the `adv_*`). Silence does not stamp. #61 and the M1 roster stay as written. After ACCEPT, Harribel soft-gates **12 M2 redraws only**. M1 regen needs a separate Jonathan stamp.
+**Record:** Jonathan ACCEPT all 24 on #63. M1 art #64. M2 art #65. Do not regen. Do not revive #62. The ask text was: ACCEPT all Race / Character / Visual / Outfit / Hook rows for the **24**, or rewrite named rows (list the `adv_*`). #61 and the M1 roster stay as written.
 
 
 ## Explicit non-goals
@@ -1147,7 +1147,7 @@ ACCEPT all Race / Character / Visual / Outfit / Hook rows for the **24**, or rew
 - Putting Wizard / Hexer / Outrider / Oathbound into `M1_JOB_POOL` — **LOCKED** out (Jonathan 2026-10-08)
 - Putting Knight / Mage / Blade Dancer / Lagoon into `M2_JOB_POOL`, or merging the two pools into one draw — **LOCKED** out (Jonathan 2026-10-21, draw B)
 - Job-stub fallback on either smoke
-- Wiring this catalog in Client, Elite N5 telegraph, interactive-order slice 4, or a stat / event retune
+- Wiring this catalog in Client, owning Elite N5 telegraph (that law is [22](22-chapter-schedule.md)), interactive-order slice 4, or a stat / event retune
 - M2 portrait gens, M1 regen, PNG edits, or posture sheets in this PR (uniqueness rows are the brief; path stays `assets/adv/<adv_id>.png`; the M1 twelve stay the landed files unless a later stamp opens regen)
 - One shared face or outlook across the M2 twelve (`adv_quill_lumen` is grain only)
 - Wizard hood-up (wizard order stays `con_robe` + `con_mantle`)
