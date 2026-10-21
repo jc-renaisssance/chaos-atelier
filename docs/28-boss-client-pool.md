@@ -19,7 +19,7 @@ One **shared adventurer / boss-client pool for all bosses and all chapters**. **
 
 Example: C1 may draw Ash Drake as boss; C1 (or C2 / C3) may still draw a knight or a mage. Different jobs → different **order constructions** and different requirement tags. Knight orders armor + gauntlet; mage orders robe + hood. Ash Drake’s favor / punish (`17`) is the threat axis.
 
-Named people (3 per job, M1 and M2) supersede job-title-only identity: **[29-adventurer-catalog](29-adventurer-catalog.md)**. M1 portrait files have landed. M2 portrait files are Later (`assets/adv/<adv_id>.png` when an art stamp opens).
+Named people (3 per job, M1 and M2) supersede job-title-only identity: **[29-adventurer-catalog](29-adventurer-catalog.md)**. M1 portrait files have landed. M2 portrait files are not stamped. The redraw brief is **Portrait uniqueness** in `29` (`assets/adv/<adv_id>.png` when that stamp opens). Constructions in this file stay the job lists.
 
 ## Draw
 
@@ -190,7 +190,7 @@ On `mission_kind=boss` (`20`):
 
 `boss_client_id` is **never** an `appt_*`. Appointments use `appointment_id` on the route map (`22`).
 
-M1 portraits have landed (`29`). M2 portraits, extra Client widgets for the new 12, and Godot = **Later**. Do not treat this doc as a Client wire.
+M1 portraits have landed (`29`). The M2 redraw brief is **Portrait uniqueness** in `29`. Gens, extra Client widgets for the new 12, and Godot stay out of this doc. Do not treat this doc as a Client wire.
 
 ## Explicit non-goals
 

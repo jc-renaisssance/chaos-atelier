@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; shipped `dev` tip still **`1765a29`**, branch base **`8b6e959`**). The **M2 four-job catalog** card at the end of this file is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, portraits, or that lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card at the end of this file is the **locked** draw-B record, not an open ask. `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; shipped `dev` tip still **`1765a29`**, branch base **`8b6e959`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed M1 portraits, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. The card after it is the **open** M2 portrait-uniqueness stamp (REJECT art #62). #61 stays the locked roster. The M1 portrait lane stays closed. `main` is not promoted (`353f1d4`).
 
 ---
 
@@ -626,3 +626,32 @@ None.
 ## Blocks stamp
 
 None. Both lines are written. Roster accepted. Draw is B.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-21 (M2 portrait uniqueness)
+
+Docs only. Off `dev` tip **`028e3e3`** (#61). Jonathan REJECT art #62 — all 12 M2 busts, same outlook. This card locks a distinct face, outfit, and hook per named person. It leaves the #61 roster, draw B, jobs, and constructions as stamped. It does not gen. It does not replace PNGs. M1 portraits stay the landed 12. Nnoitra holds until Jonathan stamps. After stamp: Harribel soft-gate on the 12 redraws, then Nnoitra reburn (replace the #62 assets). Aizen owns the Jonathan 1:1. Ulquiorra does not wire on this PR.
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/29-adventurer-catalog.md` | **Portrait uniqueness** under each of the 12 M2 people (Visual / Outfit / Hook). **M2 portrait uniqueness** — held constructions, art brief, QC / gen rules |
+| `docs/05-art.md` | Pointer only — shared grain, face not cloned |
+| `docs/28-boss-client-pool.md` | Pointer only — constructions unchanged |
+| `docs/pm/phase-1-plan.md` | Queue pointer only — Elite N5 stays next on the until-M2 queue |
+| `docs/README.md` | Index pointer only |
+| `docs/STAMP.md` | This card |
+
+## Decisions
+
+1. **Uniqueness rows — ACCEPT all 12, or rewrite named rows.** Each row is Visual (face / hair / age / body at 96×96), Outfit (silhouette + palette on that job’s existing constructions), and Hook (one sentence). ACCEPT sends Nnoitra the redraw from these rows. A rewrite names the `adv_*` rows to change. `adv_flint_rime` offers two hair reads inside that one row; a single hair is a rewrite of that id, not a second decision. Silence does not send a redraw.
+
+## Questions
+
+None.
+
+## Blocks stamp
+
+Decision 1. An ACCEPT, or a list of `adv_*` rows to rewrite, stamps the packet. #61 roster and draw B stay stamped. Art #62 assets are not in this PR. Nothing else blocks.

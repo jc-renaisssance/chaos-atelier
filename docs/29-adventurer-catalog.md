@@ -1,8 +1,8 @@
 # M1 + M2 adventurer catalog
 
-**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. M1 portraits stay the landed 12 — do not regen them. M2 portraits stay Later.
+**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. M1 portraits stay the landed 12 — do not regen them. M2 **portrait uniqueness** (below, on each of the 12) is the open stamp after Jonathan REJECT art #62 (all 12 same outlook). This file does not gen and does not replace PNGs. Nnoitra holds until that stamp.
 
-**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
+**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21; M2 portrait uniqueness 2026-10-21. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Internal ids stay (`boss_client_id`, `con_*`, `appt_*`, `adv_*`, `ord_*`, `job_*`) so saves and Test smokes do not churn. Do not mass-rename existing ids. Scrap Duelist stays `appt_*`.
 
@@ -406,6 +406,8 @@ Every job: one **monostack**, one **cross-tag**, one **defensive / neg-avoid**. 
 
 M2 **starter-tag trap:** Pell White (`adv_pell_white`, Pure mid) vs `boss_sunspear_captain`. Same shape as Sister Marrowveil vs Ivory Judge.
 
+Face, outfit, and backline for a redraw are **not** this roster table. Each of the 12 has a **Portrait uniqueness** subsection: **Visual** (face / hair / age / body at 96×96), **Outfit** (silhouette + palette on that job’s constructions), **Hook** (one sentence). Gen rules: [M2 portrait uniqueness](#m2-portrait-uniqueness). #61 ids, display names, jobs, and `construction_ids` stay as written.
+
 ### Wizard — `job_wizard` · `ord_wizard` · `con_robe` + `con_mantle`
 
 Job-default alias: `adv_wizard` → `adv_vesper_cant`. Requirement-tag family in `28`: Occult, Lunar, Royal. Not the mage order (robe + hood).
@@ -429,6 +431,16 @@ Court-adjacent caster. Wants the void in the seams, not a clean-silk sermon.
 |---:|---:|---:|---:|---:|---:|
 | 9 | 3 | 2 | 7 | 3 | 5 |
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-20s; sharp thin face; short charcoal hair with one white void streak; cool grey-pale skin; narrow eyes, slight smirk held back. |
+| Outfit | `con_robe` + `con_mantle`. Dark void-navy robe; mantle edged in near-black silk with a single seam of pale violet “void stitch”; no hood up; small void-circle clasp. |
+| Hook | Court-adjacent caster who wants the void in the seams, not a clean-silk sermon. |
+
 #### `adv_nyx_vellum` — Nyx Vellum
 
 Two inks on the mantle. A cleanse stitch splits the order.
@@ -448,6 +460,16 @@ Two inks on the mantle. A cleanse stitch splits the order.
 |---:|---:|---:|---:|---:|---:|
 | 8 | 5 | 2 | 6 | 4 | 4 |
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Late teens/early 20s; soft oval face; long platinum-white wavy hair with messy bangs; ink-smudge freckles on one cheek; calm downcast eyes. |
+| Outfit | `con_robe` + `con_mantle`. Charcoal robe; mantle with vellum/cream trim; **hood down/absent**; two-ink lunar marks on mantle (gold crescent one shoulder, star the other); square gold brooch. |
+| Hook | Two inks on the mantle — a cleanse stitch that splits the order. |
+
 #### `adv_orin_goldink` — Orin Gold-Ink
 
 The room should bow. Hemp, mud, and tar on the mantle are an insult.
@@ -466,6 +488,16 @@ The room should bow. Hemp, mud, and tar on the mantle are an insult.
 | HP | ATK | DEF | RES | MOB | PRE |
 |---:|---:|---:|---:|---:|---:|
 | 11 | 3 | 3 | 5 | 2 | 7 |
+
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Late 20s; composed longer face; warm olive or golden undertone; sleek dark hair pulled half-back with a gold ink stick pin; high cheekbones; cool assessing eyes. |
+| Outfit | `con_robe` + `con_mantle`. Deep wine/royal robe; mantle heavy with gold-ink calligraphy and gilt trim; no peasant hemp; upright posture; ornate round gold clasp. |
+| Hook | The room should bow — hemp, mud, and tar on the mantle are an insult. |
 
 ---
 
@@ -492,6 +524,16 @@ Names and cords. The chapel already knows the knot.
 |---:|---:|---:|---:|---:|---:|
 | 10 | 4 | 3 | 6 | 4 | 2 |
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-20s; angular face soot-smudged on jaw/cheek; dark brown/black hair cropped short under hood; cord burns on fingers (visible at bust); hard stare. |
+| Outfit | `con_wraps` + `con_hood`. Ash-grey wraps; **hood up** but face clear; knotted name-cords and soot-black hood edge; chapel-rope tassel at one temple. |
+| Hook | Names and cords — the chapel already knows the knot. |
+
 #### `adv_tar_veil` — Tar Veil
 
 Bind and a hex in the same wrap. `14` has no chrome for that pair.
@@ -511,6 +553,16 @@ Bind and a hex in the same wrap. `14` has no chrome for that pair.
 |---:|---:|---:|---:|---:|---:|
 | 9 | 5 | 3 | 5 | 3 | 2 |
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Early 30s; heavier brow; olive-brown skin with tar stains at lip corner; thick dark hair half-hidden; one eye slightly squinted; broader jaw than Soot. |
+| Outfit | `con_wraps` + `con_hood`. Peat-black wraps with sticky sheen; hood with a **tar-veil strip** across lower face (nose/mouth veiled, eyes clear); bog-green undertone on wrap edges. |
+| Hook | Bind and a hex in the same wrap — peat knot, no chrome for the pair. |
+
 #### `adv_ashen_cowl` — Ashen Cowl
 
 Already unheard. A metal hood is a bucket. Daylight washes the work out.
@@ -529,6 +581,16 @@ Already unheard. A metal hood is a bucket. Daylight washes the work out.
 | HP | ATK | DEF | RES | MOB | PRE |
 |---:|---:|---:|---:|---:|---:|
 | 9 | 3 | 2 | 4 | 8 | 3 |
+
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Young adult, androgynous soft face; washed ash-blonde hair almost white; very pale skin; large quiet eyes; no soot/tar grit (clean hush). |
+| Outfit | `con_wraps` + `con_hood`. Soft ashen **cowl/hood** (cloth only — **no metal bucket**); pale wraps; muted grey-lilac palette; hood frames face loosely, not armored. |
+| Hook | Already unheard — a metal hood is a bucket; daylight washes the work out. |
 
 ---
 
@@ -557,6 +619,16 @@ Wagon-side. Wants the sky in the coat, not a second helping of bog.
 
 Boots are Earth (`12`). Bog King punishes Earth. One Earth from the boots is the construction, not an Earth-mid brief. An Earth-mid or Wild-mid dump on this order is the starter trap Harrow refused.
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-30s weathered; wind-chapped skin; storm-grey short messy hair; thin scar across one brow; grit smile; broader shoulders in frame. |
+| Outfit | `con_coat` + `con_boots`. Storm-slate travel **coat** collar up in wind; no robe; sky-blue stitch on hem; road-dust on coat shoulder; boots implied by lower bust cut. |
+| Hook | Wagon-side — wants the sky in the coat, not a second helping of bog. |
+
 #### `adv_flint_rime` — Flint Rime
 
 Steam on the mile. The parade wants fire. The coat can still carry frost.
@@ -578,6 +650,16 @@ Steam on the mile. The parade wants fire. The coat can still carry frost.
 
 Sunspear punishes Earth. The boots contribute one Earth. Fire mid is not the ask — the pair is.
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-20s; sharp cheekbones; two-tone hair (ember auburn on one side, frost-white tips on the other) OR hair dark with frost rim; steam flush on nose; alert eyes. |
+| Outfit | `con_coat` + `con_boots`. Dual-palette coat — left ember rust lining flash, right frost-blue trim; steam wisps at collar; no plate; road-mile readiness. |
+| Hook | Steam on the mile — the parade wants fire; the coat can still carry frost. |
+
 #### `adv_lark_mute` — Lark Mute
 
 Sleeps in the coat and leaves no ring. Plate and soft hemp both spoil the road.
@@ -596,6 +678,16 @@ Sleeps in the coat and leaves no ring. Plate and soft hemp both spoil the road.
 | HP | ATK | DEF | RES | MOB | PRE |
 |---:|---:|---:|---:|---:|---:|
 | 10 | 4 | 4 | 3 | 7 | 4 |
+
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Early 20s; soft rounder face; mouse-brown hair tucked; small quiet mouth; eyes that look past you; no jewelry shine. |
+| Outfit | `con_coat` + `con_boots`. Muted earth-brown **coat**, matte (no metal trim); soft collar; hush palette — dusty olive + clay; deliberately un-flashy vs Harrow/Flint. |
+| Hook | Sleeps in the coat and leaves no ring — plate and soft hemp both spoil the road. |
 
 ---
 
@@ -626,6 +718,16 @@ Sworn to the paper’s noon. The yard can keep its glare if the cloth holds the 
 
 Same parade as Pell White, opposite ask. Solar is favored. Pure is punished. Aurel is the person who asked for the favor.
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-20s earnest; warm tan skin; short sun-gold cropped hair; open bright eyes; slight freckles from yard sun; square honest jaw. |
+| Outfit | `con_armor` + `con_mantle`. Polished **armor** breastplate visible; solar-yellow mantle with noon sun emblem; warm gold metal accents; open confident posture. |
+| Hook | Sworn to the paper’s noon — the yard can keep its glare if the cloth holds the sun. |
+
 #### `adv_clarion_mantle` — Clarion Mantle
 
 Dawn on sworn plate. Occult in the same weave argues with the vow.
@@ -647,6 +749,16 @@ Dawn on sworn plate. Occult in the same weave argues with the vow.
 
 C3 punishes Metal. Solar ∧ Pure is the ask. The armor’s Metal tag vs this warden is a **legal hard draw** — same shape as a Metal-mid Halden brief on the same boss.
 
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Late 20s solemn; cooler fair skin; longer ash-brown hair tied back; thinner face than Aurel; grave closed mouth; dawn-lit eyes. |
+| Outfit | `con_armor` + `con_mantle`. Formal plate with **dawn** white-gold mantle (paler than Aurel’s noon yellow); clarion/trumpet or dawn-ray crest on mantle; more ceremonial than yard-ready. |
+| Hook | Dawn on sworn plate — Occult in the same weave argues with the vow. |
+
 #### `adv_pell_white` — Pell White
 
 Wants the stitch of daylight. The sunspear yard calls that contempt.
@@ -667,6 +779,16 @@ Wants the stitch of daylight. The sunspear yard calls that contempt.
 | 12 | 2 | 5 | 6 | 2 | 6 |
 
 Pure is a **starter tag**. This brief vs Sunspear Captain is the M2 **trap row** — same job as Aurel Vow, same parade, wrong tag. Aurel asked for Solar, which this captain favors. Estimate (`30`) should show the punish once that axis is unlocked.
+
+##### Portrait uniqueness
+
+96×96 bust. Three fields only. Constructions stay the job list above.
+
+| Field | Value |
+|---|---|
+| Visual | Mid-20s severe; very pale skin; stark white or silver-white hair (short or severe cut); cold grey eyes; thinner lips; less warmth than Aurel (purity as edge, not kindness). |
+| Outfit | `con_armor` + `con_mantle`. Armor + **stark white** mantle with clean stitch embroidery; minimal gold (cold silver/white metal); clinical cleanliness vs Aurel’s warm solar. |
+| Hook | Wants the stitch of daylight — the sunspear yard calls that contempt (trap row; still oathbound plate, not peasant). |
 
 ---
 
@@ -701,7 +823,7 @@ Portrait sockets (one per surface that already shows a person) are [below](#port
 
 ## Portrait sockets (2026-10-20)
 
-**Status:** First wave **landed** (#54 art / #55 Client) — the **12** named M1 `adv_*`. Do not regen them. Job stubs are not a wave. The M2 twelve are named in the roster above; their portraits are a **later** wave (no gens in the 2026-10-21 catalog PR).
+**Status:** First wave **landed** (#54 art / #55 Client) — the **12** named M1 `adv_*`. Do not regen them. Job stubs are not a wave. The M2 twelve are named in the roster above. Their redraw brief is [M2 portrait uniqueness](#m2-portrait-uniqueness) (open stamp; REJECT art #62). No gens in this file. Do not regen the M1 twelve.
 
 ### Socket count
 
@@ -748,13 +870,13 @@ Same PixelLab grain as the stamped market shelf icons and the armor packs: **Pro
 
 ### Wire contract (Ulquiorra — after stamp, not this PR)
 
-Placeholder on each socket = **display name + job** (already on the ugly panel). When `res://assets/adv/<adv_id>.png` exists, show it in a `TextureRect` on that socket. Missing file → text only. Do not require the png for the panel to function. Do not invent interactive-order beyond the existing ugly UI. Job-stub ids do not grow their own files; the alias still resolves to the named row (`adv_knight` → `adv_halden_rook`, `adv_mage` → `adv_quill_lumen`, `adv_blade_dancer` → `adv_kite_thornreel`, `adv_lagoon` → `adv_tide_glass`, `adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`). M2 alias targets have no png until the later wave.
+Placeholder on each socket = **display name + job** (already on the ugly panel). When `res://assets/adv/<adv_id>.png` exists, show it in a `TextureRect` on that socket. Missing file → text only. Do not require the png for the panel to function. Do not invent interactive-order beyond the existing ugly UI. Job-stub ids do not grow their own files; the alias still resolves to the named row (`adv_knight` → `adv_halden_rook`, `adv_mage` → `adv_quill_lumen`, `adv_blade_dancer` → `adv_kite_thornreel`, `adv_lagoon` → `adv_tide_glass`, `adv_wizard` → `adv_vesper_cant`, `adv_hexer` → `adv_soot_cord`, `adv_outrider` → `adv_harrow_gale`, `adv_oathbound` → `adv_aurel_vow`). M2 alias targets have no stamped png on this tip. Redraw brief: [M2 portrait uniqueness](#m2-portrait-uniqueness). `style_image` grain is `adv_quill_lumen` only — do not clone that face.
 
 ### Explicit non-goals (this stamp)
 
 - Posture sheets
 - Battle playback art (`30` slice 4 stays Later)
-- Portrait gens for the M2 twelve (Wizard / Hexer / Outrider / Oathbound). People are named in the M2 roster; art is Later
+- M2 portrait gens in the 2026-10-20 wave. The redraw brief is [M2 portrait uniqueness](#m2-portrait-uniqueness). A Design PR still does not gen
 - Scrap Duelist portraits (or any `appt_*`)
 - Portraits for job stubs (`adv_knight` and the other aliases)
 - Boss / enemy portraits
@@ -762,9 +884,38 @@ Placeholder on each socket = **display name + job** (already on the ugly panel).
 
 ---
 
-## M2 portrait wave — Later
+## M2 portrait uniqueness
 
-Not this PR. No PixelLab, no posture sheets, no second folder. When a later art stamp opens, reuse the M1 socket and path: `assets/adv/<adv_id>.png` (`res://assets/adv/<adv_id>.png`). One bust per named person. Missing file → text only.
+**Status:** Open stamp. Jonathan REJECT art #62 — all 12 M2 busts read as the same outlook. This section is the redraw lock. It does **not** change roster ids, display names, jobs, `ask_*`, stats, requirement tags, or `construction_ids` from #61. It does **not** gen. It does **not** add or replace PNGs. Nnoitra holds until Jonathan stamps. After stamp: Harribel soft-gate on the 12 redraws, then Nnoitra reburn (replace the #62 assets). Aizen owns the Jonathan 1:1.
+
+Share soft-stipple grain only. Each face and outfit must read distinct at 96×96. The one-line above each roster table stays the #61 catalog voice. The **Hook** cell on each person is the art backline.
+
+### Held constructions (unchanged)
+
+| Job | Order | Silhouette lock |
+|---|---|---|
+| Wizard | `con_robe` + `con_mantle` | Mantle, not the mage hood. **Hood-up is forbidden** |
+| Hexer | `con_wraps` + `con_hood` | Hood and wraps. Cloth only — no metal bucket |
+| Outrider | `con_coat` + `con_boots` | Coat. No robe. No plate |
+| Oathbound | `con_armor` + `con_mantle` | Armor and mantle. Not a peasant coat |
+
+No new job. No new `con_*`.
+
+### Art brief (tech unchanged)
+
+Same socket and path as the landed M1 wave. No second folder. No posture sheet. Missing file → text only.
+
+| | |
+|---|---|
+| Tool / grain | PixelLab **Pro Flash 96×96 soft-stipple** bust |
+| Subject | Head and shoulders, one front view |
+| `style_image` | Stamped M1 bust `adv_quill_lumen` (`assets/adv/adv_quill_lumen.png`) — **grain only**. Not a face clone. Costume and face come from that person’s **Portrait uniqueness** row |
+| Path | `assets/adv/<adv_id>.png` (`res://assets/adv/<adv_id>.png`) |
+| Leave out | Card frame. Shiny overlay. Posture sheet. Direction sheet. A second bust |
+
+### The 12
+
+Each row’s three fields live under that person: **Visual**, **Outfit**, **Hook**.
 
 | Job | `adv_id` | Display |
 |---|---|---|
@@ -781,6 +932,24 @@ Not this PR. No PixelLab, no posture sheets, no second folder. When a later art 
 | Oathbound | `adv_clarion_mantle` | Clarion Mantle |
 | Oathbound | `adv_pell_white` | Pell White |
 
+### QC / gen rules
+
+Nnoitra, after the stamp:
+
+- Within each job trio, faces must not share the same age band + hair color + expression.
+- Silhouette must match construction. Wizard = mantle, **not hood-up**. Hexer = hood / wraps. Outrider = coat. Oathbound = armor + mantle.
+- Palette on the Outfit row is the primary 96×96 differentiator after face shape.
+- `style_image` / `quill_lumen` / `adv_quill_lumen` = grain only, not a face clone.
+- Wizard hood-up is forbidden. The hood belongs to the mage order (`con_robe` + `con_hood`), not this job.
+- Hexer hood may be up only as that row says. Soot: hood up, face clear. Tar: tar-veil strip, eyes clear. Ashen: cloth cowl, loose frame, **no metal bucket**.
+- Do not invent a job, a `con_*`, or one shared outlook to save a gen.
+- The M1 twelve stay the landed files. Do not regen them. Do not run this packet on them.
+
+### Stamp line
+
+ACCEPT all 12 Portrait uniqueness rows, or rewrite named rows (list the `adv_*`). #61 roster and draw B are already stamped. This line does not reopen them. Silence does not send a redraw.
+
+
 ---
 
 ## Explicit non-goals
@@ -792,7 +961,9 @@ Not this PR. No PixelLab, no posture sheets, no second folder. When a later art 
 - Putting Knight / Mage / Blade Dancer / Lagoon into `M2_JOB_POOL`, or merging the two pools into one draw — **LOCKED** out (Jonathan 2026-10-21, draw B)
 - Job-stub fallback on either smoke
 - Wiring this catalog in Client, Elite N5 telegraph, interactive-order slice 4, or a stat / event retune
-- Portrait gens or posture sheets for the M2 twelve (path reserved above; first wave stays the landed M1 12)
+- M2 portrait gens, PNG edits, or posture sheets in this PR (uniqueness rows are the brief; path stays `assets/adv/<adv_id>.png`; the M1 twelve stay the landed files)
+- One shared face or outlook across the M2 twelve (`adv_quill_lumen` is grain only)
+- Wizard hood-up (wizard order stays `con_robe` + `con_mantle`)
 - Scrap Duelist or job-stub portraits
 
 ---
