@@ -372,6 +372,65 @@ static func build_boss_result(
 	}
 
 
+## One piece's docs/23 card. Reads the stamp the resolver already returned. No second sim.
+static func build_piece_report(order: ClientOrder, result: Dictionary, piece_index: int) -> Dictionary:
+	var rating = result.get("rating", GameEnums.Rating.NONE)
+	var cleared := bool(result.get("cleared", false))
+	var hp := float(result.get("hp_remaining", 0.0))
+	var aid := int(result.get("damage_aid_pct", 0))
+	var stars := int(result.get("skill_effectiveness", 1))
+	var rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
+	var outlook := String(result.get("outlook_id", "plain"))
+	var lines: PackedStringArray = PackedStringArray()
+	lines.append(
+		"Mission result (docs/23, 24): rating %s · cleared %s · hp %s · aid %d%% · ★%d."
+		% [GameEnums.rating_wire(rating), str(cleared), _hp_text(hp), aid, stars]
+	)
+	lines.append(
+		"Gate: cleared = (hp > 0) ∧ rating ∈ {S,A,B,C}. Piece %d of this Finish."
+		% piece_index
+	)
+	lines.append(
+		"Piece %d · rarity %s · rating %s · look %s."
+		% [piece_index, GameEnums.craft_rarity_wire(rarity), GameEnums.rating_wire(rating), outlook]
+	)
+	lines.append(
+		"outcome %s · favor %s · punish %s."
+		% [
+			str(GameEnums.outcome_wire(result.get("outcome", GameEnums.Outcome.NONE))),
+			_join_tags(result.get("favor_tags_hit", PackedStringArray())),
+			_join_tags(result.get("punish_tags_hit", PackedStringArray())),
+		]
+	)
+	if order != null and order.mission_kind == GameEnums.MissionKind.PREP:
+		lines.append("Prep rack — resolver ran; no live client. Reps not applied.")
+	return {
+		"resolve_class": RESOLVE_ORDER,
+		"day_action": null,
+		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
+		"title": "Mission — %s · piece %d" % [GameEnums.rating_wire(rating), piece_index],
+		"body": "\n".join(lines),
+		"stub": "",
+		"order_id": order.order_id if order != null else "",
+		"phase": GameEnums.stamp_phase_wire(GameEnums.StampPhase.SCHEDULE),
+		"piece_index": piece_index,
+		"cleared": cleared,
+		"rating": GameEnums.rating_wire(rating),
+	}
+
+
+static func _join_tags(value: Variant) -> String:
+	var bits := PackedStringArray()
+	if value is PackedStringArray:
+		bits = value
+	elif value is Array:
+		for item in value:
+			bits.append(String(item))
+	if bits.is_empty():
+		return "(none)"
+	return ", ".join(bits)
+
+
 static func _hp_text(hp: float) -> String:
 	return "%.2f" % hp
 

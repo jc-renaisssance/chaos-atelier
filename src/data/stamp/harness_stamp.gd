@@ -89,6 +89,11 @@ var estimate_favor_hits: Variant = "?"
 var estimate_punish_hits: Variant = "?"
 var estimate_skill_fired: Variant = "?"
 var estimate_neg_warnings: Variant = "?"
+## Slice 4 playback logs (docs/30, docs/20). Not Required. No new assert.
+var playback_played: bool = false
+var playback_skipped: bool = false
+var playback_beats: Array = []
+var playback_actor_id: Variant = null
 
 ## docs/32 market / event visit logs. Null the unused block in to_dict.
 var gold: int = 0
@@ -523,6 +528,11 @@ func to_dict() -> Dictionary:
 		dump["event_resolved"] = null
 		dump["event_result_line"] = null
 		dump["event_mat_skipped"] = null
+	## Log-only. Not a Required column. cant_craft / market / event stay played=false, beats=[].
+	dump["playback_played"] = playback_played
+	dump["playback_skipped"] = playback_skipped
+	dump["playback_beats"] = playback_beats.duplicate()
+	dump["playback_actor_id"] = playback_actor_id
 	return dump
 
 
@@ -577,6 +587,7 @@ func schema_errors() -> PackedStringArray:
 	if run_over and run_over_reason == GameEnums.RunOverReason.NONE:
 		errs.append("run_over without run_over_reason")
 	## unlocked_builds / Dex / estimate keys are log-only (docs/30, 31). Do not schema-require them.
+	## playback_played / playback_skipped / playback_beats / playback_actor_id are log-only too.
 	## Builds tab reads unlocked_builds only — no parallel builds list.
 	## Planned-chip estimate is a prediction window, not the live resolver letter.
 	if mission_kind == GameEnums.MissionKind.BOSS:

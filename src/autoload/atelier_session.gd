@@ -35,6 +35,14 @@ var next_mat_free: bool = false
 var last_piece_result: Dictionary = {}
 var piece_results: Array = []
 var piece_stamps: Array = []
+var piece_stamp_nodes: Array = []
+## Gate A (docs/30 slice 4). A step on the existing Finish → report path.
+var playback_open: bool = false
+var piece_report_open: bool = false
+var playback_serial: int = 0
+var _playback_queue: Array = []
+var _playback_cursor: int = 0
+var _playback_rows: Array = []
 var chapter_piece_results: Array = []
 var last_mission: Dictionary = {}
 
@@ -176,6 +184,12 @@ func _reset_craft_state() -> void:
 	last_piece_result = {}
 	piece_results.clear()
 	piece_stamps.clear()
+	piece_stamp_nodes.clear()
+	playback_open = false
+	piece_report_open = false
+	_playback_queue.clear()
+	_playback_cursor = 0
+	_playback_rows.clear()
 	dex_order_adventurer_id = ""
 	planned_build = null
 
@@ -466,6 +480,12 @@ func _resolve_session() -> void:
 	CraftRules.return_run_deck(craft_session, stock)
 	piece_results.clear()
 	piece_stamps.clear()
+	piece_stamp_nodes.clear()
+	playback_open = false
+	piece_report_open = false
+	_playback_queue.clear()
+	_playback_cursor = 0
+	_playback_rows.clear()
 	var keep_zone := craft_session.selected_zone_index
 	var n := craft_session.zone_count
 	for i in range(1, n + 1):
@@ -487,6 +507,7 @@ func _resolve_session() -> void:
 			chapter_piece_results.append(result)
 		_write_finish_profile(result, i == n)
 		var stamp := _make_craft_stamp(result)
+		piece_stamp_nodes.append(stamp)
 		piece_stamps.append(stamp.to_dict())
 		last_stamp = stamp
 		piece_finished.emit(result)
@@ -497,11 +518,225 @@ func _resolve_session() -> void:
 		"Session finished (player_finish). %d piece(s) stamped in listed order. crafts_done=%d (unbounded)."
 		% [piece_results.size(), board.crafts_done]
 	)
+	## Resolver already returned for each piece. Playback does not call it again.
+	_begin_playback_gate()
 	craft_changed.emit()
 	board_changed.emit()
 
 
+## Adventurer order, appointment, and boss beat. Not prep, cant_craft, market, or event.
+## Empty zones still play — grade_piece already ran on the construction-only stamp.
+func _gate_a_plays() -> bool:
+	if craft_order == null or craft_session == null:
+		return false
+	if craft_session.finish_reason != GameEnums.FinishReason.PLAYER_FINISH:
+		return false
+	if piece_results.is_empty() or piece_stamp_nodes.size() != piece_results.size():
+		return false
+	if craft_order.mission_kind == GameEnums.MissionKind.BOSS:
+		return true
+	if craft_order.mission_kind != GameEnums.MissionKind.ORDER:
+		return false
+	if board == null:
+		return false
+	var action := board.current_day_action()
+	return action == GameEnums.RoundAction.WALK_IN or action == GameEnums.RoundAction.APPOINTMENT
+
+
+func _begin_playback_gate() -> void:
+	playback_open = false
+	piece_report_open = false
+	_playback_queue.clear()
+	_playback_cursor = 0
+	_playback_rows.clear()
+	if not _gate_a_plays():
+		return
+	playback_serial += 1
+	var actor: Variant = _playback_actor_id()
+	for i in range(piece_stamp_nodes.size()):
+		var stamp: HarnessStamp = piece_stamp_nodes[i]
+		var result: Dictionary = piece_results[i]
+		var piece_index := int(result.get("piece_index", i + 1))
+		var rows: Array = _rows_for_piece(result, piece_index, actor)
+		_playback_rows.append(rows)
+		stamp.playback_beats = PlaybackBeats.beat_ids(rows)
+		stamp.playback_actor_id = actor
+		stamp.playback_played = false
+		stamp.playback_skipped = false
+		_playback_queue.append(i)
+		## Patch the snapshot taken while this piece was focused. Do not re-dump:
+		## the live session focus is restored after the loop.
+		_patch_playback_dump(i)
+	if _playback_queue.is_empty():
+		return
+	_show_playback_cursor()
+
+
+func _show_playback_cursor() -> void:
+	if _playback_cursor < 0 or _playback_cursor >= _playback_queue.size():
+		playback_open = false
+		return
+	var index: int = int(_playback_queue[_playback_cursor])
+	var stamp: HarnessStamp = piece_stamp_nodes[index]
+	stamp.playback_played = true
+	stamp.playback_skipped = false
+	_sync_piece_stamp(index)
+	playback_open = true
+	piece_report_open = false
+	last_note = (
+		"Playback · piece %d / %d. Skip ends this playback only."
+		% [_piece_index_at(index), piece_results.size()]
+	)
+
+
+func finish_playback(skipped: bool) -> void:
+	## Skip and the natural end both open this piece's report. Neither skips it.
+	if not playback_open:
+		return
+	if _playback_cursor < 0 or _playback_cursor >= _playback_queue.size():
+		playback_open = false
+		return
+	var index: int = int(_playback_queue[_playback_cursor])
+	var stamp: HarnessStamp = piece_stamp_nodes[index]
+	stamp.playback_played = true
+	stamp.playback_skipped = skipped
+	_sync_piece_stamp(index)
+	playback_open = false
+	piece_report_open = true
+	last_note = "Piece %d report (docs/23)." % _piece_index_at(index)
+	board_changed.emit()
+
+
+func continue_piece_report() -> void:
+	## Closing this piece's report starts the next piece. The last one opens the existing report.
+	if not piece_report_open:
+		return
+	piece_report_open = false
+	_playback_cursor += 1
+	if _playback_cursor < _playback_queue.size():
+		_show_playback_cursor()
+		board_changed.emit()
+		return
+	playback_open = false
+	_return_to_schedule()
+
+
+func playback_snapshot() -> Dictionary:
+	var index := -1
+	if _playback_cursor >= 0 and _playback_cursor < _playback_queue.size():
+		index = int(_playback_queue[_playback_cursor])
+	var rows: Array = []
+	if index >= 0 and index < _playback_rows.size():
+		var got: Variant = _playback_rows[index]
+		if got is Array:
+			rows.assign(got)
+	var piece_index := _piece_index_at(index)
+	var actor: Variant = null
+	if index >= 0 and index < piece_stamp_nodes.size():
+		var stamp: HarnessStamp = piece_stamp_nodes[index]
+		actor = stamp.playback_actor_id
+	var title := ""
+	var body := ""
+	var note := ""
+	if piece_report_open and index >= 0 and index < piece_results.size():
+		var result: Dictionary = piece_results[index]
+		var card := ScheduleRules.build_piece_report(craft_order, result, piece_index)
+		title = String(card.get("title", ""))
+		body = String(card.get("body", ""))
+		if _playback_cursor + 1 < _playback_queue.size():
+			note = "Piece report (docs/23). Continue starts the next piece's playback."
+		else:
+			note = "Piece report (docs/23). Continue opens the mission report."
+	return {
+		"report": piece_report_open,
+		"beats": rows,
+		"piece_index": piece_index,
+		"piece_count": piece_results.size(),
+		"title": title,
+		"body": body,
+		"note": note,
+		"actor_id": actor,
+		"serial": playback_serial,
+	}
+
+
+func _piece_index_at(index: int) -> int:
+	if index >= 0 and index < piece_results.size():
+		return int(piece_results[index].get("piece_index", index + 1))
+	return index + 1
+
+
+func _sync_piece_stamp(index: int) -> void:
+	if index < 0 or index >= piece_stamp_nodes.size():
+		return
+	## Preview reads the live session. Focus this piece so piece_index matches its stamp.
+	var piece_index := _piece_index_at(index)
+	if craft_session != null and craft_session.is_legal_zone(piece_index):
+		craft_session.focus_zone(piece_index)
+	var stamp: HarnessStamp = piece_stamp_nodes[index]
+	_patch_playback_dump(index)
+	last_stamp = stamp
+
+
+func _patch_playback_dump(index: int) -> void:
+	if index < 0 or index >= piece_stamp_nodes.size() or index >= piece_stamps.size():
+		return
+	var raw: Variant = piece_stamps[index]
+	if not (raw is Dictionary):
+		return
+	var stamp: HarnessStamp = piece_stamp_nodes[index]
+	var dump: Dictionary = raw
+	dump["playback_played"] = stamp.playback_played
+	dump["playback_skipped"] = stamp.playback_skipped
+	dump["playback_beats"] = stamp.playback_beats.duplicate()
+	dump["playback_actor_id"] = stamp.playback_actor_id
+
+
+func _playback_actor_id() -> Variant:
+	var raw := ""
+	if craft_order != null:
+		raw = AdventurerCatalog.order_adventurer_id(craft_order)
+	return PlaybackBeats.actor_id_for(raw)
+
+
+func _appt_label() -> String:
+	if board == null:
+		return ""
+	if board.current_day_action() != GameEnums.RoundAction.APPOINTMENT:
+		return ""
+	var pin := board.current_pin()
+	if pin == null:
+		return ""
+	return pin.appointment_id
+
+
+func _playback_threat_id() -> String:
+	## Boss beat labels chapter_boss_id. Other orders use the stamp threat.
+	if craft_order != null and craft_order.mission_kind == GameEnums.MissionKind.BOSS:
+		if board != null and not board.chapter_boss_id.is_empty():
+			return board.chapter_boss_id
+	if craft_order != null:
+		return craft_order.threat_id
+	return ""
+
+
+func _rows_for_piece(result: Dictionary, piece_index: int, actor: Variant) -> Array:
+	var person := PlaybackBeats.open_person_label(actor, _appt_label())
+	var threat_id := _playback_threat_id()
+	var seen := true
+	if ThreatCatalog.is_boss(threat_id):
+		seen = profile.enemy_seen(threat_id)
+	var threat := PlaybackBeats.threat_label(threat_id, seen)
+	var skill := ""
+	if actor is String:
+		skill = AdventurerCatalog.skill_id(String(actor))
+	return PlaybackBeats.build(result, person, threat, skill, piece_index)
+
+
 func continue_after_piece() -> void:
+	## Playback and the piece report own the exit until the queue is done.
+	if playback_open or piece_report_open:
+		return
 	if not craft_open:
 		return
 	if order_craft_done:
