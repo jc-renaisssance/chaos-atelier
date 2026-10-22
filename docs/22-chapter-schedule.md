@@ -1,6 +1,6 @@
 # Chapter route map — travelling atelier (Jonathan stamp 2026-10-13)
 
-**Status:** Route map **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). Kind faces landed ([Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20), #57–#59). **Elite telegraph (2026-10-21)** below is Grimmjow Design-ready for Jonathan stamp. It answers the open elite question. It does not add a screen.
+**Status:** Route map **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). Kind faces landed ([Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20), #57–#59). **Elite telegraph shipped** (#66 / #67 / #68, Marker A, Scope A). Do not reopen. It does not add a screen.
 
 **Supersedes** the free per-day **`E*` options board** from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) (preview every windowed event per day, assign D1..(N−2) from an identical-shaped list). **Still superseded:** 2026-09-28 Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`); 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)).
 
@@ -22,7 +22,9 @@ Combos are **bound multi-day blocks on the graph**, not stacked modifiers the pl
 | Boss telegraph | Chapter start | Boss announced before spend |
 | Reserved days | Last **2** relative to `N = map.day_count` | Graph days = **D1..(N−2)**. Current 8-day map: **D7** travel / final prep, **D8** boss approach. Appointments cannot claim reserved days. |
 | Shop visits / chapter | **1–3** | From **graph design** (how many `shop` nodes sit on a complete path). **Not** a hard UI ban on picking shop. |
-| Fork width | **2–4** visible next options | Only at forks. Corridor / bind / reserved → **no** options panel. |
+| Fork width | **2–4** visible next options | Only at forks. Corridor / bind / reserved → **no** options panel. Current test forks are 2 or 3. Do not add an edge to force 4. |
+
+Until-M2 numbers (person stats, pressure, gold, reps, which `evt_*` a node resolves) are [33](33-until-m2-tuning.md), awaiting stamp. This file’s graph, Day names, `crafts_max` gone, last-2 rule, and fork width stay. Event **identity** is a pool row on a `kind=event` node, not a day-strip script, and not the free `E*` board.
 
 ### Reserved last-2 (relative to map length)
 
@@ -577,8 +579,8 @@ Szayelaporro, after that Client PR: on `map_m1`, exactly one appointment node (N
 
 ## Open questions (Jonathan)
 
-The 2026-10-13 elite question is **replaced** by [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). Marker **A/B** and Scope **A/B/C** are the stamp card. They are not a second essay question in this file. Draft-future stays **LOCKED** 2026-10-13.
+The 2026-10-13 elite question is **replaced** by [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). Marker **A** and Scope **A** are stamped (#66 / #67 / #68). Do not reopen. Draft-future stays **LOCKED** 2026-10-13. Until-M2 stat and event letters are [33](33-until-m2-tuning.md), not this section.
 
 ## Pointers
 
-`20` stamps (no new elite key under the Design default) · `32` market visit + event resolve · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper (boss telegraph, not this badge) · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `05` art socket pointer · `00` vision (display name **Wombaste**) · [STAMP](STAMP.md) card 2026-10-21
+`20` stamps (no new elite key under the Design default) · `32` market visit + event resolve · `33` until-M2 stat / event tuning · `24` win-con (cant_craft not at-max) · `27` stamina · `25` reps · `26` newspaper (boss telegraph, not this badge) · `17` bosses · `28` boss-client pool · `29` adventurers · `31` Dex · `01` loop · `03` people · `05` art socket pointer · `00` vision (display name **Wombaste**) · [STAMP](STAMP.md) card 2026-10-22

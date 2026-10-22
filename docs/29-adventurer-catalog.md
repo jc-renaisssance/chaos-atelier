@@ -20,7 +20,7 @@
 | Target enemies | Existing `boss_*` from `17` (limited enemy types = the 9 chapter bosses) |
 | Appointments | Not this catalog. Scrap Duelist stays `appt_scrap_duelist` |
 
-Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune. **S–F estimate letter bands** in `30` stay Test knobs — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do not lock the cutoff table.
+Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune. **S–F estimate letter bands** in `30` stay Test knobs — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do not lock the cutoff table. [33](33-until-m2-tuning.md) proposes to accept the six-stat cells (and the HP 8–16 / other 1–8 band) as the **until-M2** lock. No cell in this file changes. Estimate weights and the S–F table stay knobs either way.
 
 ---
 
@@ -1168,4 +1168,5 @@ Nnoitra, after the stamp, and only for the busts that stamp opens:
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
 - PM: [pm/phase-1-plan](pm/phase-1-plan.md)
 - Market (closed M1; skills icons + tab chrome live there): [32-shop-and-events](32-shop-and-events.md)
+- Until-M2 stat lock (proposed): [33-until-m2-tuning](33-until-m2-tuning.md)
 - Art pointer: [05-art](05-art.md)

@@ -72,7 +72,7 @@ Skills manipulate the craft session (costs, converts, doubles, digs), then leave
 
 ## Stamina (one pool, whole session)
 
-- **One** stamina pool for the session. Start = **`12 * N`** (Phase-1 **draft** — same per-piece base as mono, summed for parallel play). Jonathan may retune.
+- **One** stamina pool for the session. Start = **`12 * N`** (Phase-1 **draft** — same per-piece base as mono, summed for parallel play). [33](33-until-m2-tuning.md) proposes to **accept** `12 * N`, hand **5**, dig **2**, and the play costs as the until-M2 lock (no integer change). Silence on that tables line is not accept.
 - Dig cost stays **2** (session-wide, not × N).
 - Each play costs **stamina** (card-defined cost ≥ 0 after modifiers). Stamina craft UX is unchanged for costs; this lock is **when the session ends**.
 - A play (material included) spends stamina **and** the card **leaves the hand** → discard (unless a special card says otherwise). A **consumable** play (Later, distinct type) burns the card.
