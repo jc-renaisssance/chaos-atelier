@@ -30,6 +30,7 @@ var _take_btn: Button
 var _schedule_root: Control
 var _body_scroll: ScrollContainer
 var _craft_table: CraftTable
+var _playback_step: PlaybackStep
 var _dex_screen: DexScreen
 var _market_screen: MarketScreen
 var _event_screen: EventScreen
@@ -205,6 +206,11 @@ func _build() -> void:
 	_craft_table.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_craft_table)
 
+	_playback_step = PlaybackStep.new()
+	_playback_step.visible = false
+	_playback_step.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_playback_step)
+
 	_dex_screen = DexScreen.new()
 	_dex_screen.visible = false
 	_dex_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -260,15 +266,22 @@ func _redraw() -> void:
 	var in_craft := AtelierSession.craft_open
 	var in_market := AtelierSession.market_open
 	var in_event := AtelierSession.event_open
-	if in_craft or in_market or in_event:
+	var in_playback := AtelierSession.playback_open or AtelierSession.piece_report_open
+	if in_craft or in_market or in_event or in_playback:
 		_dex_open = false
 	if _dex_screen != null:
-		_dex_screen.visible = _dex_open and not in_craft and not in_market and not in_event
+		_dex_screen.visible = _dex_open and not in_craft and not in_market and not in_event and not in_playback
 	if _schedule_root != null:
-		_schedule_root.visible = not in_craft and not _dex_open and not in_market and not in_event
+		_schedule_root.visible = not in_craft and not _dex_open and not in_market and not in_event and not in_playback
+	if _playback_step != null:
+		_playback_step.visible = in_playback
+		if in_playback:
+			_playback_step.refresh()
+		else:
+			_playback_step.dismiss()
 	if _craft_table != null:
-		_craft_table.visible = in_craft
-		if in_craft:
+		_craft_table.visible = in_craft and not in_playback
+		if in_craft and not in_playback:
 			_craft_table.refresh()
 	if _market_screen != null:
 		_market_screen.visible = in_market
@@ -278,6 +291,8 @@ func _redraw() -> void:
 		_event_screen.visible = in_event
 		if in_event:
 			_event_screen.refresh()
+	if in_playback:
+		return
 	if in_craft:
 		return
 	if in_market or in_event:

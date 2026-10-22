@@ -34,6 +34,7 @@ const PORTRAITS := {
 var _title: Label
 var _note: Label
 var _order_portrait: TextureRect
+var _shop_posture: TextureRect
 var _order_title: Label
 var _order_stats: Label
 var _order_skill: Label
@@ -121,6 +122,9 @@ func _build() -> void:
 	left_box.add_child(order_head)
 	_order_portrait = _portrait_socket()
 	order_head.add_child(_order_portrait)
+	## in_shop beside the 96 bust, not instead of it. Missing file hides this slot.
+	_shop_posture = _posture_socket()
+	order_head.add_child(_shop_posture)
 	var order_text := VBoxContainer.new()
 	order_text.add_theme_constant_override("separation", 4)
 	order_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -284,6 +288,31 @@ func _bind_order_portrait(adv_id: String) -> void:
 	_order_portrait.texture = tex
 	## Missing preload → hide the socket. Display name + job stay on the panel.
 	_order_portrait.visible = tex != null
+	_bind_in_shop(adv_id)
+
+
+func _posture_socket() -> TextureRect:
+	var icon := TextureRect.new()
+	icon.name = "InShopPosture"
+	icon.custom_minimum_size = Vector2(PostureSocket.DISPLAY_PX, PostureSocket.DISPLAY_PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.visible = false
+	return icon
+
+
+func _bind_in_shop(adv_id: String) -> void:
+	## Socket A in_shop. Hide when the still is missing. Never substitute the 96 bust.
+	var still: Dictionary = PostureSocket.shop_still(adv_id)
+	var show := not bool(still.get("hidden", true))
+	_shop_posture.visible = show
+	if not show:
+		_shop_posture.texture = null
+		return
+	_shop_posture.texture = still.get("texture") as Texture2D
 
 
 func _caption(text: String) -> Label:
@@ -436,7 +465,12 @@ func _refresh() -> void:
 	var busy := session.is_finished() or AtelierSession.order_craft_done
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
 	_finish_btn.disabled = busy
-	_continue_btn.visible = AtelierSession.order_craft_done
+	## Gate A owns the exit while a playback or piece report is up.
+	_continue_btn.visible = (
+		AtelierSession.order_craft_done
+		and not AtelierSession.playback_open
+		and not AtelierSession.piece_report_open
+	)
 	if order.mission_kind == GameEnums.MissionKind.BOSS:
 		_continue_btn.text = "Resolve the fight"
 	else:
