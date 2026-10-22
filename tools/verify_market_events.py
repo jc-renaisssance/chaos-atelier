@@ -40,12 +40,28 @@ BANK = [
     "mat_velvet_court",
     "mat_steel_plate",
 ]
+# Sample legal draw on map_m1. Not the live resolver (docs/33 event letter A).
 NODE_EVENTS = {
     "N4": "evt_c1_heat_mirage",
     "N6": "evt_c1_ashfall",
     "N10": "evt_c1_scrap_market",
     "N17": "evt_c1_salt_spray",
 }
+SAMPLE_DAYS = {
+    "N4": 2,
+    "N6": 3,
+    "N10": 4,
+    "N17": 6,
+}
+POOL_ORDER = [
+    ("evt_c1_heat_mirage", 3, ("early", "mid")),
+    ("evt_c1_ashfall", 3, ("early", "mid")),
+    ("evt_c1_kind_stranger", 2, ("early", "mid")),
+    ("evt_c1_wagon_rattle", 2, ("early", "mid", "late")),
+    ("evt_c1_scrap_market", 2, ("mid", "late")),
+    ("evt_c1_salt_spray", 2, ("late",)),
+    ("evt_c1_toll_post", 1, ("mid", "late")),
+]
 EXCLUDED = {
     "mat_grave_silk",
     "mat_null_ink_cloth",
@@ -319,6 +335,106 @@ def check_bank() -> None:
             fail(f"{artifact_id} price != {price}")
     if any(k.startswith("gear_") for k in artifacts):
         fail("do not use gear_* ids")
+
+
+def band_for_day(day_index: int, day_count: int) -> str:
+    graph_last = day_count - 2
+    if day_index < 1 or day_index > day_count:
+        return ""
+    if day_index > graph_last:
+        return "reserved"
+    if day_index <= 2:
+        return "early"
+    if day_index <= 4:
+        return "mid"
+    return "late"
+
+
+def pool_candidates(pool: list[tuple[str, int, tuple[str, ...]]], band: str, resolved: set[str], use_band: bool) -> list[str]:
+    ids: list[str] = []
+    for event_id, _weight, bands in pool:
+        if event_id in resolved:
+            continue
+        if use_band and band not in bands:
+            continue
+        ids.append(event_id)
+    return ids
+
+
+def legal_draw(pool: list[tuple[str, int, tuple[str, ...]]], day_index: int, day_count: int, resolved: set[str]) -> list[str] | None:
+    """None means only the in-pool ref fallback (a repeat) is legal."""
+    band = band_for_day(day_index, day_count)
+    if band in ("", "reserved"):
+        return []
+    in_band = pool_candidates(pool, band, resolved, True)
+    if in_band:
+        return in_band
+    unused = pool_candidates(pool, "", resolved, False)
+    if unused:
+        return unused
+    return None
+
+
+def check_event_attach() -> None:
+    """Assert 26 equalities moved: event_id is a day-band draw, not the welded ref."""
+    catalog = read("src/data/catalog/event_catalog.gd")
+    pool = _const_dict(catalog, "EVENT_POOL")
+    parsed = [(eid, int(row["weight"]), tuple(row["bands"])) for eid, row in pool.items()]
+    if parsed != POOL_ORDER:
+        fail(f"EVENT_POOL scan order/weights/bands {parsed} != until-M2 table")
+    session = read("src/autoload/atelier_session.gd")
+    if re.search(r"event_id\s*=\s*node\.ref_id", session):
+        fail("event attach must draw; node ref_id is the sample fallback only")
+    if "EventCatalog.draw(" not in session:
+        fail("enter of kind=event must call EventCatalog.draw")
+    if "event_rng.seed = chapter_seed" not in session:
+        fail("event draw must be stable on the chapter seed")
+    if "chapter_events_resolved" not in session:
+        fail("event draw must skip rows already resolved this chapter")
+    draw = catalog.split("static func draw(", 1)[-1].split("static func _pool_candidates", 1)[0]
+    compact = re.sub(r"\s+", "", draw)
+    for token in (
+        '_weighted_pick(rng,_pool_candidates(band,resolved,true))',
+        '_weighted_pick(rng,_pool_candidates("",resolved,false))',
+        "EVENT_POOL.has(fallback_ref)",
+        'return"reserved"',
+        "day_index<=2",
+        'return"early"',
+        "day_index<=4",
+        'return"mid"',
+        'return"late"',
+    ):
+        if token not in compact and token not in re.sub(r"\s+", "", catalog):
+            fail(f"event draw missing step {token}")
+    if '"event_pool"' in read("src/data/stamp/harness_stamp.gd"):
+        fail("do not emit windowed event_pool")
+    # Sample refs stay on the graph and each is in band. They are not the resolver.
+    for nid, evt in NODE_EVENTS.items():
+        band = band_for_day(SAMPLE_DAYS[nid], 8)
+        bands = dict(zip([row[0] for row in POOL_ORDER], [row[2] for row in POOL_ORDER]))[evt]
+        if band not in bands:
+            fail(f"sample {nid} {evt} is not in band {band}")
+    # In-band unused does not repeat. Reserved days do not draw.
+    resolved: set[str] = set()
+    for day in (2, 3, 4, 6):
+        legal = legal_draw(POOL_ORDER, day, 8, resolved)
+        if not legal:
+            fail(f"D{day} should have an in-band unused row")
+            continue
+        picked = legal[0]
+        if picked in resolved:
+            fail(f"D{day} repeated {picked}")
+        if band_for_day(day, 8) not in dict(zip([r[0] for r in POOL_ORDER], [r[2] for r in POOL_ORDER]))[picked]:
+            fail(f"D{day} pick {picked} left its band")
+        resolved.add(picked)
+    if legal_draw(POOL_ORDER, 7, 8, set()) != [] or legal_draw(POOL_ORDER, 8, 8, set()) != []:
+        fail("reserved days N-1 and N must not draw")
+    early_ids = {eid for eid, _w, bands in POOL_ORDER if "early" in bands}
+    fallback = legal_draw(POOL_ORDER, 2, 8, early_ids)
+    if fallback is None or any(eid in early_ids for eid in fallback):
+        fail("when the early band is used up, draw unused rows and ignore band")
+    if legal_draw(POOL_ORDER, 2, 8, {eid for eid, _w, _b in POOL_ORDER}) is not None:
+        fail("exhausted pool must fall through to the node ref")
 
 
 def check_map_events() -> None:
@@ -615,6 +731,7 @@ def main() -> int:
     check_godot_47()
     check_bank()
     check_map_events()
+    check_event_attach()
     check_source()
     check_shelf_icons()
     check_formulas()
@@ -625,7 +742,8 @@ def main() -> int:
         return 1
     print(
         "market M1 materials + M2 Staffs/Skills/Gear; refresh materials-only; "
-        "staff 5 / skill 6 / artifact 8; Staffs/Skills/Gear shelf icons; events N4/N6/N10/N17."
+        "staff 5 / skill 6 / artifact 8; Staffs/Skills/Gear shelf icons; "
+        "sample refs N4/N6/N10/N17; live attach is weighted day-band draw."
     )
     return 0
 

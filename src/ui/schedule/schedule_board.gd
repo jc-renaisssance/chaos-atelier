@@ -309,7 +309,7 @@ func _redraw() -> void:
 	_title.text = "WOMBASTE  ·  travelling wagon  ·  %s" % board.player_owner_id
 	_planner_caption.text = "ROUTE GRAPH  ·  %s  ·  %d days (map.day_count)  ·  last 2 reserved  ·  nodes + edges" % [board.map_id, n]
 	_meta.text = (
-		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   gold %d   ·   reps %d (gate stub %d)   ·   decline %s   ·   seed %d"
+		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   gold %d   ·   reps %d (gate %d)   ·   decline %s   ·   seed %d"
 		% [
 			board.chapter_id,
 			GameConstants.CHAPTERS_PER_RUN,
@@ -322,7 +322,7 @@ func _redraw() -> void:
 			board.crafts_done,
 			AtelierSession.gold,
 			AtelierSession.reps,
-			GameConstants.REPS_GATE_STUB,
+			GameConstants.reps_gate_for(board.chapter_id),
 			"used" if board.appt_decline_used else "open (once / chapter)",
 			AtelierSession.chapter_seed,
 		]

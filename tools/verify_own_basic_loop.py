@@ -180,6 +180,7 @@ def grade(
     difficulty: int,
     is_boss: bool,
     prep: bool,
+    appointment: bool = False,
 ) -> dict:
     empty = cards_n == 0
     if prep:
@@ -187,6 +188,9 @@ def grade(
         empty_pen = 0.0
     elif is_boss:
         pressure = 0.84
+        empty_pen = 0.22 if empty else 0.0
+    elif appointment:
+        pressure = 0.64
         empty_pen = 0.22 if empty else 0.0
     else:
         pressure = {1: 0.28, 2: 0.40, 3: 0.52}[difficulty]
@@ -256,6 +260,15 @@ def run_spec() -> None:
     sewn = grade(8, 3, 2, 0, 0, 2, 6, 3, 2, False, False)
     if not sewn["cleared"] or sewn["rating"] not in "SABC":
         fail(f"decent sew should clear, got {sewn}")
+
+    # docs/33 — appointment 0.64 sits under boss 0.84 and above a difficulty-3 order (0.52).
+    plain_hard = grade(0, 0, 0, 0, 0, 0, 0, 1, 3, False, False, False)
+    appt = grade(0, 0, 0, 0, 0, 0, 0, 1, 3, False, False, True)
+    boss_row = grade(0, 0, 0, 0, 0, 0, 0, 1, 3, True, False, True)
+    if not (boss_row["hp"] < appt["hp"] < plain_hard["hp"]):
+        fail(f"appointment pressure must sit between boss and difficulty 3, got boss={boss_row} appt={appt} hard={plain_hard}")
+    if abs(appt["hp"] - (1.0 - 0.64)) > 1e-9:
+        fail(f"appointment with no soak should use pressure 0.64, got {appt}")
 
     d = reps_delta(False, "F", 2, 1.0, True)
     if d != -2:
@@ -360,12 +373,62 @@ def run_spec() -> None:
             fail(f"stamp dump must not emit superseded {banned_dump}")
 
 
+def check_until_m2_wire() -> None:
+    """docs/33 accept A A A A — pressure, mission gold, reps gate. Event attach is verify_market_events."""
+    resolver = (SRC / "mission" / "mission_resolver.gd").read_text(encoding="utf-8")
+    pressure = resolver.split("static func _pressure", 1)[-1].split("static func ", 1)[0]
+    i84 = pressure.find("return 0.84")
+    i64 = pressure.find("return 0.64")
+    i52 = pressure.find("return 0.52")
+    if not (0 <= i84 < i64 < i52):
+        fail("appointment 0.64 must sit under boss 0.84 and above difficulty-3 0.52")
+    if "is_appointment_order" not in resolver:
+        fail("pressure branch must use the appointment-order predicate")
+    catalog = (SRC / "data" / "chapter" / "schedule_catalog.gd").read_text(encoding="utf-8")
+    if "func is_appointment_order" not in catalog:
+        fail("ScheduleCatalog.is_appointment_order missing")
+    if '"card_difficulty": 3' not in catalog.split("appt_c1_scrap_duelist", 1)[-1][:400]:
+        fail("Scrap Duelist difficulty must stay 3")
+    session = (SRC / "autoload" / "atelier_session.gd").read_text(encoding="utf-8")
+    payout = session.split("func _apply_mission_payout", 1)[-1].split("\nfunc ", 1)[0]
+    if "if base > 0:" not in payout or "artifact_coin_purse" not in payout:
+        fail("coin purse +1 only when mission base > 0")
+    purse_at = payout.find("artifact_coin_purse")
+    base_at = payout.find("if base > 0:")
+    if purse_at < base_at:
+        fail("coin purse must not pay on a zero base")
+    mult = session.split("func _mission_gold_multiplier", 1)[-1].split("func _mission_gold_base", 1)[0]
+    for token in ("Rating.S:", "return 3", "Rating.A:", "Rating.B:", "return 2", "Rating.C:", "return 1"):
+        if token not in mult:
+            fail(f"mission gold ladder missing {token}")
+    base = session.split("func _mission_gold_base", 1)[-1].split("func _apply_mission_payout", 1)[0]
+    if "var diff := 3" not in base:
+        fail("boss mission gold uses difficulty 3")
+    if "not bool(last_mission.get(\"cleared\"" not in base and "not bool(last_mission.get(\"cleared\", false))" not in base:
+        fail("mission gold requires a clear")
+    consts = (SRC / "autoload" / "game_constants.gd").read_text(encoding="utf-8")
+    if "REPS_GATE_STUB" in consts or "REPS_GATE_STUB" in session:
+        fail("REPS_GATE_STUB must be replaced by the chapter table")
+    for line in ("1: 8", "2: 14", "3: 20"):
+        if line not in consts:
+            fail(f"reps gate table missing {line}")
+    if "func reps_gate_for" not in consts:
+        fail("reps_gate_for missing")
+    rules = (SRC / "chapter" / "reps_rules.gd").read_text(encoding="utf-8")
+    if "reps_gate_for" not in rules:
+        fail("reps apply must report the chapter gate")
+    # Worked chapter: three difficulty-2 B clears = 12; a difficulty-3 B boss = 6. D/F pay 0.
+    if 2 * 2 * 3 != 12 or 3 * 2 != 6 or 3 * 0 != 0:
+        fail("mission gold worked example drifted")
+
+
 def main() -> int:
     blob = src_text()
     check_project_godot()
     check_godot_47_hotfix(blob)
     check_source_symbols(blob)
     check_gd_balance()
+    check_until_m2_wire()
     run_spec()
     if FAILS:
         print("FAIL")

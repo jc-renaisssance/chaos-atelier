@@ -59,11 +59,15 @@ const OWNER_SKILL_DRAFT_COSTS := {
 	"sk_steady_hand": 1,
 }
 
-## docs/25 algorithm is live; C1=8 / C2=14 / C3=20 still track the old 3-round shell.
+## docs/25 formula. docs/33 gate table — not scaled by CHAPTER_DAY_COUNT.
 const REPS_START := 0
-const REPS_GATE_STUB := 0
+const REPS_GATE_BY_CHAPTER := {
+	1: 8,
+	2: 14,
+	3: 20,
+}
 
-## docs/32 + 19 — one gold purse. Market / event / (later) mission spend the same int.
+## docs/32 + 19 + 33 — one gold purse. Market, events, and mission gold write the same int.
 const GOLD_START := 12 ## Test knob
 const GOLD_FLOOR := 0
 const MARKET_BANK_ID := "market_bank_c1"
@@ -98,6 +102,10 @@ const LETTER_NEG_COMPLAINT := "let_neg_complaint"
 const LETTER_RARE_IMPRESSED := "let_rare_impressed"
 const LETTER_LEG_AWE := "let_leg_awe"
 const LETTER_BOSS_VICTORY := "let_boss_victory"
+
+
+static func reps_gate_for(chapter_id: int) -> int:
+	return int(REPS_GATE_BY_CHAPTER.get(chapter_id, 8))
 
 
 static func assignable_day_max(day_count: int) -> int:
