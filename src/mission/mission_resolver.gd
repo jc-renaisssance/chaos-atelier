@@ -87,12 +87,15 @@ static func grade_piece(craft: Dictionary, order: ClientOrder) -> Dictionary:
 	var threat_id := ""
 	var kind := GameEnums.MissionKind.PREP
 	var difficulty := 1
+	var appointment := false
 	if order != null:
 		threat_id = order.threat_id
 		kind = order.mission_kind
 		if order.card_difficulty != GameConstants.NULL_INT:
 			difficulty = order.card_difficulty
-	return attach(craft, threat_id, kind, difficulty, false)
+		## Route kind=appointment — the same predicate as the elite badge.
+		appointment = ScheduleCatalog.is_appointment_order(order)
+	return attach(craft, threat_id, kind, difficulty, false, appointment)
 
 
 static func resolve_order(piece_results: Array, order: ClientOrder) -> Dictionary:
@@ -110,7 +113,8 @@ static func attach(
 	threat_id: String,
 	kind: GameEnums.MissionKind,
 	difficulty: int,
-	is_boss: bool
+	is_boss: bool,
+	appointment: bool = false
 ) -> Dictionary:
 	var out := craft.duplicate(true)
 	if out.get("stats", null) == null:
@@ -131,7 +135,7 @@ static func attach(
 	var rarity = out.get("craft_rarity", GameEnums.CraftRarity.NONE)
 	var soak := float(maxi(0, stats.HP + stats.DEF + stats.RES))
 	var punch := float(maxi(0, stats.ATK)) + float(maxi(0, stats.MOB)) * 0.35 + float(maxi(0, stats.PRE)) * 0.35
-	var pressure := _pressure(difficulty, is_boss, kind)
+	var pressure := _pressure(difficulty, is_boss, kind, appointment)
 	var soak_ratio := clampf(soak / float(8 + 2 * maxi(difficulty, 1)), 0.0, 0.55)
 	var favor_n := favor.size()
 	var punish_n := punish.size()
@@ -197,11 +201,14 @@ static func derive_cleared(hp_remaining: float, rating: GameEnums.Rating) -> boo
 	return hp_remaining > 0.0 and GameEnums.rating_clears(rating)
 
 
-static func _pressure(difficulty: int, is_boss: bool, kind: GameEnums.MissionKind) -> float:
+static func _pressure(difficulty: int, is_boss: bool, kind: GameEnums.MissionKind, appointment: bool = false) -> float:
 	if kind == GameEnums.MissionKind.PREP:
 		return 0.0
 	if is_boss:
 		return 0.84
+	## docs/33 — appointment pressure. Difficulty (soak / reps / gold) stays on the order.
+	if appointment:
+		return 0.64
 	match clampi(difficulty, 1, 3):
 		1:
 			return 0.28

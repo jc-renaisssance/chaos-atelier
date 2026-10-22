@@ -10,12 +10,14 @@ signal craft_changed
 signal piece_finished(result: Dictionary)
 signal craft_order_finished
 
-## docs/22 −reps on decline; docs/25 gate numbers still track the old 3-round shell.
+## docs/22 + docs/33 — decline −1 once / chapter. Gate is GameConstants.reps_gate_for.
 const DECLINE_REPS_STUB := -1
 
 var run_id: String = ""
 var chapter_seed: int = 0
 var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+## Event-pool draws only. Seeded from chapter_seed so the pick does not follow market/craft rolls.
+var event_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var board: ChapterSchedule
 var last_stamp: HarnessStamp
 var last_resolve: Dictionary = {}
@@ -101,6 +103,8 @@ var artifact_equipped_ids: Array = []
 var visit_gold_before: int = 0
 var visit_gold_after: int = 0
 var event_id: String = ""
+## evt_* already resolved this chapter. Draw excludes these. Cleared on chapter start.
+var chapter_events_resolved: Array = []
 var event_choice_id: String = ""
 var event_deltas: Dictionary = {}
 var event_resolved: bool = false
@@ -120,6 +124,9 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	chapter_seed = seed if seed != 0 else randi()
 	rng = RandomNumberGenerator.new()
 	rng.seed = chapter_seed
+	event_rng = RandomNumberGenerator.new()
+	event_rng.seed = chapter_seed
+	chapter_events_resolved = []
 	run_id = "run_%d_%d" % [chapter_seed, int(Time.get_unix_time_from_system())]
 	reps = GameConstants.REPS_START
 	last_note = ""
@@ -294,11 +301,9 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 		last_note = "Pinned appointment skipped — decline used (−reps stub %d)." % DECLINE_REPS_STUB
 	var order_id := ""
 	var event_wire := ""
-	if node != null:
-		if node.kind == "event" and not node.ref_id.is_empty():
-			event_wire = node.ref_id
-		else:
-			event_wire = node.node_id
+	## kind=event draws on enter. ref_id stays on the graph as a sample, not this wire.
+	if node != null and node.kind != "event":
+		event_wire = node.node_id
 	pending_order = null
 	last_event = {}
 	match action:
@@ -317,14 +322,7 @@ func pick_action(action: GameEnums.RoundAction) -> bool:
 			pending_order = ScheduleCatalog.make_prep(board.day_index)
 			order_id = pending_order.order_id
 		GameEnums.RoundAction.WAGON_EVENT:
-			if node != null and node.kind == "event":
-				var evt_id := node.ref_id if not node.ref_id.is_empty() else node.node_id
-				last_event = {
-					"id": evt_id,
-					"title": "event · %s" % node.node_id,
-					"blurb": EventCatalog.blurb(evt_id),
-				}
-			else:
+			if node == null or node.kind != "event":
 				last_event = ScheduleCatalog.pick_wagon_event(rng)
 		GameEnums.RoundAction.WAGON_SHOP:
 			if node != null and node.kind == "shop":
@@ -838,11 +836,11 @@ func acknowledge_resolve() -> void:
 			last_resolve = {
 				"resolve_class": "newspaper",
 				"title": "Run over — reps gate",
-				"body": "reps_after < reps_gate (stub gate %d). run_over_reason=reps_gate_miss." % GameConstants.REPS_GATE_STUB,
+				"body": "reps_after < reps_gate (%d). run_over_reason=reps_gate_miss." % _reps_gate(),
 				"stub": "newspaper_chrome",
 				"phase": "newspaper",
 			}
-			last_note = "Run over — reps_gate_miss. Gate numbers Later; stub gate is 0."
+			last_note = "Run over — reps_gate_miss. Gate %d." % _reps_gate()
 			last_stamp = _make_end_stamp()
 			resolve_started.emit(last_resolve)
 		else:
@@ -859,9 +857,16 @@ func acknowledge_resolve() -> void:
 	board_changed.emit()
 
 
+func _reps_gate() -> int:
+	var chapter_id := 1
+	if board != null:
+		chapter_id = board.chapter_id
+	return GameConstants.reps_gate_for(chapter_id)
+
+
 func _reps_gate_miss() -> bool:
-	## docs/20 assert 19. Gate numbers Later — stub 0 never trips a started-at-0 run.
-	return reps < GameConstants.REPS_GATE_STUB
+	## docs/25 — after the last graph day, reps below the chapter gate fails the run.
+	return reps < _reps_gate()
 
 
 func _begin_boss_client_craft() -> void:
@@ -937,7 +942,10 @@ func _run_boss() -> void:
 
 
 func _apply_reps(result: Dictionary, card_difficulty: int) -> void:
-	var applied := RepsRules.apply(reps, result, card_difficulty)
+	var chapter_id := 1
+	if board != null:
+		chapter_id = board.chapter_id
+	var applied := RepsRules.apply(reps, result, card_difficulty, chapter_id)
 	reps = int(applied.get("reps_after", reps))
 	result["reps_before"] = applied["reps_before"]
 	result["reps_after"] = applied["reps_after"]
@@ -1048,7 +1056,7 @@ func _apply_run_meta(stamp: HarnessStamp) -> void:
 	stamp.reps_before = int(last_mission.get("reps_before", reps)) if last_mission.has("reps_before") else reps
 	stamp.reps_after = int(last_mission.get("reps_after", reps)) if last_mission.has("reps_after") else reps
 	stamp.reps_delta = int(last_mission.get("reps_delta", 0)) if last_mission.has("reps_delta") else (stamp.reps_after - stamp.reps_before)
-	stamp.reps_gate = GameConstants.REPS_GATE_STUB
+	stamp.reps_gate = _reps_gate()
 	stamp.run_over = run_over
 	stamp.run_over_reason = run_over_reason
 	stamp.newspaper_event = last_newspaper_event
@@ -1158,6 +1166,7 @@ func _make_mission_return_stamp(mission: Dictionary) -> HarnessStamp:
 	stamp.phase = GameEnums.StampPhase.CRAFT
 	stamp.session = null
 	stamp.apply_resolver(mission)
+	stamp.mission_purse = true
 	return stamp
 
 
@@ -1202,6 +1211,7 @@ func _make_boss_stamp(result: Dictionary) -> HarnessStamp:
 	stamp.apply_resolver(result)
 	stamp.run_over = run_over
 	stamp.run_over_reason = run_over_reason
+	stamp.mission_purse = true
 	return stamp
 
 
@@ -1297,12 +1307,27 @@ func _begin_market(node: RouteNode) -> bool:
 
 
 func _begin_event(node: RouteNode) -> bool:
-	if node == null:
+	if node == null or board == null:
 		return false
 	_clear_event_visit()
 	event_open = true
 	resolve_open = false
-	event_id = node.ref_id if not node.ref_id.is_empty() else EventCatalog.event_for_node(node.node_id)
+	## Draw on enter. Not a draft. ref_id is only the exhausted-pool fallback.
+	event_id = EventCatalog.draw(
+		node.day_index,
+		board.day_count,
+		chapter_events_resolved,
+		event_rng,
+		node.ref_id
+	)
+	var slot := board.current_day()
+	if slot != null:
+		slot.event_id = event_id
+	last_event = {
+		"id": event_id,
+		"title": "event · %s" % node.node_id,
+		"blurb": EventCatalog.blurb(event_id),
+	}
 	visit_gold_before = gold
 	visit_gold_after = gold
 	visit_reps_before = reps
@@ -1741,9 +1766,46 @@ func _apply_stamp_case(mission: Dictionary) -> void:
 		mission["reps_delta"] = reps - int(mission.get("reps_before", reps))
 
 
+func _mission_gold_multiplier(rating: Variant) -> int:
+	## Clear ladder: S3 / A2 / B2 / C1 / D0 / F0.
+	match rating:
+		GameEnums.Rating.S:
+			return 3
+		GameEnums.Rating.A:
+			return 2
+		GameEnums.Rating.B:
+			return 2
+		GameEnums.Rating.C:
+			return 1
+		_:
+			return 0
+
+
+func _mission_gold_base() -> int:
+	## Cleared order or boss beat only. Boss difficulty stays 3. Not cleared pays 0.
+	if craft_order == null or not bool(last_mission.get("cleared", false)):
+		return 0
+	var kind: GameEnums.MissionKind = craft_order.mission_kind
+	if kind != GameEnums.MissionKind.ORDER and kind != GameEnums.MissionKind.BOSS:
+		return 0
+	var mult := _mission_gold_multiplier(last_mission.get("rating", GameEnums.Rating.F))
+	var diff := 3
+	if kind != GameEnums.MissionKind.BOSS:
+		diff = craft_order.card_difficulty
+		if diff == GameConstants.NULL_INT:
+			diff = 0
+	return diff * mult
+
+
 func _apply_mission_payout() -> void:
-	if artifact_is_equipped("artifact_coin_purse"):
-		_set_gold(gold + 1)
+	var before := gold
+	var base := _mission_gold_base()
+	if base > 0:
+		_set_gold(gold + base)
+		if artifact_is_equipped("artifact_coin_purse"):
+			_set_gold(gold + 1)
+	visit_gold_before = before
+	visit_gold_after = gold
 
 
 func can_pick_event_choice(choice_id: String) -> bool:
@@ -1787,6 +1849,8 @@ func pick_event_choice(choice_id: String) -> bool:
 			event_mat_skipped = true
 	event_choice_id = choice_id
 	event_resolved = true
+	if not event_id.is_empty() and not chapter_events_resolved.has(event_id):
+		chapter_events_resolved.append(event_id)
 	event_deltas = {
 		"gold": gold_delta,
 		"mat_add": applied_add,

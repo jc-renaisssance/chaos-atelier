@@ -1,6 +1,6 @@
 class_name RepsRules
 extends RefCounted
-## docs/25 Δ formula. Gate numbers (8/14/20) still track the old 3-round shell — Later.
+## docs/25 Δ formula. Gate is GameConstants.reps_gate_for (C1 8 / C2 14 / C3 20).
 
 const RATING_MULT := {
 	GameEnums.Rating.S: 3.0,
@@ -34,12 +34,12 @@ static func delta(result: Dictionary, card_difficulty: int) -> int:
 	return -diff
 
 
-static func apply(reps_before: int, result: Dictionary, card_difficulty: int) -> Dictionary:
+static func apply(reps_before: int, result: Dictionary, card_difficulty: int, chapter_id: int = 1) -> Dictionary:
 	var d := delta(result, card_difficulty)
 	var after := maxi(0, reps_before + d)
 	return {
 		"reps_before": reps_before,
 		"reps_after": after,
 		"reps_delta": after - reps_before,
-		"reps_gate": GameConstants.REPS_GATE_STUB,
+		"reps_gate": GameConstants.reps_gate_for(chapter_id),
 	}

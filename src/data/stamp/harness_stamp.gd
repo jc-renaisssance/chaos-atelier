@@ -65,7 +65,7 @@ extends Resource
 @export var reps_before: int = 0
 @export var reps_after: int = 0
 @export var reps_delta: int = 0
-@export var reps_gate: int = 0 ## docs/25 draft numbers are not locked on this slice
+@export var reps_gate: int = 0 ## docs/25 — C1 8 / C2 14 / C3 20 from the live chapter
 @export var newspaper_event: GameEnums.NewspaperEvent = GameEnums.NewspaperEvent.NONE
 @export var newspaper_headline_id: String = ""
 @export var letter_id: String = ""
@@ -96,6 +96,8 @@ var playback_beats: Array = []
 var playback_actor_id: Variant = null
 
 ## docs/32 market / event visit logs. Null the unused block in to_dict.
+## mission_purse reuses gold_before / gold_after on a mission return. Not its own dump key.
+var mission_purse: bool = false
 var gold: int = 0
 var gold_before: int = GameConstants.NULL_INT
 var gold_after: int = GameConstants.NULL_INT
@@ -528,6 +530,10 @@ func to_dict() -> Dictionary:
 		dump["event_resolved"] = null
 		dump["event_result_line"] = null
 		dump["event_mat_skipped"] = null
+	if mission_purse and not _emit_market() and not _emit_event():
+		dump["gold_before"] = gold_before
+		dump["gold_after"] = gold_after
+		dump["gold_delta"] = gold_after - gold_before
 	## Log-only. Not a Required column. cant_craft / market / event stay played=false, beats=[].
 	dump["playback_played"] = playback_played
 	dump["playback_skipped"] = playback_skipped

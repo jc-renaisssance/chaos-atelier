@@ -237,6 +237,20 @@ static func _apply_row(order: ClientOrder, row: Dictionary, mission_kind: GameEn
 	return order
 
 
+## Live appointment beat. order_id is the row written by order_for_appointment.
+## Same set as route kind=appointment (the elite-badge predicate). Not a boss.
+static func is_appointment_order(order: ClientOrder) -> bool:
+	if order == null or order.order_id.is_empty():
+		return false
+	if order.mission_kind == GameEnums.MissionKind.BOSS or order.mission_kind == GameEnums.MissionKind.PREP:
+		return false
+	for chapter_id in APPOINTMENTS.keys():
+		for row in APPOINTMENTS[chapter_id]:
+			if String(row.get("order_id", "")) == order.order_id:
+				return true
+	return false
+
+
 static func order_for_appointment(pin: AppointmentPin) -> ClientOrder:
 	var order := ClientOrder.new()
 	var row := appointment_row(pin.appointment_id)
