@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; `dev` tip **`27df8cc`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. The **open** card is Elite telegraph N5 (below). `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-21**; `dev` tip **`8bc8844`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. Elite telegraph N5 is **shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not read that ask card as open. Do not reopen it. The **open** card is interactive-order slice 4 (below). `main` is not promoted (`353f1d4`).
 
 ---
 
@@ -700,3 +700,57 @@ Canvas does not block. Harribel’s soft-gate is before the gen, not before this
 If Scope is **C**, `route_nodes[].elite` is a Client precondition. This Design does not add the key to `20`. Writing **C** still stamps the mechanism. The key lands with the Client stamp. It is not a second open question.
 
 Nothing else blocks. #62 is not in this PR. Slice 4 is not in this PR.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-21 (interactive-order slice 4)
+
+Docs only. Off `dev` tip **`8bc8844`** (Elite N5 Client #68). Slices **1–3** stay locked. Catalog #61 and Elite N5 #66 / #67 / #68 stay closed. Do not revive #62. Do not open a stat / event retune. No `src/` / Godot. No PixelLab. No Aseprite file. `20` gains no Required key under the Design default (playback beats are log-only). PixelLab stays stills-only. Postures are not `animate_*`. Later motion, if a stamp asks, is Aseprite hand-keys into Godot `SpriteFrames`.
+
+Nnoitra, Ulquiorra, and Szayelaporro **hold** until Jonathan stamps. After the letters: **Ulquiorra** wires placeholders and does not wait on files. **Harribel** soft-gate, then **Nnoitra**, only if the art letter is **A**. **Szayelaporro** smokes the Client wire, including a run with zero posture files. Stat / event stays last. Aizen merges only after the stamp.
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/30-interactive-order.md` | **Slice 4 — Battle playback + posture (2026-10-21)** — gate, surface, beat list, socket, art letter, Client wire, test logs. Replaces the Later stub. Slices 1–3 are untouched |
+| `docs/STAMP.md` | This card |
+| `docs/pm/phase-1-plan.md` | Queue item 3 is **This Design**. Elite N5 is shipped. After the stamp: Client, then art soft-gate only if art is Now. Stat / event stays last |
+| `docs/05-art.md` | Pointer only — five stills, 64×64 try, no `animate_*`, no gen here |
+| `docs/20-harness-stamp.md` | Pointer only — playback keys are log-only. Not Required |
+| `docs/23-mission-report.md` | Pointer only — the result card is unchanged. Playback reads it and does not recompute it |
+| `docs/27-craft-mode-stamina.md` | Pointer only — playback sits after Finish’s resolver return |
+
+`README`, `00`, `01`, `03`, `21`, `22`, `29`, `31` carry one-line pointers. They do not add a second mechanism. `22` records Elite N5 as shipped. It does not reopen that stamp.
+
+## Decisions
+
+1. **Playback gate — A, B, or C.** **A (Design default):** after every piece Finish that already runs the mission resolver (order delivery, appointment, boss beat), one short playback per piece stamp, in listed order, **then** that piece’s mission report (`23`). Skip ends this playback and opens this report. It does not skip the report or later pieces. Abort, back-out, stamina 0 without Finish, `cant_craft`, market, and event do not play. An empty zone at Finish does play, because the resolver already runs. **B:** one playback for the whole Finish (piece beat lists concatenated), then the reports. Skip opens the first report. **C:** no playback. Finish goes straight to the report. Write **A**, **B**, or **C**. Silence is not **A**. Design recommends **A**.
+
+2. **Playback surface — A, B, or C.** **A (Design default):** ugly beat rows plus a placeholder actor in the posture slot. Beats are a pure function of the resolver stamp already required: `open`, one `favor:<tag>` per `favor_tags_hit`, one `punish:<tag>` per `punish_tags_hit`, one `skill` row (`ask_*` + `skill_effectiveness`, not a new cutoff), one `result` (`rating`, `outcome`, `hp_remaining`, slot from `cleared`). No RNG. No second combat sim. No new `20` Required key. **B:** the same rows, text only. No file reads. **C:** hold playback until posture art exists. Write **A**, **B**, or **C**. Silence is not **A**. Design recommends **A**. **C** blocks Client on art.
+
+3. **Posture socket — A, B, or C.** **A (Design default):** five slots, `in_shop` / `in_fight` / `ult` / `defend` / `attack`. One still per slot at `assets/adv/posture/<adv_id>_<slot>.png`. Pro Flash **64×64 soft-stipple**, one frame, full figure. Not a sheet. `in_shop` sits beside the landed 96 bust on the order panel and the walk-in. The other four are playback slots. Missing `in_shop` hides that slot. A missing playback png keeps the row, draws a flat placeholder, and falls back to a **1×1** if the load fails. Client must not crash. Do not substitute the 96 bust. `appt_*` (Scrap Duelist) has no file. The rows still play with actor id null. **B:** one sheet per adventurer, five 64×64 cells, same slot order, `assets/adv/posture/<adv_id>.png`. **C:** no socket and no path. Write **A**, **B**, or **C**. Silence is not **A**. Design recommends **A**. A different size is a rewrite of **A**: name 48 or 96 on the line. 48 is the chip/seal size and the stance will not read. 96 is the bust canvas and the wrong crop. Silence does not pick either.
+
+4. **Posture art — A or B.** **A (now):** gens happen after this stamp, and after the Client wire. Harribel soft-gate, then Nnoitra. Wave = the **12 M1** named `adv_*` × five slots (60 stills). M2 stays on placeholders. No portrait regen. No `appt_*`. No enemy postures. **B (Later) (Design default):** no gen on this queue item. The socket and the playback law can still stamp. Client ships placeholders either way. Write **A** or **B**. Silence is not **B**. Design recommends **B**. If socket is **C**, write art **B**.
+
+These are locks once the letters above are written, not extra forks: slices 1–3 unlock and the S–F cutoff table stay as stamped; the beat list is the one in `30`; newspaper and reps stay in the Client’s existing order; PixelLab does not animate these slots.
+
+## Questions
+
+None.
+
+## Blocks stamp
+
+An unanswered gate line (**A**, **B**, or **C**). Silence is not **A**.
+
+An unanswered surface line (**A**, **B**, or **C**). Silence is not **A**.
+
+An unanswered socket line (**A**, **B**, or **C**). Silence is not **A**.
+
+An unanswered art line (**A** or **B**). Silence is not **B**.
+
+Canvas size is inside the socket letter. Naming a different size rewrites **A**. It is not a fifth open question.
+
+Client placeholders do not block on art files. Harribel’s soft-gate is before a gen, not before this docs stamp, and not before the Client wire.
+
+Nothing else blocks. #62 is not in this PR. Elite N5 is not in this PR. Stat / event tuning is not in this PR. No PixelLab in this PR.

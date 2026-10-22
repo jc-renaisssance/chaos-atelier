@@ -465,15 +465,15 @@ On each existing `RouteNodeView`, when `res://assets/route/kind_<display_kind()>
 - Elite telegraph art inside **this** 2026-10-20 packet. The badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). `kind_appointment.png` stays a kind face
 - Edge textures; painted current / draft / frozen / cut / fork frames
 - Market tab chrome, `sk_*` shelf faces, portrait regen
-- Posture sheets, interactive-order slice 4, M2 four-job people
+- Posture sockets and battle playback — [30](30-interactive-order.md) slice 4, not this section. M2 four-job people stay in [29](29-adventurer-catalog.md)
 - Shiny gens
 - Gens, Client, or Godot in this Design PR
 
 ## Elite telegraph (2026-10-21)
 
-**Status:** Grimmjow Design-ready for Jonathan stamp. Docs only. No `src/` / Godot / art gens in this PR. Replaces the open question left by the 2026-10-13 route stamp and left again by the 2026-10-20 kind-face packet.
+**Status:** **Shipped** (#66 Design / #67 art / #68 Client). Jonathan stamped Marker **A** + Scope **A**. Do not reopen.
 
-**Proposed law (Marker A, Scope A).** Other letters are on the [STAMP](STAMP.md) card. Silence does not stamp.
+**Locked (Marker A, Scope A).** The letter tables below are the record of that stamp.
 
 An appointment node wears a **distinct ahead-of-time badge**, StS-elite style. The player sees the hard node on the graph before that day is current, and can draft a path through it or around it. On the C1 sample the node is **N5** (`appt_scrap_duelist`, D3). Type + id stays. The kind face stays. Arrival does not open a second screen.
 
@@ -563,7 +563,7 @@ Szayelaporro, after that Client PR: on `map_m1`, exactly one appointment node (N
 
 ### Explicit non-goals (this section)
 
-- Posture sheets, interactive-order slice 4, battle playback
+- Posture sockets and battle playback — [30](30-interactive-order.md) slice 4, not this section
 - An M2 Client (catalog wire, market tabs, portrait wire)
 - PixelLab or any gen in this PR
 - Reviving #62, or replacing files under `assets/adv/`

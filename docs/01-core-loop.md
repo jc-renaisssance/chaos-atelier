@@ -17,11 +17,11 @@ Goal: adjust the deck knowing the boss (StS-style). Different **player owners** 
 2. Select **materials** from deck (multi-stack into construction slots).
 3. Combine **Construction + 1..N Materials + 0..1 Enchantment** via stamina plays.
 4. Resolver: stats + powers; **neg syn skipped** on rare/legendary; **outlook** = highest `outlook_order` (negs beat peers when live).
-5. **Adventure simulation** — short report.
+5. **Adventure simulation** — the mission resolver, then the result card ([23](23-mission-report.md)). **Proposed** ([30](30-interactive-order.md) slice 4, awaiting stamp): a short deterministic playback sits between that resolver return and the report. Skip goes to the report. Market days and event days do not play it.
 6. **Result** → gold, materials, reputation; scars Later.
 
 ## Phase-1 ship spine
 
-One loop UI: graph board (draft future / confirm current fork or pinned corridor/bind) → day’s node → craft (if order) → adventure report, as **`own_basic`**, with chapter boss known at chapter start.
+One loop UI: graph board (draft future / confirm current fork or pinned corridor/bind) → day’s node → craft (if order) → adventure report, as **`own_basic`**, with chapter boss known at chapter start. **Proposed** ([30](30-interactive-order.md) slice 4): playback between the resolver and that report. Not law until Jonathan stamps.
 
 Defer encyclopedia, special clients, multi-owner unlocks, and parallel meta until that holds.
