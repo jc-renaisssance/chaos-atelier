@@ -627,10 +627,12 @@ Adventurer portraits: [29](29-adventurer-catalog.md) **Portrait sockets**. Owner
 
 ## Event resolve
 
+> **Until-M2 pool — proposed, [33](33-until-m2-tuning.md).** Which `evt_*` resolves is that pool (weights + day-band), not a script that names the day. Outcome ints in the catalog below are the proposed until-M2 lock (no integer edits here). The free `E*` board stays dead. Decision **A** draws; decision **B** keeps the welded `ref_id` rows. Until Jonathan writes the letter, Client still emits the weld.
+
 ### Enter
 
 1. Current node is `kind=event` and that day is being resolved (not a draft).
-2. Read `ref_id` → `evt_*` from the node row. **Prefer `ref_id`** over a per-node unique event. Nodes may share a catalog row on later maps; C1 uses one row each.
+2. Read `ref_id` → `evt_*` from the node row. **Prefer `ref_id`** over a per-node unique event. Nodes may share a catalog row on later maps; C1 uses one row each. Under [33](33-until-m2-tuning.md) decision **A** this step becomes the pool draw; the `ref_id` stays a sample legal row.
 3. Client shows event id + one-liner + **1–2** choice buttons.
 4. Player picks **exactly one** choice. Apply that row’s deltas. Show the **result line**.
 5. That pick **resolves the node**. Day advances. No craft session. No second choice tree.
@@ -730,7 +732,7 @@ A ditch clerk wants a road tax. Not a run-kill.
 | `choice_pay` | Pay the tax | gold **−2** | The ledger closes. (Illegal if gold < 2.) |
 | `choice_argue` | Argue the ledger | reps **−1** | The clerk scowls. You roll on. |
 
-**Test knob:** gold / reps ints and which `mat_*` is added/removed may retune inside “mild” (±1..3 gold, ±1 reps, ±1 mat from `11` commons/metal/stone). Do not add a run-kill row without a Design stamp.
+**Test knob:** gold / reps ints and which `mat_*` is added/removed may retune inside “mild” (±1..3 gold, ±1 reps, ±1 mat from `11` commons/metal/stone). Do not add a run-kill row without a Design stamp. [33](33-until-m2-tuning.md) decision 1, if accepted, stops that retune for these seven rows. The ints below do not change in that proposal.
 
 ### Ugly M1 UI
 

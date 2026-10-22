@@ -754,3 +754,63 @@ Canvas size is inside the socket letter. Naming a different size rewrites **A**.
 Client placeholders do not block on art files. Harribel’s soft-gate is before a gen, not before this docs stamp, and not before the Client wire.
 
 Nothing else blocks. #62 is not in this PR. Elite N5 is not in this PR. Stat / event tuning is not in this PR. No PixelLab in this PR.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-22 (until-M2 stat / event tuning)
+
+Docs only. Off `dev` tip **`f083b09`** (IO slice 4 Client #70). Route map, Day names, `crafts_max` gone, last-2 vs `CHAPTER_DAY_COUNT`, fork width **2–4**, and the event-pool model (not a day-strip script, not the free `E*` board) stay. Elite N5 stays shipped. Slice 4 stays on the tip. Estimate S–F cutoffs stay Test knobs (Jonathan 2026-10-08). No `src/`. No Godot. No PixelLab. No new `20` Required key. `20` assert 26’s four C1 equalities stay in that file until a Client follows event letter **A**.
+
+Nnoitra has no gen. Ulquiorra and Szayelaporro **hold** until Jonathan stamps. After the letters, Ulquiorra follows `33` and Szayelaporro smokes. Aizen merges only after the stamp.
+
+## Review
+
+| File | Section |
+|---|---|
+| `docs/33-until-m2-tuning.md` | Standing locks, code cites, Decisions 1–5 (tables, elite pressure, mission gold, reps gate, event attach) |
+| `docs/STAMP.md` | This card |
+| `docs/pm/phase-1-plan.md` | Queue item 4 is **This Design**. Slice 4 is docs #69 / Client #70. Do not reopen |
+| `docs/22-chapter-schedule.md` | Pointer only — graph, Days, last-2, fork width unchanged. Elite line marked shipped |
+| `docs/32-shop-and-events.md` | Pointer only — pool proposed; outcome ints unchanged |
+| `docs/25-reps-meter.md` | Pointer only — formula unchanged; gate letter is in `33` |
+| `docs/27-craft-mode-stamina.md` | Pointer only — `12 * N` proposed accept |
+| `docs/29-adventurer-catalog.md` | Pointer only — six-stat cells proposed accept; no cell edit |
+| `docs/20-harness-stamp.md` | Pointer only — assert 26 equalities stay until Client follows event **A** |
+| `docs/04-progression.md` | Pointer only |
+| `docs/01-core-loop.md` | Pointer only — elite and slice 4 no longer “awaiting stamp” |
+| `docs/21-app-flow.md` | Pointer only — historical shell; slice 4 no longer “awaiting stamp” |
+| `docs/README.md` / `docs/00-doc-categories.md` | Index |
+
+## Decisions
+
+1. **Tables — accept, or name the row.** `29` six-stat cells (HP 8–16, others 1–8; all 24 already inside), `11` / `12` garment cells, route difficulty **2** / Scrap Duelist **3** / boss **3**, stamina **`12 * N`** / hand **5** / dig **2** / play costs, purse start **12** and the `32` market ints, the seven event outcome ints, decline **−1**, mission letter cutoffs 82 / 68 / 54 / 40 / 24. Estimate S–F bands are not in this list. A named row rewrites that row only. Write **accept**, or name the row. Silence is not accept. Design recommends **accept**.
+
+2. **Elite pressure — A or B.** There is no enemy HP bar. **A (Design default):** appointment pressure **0.64** (`mission_resolver.gd` `_pressure` has no elite branch; N5 is 0.52 today). Difficulty stays **3** for soak, reps, and gold. Boss stays **0.84**. **B:** N5 stays **0.52**. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+3. **Mission gold — A or B.** Code pays **0** except coin-purse **+1** on every return. **A (Design default):** on a clear, `card_difficulty ×` S **3** / A **2** / B **2** / C **1** / D **0** / F **0**; else **0**. Coin purse **+1** only when that base is **> 0**. **B:** no base payout. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+4. **Reps gate — A or B.** Formula in `25` stays. Code gate is stub **0**. **A (Design default):** C1 **8** / C2 **14** / C3 **20**. Do not scale by day count. **B:** C1 **10**. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+5. **Event attach — A or B.** Pool is the seven `evt_c1_*` rows, weights and day-bands in `33`. Last 2 days are not pool days. Options shown stay fork width 2–4; the event screen stays 1–2 choices. **A (Design default):** weighted day-band draw, no repeat. Welded N4 / N6 / N10 / N17 refs stay a sample legal draw, not the resolver. **B:** keep those four ids; extras stay off `map_m1`. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+These are locks once the lines above are written, not extra forks: Days not Rounds; `crafts_max` gone; last 2 = travel / boss vs `CHAPTER_DAY_COUNT`; no free `E*` board; no windup timer; no new `20` key.
+
+## Questions
+
+None.
+
+## Blocks stamp
+
+An unanswered tables line. Silence is not accept.
+
+An unanswered elite line (**A** or **B**). Silence is not **A**.
+
+An unanswered gold line (**A** or **B**). Silence is not **A**.
+
+An unanswered reps line (**A** or **B**). Silence is not **A**.
+
+An unanswered event line (**A** or **B**). Silence is not **A**.
+
+Estimate S–F cutoffs do not block. Telegraph timing does not block. Assert 26 does not block this docs stamp.
+
+Nothing else blocks. #62 is not in this PR. Elite N5 is not in this PR. Slice 4 is not in this PR. No PixelLab in this PR. No `src/` in this PR.
