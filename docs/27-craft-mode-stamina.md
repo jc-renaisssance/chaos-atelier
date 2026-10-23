@@ -10,6 +10,8 @@
 
 **Jonathan 2026-10-12 (piece cap GONE):** **supersedes** `crafts_max=4` / cant_craft-at-max. Unlimited pieces per chapter. Stamina per session **stays**. Live chapter = **route map** ([22](22-chapter-schedule.md)) — Days not Rounds; free `E*` board superseded 2026-10-13.
 
+**Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (Design, Jonathan stamp pending, off `873e7b2`). Layout, stamina, Finish-only, zones, hand, and Current / Potential in this file do not move.
+
 ## Entering craft mode
 
 Player takes an **order** (appointment / walk-in / **boss-client**) on the **route map** → leave the timetable → enter **dedicated craft UI**. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter. Do not draw Wizard / Hexer / Outrider / Oathbound.

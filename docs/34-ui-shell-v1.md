@@ -1,0 +1,276 @@
+# Steam-demo UI shell v1 — craft + order
+
+**Doc id: `34`.** **Status: Design-ready for Jonathan stamp.** Docs only. Off `dev` tip **`873e7b2`** (M2 four-job Client wire #75, live). No `src/`. No assets. No PixelLab. No gens.
+
+This file is the **presentation** law for the dedicated craft screen. Rules stay in [27](27-craft-mode-stamina.md) and [30](30-interactive-order.md). A stamp here does not retune stamina, unlocks, estimate cutoffs, or `M2_JOB_POOL`.
+
+---
+
+## Jonathan GO — locked (2026-10-23 HKT)
+
+**A A A A.** Recorded. Not re-asked on the card below.
+
+| # | Letter | Lock |
+|---:|---|---|
+| 1 | **A** | Open the shell now. Placeholders, Godot `StyleBox` / `ColorRect` / `Label`, and existing bust sockets are enough. Do not wait on PixelLab or the Nov 2 posture wave. |
+| 2 | **A** | First lane is **craft + order**. |
+| 3 | **A** | Market chrome **stays the text strip**. Do not reopen fancy tab chips. |
+| 4 | **A** | Playback chrome is in this shell **because it is cheap**. Same frames as craft. Skip stays. Resolved under [Playback](#playback-chrome--included) below. |
+
+---
+
+## What the shell replaces
+
+The live craft screen already implements `27` / `30`: upper-left order, upper-right zones, lower hand, Dig, Finish, Current / Potential, slice 1–3 text, and the slice 4 playback step (Client #70). The M1 surface is still the ugly build: debug captions (`UPPER LEFT`, `SLICE 2`, `RESOLVER`), default Godot buttons, a raw stamp-JSON panel, and the same color literals copied per script.
+
+Shell v1 keeps that screen and that input. It replaces the debug chrome with one frame language. It does not add a scene, a combat pass, or a texture.
+
+---
+
+## One screen
+
+Craft stays its own screen. It is not the route board.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Craft                         Stamina  remaining / start │
+├────────────────────────────┬─────────────────────────────┤
+│ Order                      │ Zones (≤4)                  │
+│  name · job · six stats    │  [1] [2] [3] [4]            │
+│  one ask_*                 │                             │
+│ Plan          (text chips) │ Current    Potential       │
+│ Brief                      │ (selected zone only)        │
+│ Estimate                   │                             │
+├────────────────────────────┴─────────────────────────────┤
+│ Hand  1  2  3  4  5              Dig · 2        Finish   │
+└──────────────────────────────────────────────────────────┘
+```
+
+After **Finish**, the playback step uses this same frame, then the mission report the Client already shows (`23`). Playback is not a fourth block on the order panel.
+
+| Region | Shows | Does not show |
+|---|---|---|
+| Header | Screen title **Craft**. One stamina pool, `remaining / start`, bar. | A second pool. A piece cap. |
+| Upper left | Slices 1–3. | Current / Potential. The stamp JSON. Weight integers. |
+| Upper right | Up to 4 zone cards. Current and Potential for the **selected** zone. | A fifth zone. A readout on every zone at once. |
+| Lower | Five hand slots. **Dig**. **Finish**. Draw / discard counts as a caption. | Construction cards. An auto-finish. |
+| After Finish | Playback in this frame, then the existing report. | A new resolver. |
+
+Enter session: zone **1** selected. Stamina 0 stays open. Only **Finish** crafts. Empty zone at Finish stays the construction-only path. Keys **1–5** and **D** stay. Drag into a zone stays. N = 1 does not require a drag.
+
+Player-facing titles are the words in the diagram. They replace the debug captions. They are not lore titles. Fancy titles stay Later.
+
+---
+
+## Palette and type
+
+**Decision 1.** The colors below are the literals already painted on the craft screen and the playback step (`WOOD`, `PANEL`, `INK`, `GOLD`, `MUTED`, `BORDER`, hand `CHIP`, playback `PLATE`). Letter **A** names them once and applies them to frames, cards, hand, buttons, the stamina bar, and playback. Letter **B** drops those overrides for the Godot default theme on this shell only.
+
+Ground is **dark wood**. Type is **parchment ink**. This is not a light paper page and not a texture.
+
+### Letter A — named colors
+
+One const block, shared by the craft screen, zone cards, hand slots, and the playback step. Godot 4.7: `Color(r, g, b)` literals, not `Color.html`. No theme-texture file. No font file. Default font, size overrides only.
+
+| Token | RGB | Use |
+|---|---|---|
+| `wood` | `0.102, 0.078, 0.063` | Full-screen `ColorRect` |
+| `panel` | `0.165, 0.129, 0.094` | Frame and card fill |
+| `chip` | `0.227, 0.173, 0.094` | Hand-card fill |
+| `plate` | `0.240, 0.200, 0.160` | Playback actor plate |
+| `border` | `0.239, 0.204, 0.173` | Idle 1px border |
+| `gold` | `0.788, 0.635, 0.153` | Titles, selected border, primary button, stamina fill |
+| `ink` | `0.910, 0.835, 0.690` | Body |
+| `muted` | `0.710, 0.643, 0.541` | Captions |
+
+| Role | px | Token |
+|---|---:|---|
+| Screen title | 22 | `gold` |
+| Person name | 16 | `gold` |
+| Section title | 13 | `gold` |
+| Body | 13 | `ink` |
+| Caption, meta, `?` | 12 | `muted` |
+| Slot index | 11 | `gold` |
+
+`StyleBoxFlat` set. Corner radius **8** on every box in the set.
+
+| Box | Fill | Border | Content margin L/R/T/B |
+|---|---|---|---|
+| Frame | `panel` | 1px `border` | 10 / 10 / 8 / 8 |
+| Zone card, idle | `panel` | 1px `border` | 10 / 10 / 8 / 8 |
+| Zone card, selected | `panel` | 2px `gold` | same |
+| Hand card | `chip` | 1px `border` | 8 / 8 / 8 / 8 |
+| Hand card, shiny | existing shiny fill and gold border | 2px `gold` | same |
+| Button, primary (**Finish**) | `panel` | 2px `gold` | 10 / 10 / 6 / 6 |
+| Button, secondary (**Dig**, **Skip**, **Return**, planner chip) | `panel` | 1px `border` | same |
+
+Stamina `ProgressBar`: track `wood`, fill `gold`, percentage hidden. Height 16, as the bar already is.
+
+Shiny stays the code tint already on an enchanted material (`mat_enchant_id`, modulate, gold border). No shiny texture.
+
+Widgets on this shell: `StyleBoxFlat`, `ColorRect`, `Label`, `TextureRect`, `Button`, `ProgressBar`, `PanelContainer`, box containers. `TextureRect` only for a file that already exists (bust, posture). Nearest filter. No new generated texture.
+
+### Letter B — Godot default
+
+Same layout, same labels, same controls. Remove the custom color and `StyleBoxFlat` overrides on the craft screen, zone cards, hand slots, and playback step. Default Button, default panel, default progress bar. No wood tokens. No new texture. Sockets still follow Decision 2.
+
+---
+
+## Zone cards
+
+Max **4**. An unused zone stays hidden when the order has fewer pieces. Zone *i* is `construction_ids[i - 1]`. Title is the construction’s display name. Caption is the index. Selected reads as the gold border (letter A) or the control’s selected state (letter B). The word “selected” is not a debug suffix.
+
+Body: empty zone keeps the construction-only sentence already on the card. A played card stays a text line (display name, type, cost). No card art.
+
+Click selects. A drop plays into that zone and selects it. No zoneless play. No fifth zone. N > 4 stays Later / split.
+
+---
+
+## Hand, Dig, Finish
+
+Five slots, left to right, keys **1–5**. An empty slot is still a frame: index, no name. A filled slot shows display name, type, cost, and tags (or the skill blurb). Play leaves the hand. The slot does not keep the card.
+
+**Dig** spends **2**. Label `Dig · 2`. **D** still digs. Dig dumps the hand, then draws. It does not end the session.
+
+**Finish** is the only end. Label `Finish`. One click resolves every zone in listed order. Stamina 0 does not press it and does not hide the hand.
+
+**Return** (back to the route graph, after the report path the Client already has) stays a secondary button. It is not a second finish.
+
+Draw-pile and discard-pile counts may stay one muted caption under the row. No pile pictures.
+
+---
+
+## Order panel — slices 1–3
+
+Content is `30`. This shell only sets frames and type. Upper left, in this order:
+
+1. **Order.** Display name and job. Six stats `HP ATK DEF RES MOB PRE`. One `ask_*` name and its short line. Listed constructions. That adventurer’s requirement-taste line. Boss beat: the drawn named `adv_*`, fighting the announced boss. Job aliases resolve to the named row, as they do now.
+2. **Plan.** Unlocked outlook + tier as text. Locked stays `?`. Fresh profile stays only `?`. Click a tag chip cycles low → mid → apex, then the cross rule in `30`. The chip does not change `construction_ids`.
+3. **Brief.** Guild-quest text already built for slice 3. No poster illustration.
+4. **Estimate.** The gated fields already computed: planned outlook, favor hits, punish hits, skill, neg warnings, band. `?` until the Dex says the row is known. The weight integers (`FAVOR_W` and the rest) stay in code and in the test log. They leave the player label.
+
+The raw stamp JSON panel leaves the player screen. Test logs in `20` stay. No new Required key.
+
+### Planner chips
+
+**Decision 3.** **A:** each chip is the tag name on a secondary button. No icon. **B:** icon chips. **B** needs art, so it waits out this lane. Design recommends **A**. That matches market chrome (GO item 3): text, not a fancy chip.
+
+### Order-panel bust
+
+**Decision 2.** Slice 1 (2026-10-05) says do not show portraits. The Client already has a 96 socket, and slice 4 socket **A** puts `in_shop` beside that bust. This letter picks the shell.
+
+| Letter | Order head |
+|---|---|
+| **A (Design default)** | When `assets/adv/<adv_id>.png` exists for the resolved named id, a `TextureRect` at **96×96**, nearest, sits beside the text. A missing file hides the socket. Name, job, and the rest of the panel stay. |
+| **B** | Text only on this shell. Do not show the bust. The file stays on disk. |
+
+`in_shop` (`30` socket **A**) stays beside the bust under **A**, and beside the text under **B**. A missing posture file hides that slot. Do not scale the 96 bust into the posture slot. Do not crop a bust into a posture. `appt_*` has no bust file: text, and playback actor id null. No Scrap Duelist face.
+
+**A** supersedes the slice 1 line “do not show portraits” for this order panel only. It does not regen a portrait. It does not open a second canvas.
+
+---
+
+## Current and Potential
+
+Required by `27`. They sit in the **upper right**, under the zone row, for the **selected** zone only. Two frames, titles **Current** and **Potential**, bodies the strings the readout already builds. Locked outlook stays locked / hidden. No outlook art. No name spoiler past “locked”.
+
+Per-zone simultaneous readouts stay Later. Moving the pair out of the order column does not change the bag they read.
+
+---
+
+## Playback chrome — included
+
+GO item 4 is include **if cheap**. It is cheap, so it is in this shell. Not a letter.
+
+- Same screen frame, type scale, and button roles as craft (letter A or B, whichever stamps).
+- **Skip** stays. Gate **A** behavior stays: Skip ends this playback and opens this piece’s report. It does not skip the report or a later piece.
+- Beat list, actor slot, and placeholder rules stay Client #70 (Gate **A**, Surface **A**, Socket **A**). A missing png keeps the row and the flat placeholder. A failed load stays the 1×1 stand-in. No crash.
+- Titles: **Playback**, **Skip**. Beat rows stay the labels #70 already draws.
+- No new beat. No duration stamp. No HP tween. No enemy posture. No second sim.
+
+Writing **defer** on the card pulls this chrome out of the Client follow. Playback then keeps the #70 frame until a later UI lane. Silence keeps it here.
+
+---
+
+## Out of this shell
+
+- Route board, market, events, Dex, mission-report layout, newspaper, HUD.
+- Market tab strip stays **Materials | Staffs | Skills | Gear** text. No chip gens.
+- New people. #62. Portrait regen. Posture gens. Nov 2 stays Nov 2.
+- **PR #71** (Knight posture batch, including Solenne stills) and any file under `assets/adv/posture/`. Do not edit that PR. Do not replace those pngs. Do not open a Solenne pass.
+- Craft rules, `12 * N`, hand **5**, dig **2**, play costs, zone max **4**, unlock keys, `unlocked_builds`, estimate weights, S–F cutoff table, `M1_JOB_POOL`, `M2_JOB_POOL`.
+- Elite N5 letters. IO4 Gate / Surface / Socket letters. Those are shipped.
+- A new `20` Required key.
+
+---
+
+## Nnoitra
+
+Graphic seat is **after** this Design is on the tip **and** Jonathan has stamped it. Before any graphic, Nnoitra asks **Grimmjow**. **No gens on this lane.** No PixelLab. No new textures. Existing bust files and existing posture files are read-only. Placeholders stay legal. Harribel has nothing to soft-gate here because nothing is burned.
+
+---
+
+## Client later — Ulquiorra, after the stamp
+
+Ulquiorra **holds** until Jonathan writes the letters. Szayelaporro smokes after that Client PR. Aizen merges this Design only after the stamp.
+
+Theme tokens and scene chrome only. No mechanism retune.
+
+| After the stamp | Holds still |
+|---|---|
+| One shared color block and the `StyleBoxFlat` set (letter A), or default theme (letter B), on craft, zones, hand, and playback | A new texture, a font file, PixelLab |
+| Player titles from the diagram. Debug captions and the stamp-JSON panel leave the player screen | Dropping test logs. A new `20` key |
+| Zone cards ≤4, five hand frames, Dig, Finish, Return, keys 1–5 and D | Changing `12 * N`, dig 2, hand size, zone max, Finish-only, empty-zone path |
+| Order column is slices 1–3 text. Estimate label drops the weight-integer suffix | Changing `ask_*`, unlock, `?` gates, weights, or S–F cutoffs |
+| Bust per Decision 2. `in_shop` hide-if-missing stays | Regen, a #71 edit, a posture png |
+| Current / Potential under the selected zone | A readout on every zone at once |
+| Playback uses the same frame. Skip stays | A new beat, a second sim, hiding Skip |
+| Market, route, Dex, newspaper, HUD untouched | A restyle of those screens |
+
+---
+
+## Stamp card
+
+### Review
+
+| File | What |
+|---|---|
+| `docs/34-ui-shell-v1.md` | This law. Palette, bust, planner chips. Playback included because it is cheap |
+| `docs/27-craft-mode-stamina.md` | Pointer only. Layout, stamina, Finish-only, zones, hand, Current / Potential do not move |
+| `docs/30-interactive-order.md` | Pointer only. Slice rules stay. Bust letter, if **A**, supersedes “do not show portraits” on the order panel only |
+| `docs/05-art.md` | Pointer only. Nnoitra after the stamp. No gens |
+| `docs/pm/phase-1-plan.md` | Tip `873e7b2`. This Design is the open card. #72–#75 are landed |
+| `docs/README.md` | Index |
+| `docs/STAMP.md` | This card |
+
+### Decisions
+
+The GO **A A A A** is already written. These three are the remaining letters.
+
+1. **Palette / type — A or B.** **A (Design default):** dark wood ground, parchment ink, the named color block and `StyleBoxFlat` set in this file, including buttons and the stamina bar. No textures. **B:** Godot default theme on this shell. Same layout and labels. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+2. **Order-panel bust — A or B.** **A (Design default):** show the existing 96 bust beside the text when `assets/adv/<adv_id>.png` exists. Missing file → text. `in_shop` stays beside it and hides when its own file is missing. **B:** text only until a later lane. Write **A** or **B**. Silence is not **A**. Design recommends **A**. **A** supersedes `30` slice 1 “do not show portraits” for this panel only.
+
+3. **Planner chips — A or B.** **A (Design default):** tag name on a text button. No icon. **B:** icon chips. **B** waits on art and is outside this lane. Write **A** or **B**. Silence is not **B**. Design recommends **A**.
+
+Playback chrome is **not** one of these letters. It is in the shell (GO item 4, cheap). Market text strip is **not** one of these letters (GO item 3).
+
+### Questions
+
+None.
+
+### Blocks stamp
+
+An unanswered palette line (**A** or **B**). Silence is not **A**.
+
+An unanswered bust line (**A** or **B**). Silence is not **A**.
+
+An unanswered planner-chip line (**A** or **B**). Silence is not **B**.
+
+Playback inclusion does not block. Writing **defer** takes it out of the Client follow. It is not a fourth open question.
+
+Nothing else blocks. No PixelLab. No `src/` in this PR. PR #71 is not in this PR. Elite N5 is not in this PR. Slice 4’s gate, surface, and socket are not in this PR. #72, #73, #74, and #75 are not open.
+
+### Design recommends
+
+**Palette A. Bust A. Planner chips A.** Playback chrome stays in this shell.
