@@ -2,6 +2,8 @@ class_name MarketScreen
 extends Control
 ## Ugly M2 market shell — Materials / Staffs / Skills / Gear (docs/32).
 ## Staffs, Skills, and Gear shelves show stamped assets/m2-market icons.
+## Materials shelf lights assets/mat/<id>.png at 32×32 (docs/36, Art #84).
+## A mat id with no file leaves the text. Tab chips stay the text strip.
 ## Skill deck rows stay sk_* text. Enchant + refresh stay materials-only.
 ## Shiny tint stays on enchanted mats.
 
@@ -300,6 +302,9 @@ func _mat_shelf_row(offer: Dictionary) -> Control:
 	var box := HBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
+	var face := _mat_shelf_face(mat_id)
+	if face != null:
+		box.add_child(face)
 	var lab := _label(
 		"%s     $%d   own %d   qty %d" % [mat_id, price, own, qty],
 		13,
@@ -574,6 +579,22 @@ func _on_refresh() -> void:
 
 func _on_exit() -> void:
 	AtelierSession.exit_market()
+
+
+func _mat_shelf_face(mat_id: String) -> TextureRect:
+	## Hide-if-missing. The text row stays. Do not borrow an outlook torso.
+	var tex := MatFace.texture_for(mat_id, GameEnums.HandCardType.MATERIAL)
+	if tex == null:
+		return null
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(MatFace.ICON_PX, MatFace.ICON_PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.texture = tex
+	return icon
 
 
 func _shelf_icon(item_id: String) -> TextureRect:

@@ -1,10 +1,11 @@
 class_name CraftTable
 extends Control
-## Dedicated stamina craft screen (docs/27, docs/34). Not the route-graph board.
+## Dedicated stamina craft screen (docs/27, docs/34, docs/36). Not the route-graph board.
 ## Shell v1: palette A, bust A. Planner chips are the 16 stamped icons.
+## Hand A′ arc, Drag A, Drop A. Mat faces load from res://assets/mat/<id>.png.
 ## Current and Potential take the same Soft outlook png when that slot is unlocked.
 ## Locked outlooks hide both. Paths are res://assets/outlook/ (docs/35 ×28).
-## Regions stay: UPPER LEFT adventurer order detail, UPPER RIGHT zones, LOWER hand.
+## A mat png is not an outlook. Regions stay: UPPER LEFT order, UPPER RIGHT zones, LOWER hand.
 ## CURRENT and POTENTIAL read the selected zone. They are not on the order column.
 ## Construction comes from the order, not a hand card.
 ## Plan is the syn-target planner. Brief is the guild-quest brief.
@@ -60,11 +61,51 @@ var _current_art: TextureRect
 var _potential_body: Label
 var _potential_art: TextureRect
 var _zones: Array[CraftZone] = []
-var _hand: HBoxContainer
+var _hand_fan: CraftHandFan
+var _overlay: Control
 var _stock: Label
 var _dig_btn: Button
 var _finish_btn: Button
 var _continue_btn: Button
+
+enum _Phase { IDLE, DRAG, SETTLE, SNAP, DIG }
+
+## docs/36 Drag A. The follow clamp is drag motion. It is not the fan step.
+const _CLICK_DRAG_PX := 8.0
+const _PICKUP_SEC := 0.12
+const _PICKUP_SCALE := 1.12
+const _PICKUP_TILT_DEG := 6.0
+const _FOLLOW_ORIGIN_PX := 24.0
+const _FOLLOW_TILT_PER_PX := 0.04
+const _FOLLOW_TILT_LIMIT_DEG := 8.0
+const _DROP_SEC := 0.16
+const _CANCEL_SEC := 0.18
+const _FLY_SEC := 0.20
+const _GHOST_ALPHA := 0.35
+const _DUMP_DROP_PX := 48.0
+const _DUMP_SEC := 0.20
+const _DUMP_STAGGER_SEC := 0.03
+const _DEAL_FROM_Y := 24.0
+const _DEAL_FROM_SCALE := 0.9
+const _DEAL_SEC := 0.20
+const _DEAL_STAGGER_SEC := 0.04
+
+var _phase: _Phase = _Phase.IDLE
+var _armed: CraftHandSlot
+var _press_global: Vector2 = Vector2.ZERO
+var _ghost: CraftHandSlot
+var _follower: Control
+var _pickup_tween: Tween
+var _motion_tween: Tween
+var _pickup_done: bool = false
+var _vel_x: float = 0.0
+var _motion_this_frame: bool = false
+var _reflow: bool = false
+var _deal_in: bool = false
+var _motion_left: int = 0
+var _settle_zone: CraftZone
+var _settle_sec: float = 0.0
+var _aim_tries: int = 0
 
 
 func _ready() -> void:
@@ -72,6 +113,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build()
 	set_process_input(true)
+	set_process(true)
 	AtelierSession.craft_started.connect(_refresh)
 	AtelierSession.craft_changed.connect(_refresh)
 	AtelierSession.piece_finished.connect(_on_piece)
@@ -230,7 +272,6 @@ func _build() -> void:
 		var zone := CraftZone.new()
 		zone.zone_index = i + 1
 		zone.zone_selected.connect(_on_zone_selected)
-		zone.card_dropped.connect(_on_card_dropped)
 		zone_row.add_child(zone)
 		_zones.append(zone)
 	var readout := HBoxContainer.new()
@@ -263,6 +304,7 @@ func _build() -> void:
 
 	var lower := _panel()
 	lower.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lower.clip_contents = false
 	root.add_child(lower)
 	var lower_box := VBoxContainer.new()
 	lower_box.add_theme_constant_override("separation", 8)
@@ -274,12 +316,11 @@ func _build() -> void:
 	var hand_col := VBoxContainer.new()
 	hand_col.add_theme_constant_override("separation", 6)
 	hand_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hand_col.clip_contents = false
 	lower_row.add_child(hand_col)
 	hand_col.add_child(_section("Hand"))
-	_hand = HBoxContainer.new()
-	_hand.add_theme_constant_override("separation", 8)
-	_hand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hand_col.add_child(_hand)
+	_hand_fan = CraftHandFan.new()
+	hand_col.add_child(_hand_fan)
 	var actions := VBoxContainer.new()
 	actions.add_theme_constant_override("separation", 8)
 	actions.alignment = BoxContainer.ALIGNMENT_END
@@ -292,6 +333,13 @@ func _build() -> void:
 	actions.add_child(_continue_btn)
 	_stock = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	lower_box.add_child(_stock)
+
+	_overlay = Control.new()
+	_overlay.name = "HandMotion"
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_overlay.z_index = 20
+	add_child(_overlay)
 
 
 func _portrait_socket() -> TextureRect:
@@ -367,32 +415,41 @@ func refresh() -> void:
 	_refresh()
 
 
+func _process(_dt: float) -> void:
+	if _phase != _Phase.DRAG or _follower == null:
+		return
+	if not _motion_this_frame:
+		_vel_x = 0.0
+	_motion_this_frame = false
+	var pointer := get_global_mouse_position()
+	_place_follower(pointer)
+	_update_drop_hot(pointer)
+	if _pickup_done:
+		var tilt := clampf(_vel_x * _FOLLOW_TILT_PER_PX, -_FOLLOW_TILT_LIMIT_DEG, _FOLLOW_TILT_LIMIT_DEG)
+		_follower.rotation = deg_to_rad(tilt)
+
+
 func _input(event: InputEvent) -> void:
 	if not visible or not AtelierSession.craft_open:
 		return
 	if event is InputEventKey:
-		var key := event as InputEventKey
-		if not key.pressed or key.echo:
-			return
-		match key.keycode:
-			KEY_1, KEY_KP_1:
-				_play_slot(0)
-				get_viewport().set_input_as_handled()
-			KEY_2, KEY_KP_2:
-				_play_slot(1)
-				get_viewport().set_input_as_handled()
-			KEY_3, KEY_KP_3:
-				_play_slot(2)
-				get_viewport().set_input_as_handled()
-			KEY_4, KEY_KP_4:
-				_play_slot(3)
-				get_viewport().set_input_as_handled()
-			KEY_5, KEY_KP_5:
-				_play_slot(4)
-				get_viewport().set_input_as_handled()
-			KEY_D:
-				_on_dig()
-				get_viewport().set_input_as_handled()
+		_on_key(event as InputEventKey)
+		return
+	if event is InputEventMouseButton:
+		_on_mouse_button(event as InputEventMouseButton)
+	elif event is InputEventMouseMotion:
+		var motion := event as InputEventMouseMotion
+		if _phase == _Phase.DRAG:
+			_vel_x = motion.velocity.x
+			_motion_this_frame = true
+			_place_follower(motion.global_position)
+			_update_drop_hot(motion.global_position)
+			get_viewport().set_input_as_handled()
+		elif _armed != null and _armed.can_drag and motion.global_position.distance_to(_press_global) >= _CLICK_DRAG_PX:
+			_begin_drag(motion.global_position)
+			get_viewport().set_input_as_handled()
+		elif _phase == _Phase.IDLE:
+			_update_hover(motion.global_position)
 
 
 func _refresh() -> void:
@@ -504,34 +561,48 @@ func _rebuild_zones(session: CraftStaminaSession) -> void:
 
 
 func _clear_hand() -> void:
-	for child in _hand.get_children():
-		child.queue_free()
+	_abort_motion()
+	if _hand_fan != null:
+		_hand_fan.clear_cards()
 
 
 func _rebuild_hand(session: CraftStaminaSession) -> void:
-	_clear_hand()
-	var locked := session.is_finished() or AtelierSession.order_craft_done
-	var slots := session.hand_size
-	if slots < GameConstants.HAND_SIZE:
-		slots = GameConstants.HAND_SIZE
-	if session.hand.size() > slots:
-		slots = session.hand.size()
-	for i in range(slots):
-		var slot := CraftHandSlot.new()
-		_hand.add_child(slot)
-		if i < session.hand.size():
-			var card: HandCard = session.hand[i]
-			var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
-			slot.bind(
-				i,
-				card,
-				cost,
-				locked,
-				CraftRules.can_play(session, i, AtelierSession.next_mat_free, session.selected_zone_index)
+	## n is the cards in hand this frame. max_hand is the setting. No empty frames.
+	var max_hand := session.hand_size
+	var n := mini(session.hand.size(), max_hand)
+	var pool: Array[CraftHandSlot] = []
+	for child in _hand_fan.get_children():
+		if child is CraftHandSlot:
+			pool.append(child as CraftHandSlot)
+	var live: Array[CraftHandSlot] = []
+	var closed := session.is_finished() or AtelierSession.order_craft_done
+	for i in range(n):
+		var card: HandCard = session.hand[i]
+		var slot := _take_slot(pool, card)
+		if slot == null:
+			slot = CraftHandSlot.new()
+			_hand_fan.add_child(slot)
+		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
+		slot.bind(i, card, cost, _can_click(session, i, closed), _can_drag(session, i, closed))
+		if slot == _ghost:
+			slot.set_ghost(true)
+		live.append(slot)
+	for leftover in pool:
+		if leftover == _ghost:
+			continue
+		leftover.visible = false
+		leftover.queue_free()
+	_hand_fan.hold_layout = _phase != _Phase.IDLE
+	_hand_fan.present(live, max_hand, _reflow, _deal_in)
+	if _deal_in:
+		for i in range(live.size()):
+			live[i].play_deal(
+				_DEAL_FROM_Y,
+				_DEAL_FROM_SCALE,
+				_DEAL_SEC,
+				float(i) * _DEAL_STAGGER_SEC,
+				_note_motion_done
 			)
-			slot.slot_played.connect(_on_play)
-		else:
-			slot.bind_empty(i)
 
 
 func _outlook_socket() -> TextureRect:
@@ -651,30 +722,462 @@ func _refresh_brief_and_estimate(order: ClientOrder) -> void:
 
 
 func _play_slot(index: int) -> void:
-	if AtelierSession.order_craft_done:
+	if _phase != _Phase.IDLE or AtelierSession.order_craft_done:
 		return
-	AtelierSession.play_hand(index)
-
-
-func _on_play(index: int) -> void:
-	AtelierSession.play_hand(index)
+	var session := AtelierSession.craft_session
+	if session == null or index < 0 or index >= session.hand.size() or index >= session.hand_size:
+		return
+	for slot in _hand_fan.cards():
+		if slot.hand_index == index:
+			_begin_fly(slot)
+			return
 
 
 func _on_zone_selected(zone_index: int) -> void:
+	if _phase != _Phase.IDLE:
+		return
 	AtelierSession.select_zone(zone_index)
 
 
-func _on_card_dropped(hand_index: int, zone_index: int) -> void:
-	AtelierSession.play_hand(hand_index, zone_index)
-
-
 func _on_dig() -> void:
-	AtelierSession.dig()
+	if _phase != _Phase.IDLE:
+		return
+	var session := AtelierSession.craft_session
+	if session == null or not CraftRules.can_dig(session, AtelierSession.stock):
+		return
+	var departing := _hand_fan.detach_cards()
+	for slot in departing:
+		var saved: Variant = slot.get_meta("dump_pos")
+		_overlay.add_child(slot)
+		slot.global_position = saved as Vector2
+		slot.rotation = float(slot.get_meta("dump_rot"))
+		slot.scale = slot.get_meta("dump_scale") as Vector2
+	_phase = _Phase.DIG
+	_deal_in = true
+	_hand_fan.hold_layout = true
+	var ok := AtelierSession.dig()
+	_deal_in = false
+	if not ok:
+		for slot in departing:
+			slot.queue_free()
+		_phase = _Phase.IDLE
+		_hand_fan.hold_layout = false
+		_refresh()
+		return
+	_motion_left = departing.size() + _hand_fan.cards().size()
+	if _motion_left == 0:
+		_phase = _Phase.IDLE
+		_hand_fan.hold_layout = false
+		return
+	for i in range(departing.size()):
+		departing[i].play_dump(_DUMP_DROP_PX, _DUMP_SEC, float(i) * _DUMP_STAGGER_SEC, _note_motion_done)
 
 
 func _on_finish() -> void:
+	_abort_motion()
 	AtelierSession.finish_early()
 
 
 func _on_continue() -> void:
+	_abort_motion()
 	AtelierSession.continue_after_piece()
+
+
+func _on_key(key: InputEventKey) -> void:
+	if not key.pressed or key.echo:
+		return
+	if key.keycode == KEY_ESCAPE and _phase == _Phase.DRAG:
+		_begin_cancel()
+		get_viewport().set_input_as_handled()
+		return
+	var index := _key_index(key.keycode)
+	if _phase != _Phase.IDLE:
+		if index >= 0 or key.keycode == KEY_D:
+			get_viewport().set_input_as_handled()
+		return
+	if index >= 0:
+		_play_slot(index)
+		get_viewport().set_input_as_handled()
+	elif key.keycode == KEY_D:
+		_on_dig()
+		get_viewport().set_input_as_handled()
+
+
+func _key_index(code: Key) -> int:
+	## Keys 1..max_hand. Pack strap raises the setting by one, so 6 is live when that gear is on.
+	match code:
+		KEY_1, KEY_KP_1:
+			return 0
+		KEY_2, KEY_KP_2:
+			return 1
+		KEY_3, KEY_KP_3:
+			return 2
+		KEY_4, KEY_KP_4:
+			return 3
+		KEY_5, KEY_KP_5:
+			return 4
+		KEY_6, KEY_KP_6:
+			return 5
+		_:
+			return -1
+
+
+func _on_mouse_button(mouse: InputEventMouseButton) -> void:
+	if mouse.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if _phase == _Phase.DRAG and not mouse.pressed:
+		_end_drag(mouse.global_position)
+		get_viewport().set_input_as_handled()
+		return
+	if _phase != _Phase.IDLE:
+		return
+	if mouse.pressed:
+		var slot := _top_slot(mouse.global_position)
+		if slot == null or not (slot.can_click or slot.can_drag):
+			_armed = null
+			return
+		_armed = slot
+		_press_global = mouse.global_position
+		get_viewport().set_input_as_handled()
+		return
+	if _armed == null:
+		return
+	var slot := _armed
+	var moved := _press_global.distance_to(mouse.global_position)
+	_armed = null
+	get_viewport().set_input_as_handled()
+	if moved < _CLICK_DRAG_PX and slot.can_click:
+		_begin_fly(slot)
+
+
+func _update_hover(point: Vector2) -> void:
+	if _phase != _Phase.IDLE or _hand_fan == null:
+		return
+	var hot := _top_slot(point)
+	for slot in _hand_fan.cards():
+		slot.set_hovered(slot == hot)
+
+
+func _top_slot(point: Vector2) -> CraftHandSlot:
+	var best: CraftHandSlot = null
+	var best_z := -100000
+	for slot in _hand_fan.cards():
+		if slot == _ghost or not slot.contains_global(point):
+			continue
+		if slot.z_index >= best_z:
+			best = slot
+			best_z = slot.z_index
+	return best
+
+
+func _begin_drag(pointer: Vector2) -> void:
+	if _armed == null:
+		return
+	var slot := _armed
+	slot.suppress_hover()
+	slot.snap_rest(slot.rest_position, slot.rest_rotation)
+	_phase = _Phase.DRAG
+	_pickup_done = false
+	_ghost = slot
+	_hand_fan.hold_layout = true
+	_hand_fan.set_cards_hover_locked(true)
+	_spawn_follower(slot)
+	slot.set_ghost(true)
+	var center_x := slot.global_position.x + slot.size.x * 0.5
+	var tilt := 0.0
+	if pointer.x > center_x:
+		tilt = _PICKUP_TILT_DEG
+	elif pointer.x < center_x:
+		tilt = -_PICKUP_TILT_DEG
+	_kill_pickup()
+	_pickup_tween = create_tween()
+	_pickup_tween.set_parallel(true)
+	_pickup_tween.set_ease(Tween.EASE_OUT)
+	_pickup_tween.set_trans(Tween.TRANS_QUAD)
+	_pickup_tween.tween_property(_follower, "scale", Vector2(_PICKUP_SCALE, _PICKUP_SCALE), _PICKUP_SEC)
+	_pickup_tween.tween_property(_follower, "rotation", deg_to_rad(tilt), _PICKUP_SEC)
+	_pickup_tween.finished.connect(func() -> void:
+		_pickup_done = true
+	, CONNECT_ONE_SHOT)
+	_place_follower(pointer)
+	_update_drop_hot(pointer)
+
+
+func _end_drag(pointer: Vector2) -> void:
+	var zone := _zone_at(pointer)
+	_clear_drop_hot(true)
+	if zone != null and _ghost != null and _can_commit(_ghost.hand_index, zone.zone_index):
+		_begin_settle(zone, _ghost.hand_index, _DROP_SEC)
+		return
+	_begin_cancel()
+
+
+func _begin_fly(slot: CraftHandSlot) -> void:
+	if _phase != _Phase.IDLE or slot == null or not slot.can_click:
+		return
+	var session := AtelierSession.craft_session
+	if session == null:
+		return
+	var zone := _zone_by_index(session.selected_zone_index)
+	if zone == null or not zone.visible or zone.is_locked():
+		return
+	if not _can_commit(slot.hand_index, zone.zone_index):
+		return
+	slot.suppress_hover()
+	slot.snap_rest(slot.rest_position, slot.rest_rotation)
+	_spawn_follower(slot)
+	slot.set_ghost(true)
+	_ghost = slot
+	_hand_fan.set_cards_hover_locked(true)
+	_begin_settle(zone, slot.hand_index, _FLY_SEC)
+
+
+func _begin_settle(zone: CraftZone, hand_index: int, sec: float) -> void:
+	_phase = _Phase.SETTLE
+	_hand_fan.hold_layout = true
+	_kill_pickup()
+	_clear_drop_hot(true)
+	_reflow = true
+	var ok := AtelierSession.play_hand(hand_index, zone.zone_index)
+	_reflow = false
+	if not ok:
+		_begin_cancel()
+		return
+	_settle_zone = zone
+	_settle_sec = sec
+	_aim_tries = 0
+	call_deferred("_aim_settle")
+
+
+func _aim_settle() -> void:
+	if _phase != _Phase.SETTLE or _follower == null:
+		return
+	var rect := Rect2()
+	if _settle_zone != null and is_instance_valid(_settle_zone):
+		rect = _settle_zone.last_face_global_rect()
+	var zone_rect := Rect2()
+	if _settle_zone != null and is_instance_valid(_settle_zone):
+		zone_rect = _settle_zone.get_global_rect()
+	var laid_out := rect.size.x >= float(MatFace.ICON_PX) - 1.0 and zone_rect.grow(12.0).intersects(rect)
+	if not laid_out and _aim_tries < 4:
+		_aim_tries += 1
+		call_deferred("_aim_settle")
+		return
+	if not laid_out and _settle_zone != null:
+		var fallback := _settle_zone.get_global_rect()
+		rect = Rect2(fallback.position + fallback.size * 0.5 - Vector2(16, 16), Vector2(MatFace.ICON_PX, MatFace.ICON_PX))
+	_tween_onto(rect, _settle_sec)
+
+
+func _tween_onto(rect: Rect2, sec: float) -> void:
+	if _follower == null:
+		_finish_settle()
+		return
+	var land := float(MatFace.ICON_PX) / CraftHandLayout.CARD_W
+	var icon_center := rect.position + rect.size * 0.5
+	var end_pos := icon_center - Vector2(
+		CraftHandLayout.CARD_W * 0.5,
+		CraftHandLayout.CARD_H - CraftHandLayout.CARD_H * 0.5 * land
+	)
+	_kill_motion()
+	_motion_tween = create_tween()
+	_motion_tween.set_parallel(true)
+	_motion_tween.set_ease(Tween.EASE_OUT)
+	_motion_tween.set_trans(Tween.TRANS_QUAD)
+	_motion_tween.tween_property(_follower, "global_position", end_pos, sec)
+	_motion_tween.tween_property(_follower, "rotation", 0.0, sec)
+	_motion_tween.tween_property(_follower, "scale", Vector2(land, land), sec)
+	_motion_tween.finished.connect(_finish_settle, CONNECT_ONE_SHOT)
+
+
+func _begin_cancel() -> void:
+	_clear_drop_hot(false)
+	_kill_pickup()
+	if _follower == null or _ghost == null or not is_instance_valid(_ghost):
+		_abort_motion()
+		return
+	_phase = _Phase.SNAP
+	_hand_fan.hold_layout = true
+	var goal := _ghost.global_position
+	var rot := _ghost.rotation
+	_kill_motion()
+	_motion_tween = create_tween()
+	_motion_tween.set_parallel(true)
+	_motion_tween.set_ease(Tween.EASE_OUT)
+	_motion_tween.set_trans(Tween.TRANS_QUAD)
+	_motion_tween.tween_property(_follower, "global_position", goal, _CANCEL_SEC)
+	_motion_tween.tween_property(_follower, "rotation", rot, _CANCEL_SEC)
+	_motion_tween.tween_property(_follower, "scale", Vector2.ONE, _CANCEL_SEC)
+	_motion_tween.finished.connect(_finish_cancel, CONNECT_ONE_SHOT)
+
+
+func _finish_settle() -> void:
+	if _phase != _Phase.SETTLE:
+		return
+	_free_follower()
+	if _ghost != null and is_instance_valid(_ghost):
+		_ghost.queue_free()
+	_ghost = null
+	_armed = null
+	_settle_zone = null
+	_phase = _Phase.IDLE
+	if _hand_fan != null:
+		_hand_fan.hold_layout = false
+		_hand_fan.set_cards_hover_locked(false)
+
+
+func _finish_cancel() -> void:
+	if _ghost != null and is_instance_valid(_ghost):
+		_ghost.set_ghost(false)
+	_free_follower()
+	_ghost = null
+	_armed = null
+	_phase = _Phase.IDLE
+	if _hand_fan != null:
+		_hand_fan.hold_layout = false
+		_hand_fan.set_cards_hover_locked(false)
+
+
+func _abort_motion() -> void:
+	_kill_pickup()
+	_kill_motion()
+	_free_follower()
+	if _ghost != null and is_instance_valid(_ghost):
+		_ghost.set_ghost(false)
+	_ghost = null
+	_armed = null
+	_phase = _Phase.IDLE
+	_deal_in = false
+	_reflow = false
+	_motion_left = 0
+	if _hand_fan != null:
+		_hand_fan.hold_layout = false
+		_hand_fan.set_cards_hover_locked(false)
+	_clear_drop_hot(true)
+
+
+func _note_motion_done() -> void:
+	if _phase != _Phase.DIG:
+		return
+	_motion_left -= 1
+	if _motion_left > 0:
+		return
+	_motion_left = 0
+	_phase = _Phase.IDLE
+	if _hand_fan != null:
+		_hand_fan.hold_layout = false
+
+
+func _place_follower(pointer: Vector2) -> void:
+	if _follower == null:
+		return
+	var origin := pointer + Vector2(0, -_FOLLOW_ORIGIN_PX)
+	_follower.global_position = origin - _follower.pivot_offset
+
+
+func _spawn_follower(source: CraftHandSlot) -> void:
+	_free_follower()
+	var wrap := Control.new()
+	wrap.name = "DragFollower"
+	wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrap.size = Vector2(CraftHandLayout.CARD_W, CraftHandLayout.CARD_H)
+	wrap.pivot_offset = Vector2(CraftHandLayout.CARD_W * 0.5, CraftHandLayout.CARD_H)
+	var shadow := ColorRect.new()
+	shadow.color = Color(0, 0, 0, _GHOST_ALPHA)
+	shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shadow.position = Vector2(0, 6)
+	shadow.size = Vector2(CraftHandLayout.CARD_W, CraftHandLayout.CARD_H)
+	wrap.add_child(shadow)
+	var card := CraftHandSlot.new()
+	card.flight_visual = true
+	_overlay.add_child(wrap)
+	wrap.add_child(card)
+	card.bind(source.hand_index, source.card, source.cost, false, false)
+	card.position = Vector2.ZERO
+	card.rotation = 0.0
+	card.scale = Vector2.ONE
+	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrap.global_position = source.global_position
+	wrap.rotation = source.rotation
+	wrap.scale = source.scale
+	_follower = wrap
+
+
+func _free_follower() -> void:
+	if _follower != null and is_instance_valid(_follower):
+		_follower.queue_free()
+	_follower = null
+
+
+func _update_drop_hot(pointer: Vector2) -> void:
+	var hot := _zone_at(pointer)
+	for zone in _zones:
+		zone.set_drop_hot(zone == hot)
+
+
+func _clear_drop_hot(immediate: bool) -> void:
+	for zone in _zones:
+		zone.clear_drop_hot(immediate)
+
+
+func _zone_at(pointer: Vector2) -> CraftZone:
+	for zone in _zones:
+		if zone == null or not zone.visible or zone.is_locked():
+			continue
+		if zone.contains_global(pointer):
+			return zone
+	return null
+
+
+func _zone_by_index(zone_index: int) -> CraftZone:
+	for zone in _zones:
+		if zone.zone_index == zone_index:
+			return zone
+	return null
+
+
+func _can_commit(hand_index: int, zone_index: int) -> bool:
+	var session := AtelierSession.craft_session
+	if session == null:
+		return false
+	return CraftRules.can_play(session, hand_index, AtelierSession.next_mat_free, zone_index)
+
+
+func _can_click(session: CraftStaminaSession, index: int, closed: bool) -> bool:
+	if closed or session == null:
+		return false
+	if not CraftRules.can_play(session, index, AtelierSession.next_mat_free, session.selected_zone_index):
+		return false
+	var zone := _zone_by_index(session.selected_zone_index)
+	return zone != null and zone.visible and not zone.is_locked()
+
+
+func _can_drag(session: CraftStaminaSession, index: int, closed: bool) -> bool:
+	if closed or session == null:
+		return false
+	for z in range(1, session.zone_count + 1):
+		if CraftRules.can_play(session, index, AtelierSession.next_mat_free, z):
+			return true
+	return false
+
+
+func _take_slot(pool: Array[CraftHandSlot], card: HandCard) -> CraftHandSlot:
+	var id := card.get_instance_id()
+	for i in range(pool.size()):
+		if pool[i].tracks(id):
+			var slot := pool[i]
+			pool.remove_at(i)
+			return slot
+	return null
+
+
+func _kill_pickup() -> void:
+	if _pickup_tween != null and _pickup_tween.is_valid():
+		_pickup_tween.kill()
+	_pickup_tween = null
+
+
+func _kill_motion() -> void:
+	if _motion_tween != null and _motion_tween.is_valid():
+		_motion_tween.kill()
+	_motion_tween = null
