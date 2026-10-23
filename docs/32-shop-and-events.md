@@ -627,12 +627,12 @@ Adventurer portraits: [29](29-adventurer-catalog.md) **Portrait sockets**. Owner
 
 ## Event resolve
 
-> **Until-M2 pool — proposed, [33](33-until-m2-tuning.md).** Which `evt_*` resolves is that pool (weights + day-band), not a script that names the day. Outcome ints in the catalog below are the proposed until-M2 lock (no integer edits here). The free `E*` board stays dead. Decision **A** draws; decision **B** keeps the welded `ref_id` rows. Until Jonathan writes the letter, Client still emits the weld.
+> **Until-M2 pool — locked, [33](33-until-m2-tuning.md).** Which `evt_*` resolves is that pool (weights + day-band), not a script that names the day. Outcome ints in the catalog below are the until-M2 lock (no integer edits here). The free `E*` board stays dead. Decision **A** draws (Client #73). Decision **B** was not taken.
 
 ### Enter
 
 1. Current node is `kind=event` and that day is being resolved (not a draft).
-2. Read `ref_id` → `evt_*` from the node row. **Prefer `ref_id`** over a per-node unique event. Nodes may share a catalog row on later maps; C1 uses one row each. Under [33](33-until-m2-tuning.md) decision **A** this step becomes the pool draw; the `ref_id` stays a sample legal row.
+2. Read `ref_id` → `evt_*` from the node row. **Prefer `ref_id`** over a per-node unique event. Nodes may share a catalog row on later maps; C1 uses one row each. Under [33](33-until-m2-tuning.md) decision **A** (Client #73) this step is the pool draw; the `ref_id` stays a sample legal row.
 3. Client shows event id + one-liner + **1–2** choice buttons.
 4. Player picks **exactly one** choice. Apply that row’s deltas. Show the **result line**.
 5. That pick **resolves the node**. Day advances. No craft session. No second choice tree.

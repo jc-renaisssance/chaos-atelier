@@ -1,12 +1,12 @@
 # Until-M2 tuning — stats and event pool (2026-10-22)
 
-**Status:** Grimmjow Design-ready for Jonathan stamp. **Doc id: `33`.** Docs only. No Client, no Godot, no art, no PixelLab.
+**Status:** **Closed.** Jonathan accept **A A A A** (tables / elite pressure **A** / mission gold **A** / reps gate **A** / event attach **A**) on Design #72. Client landed (#73, `9f03c16`). **Doc id: `33`.** The decision table below is historical law. Do not reopen. No further Client on this file. No art. Does not revive #62. Does not open the M2 four-job Client wire (next lane). Posture art stays **Nov 2**.
 
 **Test chapter:** C1 on `map_m1` (`CHAPTER_DAY_COUNT` = **8**), `M1_JOB_POOL` only. Every number in this file is an **until-M2** lock for that test. It is not a forever-final for C2, C3, or a later map length.
 
 **Does not reopen:** route-map spine ([22](22-chapter-schedule.md)), Elite telegraph N5 (#66 / #67 / #68), interactive-order slice 4 (docs #69 / Client #70), portrait redraws (#64 / #65), market catalogs ([32](32-shop-and-events.md) mechanism), estimate S–F cutoffs ([30](30-interactive-order.md), Jonathan 2026-10-08 leave-as-knobs). Does not revive #62. Does not revive the free per-day `E*` board (#36 / #37).
 
-The stamp card is [STAMP](STAMP.md) (this date). Silence is not a letter.
+The stamp card is [STAMP](STAMP.md) (2026-10-22). The letters are written. Code cites in the tables below are the pre-Client #73 deltas. Client #73 followed accept **A A A A**. Do not read a stub row as live.
 
 ---
 
@@ -272,37 +272,35 @@ On enter of `kind=event` (not a draft):
 
 The four `ref_id`s on `map_m1` stay on the graph as a **sample legal draw** (each is in band). They are not the resolver. `event_id` on the stamp is the drawn id. It may differ from `route_nodes[].ref_id`.
 
-Delta vs [20](20-harness-stamp.md) assert 26 and vs `map_catalog.gd`: the four equalities (N4 heat, N6 ash, N10 scrap, N17 salt) become “`event_id` ∈ pool, band contains `day_index`, no repeat”. That assert moves with the Client that follows this letter. This Design does not delete the equality from `20` and does not add a Required key. Do not emit windowed `event_pool`.
+Delta vs the pre-Client weld and vs `map_catalog.gd`: the four equalities (N4 heat, N6 ash, N10 scrap, N17 salt) became “`event_id` ∈ pool, band contains `day_index`, no repeat”. Client #73 moved [20](20-harness-stamp.md) assert 26. The four ids stay the sample legal draw. No new Required key. Do not emit windowed `event_pool`.
 
 ### B — weld
 
-Resolver keeps the node `ref_id`. N4 / N6 / N10 / N17 stay those four ids. The three extras stay off `map_m1`. Weights and bands are filed here for a later map. Assert 26 stays as written. This is current Client.
+Resolver keeps the node `ref_id`. N4 / N6 / N10 / N17 stay those four ids. The three extras stay off `map_m1`. Weights and bands are filed here for a later map. Assert 26 would have stayed the weld. Letter **B** was not taken. Client #73 followed **A**.
 
 Write **A** or **B**. Silence is not **A**. Design recommends **A**. The standing rule is a pool. Three catalog rows already have no node. The sample ids remain legal outcomes, so the test chapter’s text does not have to change — the rule does.
 
 ---
 
-## Client later (not this PR)
+## Client (landed — #73)
 
-After the letters, Ulquiorra follows this file. Szayelaporro smokes. No art seat.
+Not open work. Ulquiorra followed this file on #73 (`9f03c16`). Szayelaporro smoked. No art seat. The M2 twelve stayed docs-only on that Client. Do not re-queue this table.
 
-| Letter | Code to follow |
+| Letter | What #73 followed |
 |---|---|
-| 1 accept | Treat the cited cells as locked. `REPS` decline **−1** already matches. No M2 people wire |
+| 1 accept | Cited cells locked. Decline **−1** already matched. No M2 people wire |
 | 2 A | `mission_resolver.gd` `_pressure` — appointment **0.64** |
-| 2 B | leave `_pressure` |
 | 3 A | `_apply_mission_payout` — base table; coin purse only if base > 0 |
-| 3 B | leave payout |
-| 4 A | `REPS_GATE_STUB` → chapter table (C1 **8**) |
-| 4 B | C1 gate **10**; C2 / C3 from `25` |
-| 5 A | draw in place of `EventCatalog.NODE_EVENTS` / welded `ref_id`. Assert 26’s four equalities retire with that Client |
-| 5 B | keep the weld |
+| 4 A | chapter table (C1 **8** / C2 **14** / C3 **20**). `REPS_GATE_STUB` **0** retired |
+| 5 A | day-band draw in place of the welded `ref_id`. Assert 26’s four equalities retired with that Client |
 
-No new [20](20-harness-stamp.md) Required key under any letter. `gold` on a mission stamp, when Decision 3 is A, uses the `gold` / `gold_before` / `gold_after` fields `20` already has for the purse.
+Letters **B** were not taken. No new [20](20-harness-stamp.md) Required key. `gold` on a mission stamp uses the `gold` / `gold_before` / `gold_after` fields `20` already has for the purse.
 
 ---
 
 ## Decisions (stamp)
+
+**Record:** accept / **A** / **A** / **A** / **A** (Jonathan, Design #72). Client #73. The five lines below are the law as stamped. They are not an open ask.
 
 1. **Tables — accept, or name the row.** People, garments, difficulty, stamina, purse knobs, event outcome ints, decline **−1**, mission letter cutoffs. Estimate S–F bands are not in this list. Design recommends **accept**. Silence is not accept.
 
@@ -319,6 +317,8 @@ No new [20](20-harness-stamp.md) Required key under any letter. `gold` on a miss
 None.
 
 ## Blocks stamp
+
+**Stamped.** The lines below are the ask as written. They are not open.
 
 An unanswered tables line. Silence is not accept.
 

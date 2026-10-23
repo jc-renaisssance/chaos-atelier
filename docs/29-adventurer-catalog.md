@@ -20,7 +20,7 @@
 | Target enemies | Existing `boss_*` from `17` (limited enemy types = the 9 chapter bosses) |
 | Appointments | Not this catalog. Scrap Duelist stays `appt_scrap_duelist` |
 
-Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune. **S–F estimate letter bands** in `30` stay Test knobs — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do not lock the cutoff table. [33](33-until-m2-tuning.md) proposes to accept the six-stat cells (and the HP 8–16 / other 1–8 band) as the **until-M2** lock. No cell in this file changes. Estimate weights and the S–F table stay knobs either way.
+Numbers in this doc (stats, estimate weights in `30`) are **test knobs**, not a hard lock. Jonathan may retune. **S–F estimate letter bands** in `30` stay Test knobs — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do not lock the cutoff table. [33](33-until-m2-tuning.md) accepts the six-stat cells (and the HP 8–16 / other 1–8 band) as the **until-M2** lock (Design #72 / Client #73). No cell in this file changes. Estimate weights and the S–F table stay knobs.
 
 ---
 
@@ -985,7 +985,7 @@ Profile unlock save (`unlocked_builds`) is **not** a `20` Required run field —
 
 ## Ugly-Client
 
-Text-first stays legal. Names + job + stats + skill line + tag line + `boss_*` brief id are enough until a portrait file exists. Slice UI for slices 1–3 stays the ugly panel in [30](30-interactive-order.md). Posture stills and playback are that file’s slice 4 (open Design) — not a second portrait, and not this catalog’s gen list. No poster art.
+Text-first stays legal. Names + job + stats + skill line + tag line + `boss_*` brief id are enough until a portrait file exists. Slice UI for slices 1–3 stays the ugly panel in [30](30-interactive-order.md). Posture stills and playback are that file’s slice 4 (Client #70; sockets shipped; art Later, **Nov 2**) — not a second portrait, and not this catalog’s gen list. No poster art.
 
 Portrait sockets (one per surface that already shows a person) are [below](#portrait-sockets-2026-10-20).
 
@@ -1168,5 +1168,5 @@ Nnoitra, after the stamp, and only for the busts that stamp opens:
 - Starter tags: [19-own-basic-starter](19-own-basic-starter.md)
 - PM: [pm/phase-1-plan](pm/phase-1-plan.md)
 - Market (closed M1; skills icons + tab chrome live there): [32-shop-and-events](32-shop-and-events.md)
-- Until-M2 stat lock (proposed): [33-until-m2-tuning](33-until-m2-tuning.md)
+- Until-M2 stat lock (closed, Design #72 / Client #73, accept **A A A A**): [33-until-m2-tuning](33-until-m2-tuning.md)
 - Art pointer: [05-art](05-art.md)
