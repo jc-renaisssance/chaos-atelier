@@ -265,7 +265,7 @@ static func order_for_appointment(pin: AppointmentPin) -> ClientOrder:
 
 
 static func make_walk_in(chapter_id: int, day_index: int, rng: RandomNumberGenerator) -> ClientOrder:
-	## M1 walk-in draws a named person from the 12 (docs/29). Job constructions from docs/28.
+	## Walk-in draws one named person from the active 4-job pool (docs/29). M2 when Steam-demo is live.
 	var named := BossClientCatalog.make_walk_in_order(chapter_id, day_index, rng)
 	if not named.adventurer_id.is_empty():
 		return named

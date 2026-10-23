@@ -53,6 +53,8 @@ var awaiting_boss: bool = false
 var boss_open: bool = false
 var boss_client_id: String = ""
 var boss_job_id: String = ""
+## "m1" or "m2" for the boss draw that opened this beat. Assert 23 reads it. Not a dump key.
+var boss_draw_pool: String = ""
 var chapter_over: bool = false
 var run_over: bool = false
 var run_over_reason: GameEnums.RunOverReason = GameEnums.RunOverReason.NONE
@@ -141,6 +143,7 @@ func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
 	boss_open = false
 	boss_client_id = ""
 	boss_job_id = ""
+	boss_draw_pool = ""
 	chapter_over = false
 	run_over = false
 	run_over_reason = GameEnums.RunOverReason.NONE
@@ -871,8 +874,15 @@ func _reps_gate_miss() -> bool:
 
 func _begin_boss_client_craft() -> void:
 	## Boss beat (docs/28 + 29): seeded 4-job named draw, independent of chapter_boss_id.
+	## Live Steam-demo content uses M2_JOB_POOL only. The else keeps pick_boss_client for M1 smokes.
 	awaiting_boss = false
-	var job := BossClientCatalog.pick_boss_client(chapter_seed)
+	var job: Dictionary = {}
+	if AdventurerCatalog.live_content_is_m2():
+		boss_draw_pool = "m2"
+		job = BossClientCatalog.pick_boss_client_m2(chapter_seed)
+	else:
+		boss_draw_pool = "m1"
+		job = BossClientCatalog.pick_boss_client(chapter_seed)
 	boss_client_id = String(job.get("boss_client_id", ""))
 	boss_job_id = String(job.get("job_id", ""))
 	var boss_id := board.chapter_boss_id if board != null else ""
@@ -1142,12 +1152,25 @@ func _make_newspaper_stamp() -> HarnessStamp:
 	return stamp
 
 
+func _apply_boss_draw_pool(stamp: HarnessStamp) -> void:
+	if stamp == null:
+		return
+	if stamp.mission_kind != GameEnums.MissionKind.BOSS:
+		stamp.adventurer_pool_id = ""
+		return
+	if not boss_draw_pool.is_empty():
+		stamp.adventurer_pool_id = boss_draw_pool
+		return
+	stamp.adventurer_pool_id = AdventurerCatalog.pool_id_for_job(stamp.boss_job_id)
+
+
 func _make_craft_stamp(result: Dictionary = {}) -> HarnessStamp:
 	var stamp := _base_stamp()
 	if craft_order != null and craft_session != null:
 		stamp.apply_piece_session(craft_order, craft_session)
 	if not result.is_empty():
 		stamp.apply_resolver(result)
+	_apply_boss_draw_pool(stamp)
 	return stamp
 
 
@@ -1167,6 +1190,7 @@ func _make_mission_return_stamp(mission: Dictionary) -> HarnessStamp:
 	stamp.session = null
 	stamp.apply_resolver(mission)
 	stamp.mission_purse = true
+	_apply_boss_draw_pool(stamp)
 	return stamp
 
 
@@ -1186,6 +1210,7 @@ func _make_cant_craft_stamp(order: ClientOrder, result: Dictionary) -> HarnessSt
 	stamp.session = null
 	stamp.cant_craft = true
 	stamp.apply_resolver(result)
+	_apply_boss_draw_pool(stamp)
 	return stamp
 
 
@@ -1212,6 +1237,7 @@ func _make_boss_stamp(result: Dictionary) -> HarnessStamp:
 	stamp.run_over = run_over
 	stamp.run_over_reason = run_over_reason
 	stamp.mission_purse = true
+	_apply_boss_draw_pool(stamp)
 	return stamp
 
 

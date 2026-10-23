@@ -1,9 +1,9 @@
 class_name BossClientCatalog
 extends RefCounted
-## Shared adventurer / boss-client pool (docs/28). One pool for all bosses / chapters.
+## Shared adventurer / boss-client pool (docs/28). One construction catalog for all bosses.
 ## Not a fixed client per boss. Not appointments (Scrap Duelist stays appt_*).
-## M1 live draw is the 4-job named roster in AdventurerCatalog (docs/29). Wizard / Hexer /
-## Outrider / Oathbound stay in JOBS for M2 and are out of the M1 draw.
+## Draws are disjoint 4-job filters (docs/29). pick_boss_client = M1_JOB_POOL (historical
+## smokes). pick_boss_client_m2 = M2_JOB_POOL (live Steam-demo boss beat and walk-in).
 
 const SHARED_BOSS_CLIENT_POOL := [
 	"job_knight",
@@ -86,10 +86,20 @@ const JOBS := {
 
 
 ## Seeded M1 draw: 4 jobs × 3 named people (docs/29). Do not pass chapter_boss_id.
+## Historical / M1 smokes call this. It does not read the live Steam-demo flag.
 static func pick_boss_client(seed: int) -> Dictionary:
+	return _pick_from_pool(seed, AdventurerCatalog.M1_JOB_POOL)
+
+
+## Seeded M2 / Steam-demo draw (docs/28, docs/29 draw B). Disjoint from M1. Seed only.
+static func pick_boss_client_m2(seed: int) -> Dictionary:
+	return _pick_from_pool(seed, AdventurerCatalog.M2_JOB_POOL)
+
+
+static func _pick_from_pool(seed: int, pool_src: Array) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed
-	var pool: PackedStringArray = PackedStringArray(AdventurerCatalog.M1_JOB_POOL)
+	var pool := PackedStringArray(pool_src)
 	var n := pool.size()
 	if n <= 0:
 		return {}
@@ -200,7 +210,11 @@ static func make_order(job: Dictionary, chapter_boss_id: String) -> ClientOrder:
 
 
 static func make_walk_in_order(chapter_id: int, day_index: int, rng: RandomNumberGenerator) -> ClientOrder:
-	var person := AdventurerCatalog.pick_named(rng)
+	## Live Steam-demo walk-in draws the M2 12. live_content_is_m2 false keeps the M1 12.
+	var pool_id := "m1"
+	if AdventurerCatalog.live_content_is_m2():
+		pool_id = "m2"
+	var person := AdventurerCatalog.pick_named(rng, pool_id)
 	var order := ClientOrder.new()
 	if person.is_empty():
 		return order

@@ -10,6 +10,8 @@ extends Resource
 @export var boss_pool_id: String = ""
 @export var boss_client_id: String = "" ## adv_* on mission_kind=boss; dump null otherwise
 @export var boss_job_id: String = "" ## job_* on mission_kind=boss; dump null otherwise
+## Assert 23 pool ("m1" | "m2"). Schema only. Not a docs/20 dump key and not a person field.
+@export var adventurer_pool_id: String = ""
 @export var adventurer_skill_id: String = "" ## ask_* log-only (docs/30 slice 1); not a 20 Required field
 @export var adventurer_stats: Dictionary = {} ## panel knobs {HP,ATK,DEF,RES,MOB,PRE}; log-only
 
@@ -607,6 +609,10 @@ func schema_errors() -> PackedStringArray:
 			errs.append("boss_job_id does not match boss_client_id")
 		if not BossClientCatalog.constructions_match(boss_job_id, construction_ids):
 			errs.append("construction_ids must equal that job's listed con_*")
+		var roster_pool := adventurer_pool_id
+		if roster_pool.is_empty():
+			roster_pool = AdventurerCatalog.pool_id_for_job(boss_job_id)
+		errs.append_array(AdventurerCatalog.boss_roster_errors(boss_client_id, boss_job_id, roster_pool))
 		if threat_id != chapter_boss_id or chapter_boss_id.is_empty():
 			errs.append("mission_kind=boss threat_id must equal chapter_boss_id")
 	return errs

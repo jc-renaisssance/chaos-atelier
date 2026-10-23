@@ -14,7 +14,7 @@ const WOOD := Color(0.102, 0.078, 0.063)
 const PANEL := Color(0.165, 0.129, 0.094)
 const BORDER := Color(0.239, 0.204, 0.173)
 const PORTRAIT_PX := 96
-## Stamped Pro Flash busts (art #54). PNG-only; Godot imports locally.
+## Stamped busts (M1 art #54, M2 art #65). PNG-only; Godot imports locally.
 ## Job stubs have no file — resolve_id maps them onto these named rows.
 const PORTRAITS := {
 	"adv_halden_rook": preload("res://assets/adv/adv_halden_rook.png"),
@@ -29,6 +29,18 @@ const PORTRAITS := {
 	"adv_tide_glass": preload("res://assets/adv/adv_tide_glass.png"),
 	"adv_brine_latch": preload("res://assets/adv/adv_brine_latch.png"),
 	"adv_rime_peddler": preload("res://assets/adv/adv_rime_peddler.png"),
+	"adv_vesper_cant": preload("res://assets/adv/adv_vesper_cant.png"),
+	"adv_nyx_vellum": preload("res://assets/adv/adv_nyx_vellum.png"),
+	"adv_orin_goldink": preload("res://assets/adv/adv_orin_goldink.png"),
+	"adv_soot_cord": preload("res://assets/adv/adv_soot_cord.png"),
+	"adv_tar_veil": preload("res://assets/adv/adv_tar_veil.png"),
+	"adv_ashen_cowl": preload("res://assets/adv/adv_ashen_cowl.png"),
+	"adv_harrow_gale": preload("res://assets/adv/adv_harrow_gale.png"),
+	"adv_flint_rime": preload("res://assets/adv/adv_flint_rime.png"),
+	"adv_lark_mute": preload("res://assets/adv/adv_lark_mute.png"),
+	"adv_aurel_vow": preload("res://assets/adv/adv_aurel_vow.png"),
+	"adv_clarion_mantle": preload("res://assets/adv/adv_clarion_mantle.png"),
+	"adv_pell_white": preload("res://assets/adv/adv_pell_white.png"),
 }
 
 var _title: Label
