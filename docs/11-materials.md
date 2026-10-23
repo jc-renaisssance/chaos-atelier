@@ -90,3 +90,7 @@ Cost band (draft): **1** scrap · **2** common · **3** uncommon · **4** rare �
 - **M1 route-node market visit** (display Market; wire `kind=shop`; buy / sell / refresh / **enchant**; chapter-shared `market_bank_c1`; sell ⌊**base** $ / 2⌋ min 1; ≥3 material floor; `mat_ench_*` + shiny overlay) is **[32](32-shop-and-events.md)**. M1 tab = materials only. **M2** = Staffs / Skills / Gear on the same shell (`staff_*` / `sk_*` / `artifact_*`). Enchant stays **materials only**. Weighted roll-5 in [19](19-own-basic-starter.md) is **not** the M1 visit. Material enchant is **not** craft `enc_*` ([13](13-enchantments.md)).
 - Phase-1 starter hand: `mat_hemp_plain`, `mat_cotton_spring`, `mat_leather_tan`, `mat_wool_grey`, `mat_iron_scrap` + 1 random common — concrete 8-card list in [19](19-own-basic-starter.md).
 - Forbidden ($5) unlocked via shop room / scars — not day-one free pile. **Later** (not C1 `32` stock).
+
+## Faces (open, 2026-10-23)
+
+The 38 ids in this file have gallery faces. The path table, the dest `assets/mat/<id>.png`, and the gap note (live catalog **0**, nine other-owner ids in [16](16-shop-owners.md) uncovered) are [36](36-craft-hand-cards.md). `look_armor_*` is not a face for these ids. This section does not copy a png.

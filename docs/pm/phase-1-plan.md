@@ -1,6 +1,6 @@
 # Roadmap — Chaos Atelier
 
-Updated **2026-10-23**. `dev` tip is **`4d9fa19`** (docs #78). Client shell is **`c8a5a1a`** (UI shell v1 #77). That tip is **not** Steam-demo ready. Open card: [35](../35-steam-demo-cut.md). Route/Dex Client tip stays **`1765a29`**. **M1 ugly full-experience is operationally exit-ready** at that Client tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **stamped** (Jonathan 2026-10-21, #61, draw B) in [29](../29-adventurer-catalog.md). `M2_JOB_POOL` is those four only, disjoint from `M1_JOB_POOL`. **Client wire landed** (#75, `873e7b2`). Do not read #72, #73, #74, or #75 as open. **Portrait uniqueness** is stamped (#63 ACCEPT all 24). Redraws landed: M1 #64, M2 #65. Do not regen. Do not revive #62. **Elite telegraph N5 shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not reopen. **Until-M2 stat / event tuning shipped** (Design #72 / Client #73, accept **A A A A**) in [33](../33-until-m2-tuning.md). Do not reopen. Interactive-order slice 4 docs are #69 and Client is #70. Sockets shipped. Posture art stays **Nov 2**. Do not reopen playback. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only). Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done** (lane 1 docs #74, lane 2 Client #75). Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo UI shell v1 **shipped** ([34](../34-ui-shell-v1.md), Design #76 `daa0280`, Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** as text on #77). Do not read #76 or #77 as open. The shell is not an open card. The demo cut is. Do not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**.
+Updated **2026-10-23**. `dev` tip is **`2c338ed`** (Client #82). Steam-demo cut **AAAA** landed (#79 docs / #80 chips / #81 outlook ×28 / #82 Client). Open card: [36](../36-craft-hand-cards.md). Route/Dex Client tip stays **`1765a29`**. **M1 ugly full-experience is operationally exit-ready** at that Client tip. **M2 four-job catalog** (Wizard / Hexer / Outrider / Oathbound) is **stamped** (Jonathan 2026-10-21, #61, draw B) in [29](../29-adventurer-catalog.md). `M2_JOB_POOL` is those four only, disjoint from `M1_JOB_POOL`. **Client wire landed** (#75, `873e7b2`). Do not read #72, #73, #74, or #75 as open. **Portrait uniqueness** is stamped (#63 ACCEPT all 24). Redraws landed: M1 #64, M2 #65. Do not regen. Do not revive #62. **Elite telegraph N5 shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not reopen. **Until-M2 stat / event tuning shipped** (Design #72 / Client #73, accept **A A A A**) in [33](../33-until-m2-tuning.md). Do not reopen. Interactive-order slice 4 docs are #69 and Client is #70. Sockets shipped. Posture art stays **Nov 2**. Do not reopen playback. Market + events M1 (#44 Design / #45 Client) and Market M2 tabs (#46 Design / #47 Client) plus 13 stamped `staff_*` + `artifact_*` icons (#48 art / #49 Client wire) are **shipped** — do not mark them pending. Skills shelf Design #51 / art #52 / Client #53 and adventurer portraits art #54 / Client #55 are **shipped**. Tab chrome is stamped **A** (no gens). Route-board + Dex art Design #57 (`ddbe8b5`) / art #58 (`d432fc2`) / Client #59 (`1765a29`) are **shipped** — do not mark them pending. Shiny stays code-only. **`main` is not promoted** (`353f1d4`, README seed only). Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done** (lane 1 docs #74, lane 2 Client #75). Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo UI shell v1 **shipped** ([34](../34-ui-shell-v1.md), Design #76 `daa0280`, Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** as text on #77). Do not read #76 or #77 as open. The shell is not an open card. The demo cut **AAAA** has landed (#79–#82). The open card is the craft hand ([36](../36-craft-hand-cards.md)). Do not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**.
 
 Prior stamps still hold as history: **2026-10-13** route map with forks (free per-day `E*` board from #36/#37 superseded); **2026-10-05** M1 / M2 framing + **adventurers** terminology. **Supersedes** the 2026-09-28 Cursor-reset / Phase-0–1C framing in this file. **Supersedes** Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law) and `crafts_max=4`. Display name **Wombaste**.
 
@@ -20,7 +20,7 @@ The 2026-10-05 stamp locks the term in PM + STAMP. It does **not** mass-rename h
 
 ## Already on `dev`
 
-HEAD **`4d9fa19`** (`origin/dev` at this writing; docs #78). Client shell **`c8a5a1a`**. Route/Dex Client art is **`1765a29`**. On this tip: catalog #61, uniqueness #63, portrait redraws #64 / #65, Elite telegraph #66 / #67 / #68, interactive-order slice 4 docs #69 / Client #70 (`f083b09`), until-M2 tuning Design #72 (`5adae28`) / Client #73 (`9f03c16`), docs tip catch-up #74 (`7f82483`), M2 four-job Client wire #75 (`873e7b2`), UI shell Design #76 (`daa0280`) / Client #77 (`c8a5a1a`). `main` stays at `353f1d4`. #72, #73, #74, #75, #76, and #77 are **landed**. Do not mark them open.
+HEAD **`2c338ed`** (`origin/dev` at this writing; Client #82). Client shell for the AAAA wire is that same tip. Earlier shell commit **`c8a5a1a`** (#77) is the palette/bust record. Route/Dex Client art is **`1765a29`**. On this tip: catalog #61, uniqueness #63, portrait redraws #64 / #65, Elite telegraph #66 / #67 / #68, interactive-order slice 4 docs #69 / Client #70 (`f083b09`), until-M2 tuning Design #72 (`5adae28`) / Client #73 (`9f03c16`), docs tip catch-up #74 (`7f82483`), M2 four-job Client wire #75 (`873e7b2`), UI shell Design #76 (`daa0280`) / Client #77 (`c8a5a1a`). `main` stays at `353f1d4`. #72, #73, #74, #75, #76, and #77 are **landed**. Do not mark them open.
 
 ### Shipped PR track (closed — do not re-queue)
 
@@ -101,7 +101,7 @@ Ugly full-experience M1 is the base. Steam demo is **not** a new gameplay system
 
 ### Until-M2 queue (items 1–4 closed)
 
-The four rows are **closed**. Do not pull one back open. Route-graph board art + Dex art sockets are **shipped** (#57 / #58 / #59) — not in this queue. Market chrome and M1 portraits stay closed. The M2 four-job **Client** wire **landed** (#75). UI shell v1 **shipped** (#76 / #77). Neither of those is an open card. The Steam-demo **cut** is open ([35](../35-steam-demo-cut.md)). Tip `4d9fa19` is not demo-ready.
+The four rows are **closed**. Do not pull one back open. Route-graph board art + Dex art sockets are **shipped** (#57 / #58 / #59) — not in this queue. Market chrome and M1 portraits stay closed. The M2 four-job **Client** wire **landed** (#75). UI shell v1 **shipped** (#76 / #77). Neither of those is an open card. The Steam-demo **cut** landed **AAAA** (#79–#82). Tip `2c338ed`. The open card is the craft hand ([36](../36-craft-hand-cards.md)).
 
 | # | Item | Note |
 |---:|------|------|
@@ -135,25 +135,31 @@ Already through that lane on this tip (do not re-hold): market M1 #44 → #45; m
 
 **Queue 4** is closed. Until-M2 stat / event tuning shipped (#72 / #73). Do not re-hold that lane. Docs catch-up #74 landed. Do not re-open it.
 
-The shell drop is **docs only** and has shipped. This cut is also **docs only**. No game Client code. UI shell v1 is **shipped** (#76 / #77, stamp **A A B**). Ulquiorra does not hold a shell Client. He **does** hold the demo-cut Client until Jonathan stamps [35](../35-steam-demo-cut.md). Nnoitra does not gen on the shell lane, and does not gen on this cut unless the tag-icon letter is **B** after the stamp. Do not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**.
+The shell drop is **docs only** and has shipped. This cut is also **docs only**. No game Client code. UI shell v1 is **shipped** (#76 / #77, stamp **A A B**). Ulquiorra does not hold a shell Client. He does not hold the demo-cut Client: **AAAA** landed (#82). He holds the craft-hand Client until Jonathan stamps [36](../36-craft-hand-cards.md). Nnoitra does not gen on the shell lane. The tag-chip letter **B** already landed (#80). Do not regen those chips. Nnoitra’s next copy, if path letter **A** stamps, is the 38 `mat_*` files in `36`. That copy is not this docs PR. Do not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**.
 
 ---
 
 ## Shipped — Steam-demo UI shell v1
 
-**Closed.** Design #76 (`daa0280`). Client #77 (`c8a5a1a`). Law: [34](../34-ui-shell-v1.md). Jonathan GO **A A A A** (2026-10-23 HKT) is locked: open now, craft + order first, market text strip stays, playback chrome included because it is cheap. Stamp **A A B**: palette **A**, order-panel bust **A**, planner chips **B** (text on #77). Do not reopen the shell. The text interim is not the demo law. The open card is the cut below.
+**Closed.** Design #76 (`daa0280`). Client #77 (`c8a5a1a`). Law: [34](../34-ui-shell-v1.md). Jonathan GO **A A A A** (2026-10-23 HKT) is locked: open now, craft + order first, market text strip stays, playback chrome included because it is cheap. Stamp **A A B**: palette **A**, order-panel bust **A**, planner chips **B** (text on #77). Do not reopen the shell. The text interim is not the demo law. The demo cut below has since stamped **AAAA** and landed (#79–#82). The open card is [36](../36-craft-hand-cards.md).
 
 Replaces the M1 debug captions on the craft screen. Does not retune craft rules, stamina ints, unlock keys, estimate cutoffs, or `M2_JOB_POOL`. Does not restyle the route board, market, Dex, newspaper, or HUD. Does not touch PR #71 or posture pngs. Posture art stays **Nov 2** (PixelLab reset **2026-11-02**). Solenne ×4 art on #71 stays **HOLD** until that reset. Halden + Vex **KEEP**. Shop **ACCEPT** stays. Do not open a Solenne pass.
 
 ---
 
-## Open — Steam-demo cut
+## Shipped — Steam-demo cut AAAA
 
-**Open.** Law: [35](../35-steam-demo-cut.md). Stamp card: [STAMP](../STAMP.md) (2026-10-23). Tip **`4d9fa19`** / shell **`c8a5a1a`** is not demo-ready. Docs only. No gens in this PR. Ulquiorra holds the Client until Jonathan stamps.
+**Closed.** Law: [35](../35-steam-demo-cut.md). Jonathan **AAAA**: Current **A**, tag source **B**, vignettes **A**, copy **A**. Docs #79, chips #80, outlook ×28 #81, Client #82 (`2c338ed`). Do not reopen the four letters. Mat shelf faces were outside that stamp. They are the open card below. `look_armor_*` stays the outlook socket.
 
-M2 is the ship bar. Placeholder art is legal where a file is missing. These are production-ready: graph click (FORK OPTIONS is not the player path), title screen (`run/main_scene` leaves `schedule_board.tscn`), one 2-piece craft session and **one** fight, outlook sockets from the two stamped armor folders, planner chips as icons, demo-facing Brief / Estimate.
+---
 
-Design recommends **accept** on the outlook path, the graph, the title, and one fight. Letters: Current **A**, vignettes **A** (keep Gate A; two vignettes are not two fights), copy **A**. Tag-icon source is **A or B**. The chips are not asset-ready. If Jonathan names no files, **B**.
+## Open — Craft hand cards
+
+**Open.** Law: [36](../36-craft-hand-cards.md). Stamp card: [STAMP](../STAMP.md) (2026-10-23). Tip **`2c338ed`**. Docs only. No gens. No png copy. Ulquiorra holds the motion Client until Jonathan writes the five letters.
+
+The lower band on the tip is five text panels. The drag preview is a label. This card is the fan, the pickup / follow / settle / snap-back, the zone well, and the 38-row `mat_*` export. Live-catalog gap is **0**. Nine other-owner ids stay uncovered and are not a gen in this PR.
+
+Design recommends **Hand A. Drag A. Drop A. Path A. Placeholder A.** Silence is not a letter. Placeholder **A** lets the motion ship on `chip` wells; the asset lane closes on the Art PR that lands the 38 files.
 
 ---
 
@@ -162,7 +168,7 @@ Design recommends **accept** on the outlook path, the graph, the title, and one 
 - Elite N5 is shipped — do not list it here. Slice 4 docs #69 / Client #70 are on the tip — do not list playback as open. Posture art stays **Nov 2** (PixelLab reset **2026-11-02**). PR #71: Solenne ×4 art **HOLD** until that reset; Halden + Vex **KEEP**; shop **ACCEPT**. Do not open a Solenne pass
 - M2 four-job **Client** wire **landed** (#75, `873e7b2`). Not a Later bullet. Portrait redraws landed (#64 / #65). Do not regen. Do not revive #62
 - UI shell v1 **shipped** (#76 / #77, stamp **A A B**). Not a Later bullet. The shell letters are not an open card
-- Market restyle, route-board restyle, Dex / newspaper / HUD chrome, and posture gens stay Later. Planner **icon** chips are in the open cut ([35](../35-steam-demo-cut.md)). They are not asset-ready. Text interim is not the demo law
+- Market restyle, route-board restyle, Dex / newspaper / HUD chrome, and posture gens stay Later. Planner icon chips and outlook ×28 **landed** (#80 / #81 / #82). Do not regen them. Craft-hand `mat_*` faces are the open card ([36](../36-craft-hand-cards.md))
 - Stat / event tuning is **shipped** (#72 / #73, accept **A A A A**, [33](../33-until-m2-tuning.md)), not a Later bullet
 - Unlockable player-owners, encyclopedia, scars, named-unique art, full outlook matrix
 - Full game ship (beyond Steam demo)

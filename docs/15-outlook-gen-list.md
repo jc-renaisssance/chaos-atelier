@@ -45,7 +45,7 @@ These monostack syn lines keep power rows in [14](14-synergies.md) but **armor o
 
 Cross-tag outlooks (Temper, Greenmail, Snaretooth, Masked Crown, Dawn Vestment, Pale Hex): **power + single chrome** — art is the 2026-10-02 pack. No 3/5/8 unlock keys ([14](14-synergies.md) Cross-tag review).
 
-**Wire (open, 2026-10-23).** Craft Current / Potential loads these bytes. Path table, the mid-file cross slot, and the `mat_*.png` exclusion are [35](35-steam-demo-cut.md). This list does not add a gen. Do not regen the two packs.
+**Wire (landed, 2026-10-23).** Craft Current / Potential loads these bytes (#81 copies, #82 Client). Path table and the mid-file cross slot are [35](35-steam-demo-cut.md). `mat_*.png` is still not an outlook source. Hand and shelf faces are [36](36-craft-hand-cards.md). This list does not add a gen. Do not regen the two packs.
 
 ## Phase-1C batch — **armor stamped 2026-09-29** (complete)
 
