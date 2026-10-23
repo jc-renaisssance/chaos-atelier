@@ -280,9 +280,17 @@ def check_harness_and_flow(blob: str) -> None:
         fail("boss sim must use the boss-client sew, not mid-chapter pieces")
     if "pick_boss_client(chapter_seed)" not in session:
         fail("boss beat must call pick_boss_client(seed) without chapter_boss_id")
+    if "pick_boss_client_m2(chapter_seed)" not in session:
+        fail("Steam-demo boss beat must call pick_boss_client_m2(seed) without chapter_boss_id")
     catalog = (SRC / "data" / "catalog" / "boss_client_catalog.gd").read_text(encoding="utf-8")
     if "AdventurerCatalog.M1_JOB_POOL" not in catalog:
         fail("M1 pick_boss_client must draw from the 4-job pool, not the 8-job SHARED list")
+    if "func pick_boss_client_m2(seed: int)" not in catalog:
+        fail("pick_boss_client_m2(seed) missing")
+    if "AdventurerCatalog.M2_JOB_POOL" not in catalog:
+        fail("M2 pick_boss_client_m2 must draw from M2_JOB_POOL, not the 8-job SHARED list")
+    if "boss_roster_errors" not in dump_src:
+        fail("assert 23 must split boss missions by M1 vs M2 pool")
     if "SHARED_BOSS_CLIENT_POOL[rng.randi_range" in catalog:
         fail("M1 draw still indexes the 8-job SHARED_BOSS_CLIENT_POOL")
     if "BossClientCatalog.make_order" not in session:

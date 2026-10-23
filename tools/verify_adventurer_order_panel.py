@@ -24,7 +24,8 @@ M1_JOB_POOL = [
     "job_lagoon",
 ]
 
-M2_JOBS = ["job_wizard", "job_hexer", "job_outrider", "job_oathbound"]
+M2_JOB_POOL = ["job_wizard", "job_hexer", "job_outrider", "job_oathbound"]
+M2_JOBS = M2_JOB_POOL
 
 ALIASES = {
     "adv_knight": "adv_halden_rook",
@@ -136,6 +137,143 @@ PEOPLE = {
         "requirement_taste": "Frost mid",
         "stats": {"HP": 12, "ATK": 3, "DEF": 4, "RES": 6, "MOB": 5, "PRE": 3},
         "construction_ids": ["con_cloak", "con_boots"],
+    },
+}
+
+M2_ALIASES = {
+    "adv_wizard": "adv_vesper_cant",
+    "adv_hexer": "adv_soot_cord",
+    "adv_outrider": "adv_harrow_gale",
+    "adv_oathbound": "adv_aurel_vow",
+}
+
+M2_PEOPLE_BY_JOB = {
+    "job_wizard": ["adv_vesper_cant", "adv_nyx_vellum", "adv_orin_goldink"],
+    "job_hexer": ["adv_soot_cord", "adv_tar_veil", "adv_ashen_cowl"],
+    "job_outrider": ["adv_harrow_gale", "adv_flint_rime", "adv_lark_mute"],
+    "job_oathbound": ["adv_aurel_vow", "adv_clarion_mantle", "adv_pell_white"],
+}
+
+M2_PEOPLE = {
+    "adv_vesper_cant": {
+        "display": "Vesper Cant",
+        "job_id": "job_wizard",
+        "skill_id": "ask_void_seam",
+        "requirement_taste": "Occult mid",
+        "requirement_tags": ["Occult"],
+        "target_threat_id": "boss_pale_choir",
+        "stats": {"HP": 9, "ATK": 3, "DEF": 2, "RES": 7, "MOB": 3, "PRE": 5},
+        "construction_ids": ["con_robe", "con_mantle"],
+    },
+    "adv_nyx_vellum": {
+        "display": "Nyx Vellum",
+        "job_id": "job_wizard",
+        "skill_id": "ask_two_ink",
+        "requirement_taste": "Lunar + Occult (Pale Hex)",
+        "requirement_tags": ["Lunar", "Occult"],
+        "target_threat_id": "boss_mire_bride",
+        "stats": {"HP": 8, "ATK": 5, "DEF": 2, "RES": 6, "MOB": 4, "PRE": 4},
+        "construction_ids": ["con_robe", "con_mantle"],
+    },
+    "adv_orin_goldink": {
+        "display": "Orin Gold-Ink",
+        "job_id": "job_wizard",
+        "skill_id": "ask_court_ink",
+        "requirement_taste": "Royal mid",
+        "requirement_tags": ["Royal"],
+        "target_threat_id": "boss_gilded_warden",
+        "stats": {"HP": 11, "ATK": 3, "DEF": 3, "RES": 5, "MOB": 2, "PRE": 7},
+        "construction_ids": ["con_robe", "con_mantle"],
+    },
+    "adv_soot_cord": {
+        "display": "Soot Cord",
+        "job_id": "job_hexer",
+        "skill_id": "ask_cord_hex",
+        "requirement_taste": "Occult mid",
+        "requirement_tags": ["Occult"],
+        "target_threat_id": "boss_mire_bride",
+        "stats": {"HP": 10, "ATK": 4, "DEF": 3, "RES": 6, "MOB": 4, "PRE": 2},
+        "construction_ids": ["con_wraps", "con_hood"],
+    },
+    "adv_tar_veil": {
+        "display": "Tar Veil",
+        "job_id": "job_hexer",
+        "skill_id": "ask_peat_knot",
+        "requirement_taste": "Occult + Sticky",
+        "requirement_tags": ["Occult", "Sticky"],
+        "target_threat_id": "boss_bog_king",
+        "stats": {"HP": 9, "ATK": 5, "DEF": 3, "RES": 5, "MOB": 3, "PRE": 2},
+        "construction_ids": ["con_wraps", "con_hood"],
+    },
+    "adv_ashen_cowl": {
+        "display": "Ashen Cowl",
+        "job_id": "job_hexer",
+        "skill_id": "ask_unbucketed",
+        "requirement_taste": "Silent mid",
+        "requirement_tags": ["Silent"],
+        "target_threat_id": "boss_ivory_judge",
+        "stats": {"HP": 9, "ATK": 3, "DEF": 2, "RES": 4, "MOB": 8, "PRE": 3},
+        "construction_ids": ["con_wraps", "con_hood"],
+    },
+    "adv_harrow_gale": {
+        "display": "Harrow Gale",
+        "job_id": "job_outrider",
+        "skill_id": "ask_road_static",
+        "requirement_taste": "Storm mid",
+        "requirement_tags": ["Storm"],
+        "target_threat_id": "boss_bog_king",
+        "stats": {"HP": 12, "ATK": 5, "DEF": 3, "RES": 4, "MOB": 7, "PRE": 3},
+        "construction_ids": ["con_coat", "con_boots"],
+    },
+    "adv_flint_rime": {
+        "display": "Flint Rime",
+        "job_id": "job_outrider",
+        "skill_id": "ask_mile_temper",
+        "requirement_taste": "Fire + Frost (Temper)",
+        "requirement_tags": ["Fire", "Frost"],
+        "target_threat_id": "boss_sunspear_captain",
+        "stats": {"HP": 11, "ATK": 6, "DEF": 3, "RES": 5, "MOB": 6, "PRE": 2},
+        "construction_ids": ["con_coat", "con_boots"],
+    },
+    "adv_lark_mute": {
+        "display": "Lark Mute",
+        "job_id": "job_outrider",
+        "skill_id": "ask_coat_hush",
+        "requirement_taste": "Silent mid",
+        "requirement_tags": ["Silent"],
+        "target_threat_id": "boss_ivory_judge",
+        "stats": {"HP": 10, "ATK": 4, "DEF": 4, "RES": 3, "MOB": 7, "PRE": 4},
+        "construction_ids": ["con_coat", "con_boots"],
+    },
+    "adv_aurel_vow": {
+        "display": "Aurel Vow",
+        "job_id": "job_oathbound",
+        "skill_id": "ask_noon_oath",
+        "requirement_taste": "Solar mid",
+        "requirement_tags": ["Solar"],
+        "target_threat_id": "boss_sunspear_captain",
+        "stats": {"HP": 15, "ATK": 3, "DEF": 6, "RES": 4, "MOB": 2, "PRE": 6},
+        "construction_ids": ["con_armor", "con_mantle"],
+    },
+    "adv_clarion_mantle": {
+        "display": "Clarion Mantle",
+        "job_id": "job_oathbound",
+        "skill_id": "ask_dawn_line",
+        "requirement_taste": "Solar + Pure (Dawn Vestment)",
+        "requirement_tags": ["Solar", "Pure"],
+        "target_threat_id": "boss_gilded_warden",
+        "stats": {"HP": 13, "ATK": 3, "DEF": 5, "RES": 5, "MOB": 2, "PRE": 7},
+        "construction_ids": ["con_armor", "con_mantle"],
+    },
+    "adv_pell_white": {
+        "display": "Pell White",
+        "job_id": "job_oathbound",
+        "skill_id": "ask_clean_vow",
+        "requirement_taste": "Pure mid",
+        "requirement_tags": ["Pure"],
+        "target_threat_id": "boss_sunspear_captain",
+        "stats": {"HP": 12, "ATK": 2, "DEF": 5, "RES": 6, "MOB": 2, "PRE": 6},
+        "construction_ids": ["con_armor", "con_mantle"],
     },
 }
 
@@ -263,9 +401,12 @@ def check_draw_and_jobs() -> None:
         fail("pick_boss_client must not take chapter_boss_id")
     if "SHARED_BOSS_CLIENT_POOL[rng.randi_range" in boss:
         fail("M1 draw must not use the 8-job SHARED_BOSS_CLIENT_POOL")
-    for m2 in ("adv_wizard", "adv_hexer", "adv_outrider", "adv_oathbound"):
-        if m2 in catalog_text():
-            fail(f"M1 catalog must not name {m2}")
+    if "func pick_boss_client_m2(seed: int)" not in boss:
+        fail("pick_boss_client_m2(seed) missing — M2 draw is seed only")
+    if "AdventurerCatalog.M2_JOB_POOL" not in boss:
+        fail("pick_boss_client_m2 must draw from AdventurerCatalog.M2_JOB_POOL")
+    if re.search(r"func pick_boss_client_m2\([^)]*chapter_boss", boss):
+        fail("pick_boss_client_m2 must not take chapter_boss_id")
     if "client_matches_job" not in boss:
         fail("job match must accept named adv_* / aliases, not only job stubs")
     if "make_walk_in_order" not in boss:
@@ -285,6 +426,18 @@ PORTRAIT_IDS = [
     "adv_tide_glass",
     "adv_brine_latch",
     "adv_rime_peddler",
+    "adv_vesper_cant",
+    "adv_nyx_vellum",
+    "adv_orin_goldink",
+    "adv_soot_cord",
+    "adv_tar_veil",
+    "adv_ashen_cowl",
+    "adv_harrow_gale",
+    "adv_flint_rime",
+    "adv_lark_mute",
+    "adv_aurel_vow",
+    "adv_clarion_mantle",
+    "adv_pell_white",
 ]
 
 
@@ -320,7 +473,16 @@ def check_portraits() -> None:
     brief = _fn_body(table, "_refresh_brief_and_estimate")
     if "TextureRect" in brief or "assets/adv/" in brief:
         fail("guild-quest brief stays text — no adventurer bust on the enemy brief")
-    for stub in ("adv_knight", "adv_mage", "adv_blade_dancer", "adv_lagoon"):
+    for stub in (
+        "adv_knight",
+        "adv_mage",
+        "adv_blade_dancer",
+        "adv_lagoon",
+        "adv_wizard",
+        "adv_hexer",
+        "adv_outrider",
+        "adv_oathbound",
+    ):
         if f"res://assets/adv/{stub}.png" in table:
             fail(f"job stub {stub} must not grow its own portrait file")
     if "appt_" in _fn_body(table, "_portrait_socket") or "assets/adv/appt_" in table:
@@ -371,6 +533,10 @@ def check_panel_and_dump() -> None:
         fail("stamp must fill adventurer log keys")
     if "pick_boss_client(chapter_seed)" not in session:
         fail("boss beat must still call pick_boss_client(seed)")
+    if "pick_boss_client_m2(chapter_seed)" not in session:
+        fail("Steam-demo boss beat must call pick_boss_client_m2(seed)")
+    if "live_content_is_m2" not in session:
+        fail("boss beat must branch on live_content_is_m2")
     schedule = (SRC / "data" / "chapter" / "schedule_catalog.gd").read_text(encoding="utf-8")
     if "make_walk_in_order" not in schedule:
         fail("walk-in should resolve through named M1 people")
@@ -406,6 +572,97 @@ def check_godot_47() -> None:
             if line.startswith("    ") and not line.startswith("\t"):
                 fail(f"space indent {path.relative_to(ROOT)}:{i}")
                 break
+
+
+def _const_list(text: str, name: str) -> list[str]:
+    match = re.search(rf"{name}\s*:=\s*(\[[^\]]*\])", text, re.S)
+    if not match:
+        return []
+    return ast.literal_eval(re.sub(r"\s+", " ", match.group(1)))
+
+
+def check_m2_catalog() -> None:
+    """M2 roster + disjoint pools. Assert 23 M2 branch rejects the M1 four."""
+    text = catalog_text()
+    m2 = _const_list(text, "M2_JOB_POOL")
+    steam = _const_list(text, "STEAM_DEMO_JOB_POOL")
+    if m2 != M2_JOB_POOL:
+        fail(f"M2_JOB_POOL expected {M2_JOB_POOL}, got {m2}")
+    if steam != M2_JOB_POOL:
+        fail(f"STEAM_DEMO_JOB_POOL must alias M2_JOB_POOL, got {steam}")
+    if set(m2) & set(M1_JOB_POOL):
+        fail("M1_JOB_POOL and M2_JOB_POOL must stay disjoint")
+    live = text.split("func live_content_is_m2", 1)[-1].split("static func", 1)[0]
+    if "return true" not in live:
+        fail("live Steam-demo content must select the M2 pool")
+    aliases_blob = text.split("const JOB_DEFAULT_ALIASES")[1].split("const PEOPLE_BY_JOB")[0]
+    for alias, named in M2_ALIASES.items():
+        if f'"{alias}": "{named}"' not in aliases_blob:
+            fail(f"missing M2 alias {alias} → {named}")
+    if len(M2_PEOPLE) != 12:
+        fail("M2 roster must be 12 named adv_*")
+    for adv_id, row in M2_PEOPLE.items():
+        if adv_id in PEOPLE:
+            fail(f"{adv_id} must not also be an M1 person")
+        block = _block_for(text, adv_id)
+        if not block:
+            fail(f"could not parse M2 person {adv_id}")
+            continue
+        display = re.search(r'"display":\s*"([^"]+)"', block)
+        if display is None or display.group(1) != row["display"]:
+            fail(f"{adv_id} display expected {row['display']}")
+        job = re.search(r'"job_id":\s*"([^"]+)"', block)
+        if job is None or job.group(1) != row["job_id"]:
+            fail(f"{adv_id} job_id expected {row['job_id']}")
+        if row["job_id"] in M1_JOB_POOL:
+            fail(f"{adv_id} job is in M1_JOB_POOL")
+        skill = re.search(r'"skill_id":\s*"([^"]+)"', block)
+        if skill is None or skill.group(1) != row["skill_id"] or not row["skill_id"].startswith("ask_"):
+            fail(f"{adv_id} skill_id expected {row['skill_id']}")
+        taste = re.search(r'"requirement_taste":\s*"([^"]+)"', block)
+        if taste is None or taste.group(1) != row["requirement_taste"]:
+            fail(f"{adv_id} requirement_taste expected {row['requirement_taste']}")
+        tags = _list_literal(block, "requirement_tags")
+        if tags != row["requirement_tags"]:
+            fail(f"{adv_id} requirement_tags expected {row['requirement_tags']}, got {tags}")
+        threat = re.search(r'"target_threat_id":\s*"([^"]+)"', block)
+        if threat is None or threat.group(1) != row["target_threat_id"]:
+            fail(f"{adv_id} target_threat_id expected {row['target_threat_id']}")
+        stats = _stats_literal(block)
+        if stats != row["stats"]:
+            fail(f"{adv_id} stats expected {row['stats']}, got {stats}")
+    stamp = (SRC / "data" / "stamp" / "harness_stamp.gd").read_text(encoding="utf-8")
+    if "boss_roster_errors" not in stamp:
+        fail("assert 23 must call boss_roster_errors for the active pool")
+    schema = stamp.split("func schema_errors", 1)[-1]
+    if "boss_roster_errors" not in schema:
+        fail("mission_kind=boss schema must apply the M1/M2 roster split")
+    to_dict = stamp.split("func to_dict", 1)[-1].split("\nfunc ", 1)[0]
+    if '"adventurer_pool_id"' in to_dict:
+        fail("adventurer_pool_id is schema context, not a docs/20 dump key")
+
+
+def _pool_of(job_id: str) -> str:
+    if job_id in M1_JOB_POOL:
+        return "m1"
+    if job_id in M2_JOB_POOL:
+        return "m2"
+    return ""
+
+
+def _roster_errors(client_id: str, job_id: str, pool_id: str) -> list[str]:
+    errs: list[str] = []
+    if pool_id not in {"m1", "m2"}:
+        return ["boss draw pool must be m1 or m2"]
+    if _pool_of(job_id) != pool_id:
+        errs.append(f"boss_job_id is outside the active {pool_id} job pool")
+    named = client_id
+    if named not in PEOPLE and named not in M2_PEOPLE:
+        named = {**ALIASES, **M2_ALIASES}.get(client_id, "")
+    person = PEOPLE.get(named) or M2_PEOPLE.get(named)
+    if person is None or _pool_of(person["job_id"]) != pool_id:
+        errs.append(f"boss_client_id is outside the active {pool_id} named roster")
+    return errs
 
 
 def run_spec() -> None:
@@ -466,10 +723,48 @@ def run_spec() -> None:
         fail("named dump skill mismatch")
     if named_dump["adventurer_stats"] != PEOPLE["adv_halden_rook"]["stats"]:
         fail("named dump stats mismatch")
+    ## Assert 23 M2 branch: the 12 M2 people and their aliases pass; the M1 four fail.
+    for alias, named in M2_ALIASES.items():
+        person = M2_PEOPLE[named]
+        if _roster_errors(alias, person["job_id"], "m2"):
+            fail(f"M2 alias {alias} must pass the M2 roster assert")
+        if _roster_errors(named, person["job_id"], "m2"):
+            fail(f"M2 person {named} must pass the M2 roster assert")
+        if not _roster_errors(named, person["job_id"], "m1"):
+            fail(f"M2 person {named} must fail an M1 smoke")
+        if person["construction_ids"] != M2_PEOPLE[M2_PEOPLE_BY_JOB[person["job_id"]][0]]["construction_ids"] and person[
+            "job_id"
+        ] not in M2_PEOPLE_BY_JOB:
+            fail(f"{named} constructions left the job list")
+    for job_id, ids in M2_PEOPLE_BY_JOB.items():
+        cons = M2_PEOPLE[ids[0]]["construction_ids"]
+        for adv_id in ids:
+            if M2_PEOPLE[adv_id]["construction_ids"] != cons:
+                fail(f"{adv_id} construction_ids must stay the job list")
+            if M2_PEOPLE[adv_id]["job_id"] != job_id:
+                fail(f"{adv_id} is not in {job_id}")
+    for m1_id, row in PEOPLE.items():
+        if not _roster_errors(m1_id, row["job_id"], "m2"):
+            fail(f"M1 person {m1_id} must fail an M2 smoke")
+        if _roster_errors(m1_id, row["job_id"], "m1"):
+            fail(f"M1 person {m1_id} must still pass an M1 smoke")
+    if not _roster_errors("appt_scrap_duelist", "job_wizard", "m2"):
+        fail("boss_client_id must never be appt_* on the M2 assert")
+    m2_draw_jobs = set()
+    for seed in range(1, 80):
+        rng = random.Random(seed)
+        job = rng.choice(M2_JOB_POOL)
+        person = rng.choice(M2_PEOPLE_BY_JOB[job])
+        if job in M1_JOB_POOL or person in PEOPLE:
+            fail("M2 draw leaked an M1 job or person")
+        m2_draw_jobs.add(job)
+    if len(m2_draw_jobs) < 2:
+        fail("M2 4-job pool should draw more than one job across seeds")
 
 
 def main() -> int:
     check_catalog()
+    check_m2_catalog()
     check_draw_and_jobs()
     check_portraits()
     check_panel_and_dump()

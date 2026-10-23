@@ -42,6 +42,20 @@ PEOPLE = [
     "adv_brine_latch",
     "adv_rime_peddler",
 ]
+M2_PEOPLE = [
+    "adv_vesper_cant",
+    "adv_nyx_vellum",
+    "adv_orin_goldink",
+    "adv_soot_cord",
+    "adv_tar_veil",
+    "adv_ashen_cowl",
+    "adv_harrow_gale",
+    "adv_flint_rime",
+    "adv_lark_mute",
+    "adv_aurel_vow",
+    "adv_clarion_mantle",
+    "adv_pell_white",
+]
 MONOSTACK = [
     "Fire",
     "Frost",
@@ -351,6 +365,13 @@ def check_dex_art(dex: str) -> None:
         rel = f"res://assets/adv/{adv_id}.png"
         if rel not in dex:
             fail(f"met adventurer row must reuse {rel}")
+    for adv_id in M2_PEOPLE:
+        rel = f"res://assets/adv/{adv_id}.png"
+        if rel not in dex:
+            fail(f"M2 adventurer row must reuse {rel}")
+        path = ROOT / "assets" / "adv" / f"{adv_id}.png"
+        if not path.is_file():
+            fail(f"missing {path.relative_to(ROOT)}")
     enemy_icon = dex.split("func _enemy_icon(", 1)[-1].split("\nfunc ", 1)[0]
     before_boss = enemy_icon.split("BOSS_ICONS.get", 1)[0]
     if "not seen and not fought" not in before_boss or "return null" not in before_boss:

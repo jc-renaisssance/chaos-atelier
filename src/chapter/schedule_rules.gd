@@ -279,6 +279,18 @@ static func build_boss_announce(board: ChapterSchedule) -> Dictionary:
 	}
 
 
+static func _awaiting_boss_pool_line() -> String:
+	if AdventurerCatalog.live_content_is_m2():
+		return "Draw one named adventurer from the M2 4-job pool (docs/29), independent of the announced boss. "
+	return "Draw one named adventurer from the M1 4-job pool (docs/29), independent of the announced boss. "
+
+
+static func _boss_draw_label(job_id: String) -> String:
+	if AdventurerCatalog.pool_id_for_job(job_id) == "m2":
+		return "M2 named draw (docs/29)"
+	return "M1 named draw (docs/29)"
+
+
 static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 	var title := ScheduleCatalog.boss_title(board.chapter_boss_id) if board != null else "Boss"
 	return {
@@ -288,7 +300,7 @@ static func build_awaiting_boss(board: ChapterSchedule) -> Dictionary:
 		"title": "Final prep — sew for a fighter vs %s" % title,
 		"body": (
 			"Day budget resolved (including reserved last-2). Appointments never claimed reserved days. "
-			+ "Draw one named adventurer from the M1 4-job pool (docs/29), independent of the announced boss. "
+			+ _awaiting_boss_pool_line()
 			+ "Sew that job's listed constructions. That adventurer fights %s. "
 			% title
 			+ "Player is the clothier. Fail (adventurer dead / hard loss) = run_over, no retry (docs/24)."
@@ -318,8 +330,8 @@ static func build_boss_client_draw(board: ChapterSchedule, job: Dictionary) -> D
 		"mission_kind": "boss",
 		"title": "Boss-client — %s · %s vs %s" % [who, job_display, boss_title],
 		"body": (
-			"M1 named draw (docs/29): %s / %s / %s / %s. "
-			% [who, job_id, adv_id, String(job.get("order_id", ""))]
+			"%s: %s / %s / %s / %s. "
+			% [_boss_draw_label(job_id), who, job_id, adv_id, String(job.get("order_id", ""))]
 			+ "Order constructions: %s. Taste: %s. "
 			% [", ".join(PackedStringArray(cons)), taste]
 			+ "Independent of chapter_boss_id=%s. Enter stamina craft (N=2, 12×2)."

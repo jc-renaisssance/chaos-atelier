@@ -37,6 +37,18 @@ const PORTRAITS := {
 	"adv_tide_glass": preload("res://assets/adv/adv_tide_glass.png"),
 	"adv_brine_latch": preload("res://assets/adv/adv_brine_latch.png"),
 	"adv_rime_peddler": preload("res://assets/adv/adv_rime_peddler.png"),
+	"adv_vesper_cant": preload("res://assets/adv/adv_vesper_cant.png"),
+	"adv_nyx_vellum": preload("res://assets/adv/adv_nyx_vellum.png"),
+	"adv_orin_goldink": preload("res://assets/adv/adv_orin_goldink.png"),
+	"adv_soot_cord": preload("res://assets/adv/adv_soot_cord.png"),
+	"adv_tar_veil": preload("res://assets/adv/adv_tar_veil.png"),
+	"adv_ashen_cowl": preload("res://assets/adv/adv_ashen_cowl.png"),
+	"adv_harrow_gale": preload("res://assets/adv/adv_harrow_gale.png"),
+	"adv_flint_rime": preload("res://assets/adv/adv_flint_rime.png"),
+	"adv_lark_mute": preload("res://assets/adv/adv_lark_mute.png"),
+	"adv_aurel_vow": preload("res://assets/adv/adv_aurel_vow.png"),
+	"adv_clarion_mantle": preload("res://assets/adv/adv_clarion_mantle.png"),
+	"adv_pell_white": preload("res://assets/adv/adv_pell_white.png"),
 }
 ## Enemy stamp A. Shown only when the row is already seen or fought.
 const BOSS_ICONS := {
@@ -252,7 +264,7 @@ func _craft_lines() -> PackedStringArray:
 
 
 func _adventurer_lines() -> PackedStringArray:
-	## Fresh = 12 unknown slots, no names. Never spoiler unmet people. No appt_* / Scrap Duelist.
+	## Fresh = the active pool's 12 unknown slots. Never spoiler unmet people. No appt_* / Scrap Duelist.
 	var lines: PackedStringArray = PackedStringArray()
 	var ids := AdventurerCatalog.all_named_ids()
 	for raw in ids:
