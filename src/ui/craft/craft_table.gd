@@ -1,7 +1,9 @@
 class_name CraftTable
 extends Control
 ## Dedicated stamina craft screen (docs/27, docs/34). Not the route-graph board.
-## Shell v1: palette A, bust A, text-only planner chips. Theme and titles only.
+## Shell v1: palette A, bust A. Planner chips are the 16 stamped icons.
+## Current and Potential take the same outlook png when that slot is unlocked
+## and res://assets/outlook/ has the file. A missing file hides the picture.
 ## Regions stay: UPPER LEFT adventurer order detail, UPPER RIGHT zones, LOWER hand.
 ## CURRENT and POTENTIAL read the selected zone. They are not on the order column.
 ## Construction comes from the order, not a hand card.
@@ -54,7 +56,9 @@ var _estimate_body: Label
 var _stam_label: Label
 var _stam_bar: ProgressBar
 var _current_body: Label
+var _current_art: TextureRect
 var _potential_body: Label
+var _potential_art: TextureRect
 var _zones: Array[CraftZone] = []
 var _hand: HBoxContainer
 var _stock: Label
@@ -178,9 +182,20 @@ func _build() -> void:
 	for tag in PlannerCatalog.MONOSTACK_TAGS:
 		var chip := Button.new()
 		var tag_name := String(tag)
-		chip.text = tag_name
-		## Text-only interim. No TextureRect icon socket. Icon chips are Later.
+		chip.text = ""
+		chip.custom_minimum_size = Vector2(PlannerChipArt.PX + 8, PlannerChipArt.PX + 8)
+		chip.clip_contents = false
 		ShellTheme.paint_button(chip, false)
+		var icon := TextureRect.new()
+		icon.name = "Icon"
+		icon.custom_minimum_size = Vector2(PlannerChipArt.PX, PlannerChipArt.PX)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.texture = PlannerChipArt.texture_for(tag_name)
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		chip.add_child(icon)
 		chip.pressed.connect(_on_planner_tag.bind(tag_name))
 		chip_row.add_child(chip)
 		_tag_chips[tag_name] = chip
@@ -228,6 +243,8 @@ func _build() -> void:
 	current_box.add_theme_constant_override("separation", 4)
 	current_panel.add_child(current_box)
 	current_box.add_child(_section("Current"))
+	_current_art = _outlook_socket()
+	current_box.add_child(_current_art)
 	_current_body = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_current_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	current_box.add_child(_current_body)
@@ -238,6 +255,8 @@ func _build() -> void:
 	potential_box.add_theme_constant_override("separation", 4)
 	potential_panel.add_child(potential_box)
 	potential_box.add_child(_section("Potential"))
+	_potential_art = _outlook_socket()
+	potential_box.add_child(_potential_art)
 	_potential_body = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_potential_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	potential_box.add_child(_potential_body)
@@ -389,6 +408,10 @@ func _refresh() -> void:
 		_planner_list.text = "?"
 		_brief_body.text = ""
 		_estimate_body.text = ""
+		if _current_art != null:
+			_current_art.visible = false
+		if _potential_art != null:
+			_potential_art.visible = false
 		_stam_label.text = "Stamina  — / —"
 		_stam_bar.max_value = GameConstants.STAMINA_START
 		_stam_bar.value = 0
@@ -399,7 +422,7 @@ func _refresh() -> void:
 		_clear_hand()
 		for zone in _zones:
 			zone.visible = false
-		_refresh_planner_chips(null)
+		_paint_tag_chips(null)
 		return
 	_bind_order_portrait(AdventurerCatalog.order_adventurer_id(order))
 	_fill_order(session, order)
@@ -511,6 +534,31 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 			slot.bind_empty(i)
 
 
+func _outlook_socket() -> TextureRect:
+	var icon := TextureRect.new()
+	icon.custom_minimum_size = Vector2(OutlookArt.PX, OutlookArt.PX)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.visible = false
+	return icon
+
+
+func _bind_outlook_art(preview: Dictionary, unlocked: PackedStringArray) -> void:
+	## Same file on Current and Potential when unlocked. Hide both when locked
+	## or when assets/outlook/ does not have that slot yet.
+	var tex: Texture2D = null
+	if CraftReadout.potential_unlocked(preview, unlocked):
+		tex = OutlookArt.texture_for(CraftReadout.outlook_id_of(preview))
+	if _current_art != null:
+		_current_art.texture = tex
+		_current_art.visible = tex != null
+	if _potential_art != null:
+		_potential_art.texture = tex
+		_potential_art.visible = tex != null
+
+
 func _refresh_readout(session: CraftStaminaSession) -> void:
 	var preview := CraftReadout.preview(session, session.selected_zone_index)
 	_current_body.text = CraftReadout.current_line(preview)
@@ -518,6 +566,7 @@ func _refresh_readout(session: CraftStaminaSession) -> void:
 	var open := CraftReadout.potential_unlocked(preview, unlocked)
 	_potential_body.text = CraftReadout.potential_label(preview, unlocked)
 	_potential_body.add_theme_color_override("font_color", ShellTheme.INK if open else ShellTheme.MUTED)
+	_bind_outlook_art(preview, unlocked)
 
 
 func _on_piece(_result: Dictionary) -> void:
@@ -528,77 +577,54 @@ func _on_planner_tag(tag: String) -> void:
 	AtelierSession.click_planner_tag(tag)
 
 
-func _refresh_planner_chips(planned: Variant) -> void:
+func _paint_tag_chips(planned: Variant) -> void:
 	for tag in _tag_chips.keys():
 		var chip: Button = _tag_chips[tag]
-		chip.text = PlannerCatalog.chip_caption(String(tag), planned)
+		chip.text = ""
+		var mark := PlannerCatalog.chip_mark(String(tag), planned)
+		ShellTheme.paint_button(chip, mark != "")
+		var icon := chip.get_node_or_null("Icon") as TextureRect
+		if icon == null:
+			continue
+		match mark:
+			"mid":
+				icon.modulate = Color(1.12, 1.06, 0.86)
+			"apex":
+				icon.modulate = Color(1.28, 1.16, 0.72)
+			"cross":
+				icon.modulate = Color(1.08, 0.92, 1.12)
+			_:
+				icon.modulate = Color(1, 1, 1)
 
 
 func _refresh_planner() -> void:
 	var planned: Variant = AtelierSession.planned_build
-	_refresh_planner_chips(planned)
-	var lines := PlannerCatalog.list_lines(AtelierSession.profile.unlocked_builds)
-	if lines.size() == 1 and lines[0] == "?":
-		_planner_list.text = "?"
-	else:
-		_planner_list.text = "  |  ".join(lines)
-
-
-func _gate_text(value: Variant) -> String:
-	if value == null:
-		return EstimateLaw.LOCKED
-	if value is String:
-		return String(value)
-	if value is bool:
-		return "fires" if bool(value) else "does not"
-	if value is Array:
-		var bits: PackedStringArray = PackedStringArray()
-		for item in value:
-			bits.append(str(item))
-		if bits.is_empty():
-			return "(none)"
-		return ", ".join(bits)
-	return str(value)
+	_paint_tag_chips(planned)
+	var plan_line := "?"
+	var row: Variant = PlannerCatalog.dup_plan(planned)
+	if row is Dictionary:
+		var item: Dictionary = row
+		if AtelierSession.profile.has_build(String(item.get("outlook_id", "")), String(item.get("tier", ""))):
+			plan_line = PlannerCatalog.plan_label(row)
+	_planner_list.text = plan_line
 
 
 func _refresh_brief_and_estimate(order: ClientOrder) -> void:
+	## Guild-quest brief. Three lines when the enemy is seen. Unseen body is ?.
 	var threat_id := AtelierSession.brief_threat_id(order)
 	if threat_id.is_empty():
-		_brief_body.text = "No guild-quest brief on this order (prep has no threat)."
-		_estimate_body.text = "Estimate waits on a brief + a planned chip."
+		_brief_body.text = "?"
+		_estimate_body.text = DemoFacing.locked_estimate()
 		return
 	var seen := AtelierSession.profile.enemy_seen(threat_id)
 	if not ThreatCatalog.is_boss(threat_id):
 		seen = true
 	var fought := AtelierSession.profile.enemy_fought(threat_id)
-	var name_line := ThreatCatalog.display_name(threat_id) if seen else EstimateLaw.LOCKED
-	var env := ThreatCatalog.environment(threat_id) if seen else EstimateLaw.LOCKED
-	if seen and env.is_empty():
-		env = "—"
-	var flavor := ThreatCatalog.flavor(threat_id) if seen else EstimateLaw.LOCKED
-	if seen and flavor.is_empty():
-		flavor = "—"
-	var favor_line := EstimateLaw.LOCKED
-	var punish_line := EstimateLaw.LOCKED
-	if fought:
-		favor_line = ", ".join(ThreatCatalog.favor_tags(threat_id))
-		punish_line = ", ".join(ThreatCatalog.punish_tags(threat_id))
-		if favor_line.is_empty():
-			favor_line = "(none)"
-		if punish_line.is_empty():
-			punish_line = "(none)"
-	_brief_body.text = (
-		"threat %s   ·   name %s   ·   env %s   ·   flavor %s   ·   favor %s   ·   punish %s   ·   seen %s   ·   fought %s"
-		% [
-			threat_id,
-			name_line,
-			env,
-			flavor,
-			favor_line,
-			punish_line,
-			"yes" if AtelierSession.profile.enemy_seen(threat_id) else "no",
-			"yes" if fought else "no",
-		]
+	_brief_body.text = DemoFacing.brief_text(
+		seen,
+		ThreatCatalog.display_name(threat_id),
+		ThreatCatalog.environment(threat_id),
+		ThreatCatalog.flavor(threat_id)
 	)
 	var adv_id := AdventurerCatalog.order_adventurer_id(order)
 	var raw := EstimateLaw.compute(
@@ -617,21 +643,11 @@ func _refresh_brief_and_estimate(order: ClientOrder) -> void:
 			String(row.get("tier", ""))
 		)
 	var gated := EstimateLaw.gated_dump(raw, AtelierSession.planned_build, build_unlocked, fought)
-	var skill_line := AdventurerCatalog.skill_panel_line(adv_id)
-	var skill_txt := _gate_text(gated.get("estimate_skill_fired", EstimateLaw.LOCKED))
-	if skill_txt != EstimateLaw.LOCKED and not skill_line.is_empty():
-		skill_txt = "%s  ·  %s" % [skill_txt, skill_line]
 	## Weight integers stay in EstimateLaw and the test log. They are not on this label.
-	_estimate_body.text = (
-		"planned %s   ·   favor hits %s   ·   punish hits %s   ·   skill %s   ·   neg %s   ·   band %s"
-		% [
-			_gate_text(gated.get("planned_outlook", EstimateLaw.LOCKED)),
-			_gate_text(gated.get("estimate_favor_hits", EstimateLaw.LOCKED)),
-			_gate_text(gated.get("estimate_punish_hits", EstimateLaw.LOCKED)),
-			skill_txt,
-			_gate_text(gated.get("estimate_neg_warnings", EstimateLaw.LOCKED)),
-			_gate_text(gated.get("estimate_band", EstimateLaw.LOCKED)),
-		]
+	_estimate_body.text = DemoFacing.estimate_text(
+		gated,
+		AdventurerCatalog.skill_name(adv_id),
+		AdventurerCatalog.skill_clause(adv_id)
 	)
 
 

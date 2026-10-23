@@ -156,6 +156,24 @@ static func chip_caption(tag: String, planned: Variant) -> String:
 	return tag
 
 
+## "" when this chip is outside the plan. "low" / "mid" / "apex" / "cross" otherwise.
+## Cross marks both tags. It is not a seventeenth chip.
+static func chip_mark(tag: String, planned: Variant) -> String:
+	var row: Variant = dup_plan(planned)
+	if not row is Dictionary:
+		return ""
+	var item: Dictionary = row
+	var outlook_id := String(item.get("outlook_id", ""))
+	var tier := String(item.get("tier", ""))
+	if tier == "cross":
+		if tag in tags_for_cross(outlook_id):
+			return "cross"
+		return ""
+	if outlook_id == outlook_for_tag(tag) and MONO_TIERS.has(tier):
+		return tier
+	return ""
+
+
 static func planned_tags(planned: Variant) -> Dictionary:
 	var bag := {}
 	var row: Variant = dup_plan(planned)

@@ -459,6 +459,16 @@ static func skill_id(adv_id: String) -> String:
 	return String(person.get("skill_id", ""))
 
 
+static func skill_name(adv_id: String) -> String:
+	var person := row_resolved(adv_id)
+	return String(person.get("skill_name", ""))
+
+
+static func skill_clause(adv_id: String) -> String:
+	var person := row_resolved(adv_id)
+	return String(person.get("skill_line", ""))
+
+
 static func skill_panel_line(adv_id: String) -> String:
 	var person := row_resolved(adv_id)
 	if person.is_empty():
