@@ -6,6 +6,12 @@
 
 Kept: travelling atelier. Craft = stamina ([27](27-craft-mode-stamina.md)). Boss-client draw unchanged (`28` / `29`). Scrap Duelist / `appt_*` stay appointments — **not** Dex Adventurers ([31](31-dex.md)). Piece cap **GONE**. `map.day_count` **stays** a map setting (current map **8**; last 2 reserved). M1 panel = **type + id**; fancy titles **Later**.
 
+## Graph commit (2026-10-23)
+
+Live player path for the Steam demo ([35](35-steam-demo-cut.md)). A click on a node the board can confirm writes that node into `route_path`. A click that is only a legal future draft still drafts. The **FORK OPTIONS** panel is not the player path. Hide it. Remove it from the player tree. Do not keep a second row of buttons that commit the same edge. `fork_options` may stay a test log of the legal next nodes. It is not a screen. No new `20` key. The fork-width law (2–4) stays on the graph. Corridor, bind, reserved, and D1 still have nothing to pick. Kind faces and the elite badge stay on the node.
+
+The timetable section below still describes the 2026-10-13 options panel. That panel is the record of what Client #41 shipped. It is not the demo control. Boot is a title screen ([21](21-app-flow.md), [35](35-steam-demo-cut.md)), not this board.
+
 ## Fiction
 
 The atelier rides a **horse-car / wagon**. Each chapter is one stretch of road to the destination **chapter boss**. The stretch is a **hand-authored route map**: corridors, forks, and bound multi-day blocks — **StS-like**, **not** seed-generated sprawl, **not** a free options list under every day.
@@ -22,7 +28,7 @@ Combos are **bound multi-day blocks on the graph**, not stacked modifiers the pl
 | Boss telegraph | Chapter start | Boss announced before spend |
 | Reserved days | Last **2** relative to `N = map.day_count` | Graph days = **D1..(N−2)**. Current 8-day map: **D7** travel / final prep, **D8** boss approach. Appointments cannot claim reserved days. |
 | Shop visits / chapter | **1–3** | From **graph design** (how many `shop` nodes sit on a complete path). **Not** a hard UI ban on picking shop. |
-| Fork width | **2–4** visible next options | Only at forks. Corridor / bind / reserved → **no** options panel. Current test forks are 2 or 3. Do not add an edge to force 4. |
+| Fork width | **2–4** outgoing edges | The next nodes are on the graph. Click commits ([Graph commit](#graph-commit-2026-10-23)). The FORK OPTIONS panel is not the player path. Corridor / bind / reserved still have no choice. Current test forks are 2 or 3. Do not add an edge to force 4. |
 
 Until-M2 numbers (person stats, pressure, gold, reps, which `evt_*` a node resolves) are [33](33-until-m2-tuning.md), **closed** (Design #72 / Client #73, accept **A A A A**). This file’s graph, Day names, `crafts_max` gone, last-2 rule, and fork width stay. Event **identity** is a pool row on a `kind=event` node, not a day-strip script, and not the free `E*` board.
 
@@ -325,7 +331,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
 4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp. **Shipped:** ugly layout Client #41 (`144c151`). Kind-face sockets for that layout are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20). Wire them only after Jonathan stamps. Do not build a second board.
 5. **Route graph data.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
-6. **Options panel only at a current choice.** Fork or unbound remaining picks **on the current day**: 2–4 next nodes, **M1 type + id** (`shop` / `adventurer` / `appointment` / `event` + `N2`…). Keep `adv_*` / `appt_*` / `evt_*` on the row. Fancy titles **Later**. **No choice → no panel** (corridor, bind, reserved, D1, frozen past, draft-only future).
+6. **Options panel — superseded as the player path (2026-10-23).** The 2026-10-13 need was: fork or unbound remaining picks **on the current day**, 2–4 next nodes, **M1 type + id**. **Demo law:** the player commits by clicking the graph node ([Graph commit](#graph-commit-2026-10-23) at the top of this file). The FORK OPTIONS panel is not shown. **No choice → no extra control** (corridor, bind, reserved, D1, frozen past). A future draft is still a graph highlight, not a panel.
 7. **Draft future.** Player may ghost a legal unbound path. Draft is **not** a confirm. Confirm when that day is current. Do not write drafts into `route_path`.
 8. **Binds.** Entering N7 pins N8 and N9. Bound days are frozen — not drafts, not re-pickable.
 9. **Frozen past.** Played nodes cannot be moved.
@@ -395,6 +401,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 - Pre-assigning the whole chapter at start from a pool
 - Treating a drafted future node as confirmed (`route_path` / `day_action`)
 - Day-strip-only M1 board (graph layout is required; kind-face sockets are the 2026-10-20 section, not a new board)
+- **FORK OPTIONS as the player path** (2026-10-23). Graph click commits. The panel is not the control ([35](35-steam-demo-cut.md))
 - Edge-texture gens, painted per-state frames, named busts on nodes. The one elite badge is [Elite telegraph (2026-10-21)](#elite-telegraph-2026-10-21). It is not a kind-face redraw and not a Scrap Duelist bust
 
 ## Supersedes
