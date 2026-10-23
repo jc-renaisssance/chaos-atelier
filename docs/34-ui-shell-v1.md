@@ -1,6 +1,6 @@
 # Steam-demo UI shell v1 — craft + order
 
-**Doc id: `34`.** **Status: Design-ready for Jonathan stamp.** Docs only. Off `dev` tip **`873e7b2`** (M2 four-job Client wire #75, live). No `src/`. No assets. No PixelLab. No gens.
+**Doc id: `34`.** **Status: Shipped.** Jonathan stamp **A A B** (palette **A** / order-panel bust **A** / planner chips **B** — text interim; icon chips Later) on Design #76 (`daa0280`). Client landed (#77, `c8a5a1a`). `dev` tip is **`c8a5a1a`**. The letter tables below are the law as stamped. Do not reopen. No further Client on this file. No gens. Does not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not open a Solenne pass. Posture art stays **Nov 2**. Icon chips stay Later.
 
 This file is the **presentation** law for the dedicated craft screen. Rules stay in [27](27-craft-mode-stamina.md) and [30](30-interactive-order.md). A stamp here does not retune stamina, unlocks, estimate cutoffs, or `M2_JOB_POOL`.
 
@@ -112,6 +112,8 @@ Widgets on this shell: `StyleBoxFlat`, `ColorRect`, `Label`, `TextureRect`, `But
 
 ### Letter B — Godot default
 
+**Not taken.** Jonathan wrote **A**.
+
 Same layout, same labels, same controls. Remove the custom color and `StyleBoxFlat` overrides on the craft screen, zone cards, hand slots, and playback step. Default Button, default panel, default progress bar. No wood tokens. No new texture. Sockets still follow Decision 2.
 
 ---
@@ -153,7 +155,7 @@ The raw stamp JSON panel leaves the player screen. Test logs in `20` stay. No ne
 
 ### Planner chips
 
-**Decision 3.** **A:** each chip is the tag name on a secondary button. No icon. **B:** icon chips. **B** needs art, so it waits out this lane. Design recommends **A**. That matches market chrome (GO item 3): text, not a fancy chip.
+**Decision 3.** **A:** each chip is the tag name on a secondary button. No icon. **B:** icon chips. **B** needs art, so the icons wait. Design recommended **A**. Jonathan wrote **B**. Client #77 keeps the tag name on the secondary button (text interim). Icon chips stay Later. No gens.
 
 ### Order-panel bust
 
@@ -162,11 +164,11 @@ The raw stamp JSON panel leaves the player screen. Test logs in `20` stay. No ne
 | Letter | Order head |
 |---|---|
 | **A (Design default)** | When `assets/adv/<adv_id>.png` exists for the resolved named id, a `TextureRect` at **96×96**, nearest, sits beside the text. A missing file hides the socket. Name, job, and the rest of the panel stay. |
-| **B** | Text only on this shell. Do not show the bust. The file stays on disk. |
+| **B** | Text only on this shell. Do not show the bust. The file stays on disk. **Not taken.** |
 
 `in_shop` (`30` socket **A**) stays beside the bust under **A**, and beside the text under **B**. A missing posture file hides that slot. Do not scale the 96 bust into the posture slot. Do not crop a bust into a posture. `appt_*` has no bust file: text, and playback actor id null. No Scrap Duelist face.
 
-**A** supersedes the slice 1 line “do not show portraits” for this order panel only. It does not regen a portrait. It does not open a second canvas.
+**A** is the stamp (Client #77). It supersedes the slice 1 line “do not show portraits” for this order panel only. It does not regen a portrait. It does not open a second canvas.
 
 ---
 
@@ -180,7 +182,7 @@ Per-zone simultaneous readouts stay Later. Moving the pair out of the order colu
 
 ## Playback chrome — included
 
-GO item 4 is include **if cheap**. It is cheap, so it is in this shell. Not a letter.
+GO item 4 is include **if cheap**. It is cheap, so it is in this shell. Not a letter. The stamp kept it. Client #77 uses this frame. Do not pull it back out.
 
 - Same screen frame, type scale, and button roles as craft (letter A or B, whichever stamps).
 - **Skip** stays. Gate **A** behavior stays: Skip ends this playback and opens this piece’s report. It does not skip the report or a later piece.
@@ -197,7 +199,7 @@ Writing **defer** on the card pulls this chrome out of the Client follow. Playba
 - Route board, market, events, Dex, mission-report layout, newspaper, HUD.
 - Market tab strip stays **Materials | Staffs | Skills | Gear** text. No chip gens.
 - New people. #62. Portrait regen. Posture gens. Nov 2 stays Nov 2.
-- **PR #71** (Knight posture batch, including Solenne stills) and any file under `assets/adv/posture/`. Do not edit that PR. Do not replace those pngs. Do not open a Solenne pass.
+- **PR #71** and any file under `assets/adv/posture/`. Solenne ×4 art stays **HOLD** until the PixelLab reset **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT** stays. Do not edit that PR. Do not replace those pngs. Do not open a Solenne pass.
 - Craft rules, `12 * N`, hand **5**, dig **2**, play costs, zone max **4**, unlock keys, `unlocked_builds`, estimate weights, S–F cutoff table, `M1_JOB_POOL`, `M2_JOB_POOL`.
 - Elite N5 letters. IO4 Gate / Surface / Socket letters. Those are shipped.
 - A new `20` Required key.
@@ -206,23 +208,23 @@ Writing **defer** on the card pulls this chrome out of the Client follow. Playba
 
 ## Nnoitra
 
-Graphic seat is **after** this Design is on the tip **and** Jonathan has stamped it. Before any graphic, Nnoitra asks **Grimmjow**. **No gens on this lane.** No PixelLab. No new textures. Existing bust files and existing posture files are read-only. Placeholders stay legal. Harribel has nothing to soft-gate here because nothing is burned.
+The graphic seat did not open. Client #77 used placeholders, `StyleBoxFlat`, and existing bust files. **No gens on this lane.** No PixelLab. No new textures. Existing bust files and existing posture files stay read-only. Placeholders stay legal. Harribel has nothing to soft-gate here because nothing is burned. Do not open a graphic pass.
 
 ---
 
-## Client later — Ulquiorra, after the stamp
+## Client (landed — #77)
 
-Ulquiorra **holds** until Jonathan writes the letters. Szayelaporro smokes after that Client PR. Aizen merges this Design only after the stamp.
+Not open work. Ulquiorra followed this file on #77 (`c8a5a1a`), stamp **A A B**. Szayelaporro smoked. No art seat. Do not re-queue this shell.
 
 Theme tokens and scene chrome only. No mechanism retune.
 
-| After the stamp | Holds still |
+| What #77 followed | Holds still |
 |---|---|
-| One shared color block and the `StyleBoxFlat` set (letter A), or default theme (letter B), on craft, zones, hand, and playback | A new texture, a font file, PixelLab |
+| Letter **A**: one shared color block and the `StyleBoxFlat` set on craft, zones, hand, and playback | A new texture, a font file, PixelLab, a switch to letter **B** |
 | Player titles from the diagram. Debug captions and the stamp-JSON panel leave the player screen | Dropping test logs. A new `20` key |
 | Zone cards ≤4, five hand frames, Dig, Finish, Return, keys 1–5 and D | Changing `12 * N`, dig 2, hand size, zone max, Finish-only, empty-zone path |
 | Order column is slices 1–3 text. Estimate label drops the weight-integer suffix | Changing `ask_*`, unlock, `?` gates, weights, or S–F cutoffs |
-| Bust per Decision 2. `in_shop` hide-if-missing stays | Regen, a #71 edit, a posture png |
+| Bust letter **A**. `in_shop` hide-if-missing stays. Planner chips letter **B** as text on the secondary button | Regen, a #71 edit, a posture png, icon chips |
 | Current / Potential under the selected zone | A readout on every zone at once |
 | Playback uses the same frame. Skip stays | A new beat, a second sim, hiding Skip |
 | Market, route, Dex, newspaper, HUD untouched | A restyle of those screens |
@@ -237,15 +239,17 @@ Theme tokens and scene chrome only. No mechanism retune.
 |---|---|
 | `docs/34-ui-shell-v1.md` | This law. Palette, bust, planner chips. Playback included because it is cheap |
 | `docs/27-craft-mode-stamina.md` | Pointer only. Layout, stamina, Finish-only, zones, hand, Current / Potential do not move |
-| `docs/30-interactive-order.md` | Pointer only. Slice rules stay. Bust letter, if **A**, supersedes “do not show portraits” on the order panel only |
-| `docs/05-art.md` | Pointer only. Nnoitra after the stamp. No gens |
-| `docs/pm/phase-1-plan.md` | Tip `873e7b2`. This Design is the open card. #72–#75 are landed |
+| `docs/30-interactive-order.md` | Pointer only. Slice rules stay. Bust **A** supersedes “do not show portraits” on the order panel only |
+| `docs/05-art.md` | Pointer only. No gens. #71 hold stays |
+| `docs/pm/phase-1-plan.md` | Tip `c8a5a1a`. This shell is shipped. #72–#77 are landed |
 | `docs/README.md` | Index |
 | `docs/STAMP.md` | This card |
 
 ### Decisions
 
-The GO **A A A A** is already written. These three are the remaining letters.
+**Record:** **A / A / B** (Jonathan, Design #76). Palette **A**. Bust **A**. Planner chips **B** — text interim on Client #77; icon chips Later. Client #77 (`c8a5a1a`). The three lines below are the ask as written. They are not an open ask. Design had recommended planner chips **A**. Jonathan wrote **B**.
+
+The GO **A A A A** is already written. These three were the remaining letters.
 
 1. **Palette / type — A or B.** **A (Design default):** dark wood ground, parchment ink, the named color block and `StyleBoxFlat` set in this file, including buttons and the stamina bar. No textures. **B:** Godot default theme on this shell. Same layout and labels. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
 
@@ -261,16 +265,18 @@ None.
 
 ### Blocks stamp
 
+**Stamped.** The lines below are the ask as written. They are not open.
+
 An unanswered palette line (**A** or **B**). Silence is not **A**.
 
 An unanswered bust line (**A** or **B**). Silence is not **A**.
 
 An unanswered planner-chip line (**A** or **B**). Silence is not **B**.
 
-Playback inclusion does not block. Writing **defer** takes it out of the Client follow. It is not a fourth open question.
+Playback inclusion does not block. **Defer** was not written. Client #77 kept this chrome. It is not a fourth open question.
 
-Nothing else blocks. No PixelLab. No `src/` in this PR. PR #71 is not in this PR. Elite N5 is not in this PR. Slice 4’s gate, surface, and socket are not in this PR. #72, #73, #74, and #75 are not open.
+Nothing else blocks. No PixelLab. No `src/` in this PR. PR #71 is not in this PR (Solenne ×4 stays **HOLD** until **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**). Elite N5 is not in this PR. Slice 4’s gate, surface, and socket are not in this PR. #72, #73, #74, #75, #76, and #77 are not open. Do not revive #62.
 
 ### Design recommends
 
-**Palette A. Bust A. Planner chips A.** Playback chrome stays in this shell.
+**Palette A. Bust A. Planner chips A.** Playback chrome stays in this shell. Jonathan’s stamp is **A A B** (chips **B**, text interim). The recommendation is the record. It is not an open ask.
