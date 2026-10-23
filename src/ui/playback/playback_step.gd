@@ -1,16 +1,9 @@
 class_name PlaybackStep
 extends Control
 ## Gate A step between craft Finish and the report the client already shows.
-## Ugly beat rows + placeholder actor. Skip ends this playback only.
+## Same frame language as craft (docs/34). Skip stays. Beat rows stay #70.
+## The stamp JSON panel is not on this screen. Test logs stay in the harness.
 
-## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
-const INK := Color(0.91, 0.835, 0.69)
-const MUTED := Color(0.71, 0.643, 0.541)
-const GOLD := Color(0.788, 0.635, 0.153)
-const WOOD := Color(0.102, 0.078, 0.063)
-const PANEL := Color(0.165, 0.129, 0.094)
-const PLATE := Color(0.24, 0.2, 0.16)
-const BORDER := Color(0.239, 0.204, 0.173)
 ## Beat length is a client constant. Not a stamp field.
 const BEAT_SEC := 0.7
 
@@ -25,7 +18,6 @@ var _actor_name: Label
 var _actor_caption: Label
 var _skip_btn: Button
 var _continue_btn: Button
-var _stamp: Label
 var _built := false
 var _report_mode := false
 var _serial := -1
@@ -47,7 +39,7 @@ func _ready() -> void:
 
 func _build() -> void:
 	var bg := ColorRect.new()
-	bg.color = WOOD
+	bg.color = ShellTheme.WOOD
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
@@ -66,9 +58,9 @@ func _build() -> void:
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
-	_title = _label("PLAYBACK", 22, GOLD)
+	_title = _label("Playback", ShellTheme.TITLE_PX, ShellTheme.GOLD)
 	root.add_child(_title)
-	_note = _label("", 13, MUTED)
+	_note = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_note)
 
@@ -84,12 +76,11 @@ func _build() -> void:
 	var actor_box := VBoxContainer.new()
 	actor_box.add_theme_constant_override("separation", 6)
 	actor.add_child(actor_box)
-	actor_box.add_child(_label("ACTOR", 11, GOLD))
 	var socket := Control.new()
 	socket.custom_minimum_size = Vector2(PostureSocket.DISPLAY_PX, PostureSocket.DISPLAY_PX)
 	actor_box.add_child(socket)
 	_actor_plate = ColorRect.new()
-	_actor_plate.color = PLATE
+	_actor_plate.color = ShellTheme.PLATE
 	_actor_plate.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_actor_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	socket.add_child(_actor_plate)
@@ -101,13 +92,13 @@ func _build() -> void:
 	_actor_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_actor_tex.visible = false
 	socket.add_child(_actor_tex)
-	_actor_name = _label("—", 16, INK)
+	_actor_name = _label("—", ShellTheme.NAME_PX, ShellTheme.INK)
 	_actor_name.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_actor_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_actor_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_actor_name.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	socket.add_child(_actor_name)
-	_actor_caption = _label("", 12, MUTED)
+	_actor_caption = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_actor_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	actor_box.add_child(_actor_caption)
 
@@ -124,16 +115,15 @@ func _build() -> void:
 	rows_wrap.add_theme_constant_override("separation", 6)
 	rows_wrap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows_scroll.add_child(rows_wrap)
-	rows_wrap.add_child(_label("BEATS  ·  open / favor / punish / skill / result", 11, GOLD))
 	_rows_box = VBoxContainer.new()
 	_rows_box.add_theme_constant_override("separation", 4)
 	_rows_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows_wrap.add_child(_rows_box)
-	_report_title = _label("", 16, GOLD)
+	_report_title = _label("", ShellTheme.NAME_PX, ShellTheme.GOLD)
 	_report_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_report_title.visible = false
 	rows_wrap.add_child(_report_title)
-	_report_body = _label("", 14, INK)
+	_report_body = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_report_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_report_body.visible = false
 	rows_wrap.add_child(_report_body)
@@ -145,19 +135,6 @@ func _build() -> void:
 	btns.add_child(_skip_btn)
 	_continue_btn = _btn("Continue", _on_continue)
 	btns.add_child(_continue_btn)
-
-	var stamp_panel := _panel()
-	stamp_panel.custom_minimum_size.y = 72
-	root.add_child(stamp_panel)
-	var stamp_scroll := ScrollContainer.new()
-	stamp_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	stamp_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	stamp_scroll.custom_minimum_size.y = 64
-	stamp_panel.add_child(stamp_scroll)
-	_stamp = _label("{}", 11, MUTED)
-	_stamp.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_stamp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	stamp_scroll.add_child(_stamp)
 
 
 func dismiss() -> void:
@@ -175,7 +152,6 @@ func refresh() -> void:
 	var piece := int(snap.get("piece_index", -1))
 	var serial := int(snap.get("serial", -1))
 	if _built and _serial == serial and _report_mode == report and _piece == piece:
-		_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 		return
 	_built = true
 	_report_mode = report
@@ -188,7 +164,7 @@ func refresh() -> void:
 	var raw_rows: Variant = snap.get("beats", [])
 	if raw_rows is Array:
 		_rows.assign(raw_rows)
-	_title.text = "PLAYBACK  ·  piece %d / %d  ·  docs/30" % [piece, int(snap.get("piece_count", 0))]
+	_title.text = "Playback"
 	if report:
 		_note.text = String(snap.get("note", ""))
 		_report_title.text = String(snap.get("title", ""))
@@ -202,7 +178,6 @@ func refresh() -> void:
 	_continue_btn.visible = report
 	_rebuild_rows()
 	_apply_beat()
-	_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 
 
 func _process(delta: float) -> void:
@@ -229,7 +204,7 @@ func _rebuild_rows() -> void:
 	for row in _rows:
 		if not (row is Dictionary):
 			continue
-		var lab := _label("", 14, INK)
+		var lab := _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 		lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_rows_box.add_child(lab)
 		_row_labels.append(lab)
@@ -243,13 +218,13 @@ func _apply_beat() -> void:
 		if i < _rows.size() and _rows[i] is Dictionary:
 			row = _rows[i]
 		var mark := "  "
-		var color := MUTED
+		var color := ShellTheme.MUTED
 		if not _report_mode and i == _beat:
 			mark = "▸ "
-			color = INK
+			color = ShellTheme.INK
 		if _report_mode:
 			mark = "  "
-			color = MUTED
+			color = ShellTheme.MUTED
 		lab.text = "p%s  %s%s  ·  %s  ·  %s" % [
 			str(row.get("piece_index", _piece)),
 			mark,
@@ -280,7 +255,7 @@ func _bind_actor(slot: String) -> void:
 	var who := "—"
 	if _actor_id is String and not String(_actor_id).is_empty():
 		who = String(_actor_id)
-	_actor_caption.text = "%s  ·  %s  ·  64×64 ×2" % [slot_name, who]
+	_actor_caption.text = "%s  ·  %s" % [slot_name, who]
 
 
 func _on_skip() -> void:
@@ -297,30 +272,18 @@ func _on_continue() -> void:
 
 
 func _label(text: String, size: int, color: Color) -> Label:
-	var lab := Label.new()
-	lab.text = text
-	lab.add_theme_font_size_override("font_size", size)
-	lab.add_theme_color_override("font_color", color)
-	return lab
+	return ShellTheme.label(text, size, color)
 
 
 func _panel() -> PanelContainer:
 	var panel := PanelContainer.new()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = PANEL
-	sb.set_corner_radius_all(8)
-	sb.set_border_width_all(1)
-	sb.border_color = BORDER
-	sb.content_margin_left = 10
-	sb.content_margin_right = 10
-	sb.content_margin_top = 8
-	sb.content_margin_bottom = 8
-	panel.add_theme_stylebox_override("panel", sb)
+	ShellTheme.paint_panel(panel, ShellTheme.frame())
 	return panel
 
 
 func _btn(text: String, cb: Callable) -> Button:
 	var btn := Button.new()
 	btn.text = text
+	ShellTheme.paint_button(btn, false)
 	btn.pressed.connect(cb)
 	return btn
