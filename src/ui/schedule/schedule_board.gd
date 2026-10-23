@@ -14,10 +14,6 @@ var _meta: Label
 var _note: Label
 var _planner_caption: Label
 var _graph: RouteGraphView
-var _options_caption: Label
-var _options_panel: PanelContainer
-var _options_title: Label
-var _options: VBoxContainer
 var _draft_lab: Label
 var _today_title: Label
 var _actions: HFlowContainer
@@ -91,7 +87,8 @@ func _build() -> void:
 	_graph.node_picked.connect(_on_graph_pick)
 	graph_panel.add_child(_graph)
 
-	## 1280×720: graph stays put; FORK OPTIONS / TODAY / RESOLVE scroll.
+	## 1280×720: graph stays put; TODAY / RESOLVE scroll.
+	## A click on the graph commits or drafts. There is no options panel.
 	_body_scroll = ScrollContainer.new()
 	_body_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -102,23 +99,6 @@ func _build() -> void:
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body_scroll.add_child(body)
 
-	_options_caption = _caption("FORK OPTIONS  ·  type + id  ·  current choice only")
-	body.add_child(_options_caption)
-	_options_panel = _panel()
-	_options_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_child(_options_panel)
-	var options_box := VBoxContainer.new()
-	options_box.add_theme_constant_override("separation", 6)
-	options_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_options_panel.add_child(options_box)
-	_options_title = _label("No live fork.", 15, INK)
-	_options_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_options_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	options_box.add_child(_options_title)
-	_options = VBoxContainer.new()
-	_options.add_theme_constant_override("separation", 4)
-	_options.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	options_box.add_child(_options)
 	_draft_lab = _label("", 13, MUTED)
 	_draft_lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_draft_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -132,7 +112,7 @@ func _build() -> void:
 	today_box.add_theme_constant_override("separation", 8)
 	today_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today.add_child(today_box)
-	_today_title = _label("D1 is N1. Confirm forks when current.", 16, INK)
+	_today_title = _label("D1 is N1. Click the graph to commit the next node.", 16, INK)
 	_today_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_today_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today_box.add_child(_today_title)
@@ -173,6 +153,38 @@ func _build() -> void:
 	_resolve_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	resolve_box.add_child(_resolve_body)
 
+	if AtelierSession.dev_tools:
+		_build_dev_tools(body)
+
+	_craft_table = CraftTable.new()
+	_craft_table.visible = false
+	_craft_table.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_craft_table)
+
+	_playback_step = PlaybackStep.new()
+	_playback_step.visible = false
+	_playback_step.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_playback_step)
+
+	if AtelierSession.dev_tools:
+		_dex_screen = DexScreen.new()
+		_dex_screen.visible = false
+		_dex_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_dex_screen.closed.connect(_on_dex_closed)
+		add_child(_dex_screen)
+
+	_market_screen = MarketScreen.new()
+	_market_screen.visible = false
+	_market_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_market_screen)
+
+	_event_screen = EventScreen.new()
+	_event_screen.visible = false
+	_event_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_event_screen)
+
+
+func _build_dev_tools(body: VBoxContainer) -> void:
 	body.add_child(_caption("STAMP  ·  docs/20 full dump  ·  crafts_done unbounded telemetry"))
 	var stamp_panel := _panel()
 	stamp_panel.custom_minimum_size.y = 96
@@ -195,37 +207,6 @@ func _build() -> void:
 	demo.add_child(_btn("Dex", _on_dex))
 	demo.add_child(_btn("Reroll this chapter", _on_reroll))
 	demo.add_child(_btn("Demo next chapter", _on_next_chapter))
-	var hint := _label("Dex · shop / menu collection list. Market on kind=shop. Text events on N4/N6/N10/N17. Staffs / skills / gear = M2.", 12, MUTED)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	demo.add_child(hint)
-
-	_craft_table = CraftTable.new()
-	_craft_table.visible = false
-	_craft_table.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_craft_table)
-
-	_playback_step = PlaybackStep.new()
-	_playback_step.visible = false
-	_playback_step.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_playback_step)
-
-	_dex_screen = DexScreen.new()
-	_dex_screen.visible = false
-	_dex_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_dex_screen.closed.connect(_on_dex_closed)
-	add_child(_dex_screen)
-
-	_market_screen = MarketScreen.new()
-	_market_screen.visible = false
-	_market_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_market_screen)
-
-	_event_screen = EventScreen.new()
-	_event_screen.visible = false
-	_event_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_child(_event_screen)
 
 
 func _caption(text: String) -> Label:
@@ -330,58 +311,23 @@ func _redraw() -> void:
 	_note.text = AtelierSession.last_note
 	if _graph != null:
 		_graph.bind(board)
-	_rebuild_options()
 	_rebuild_actions()
 	_refresh_resolve()
-	_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
+	_refresh_draft()
+	if _stamp != null:
+		_stamp.text = JSON.stringify(AtelierSession.stamp_preview(), "  ")
 
 
-func _rebuild_options() -> void:
-	for child in _options.get_children():
-		child.queue_free()
+func _refresh_draft() -> void:
 	var board: ChapterSchedule = AtelierSession.board
-	if board == null:
+	if _draft_lab == null or board == null:
 		return
-	var opts := board.fork_options()
-	var show := not opts.is_empty() and not AtelierSession.newspaper_open
-	if _options_caption != null:
-		_options_caption.visible = show
-	if _options_panel != null:
-		_options_panel.visible = show
-	var draft_line := ""
-	if not board.draft_path.is_empty():
-		draft_line = "DRAFT  ·  ghost only  ·  %s" % ", ".join(board.draft_path)
-	if _draft_lab != null:
-		_draft_lab.text = draft_line
-		_draft_lab.visible = not draft_line.is_empty()
-	if not show:
-		_options_title.text = "No live fork — corridor / bind / reserved / D1 / draft-only future hide this panel."
+	if board.draft_path.is_empty() or AtelierSession.newspaper_open:
+		_draft_lab.text = ""
+		_draft_lab.visible = false
 		return
-	_options_title.text = "D%d  ·  %d next  ·  M1 type + id  ·  confirm writes route_path" % [board.day_index, opts.size()]
-	for node in opts:
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		## Live fork only. Same Scope A predicate as the card. Label stays panel_line().
-		if RouteNodeView.wears_elite_badge(node):
-			var tex := RouteNodeView.elite_mark_texture()
-			if tex != null:
-				var mark := TextureRect.new()
-				mark.name = "EliteMark"
-				mark.custom_minimum_size = Vector2(RouteNodeView.ELITE_ROW_PX, RouteNodeView.ELITE_ROW_PX)
-				mark.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-				mark.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-				mark.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-				mark.texture = tex
-				row.add_child(mark)
-		var lab := _label(node.panel_line(), 14, INK)
-		lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(lab)
-		if AtelierSession.can_confirm_node(node.node_id):
-			var btn := _btn("Confirm", _on_confirm.bind(node.node_id))
-			row.add_child(btn)
-		_options.add_child(row)
+	_draft_lab.text = "DRAFT  ·  ghost only  ·  %s" % ", ".join(board.draft_path)
+	_draft_lab.visible = true
 
 
 func _rebuild_actions() -> void:
@@ -426,7 +372,7 @@ func _rebuild_actions() -> void:
 	var pin: AppointmentPin = board.current_pin()
 	var node: RouteNode = board.node_for_day(board.day_index)
 	if not board.day_node_confirmed():
-		_today_title.text = "Live fork on D%d — confirm 1 of %d next nodes (type + id). Draft is not a pick." % [board.day_index, board.fork_options().size()]
+		_today_title.text = "Click the next node on the graph. That commits the path. A later node only drafts."
 		_take_btn.text = "Take node"
 		_take_btn.disabled = true
 		return
@@ -447,7 +393,7 @@ func _rebuild_actions() -> void:
 		_today_title.text = "Current node %s. Take it. Market 1–3 is graph law — not a UI ban." % node.panel_line()
 		_take_btn.text = "Take node"
 	else:
-		_today_title.text = "Confirm today's node, then take it."
+		_today_title.text = "Click today's node on the graph, then take it."
 		_take_btn.text = "Take node"
 	for action in legal:
 		if node != null and action == ScheduleRules.action_for_kind(node.kind) and not AtelierSession.declined_this_day:
@@ -469,7 +415,7 @@ func _refresh_resolve() -> void:
 		else:
 			_resolve_title.text = "Waiting for a pick."
 			_resolve_body.text = (
-				"Walk the authored graph. Confirm a live fork when that day is current. "
+				"Walk the authored graph. A click commits the next node when that day is current. "
 				+ "Draft future is ghost only — not route_path. "
 				+ "Order path: appointment / adventurer → stamina craft. "
 				+ "Event path: market (wire shop) / event / reserved stay phase=schedule. "
@@ -491,10 +437,6 @@ func _on_graph_pick(node_id: String) -> void:
 		AtelierSession.confirm_node(node_id)
 		return
 	AtelierSession.draft_node(node_id)
-
-
-func _on_confirm(node_id: String) -> void:
-	AtelierSession.confirm_node(node_id)
 
 
 func _on_pick(action: GameEnums.RoundAction) -> void:

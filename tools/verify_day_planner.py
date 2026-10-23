@@ -142,7 +142,6 @@ def check_source_symbols(blob: str) -> None:
         "func take_day",
         "func can_confirm_node",
         "ROUTE GRAPH",
-        "FORK OPTIONS",
         "panel_line",
         "appt_scrap_duelist",
         "combo_market",
@@ -191,8 +190,10 @@ def check_source_symbols(blob: str) -> None:
         fail("board must not keep DAY PLANNER caption — live board is the route graph")
     if "class_name RouteGraphView" not in blob:
         fail("M1 must ship a route-graph layout (nodes + edges), not a day strip only")
-    if "Confirm" not in ui or "confirm_node" not in ui:
-        fail("board must expose Confirm on a live fork")
+    if "func _on_graph_pick" not in ui or "confirm_node" not in ui:
+        fail("a graph pick must confirm_node when the board can confirm")
+    if "_on_confirm" in ui or "_rebuild_options" in ui or '"FORK OPTIONS' in ui:
+        fail("FORK OPTIONS is not the player path (docs/35)")
     craft = (SRC / "ui" / "craft" / "craft_table.gd").read_text(encoding="utf-8")
     if "CRAFTS_MAX" in craft or "pieces sewn %d /" in craft:
         fail("craft table must not show a piece cap")
@@ -417,8 +418,11 @@ def check_map_graph() -> None:
     if "draft_path" not in schedule or "route_path" not in schedule:
         fail("board must keep route_path vs draft_path")
     ui = (SRC / "ui" / "schedule" / "schedule_board.gd").read_text(encoding="utf-8")
-    if "_on_confirm" not in ui or "can_confirm_node" not in ui:
-        fail("options panel must wire Confirm on a live fork only")
+    pick = ui.split("func _on_graph_pick", 1)[-1].split("\nfunc ", 1)[0]
+    if "can_confirm_node" not in pick or "confirm_node" not in pick or "draft_node" not in pick:
+        fail("graph pick must confirm a legal node, otherwise draft")
+    if "_on_confirm" in ui:
+        fail("do not keep a second Confirm control beside the graph")
     if "shops_taken" in ui or "shop ban" in ui.lower():
         fail("UI must not ban shop picks")
     graph_ui = (SRC / "ui" / "schedule" / "route_graph_view.gd").read_text(encoding="utf-8")
@@ -511,20 +515,22 @@ def check_board_scroll() -> None:
     if "horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED" not in ui:
         fail("overflow ScrollContainer must disable horizontal so labels wrap at viewport width")
     if re.search(r"graph_panel\.size_flags_vertical\s*=\s*Control\.SIZE_EXPAND_FILL", ui):
-        fail("graph must not SIZE_EXPAND_FILL vertically — that clips FORK OPTIONS / TODAY / RESOLVE at 720")
+        fail("graph must not SIZE_EXPAND_FILL vertically — that clips TODAY / RESOLVE at 720")
     build = ui.split("func _build", 1)[-1].split("func _caption", 1)[0]
     scroll_at = build.find("_body_scroll")
     if scroll_at < 0:
         fail("board _build must create _body_scroll")
         return
     after = build[scroll_at:]
-    for token in ('"FORK OPTIONS', '"TODAY', '"RESOLVE'):
+    for token in ('"TODAY', '"RESOLVE'):
         if token not in after:
             fail(f"{token} panel must be parented under the overflow ScrollContainer")
     if "size_flags_vertical = Control.SIZE_EXPAND_FILL" not in after:
         fail("overflow ScrollContainer must SIZE_EXPAND_FILL the leftover height")
-    if "_options_panel.visible" not in ui and "_options_caption.visible" not in ui:
-        fail("no choice → no options panel (hide fork panel when empty)")
+    if '"FORK OPTIONS' in ui or "_options_panel" in ui or "_on_confirm" in ui:
+        fail("graph click commits — do not keep a second options panel")
+    if "confirm_node" not in ui:
+        fail("a graph pick must still confirm_node")
 
 
 KIND_CHIPS = ("market", "adventurer", "appointment", "event", "reserved")
@@ -612,13 +618,15 @@ def check_elite_telegraph() -> None:
         fail("card badge reuses _kind_modulate")
     if "kind_appointment.png" not in view:
         fail("kind_appointment.png stays the kind face")
-    rebuild = board.split("func _rebuild_options", 1)[-1].split("\nfunc ", 1)[0]
-    if "panel_line()" not in rebuild:
-        fail("options row label must stay panel_line()")
-    if "wears_elite_badge" not in rebuild or "elite_mark_texture" not in rebuild:
-        fail("options row must use the appointment predicate and the same texture")
-    if "ELITE_ROW_PX" not in rebuild:
-        fail("options row badge must be ELITE_ROW_PX (16)")
+    if "func _rebuild_options" in board or '"FORK OPTIONS' in board:
+        fail("FORK OPTIONS rows are not a second commit control (docs/35)")
+    card_badge = view.split("func _bind_elite_badge", 1)[-1].split("func ", 1)[0]
+    if "wears_elite_badge" not in card_badge or "elite_mark_texture" not in card_badge:
+        fail("elite badge stays on the route card via the appointment predicate")
+    socket = view.split("func _elite_socket", 1)[-1].split("func ", 1)[0]
+    anchor = view.split("func _anchor_elite_badge", 1)[-1].split("func ", 1)[0]
+    if "func _elite_socket" not in view or "ELITE_CARD_PX" not in socket or "ELITE_CARD_PX" not in anchor:
+        fail("route-card elite badge must stay ELITE_CARD_PX")
     if "Take appointment" not in board or "Decline appointment" not in board:
         fail("do not change take-appointment or decline copy")
     if "Kingdom newspaper" not in board:
@@ -655,7 +663,7 @@ def main() -> int:
         return 1
     print("OK route-graph source + spec (docs/22, 20, 24, 27)")
     print("map_m1 nodes+edges; D1=N1; forks 2–4 when current; bind combo_market; shop 1–3 from graph.")
-    print("No crafts_max; phase=schedule; draft ghost only; corridor/bind/reserved/D1 hide the options panel.")
+    print("No crafts_max; phase=schedule; draft ghost only; graph click commits; FORK OPTIONS stays off the player tree.")
     print("Godot 4.7 constraints: features 4.7; no class_name on autoloads; no Color.html; no const Packed*Array; no var x := Variant helpers.")
     print("route_graph_view: no Object.free mid-picked — disconnect + queue_free + deferred _apply_bind.")
     print("Godot editor was not opened.")

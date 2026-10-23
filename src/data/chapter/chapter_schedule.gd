@@ -271,9 +271,9 @@ func confirm_reason(node_id: String) -> String:
 	if is_day_played(day_index):
 		return "D%d is frozen (played)" % day_index
 	if day_index == 1:
-		return "D1 is fixed (N1) — no fork panel"
+		return "D1 is fixed (N1)."
 	if is_reserved_day(day_index):
-		return "D%d is reserved — no fork panel" % day_index
+		return "D%d is reserved." % day_index
 	if _path_has_day(day_index):
 		return "D%d already confirmed" % day_index
 	var opts := fork_options()

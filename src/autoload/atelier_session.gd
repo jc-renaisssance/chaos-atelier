@@ -114,10 +114,31 @@ var event_result_line: String = ""
 var event_mat_skipped: bool = false
 var visit_reps_before: int = 0
 
+## docs/35. Default false. Dex, Reroll, Demo next chapter, and the stamp dump
+## are created on the board only when this is true. Never on the title screen.
+var dev_tools: bool = false
+
+const RUN_SAVE_PATH := "user://atelier_run.json"
+
 
 func _ready() -> void:
 	profile.load_from_disk()
+	board_changed.connect(_save_run_if_idle)
+
+
+func new_run() -> void:
+	_delete_run_save()
 	start_chapter(1)
+
+
+func can_continue() -> bool:
+	return FileAccess.file_exists(RUN_SAVE_PATH)
+
+
+func continue_run() -> bool:
+	if not can_continue():
+		return false
+	return _load_run_save()
 
 
 func start_chapter(chapter_id: int = 1, seed: int = 0) -> void:
@@ -644,10 +665,10 @@ func playback_snapshot() -> Dictionary:
 		var card := ScheduleRules.build_piece_report(craft_order, result, piece_index)
 		title = String(card.get("title", ""))
 		body = String(card.get("body", ""))
-		if _playback_cursor + 1 < _playback_queue.size():
-			note = "Piece report (docs/23). Continue starts the next piece's playback."
-		else:
-			note = "Piece report (docs/23). Continue opens the mission report."
+	if _playback_cursor + 1 < _playback_queue.size():
+		note = "Piece report. Continue starts the next piece's playback."
+	else:
+		note = "Piece report. Continue opens the one fight."
 	return {
 		"report": piece_report_open,
 		"beats": rows,
@@ -855,7 +876,7 @@ func acknowledge_resolve() -> void:
 			resolve_started.emit(last_resolve)
 	else:
 		last_resolve = {}
-		last_note = "D%d — confirm the live fork if shown, then take today's node." % board.day_index
+		last_note = "D%d — click the next node on the graph, then take it." % board.day_index
 		last_stamp = _make_schedule_stamp()
 	board_changed.emit()
 
@@ -1961,4 +1982,241 @@ func _apply_market_event_logs(stamp: HarnessStamp) -> void:
 		stamp.reps_before = visit_reps_before
 		stamp.reps_after = reps
 		stamp.reps_delta = reps - visit_reps_before
+
+
+func _save_run_if_idle() -> void:
+	if board == null:
+		return
+	if craft_open or market_open or event_open or playback_open or piece_report_open:
+		return
+	_write_run_save()
+
+
+func _delete_run_save() -> void:
+	var dir := DirAccess.open("user://")
+	if dir != null and dir.file_exists("atelier_run.json"):
+		dir.remove("atelier_run.json")
+
+
+func _write_run_save() -> void:
+	if board == null:
+		return
+	var days: Array = []
+	for slot in board.days:
+		var action := ""
+		var wire: Variant = GameEnums.round_action_wire(slot.day_action)
+		if wire != null:
+			action = String(wire)
+		days.append({
+			"day_index": slot.day_index,
+			"action": action,
+			"order_id": slot.order_id,
+			"event_id": slot.event_id,
+			"node_id": slot.node_id,
+		})
+	var cards: Array = []
+	if stock != null:
+		for card in stock.cards:
+			if card == null:
+				continue
+			cards.append({
+				"id": card.id,
+				"type": GameEnums.hand_card_type_wire(card.type),
+				"mat_enchant_id": card.mat_enchant_id,
+				"shiny": card.shiny,
+			})
+	var payload := {
+		"run_id": run_id,
+		"chapter_seed": chapter_seed,
+		"rng_state": rng.state,
+		"event_rng_state": event_rng.state,
+		"reps": reps,
+		"gold": gold,
+		"newspaper_open": newspaper_open,
+		"resolve_open": resolve_open,
+		"awaiting_boss": awaiting_boss,
+		"boss_open": boss_open,
+		"boss_client_id": boss_client_id,
+		"boss_job_id": boss_job_id,
+		"boss_draw_pool": boss_draw_pool,
+		"chapter_over": chapter_over,
+		"run_over": run_over,
+		"run_over_reason": String(GameEnums.run_over_reason_wire(run_over_reason) if GameEnums.run_over_reason_wire(run_over_reason) != null else ""),
+		"declined_this_day": declined_this_day,
+		"last_note": last_note,
+		"last_resolve": last_resolve.duplicate(true),
+		"unlocked_outlooks": Array(unlocked_outlooks),
+		"staff_equipped_id": staff_equipped_id,
+		"staff_owned": staff_owned.duplicate(true),
+		"artifact_owned": artifact_owned.duplicate(true),
+		"artifact_equipped_ids": artifact_equipped_ids.duplicate(true),
+		"chapter_events_resolved": chapter_events_resolved.duplicate(true),
+		"stock": cards,
+		"chapter_id": board.chapter_id,
+		"chapter_boss_id": board.chapter_boss_id,
+		"boss_pool_id": board.boss_pool_id,
+		"day_index": board.day_index,
+		"route_path": Array(board.route_path),
+		"draft_path": Array(board.draft_path),
+		"current_node_id": board.current_node_id,
+		"appt_decline_used": board.appt_decline_used,
+		"crafts_done": board.crafts_done,
+		"days": days,
+	}
+	var file := FileAccess.open(RUN_SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		return
+	file.store_string(JSON.stringify(payload))
+
+
+func _load_run_save() -> bool:
+	var file := FileAccess.open(RUN_SAVE_PATH, FileAccess.READ)
+	if file == null:
+		return false
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if not (parsed is Dictionary):
+		return false
+	var data: Dictionary = parsed
+	var chapter_id := int(data.get("chapter_id", 1))
+	_reset_craft_state()
+	market_open = false
+	event_open = false
+	_clear_market_visit()
+	_clear_event_visit()
+	chapter_seed = int(data.get("chapter_seed", 0))
+	rng = RandomNumberGenerator.new()
+	rng.seed = chapter_seed
+	rng.state = int(data.get("rng_state", 0))
+	event_rng = RandomNumberGenerator.new()
+	event_rng.seed = chapter_seed
+	event_rng.state = int(data.get("event_rng_state", 0))
+	run_id = String(data.get("run_id", ""))
+	reps = int(data.get("reps", GameConstants.REPS_START))
+	gold = int(data.get("gold", GameConstants.GOLD_START))
+	newspaper_open = bool(data.get("newspaper_open", false))
+	resolve_open = bool(data.get("resolve_open", false))
+	awaiting_boss = bool(data.get("awaiting_boss", false))
+	boss_open = bool(data.get("boss_open", false))
+	boss_client_id = String(data.get("boss_client_id", ""))
+	boss_job_id = String(data.get("boss_job_id", ""))
+	boss_draw_pool = String(data.get("boss_draw_pool", ""))
+	chapter_over = bool(data.get("chapter_over", false))
+	run_over = bool(data.get("run_over", false))
+	run_over_reason = _run_over_from_wire(String(data.get("run_over_reason", "")))
+	declined_this_day = bool(data.get("declined_this_day", false))
+	last_note = String(data.get("last_note", ""))
+	var resolve_raw: Variant = data.get("last_resolve", {})
+	last_resolve = resolve_raw if resolve_raw is Dictionary else {}
+	unlocked_outlooks = PackedStringArray()
+	var outlooks: Variant = data.get("unlocked_outlooks", ["plain"])
+	if outlooks is Array:
+		for item in outlooks:
+			var id := String(item)
+			if not id.is_empty() and not (id in unlocked_outlooks):
+				unlocked_outlooks.append(id)
+	if not ("plain" in unlocked_outlooks):
+		unlocked_outlooks.append("plain")
+	staff_equipped_id = String(data.get("staff_equipped_id", ""))
+	staff_owned = _string_array(data.get("staff_owned", []))
+	artifact_owned = _string_array(data.get("artifact_owned", []))
+	artifact_equipped_ids = _string_array(data.get("artifact_equipped_ids", []))
+	chapter_events_resolved = _string_array(data.get("chapter_events_resolved", []))
+	stock = WagonStock.new()
+	stock.cards.clear()
+	var cards: Variant = data.get("stock", [])
+	if cards is Array:
+		for item in cards:
+			if not (item is Dictionary):
+				continue
+			var row: Dictionary = item
+			stock.cards.append(HandCard.make(
+				String(row.get("id", "")),
+				_card_type_from_wire(String(row.get("type", "material"))),
+				String(row.get("mat_enchant_id", "")),
+				bool(row.get("shiny", false))
+			))
+	board = ChapterSchedule.make_empty(chapter_id)
+	board.begin_live(String(data.get("chapter_boss_id", "")), String(data.get("boss_pool_id", "")))
+	board.day_index = int(data.get("day_index", 1))
+	board.route_path = _packed_ids(data.get("route_path", []))
+	board.draft_path = _packed_ids(data.get("draft_path", []))
+	board.current_node_id = String(data.get("current_node_id", ""))
+	board.appt_decline_used = bool(data.get("appt_decline_used", false))
+	board.crafts_done = int(data.get("crafts_done", 0))
+	var day_rows: Variant = data.get("days", [])
+	if day_rows is Array:
+		for item in day_rows:
+			if not (item is Dictionary):
+				continue
+			var row: Dictionary = item
+			var slot := board.slot_at(int(row.get("day_index", 0)))
+			if slot == null:
+				continue
+			slot.day_action = _action_from_wire(String(row.get("action", "")))
+			slot.order_id = String(row.get("order_id", ""))
+			slot.event_id = String(row.get("event_id", ""))
+			slot.node_id = String(row.get("node_id", ""))
+	board.sync_days_left()
+	if newspaper_open:
+		last_stamp = _make_newspaper_stamp()
+	else:
+		last_stamp = _make_schedule_stamp()
+	board_changed.emit()
+	return true
+
+
+func _packed_ids(value: Variant) -> Array[String]:
+	var out: Array[String] = []
+	if value is Array:
+		for item in value:
+			var id := String(item)
+			if not id.is_empty():
+				out.append(id)
+	return out
+
+
+func _string_array(value: Variant) -> Array:
+	var out: Array = []
+	if value is Array:
+		for item in value:
+			out.append(String(item))
+	return out
+
+
+func _action_from_wire(wire: String) -> GameEnums.RoundAction:
+	match wire:
+		"appointment":
+			return GameEnums.RoundAction.APPOINTMENT
+		"walk_in":
+			return GameEnums.RoundAction.WALK_IN
+		"wagon_shop":
+			return GameEnums.RoundAction.WAGON_SHOP
+		"wagon_event":
+			return GameEnums.RoundAction.WAGON_EVENT
+		"prep_craft":
+			return GameEnums.RoundAction.PREP_CRAFT
+		"rest_dig":
+			return GameEnums.RoundAction.REST_DIG
+		_:
+			return GameEnums.RoundAction.NONE
+
+
+func _card_type_from_wire(wire: String) -> GameEnums.HandCardType:
+	match wire:
+		"rune":
+			return GameEnums.HandCardType.RUNE
+		"skill":
+			return GameEnums.HandCardType.SKILL
+		_:
+			return GameEnums.HandCardType.MATERIAL
+
+
+func _run_over_from_wire(wire: String) -> GameEnums.RunOverReason:
+	match wire:
+		"reps_gate_miss":
+			return GameEnums.RunOverReason.REPS_GATE_MISS
+		"boss_death":
+			return GameEnums.RunOverReason.BOSS_DEATH
+		_:
+			return GameEnums.RunOverReason.NONE
 
