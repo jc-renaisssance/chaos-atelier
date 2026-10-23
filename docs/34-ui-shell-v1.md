@@ -1,6 +1,8 @@
 # Steam-demo UI shell v1 — craft + order
 
-**Doc id: `34`.** **Status: Shipped.** Jonathan stamp **A A B** (palette **A** / order-panel bust **A** / planner chips **B** — text interim; icon chips Later) on Design #76 (`daa0280`). Client landed (#77, `c8a5a1a`). `dev` tip is **`c8a5a1a`**. The letter tables below are the law as stamped. Do not reopen. No further Client on this file. No gens. Does not revive #62. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not open a Solenne pass. Posture art stays **Nov 2**. Icon chips stay Later.
+**Doc id: `34`.** **Status: Shipped** for palette, bust, and the craft frame. Jonathan stamp **A A B** (palette **A** / order-panel bust **A** / planner chips **B**) on Design #76 (`daa0280`). Client landed (#77, `c8a5a1a`). `dev` tip is **`4d9fa19`**. The letter tables below are the shell record. Do not reopen palette or bust. PR #71 stays held: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not open a Solenne pass. Posture art stays **Nov 2**. Does not revive #62.
+
+**Demo override (2026-10-23).** Planner chips **B** shipped as text interim, icon chips Later. That interim is **not** live law for the Steam demo. Chips are icons. The files are **not** on the tip — source letter is [35](35-steam-demo-cut.md) Decision 2. Outlook art on Current / Potential, the title screen, graph commit, one fight, and Brief / Estimate sentences live in `35`. This file does not reopen them as shell letters.
 
 This file is the **presentation** law for the dedicated craft screen. Rules stay in [27](27-craft-mode-stamina.md) and [30](30-interactive-order.md). A stamp here does not retune stamina, unlocks, estimate cutoffs, or `M2_JOB_POOL`.
 
@@ -38,7 +40,7 @@ Craft stays its own screen. It is not the route board.
 │ Order                      │ Zones (≤4)                  │
 │  name · job · six stats    │  [1] [2] [3] [4]            │
 │  one ask_*                 │                             │
-│ Plan          (text chips) │ Current    Potential       │
+│ Plan       (text on #77)   │ Current    Potential       │
 │ Brief                      │ (selected zone only)        │
 │ Estimate                   │                             │
 ├────────────────────────────┴─────────────────────────────┤
@@ -47,6 +49,8 @@ Craft stays its own screen. It is not the route board.
 ```
 
 After **Finish**, the playback step uses this same frame, then the mission report the Client already shows (`23`). Playback is not a fourth block on the order panel.
+
+The Plan cell is what #77 shipped (tag name on the button). The demo cut replaces that cell with an icon ([35](35-steam-demo-cut.md)). #77 did not load a chip file.
 
 | Region | Shows | Does not show |
 |---|---|---|
@@ -155,7 +159,9 @@ The raw stamp JSON panel leaves the player screen. Test logs in `20` stay. No ne
 
 ### Planner chips
 
-**Decision 3.** **A:** each chip is the tag name on a secondary button. No icon. **B:** icon chips. **B** needs art, so the icons wait. Design recommended **A**. Jonathan wrote **B**. Client #77 keeps the tag name on the secondary button (text interim). Icon chips stay Later. No gens.
+**Decision 3 — record.** **A:** each chip is the tag name on a secondary button. No icon. **B:** icon chips. Design recommended **A**. Jonathan wrote **B**. Client #77 painted the tag name (text interim) because no chip file was in that lane.
+
+**Live demo law** is [35](35-steam-demo-cut.md): the chip is an icon. Text interim is not the ship bar. No discrete tag-chip PNG is on the tip. Do not treat this record as “icons already exist.”
 
 ### Order-panel bust
 
@@ -174,7 +180,9 @@ The raw stamp JSON panel leaves the player screen. Test logs in `20` stay. No ne
 
 ## Current and Potential
 
-Required by `27`. They sit in the **upper right**, under the zone row, for the **selected** zone only. Two frames, titles **Current** and **Potential**, bodies the strings the readout already builds. Locked outlook stays locked / hidden. No outlook art. No name spoiler past “locked”.
+Required by `27`. They sit in the **upper right**, under the zone row, for the **selected** zone only. Two frames, titles **Current** and **Potential**, bodies the strings the readout already builds. Locked outlook stays locked / hidden. No name spoiler past “locked”.
+
+**Outlook art** is the open cut in [35](35-steam-demo-cut.md): stamped `look_armor_*.png` from `armor-stamped-2026-09-29/` and `armor-cross-tag-locked-2026-10-02/`, Potential required, Current if Decision 1 is **A**, locked hides the picture. The “no outlook art” line in the shell record is the #77 surface. It is not the demo law.
 
 Per-zone simultaneous readouts stay Later. Moving the pair out of the order column does not change the bag they read.
 
@@ -224,7 +232,7 @@ Theme tokens and scene chrome only. No mechanism retune.
 | Player titles from the diagram. Debug captions and the stamp-JSON panel leave the player screen | Dropping test logs. A new `20` key |
 | Zone cards ≤4, five hand frames, Dig, Finish, Return, keys 1–5 and D | Changing `12 * N`, dig 2, hand size, zone max, Finish-only, empty-zone path |
 | Order column is slices 1–3 text. Estimate label drops the weight-integer suffix | Changing `ask_*`, unlock, `?` gates, weights, or S–F cutoffs |
-| Bust letter **A**. `in_shop` hide-if-missing stays. Planner chips letter **B** as text on the secondary button | Regen, a #71 edit, a posture png, icon chips |
+| Bust letter **A**. `in_shop` hide-if-missing stays. Planner chips letter **B** painted as text on #77 | Regen, a #71 edit, a posture png. Icon files are the open cut in [35](35-steam-demo-cut.md), not a shell reopen |
 | Current / Potential under the selected zone | A readout on every zone at once |
 | Playback uses the same frame. Skip stays | A new beat, a second sim, hiding Skip |
 | Market, route, Dex, newspaper, HUD untouched | A restyle of those screens |
@@ -279,4 +287,4 @@ Nothing else blocks. No PixelLab. No `src/` in this PR. PR #71 is not in this PR
 
 ### Design recommends
 
-**Palette A. Bust A. Planner chips A.** Playback chrome stays in this shell. Jonathan’s stamp is **A A B** (chips **B**, text interim). The recommendation is the record. It is not an open ask.
+**Palette A. Bust A. Planner chips A.** Playback chrome stays in this shell. Jonathan’s stamp is **A A B** (chips **B**, text interim on #77). The recommendation is the shell record. It is not an open shell ask. The Steam-demo cut ([35](35-steam-demo-cut.md)) overrides the text interim: chips are icons, and the icon files are not on the tip.

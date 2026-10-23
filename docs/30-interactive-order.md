@@ -132,7 +132,7 @@ Planned target is **intent** for the estimate (slice 3). It does **not** change 
 - On each piece Finish: if threshold met, union the key(s); if apex, also union low + mid of that outlook. Also write `dex_crafts` (`31`) — do **not** duplicate Builds into another builds array.
 - Do **not** write on abandon. Do **not** clear on run end / death. **LOCKED** cross-run.
 - Render unlocked rows from `unlocked_builds`; render `?` for locked (see UX). Click-to-tier for tags the player can see.
-- No outlook art required — text labels are the M1 surface (extends `27` Potential “locked if not unlocked”).
+- Outlook art on Current / Potential is the Steam-demo cut ([35](35-steam-demo-cut.md)), not this slice. Locked still hides the picture. Planner chips are icons in that cut. The M1 text surface above is the slice-2 record.
 
 ### Test logs
 
@@ -272,6 +272,8 @@ On boss beat: `threat_id == chapter_boss_id` (`20` assert 23) even if the catalo
 **Law (Client #70: Gate A, Surface A, Socket A).** Posture art stays **Nov 2**. Other letters stay on the [STAMP](STAMP.md) card as the ask. Do not reopen playback.
 
 After a player **Finish** that already runs the mission resolver, Client plays a short deterministic timeline, then shows the mission report ([23](23-mission-report.md)). The timeline displays the stamp the resolver just returned. It does not run a second fight.
+
+**Steam-demo cut (2026-10-23).** A 2-piece order is one craft session and **one** fight ([35](35-steam-demo-cut.md)). `grade_piece` runs per zone so each piece has a stamp. Gate **A** then shows a vignette per piece (this playback, then that piece’s report). After the last piece report, the order resolve grades the **combined** gear **once**. That grade is the fight. N = 2 is two vignettes and one fight. The vignettes are not fights. Collapsing them into one playback is letter **B** on the cut card. Silence keeps Gate **A**.
 
 ### Playback gate — A, B, or C
 

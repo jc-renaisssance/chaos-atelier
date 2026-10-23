@@ -43,7 +43,9 @@ These monostack syn lines keep power rows in [14](14-synergies.md) but **armor o
 |---|---|---|
 | storm, lunar, solar, sticky, sharp, soft, wild, occult, pure | `syn_{tag}_{3\|5\|8}` live in `14` | **Other owner pool** — do **not** monostack-gen for default atelier armor |
 
-Cross-tag outlooks (Temper, Greenmail, Snaretooth, Masked Crown, Dawn Vestment, Pale Hex): **power + single chrome** — **next** (with neg outlooks); no 3/5/8 tiers ([14](14-synergies.md) Cross-tag review).
+Cross-tag outlooks (Temper, Greenmail, Snaretooth, Masked Crown, Dawn Vestment, Pale Hex): **power + single chrome** — art is the 2026-10-02 pack. No 3/5/8 unlock keys ([14](14-synergies.md) Cross-tag review).
+
+**Wire (open, 2026-10-23).** Craft Current / Potential loads these bytes. Path table, the mid-file cross slot, and the `mat_*.png` exclusion are [35](35-steam-demo-cut.md). This list does not add a gen. Do not regen the two packs.
 
 ## Phase-1C batch — **armor stamped 2026-09-29** (complete)
 

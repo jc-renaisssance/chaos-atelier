@@ -1,4 +1,20 @@
 > **Superseded:** **1-of-3 card lineup** / `CHAPTER_ROUND_LIMIT=3` / Round board / free per-day `E*` board below is **not** the live chapter spine. Live = travelling atelier **route map with forks**, `CHAPTER_DAY_COUNT` = `map.day_count` (current map **8**) — [22-chapter-schedule](22-chapter-schedule.md). Craft = stamina mode — [27-craft-mode-stamina](27-craft-mode-stamina.md). **No `crafts_max`.** The `atelier_shop(player)` **opening-shop** / last-shop-before-boss calls below are **historical** — live **market** is a **route node** visit only ([32](32-shop-and-events.md); display Market, wire `kind=shop`; M1 materials / M2 Staffs·Skills·Gear). Keep this file as historical PR #7 shell notes.
+
+## Boot (2026-10-23)
+
+The process opens a **title screen**, then the route graph. It does not open `schedule_board` as `run/main_scene`. Law: [35](35-steam-demo-cut.md).
+
+Client adds `res://src/ui/title/title_screen.tscn` and sets `project.godot` `run/main_scene` to that scene. The board scene stays the board.
+
+| Control | Does |
+|---|---|
+| **New run** | Starts a chapter the way a run starts today. Newspaper, then the graph. |
+| **Continue** | Resumes the profile save. Disabled when there is no save. |
+| **Quit** | Leaves the process. |
+
+Word on the screen: **Wombaste**. No seed field. No stamp dump.
+
+`dev_tools` defaults **false**. Dex, **Reroll this chapter**, **Demo next chapter**, and the STAMP JSON dump are off that flag, on the board, never on the title. A demo boot does not show them.
 # Application flow (pseudocode) — Phase-1 `own_basic`
 
 ```
