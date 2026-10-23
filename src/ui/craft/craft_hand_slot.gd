@@ -1,111 +1,310 @@
 class_name CraftHandSlot
-extends PanelContainer
-## Hand slot. Cards display here only (docs/27, docs/34). Drag into a zone, or click / 1–5.
-## An empty slot is still a frame: index, no name.
-
-signal slot_played(hand_index: int)
+extends Panel
+## Portrait hand card (docs/36). 108×148, face well 88×88, pivot at the bottom center.
+## A missing mat png keeps the chip well. Drag threshold and play live on the table.
 
 var hand_index: int = 0
-var _locked: bool = true
-var _press_pos: Vector2 = Vector2.ZERO
-var _dragged: bool = false
+var card: HandCard
+var cost: int = 0
+var can_click: bool = false
+var can_drag: bool = false
+var rest_position: Vector2 = Vector2.ZERO
+var rest_rotation: float = 0.0
+var rest_z: int = 0
+var flight_visual: bool = false
+
+var _hovered: bool = false
+var _hover_locked: bool = false
+var _ghost: bool = false
 var _shiny: bool = false
-var _shine_bar: ColorRect
-var _caption: Label
+var _instance_id: int = 0
+var _tween: Tween
+var _face_well: Panel
+var _face: TextureRect
+var _shine: ColorRect
+var _index: Label
 var _name: Label
-var _meta: Label
-var _blurb: Label
+var _caption: Label
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	custom_minimum_size = Vector2(148, 120)
-	size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_apply_style()
-	if _caption != null:
+	clip_contents = true
+	custom_minimum_size = Vector2(CraftHandLayout.CARD_W, CraftHandLayout.CARD_H)
+	size = custom_minimum_size
+	pivot_offset = Vector2(size.x * 0.5, size.y)
+	mouse_filter = Control.MOUSE_FILTER_IGNORE if flight_visual else Control.MOUSE_FILTER_STOP
+	if _index != null:
 		return
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 4)
-	add_child(box)
-	_shine_bar = ColorRect.new()
-	_shine_bar.color = ShellTheme.SHINE_BAR
-	_shine_bar.custom_minimum_size = Vector2(0, 8)
-	_shine_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_shine_bar.visible = false
-	box.add_child(_shine_bar)
-	_caption = _label("1", ShellTheme.SLOT_PX, ShellTheme.GOLD)
-	box.add_child(_caption)
+	_build()
+	_apply_style()
+
+
+func bind(index: int, next: HandCard, next_cost: int, clickable: bool, draggable: bool) -> void:
+	hand_index = index
+	card = next
+	cost = next_cost
+	can_click = clickable
+	can_drag = draggable
+	_instance_id = next.get_instance_id() if next != null else 0
+	_shiny = next != null and next.is_enchanted()
+	_index.text = str(index + 1)
+	_name.text = CraftCatalog.display_name(next.id, next.type) if next != null else ""
+	_caption.text = _caption_for(next, next_cost)
+	_bind_face(next)
+	if flight_visual or _ghost:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+	else:
+		mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if (can_click or can_drag) else Control.CURSOR_ARROW
+	_apply_style()
+	if _ghost:
+		_apply_ghost_look()
+
+
+func tracks(instance_id: int) -> bool:
+	return _instance_id == instance_id and instance_id != 0
+
+
+func is_hovered() -> bool:
+	return _hovered
+
+
+func set_ghost(on: bool) -> void:
+	_ghost = on
+	if on:
+		suppress_hover()
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_apply_ghost_look()
+	else:
+		_face_well.visible = true
+		_face.visible = _face.texture != null
+		mouse_filter = Control.MOUSE_FILTER_IGNORE if flight_visual else Control.MOUSE_FILTER_STOP
+		_apply_style()
+
+
+func set_hover_locked(locked: bool) -> void:
+	_hover_locked = locked
+	if locked:
+		suppress_hover()
+		position = rest_position
+		rotation = rest_rotation
+		scale = Vector2.ONE
+
+
+func set_hovered(on: bool) -> void:
+	if _ghost or _hover_locked or flight_visual:
+		on = false
+	if _hovered == on:
+		return
+	_hovered = on
+	z_index = 40 if on else rest_z
+	_tween_to(_shown_position(), _shown_rotation(), _shown_scale(), CraftHandLayout.HOVER_SEC)
+
+
+func suppress_hover() -> void:
+	_hovered = false
+	z_index = rest_z
+	_kill_tween()
+
+
+func snap_rest(pos: Vector2, rot: float) -> void:
+	rest_position = pos
+	rest_rotation = rot
+	_kill_tween()
+	position = pos
+	rotation = rot
+	scale = Vector2.ONE
+
+
+func apply_rest(pos: Vector2, rot: float, animate: bool, duration: float) -> void:
+	rest_position = pos
+	rest_rotation = rot
+	if _hovered:
+		z_index = 40
+	else:
+		z_index = rest_z
+	if not animate:
+		_kill_tween()
+		position = _shown_position()
+		rotation = _shown_rotation()
+		scale = _shown_scale()
+		return
+	_tween_to(_shown_position(), _shown_rotation(), _shown_scale(), duration)
+
+
+func play_deal(from_y: float, from_scale: float, duration: float, delay: float, done: Callable) -> void:
+	suppress_hover()
+	position = rest_position + Vector2(0, from_y)
+	rotation = rest_rotation
+	scale = Vector2(from_scale, from_scale)
+	modulate.a = 0.0
+	var tw := _begin_tween()
+	tw.tween_property(self, "position", rest_position, duration).set_delay(delay)
+	tw.tween_property(self, "scale", Vector2.ONE, duration).set_delay(delay)
+	tw.tween_property(self, "modulate:a", 1.0, duration).set_delay(delay)
+	if done.is_valid():
+		tw.finished.connect(done, CONNECT_ONE_SHOT)
+
+
+func play_dump(drop_px: float, duration: float, delay: float, done: Callable) -> void:
+	suppress_hover()
+	var tw := _begin_tween()
+	tw.tween_property(self, "position:y", position.y + drop_px, duration).set_delay(delay)
+	tw.tween_property(self, "modulate:a", 0.0, duration).set_delay(delay)
+	tw.finished.connect(func() -> void:
+		if done.is_valid():
+			done.call()
+		if is_instance_valid(self):
+			queue_free()
+	, CONNECT_ONE_SHOT)
+
+
+func contains_global(point: Vector2) -> bool:
+	if not is_visible_in_tree():
+		return false
+	var xform := get_global_transform()
+	if is_zero_approx(xform.determinant()):
+		return false
+	var local: Vector2 = xform.affine_inverse() * point
+	return Rect2(Vector2.ZERO, size).has_point(local)
+
+
+func _shown_position() -> Vector2:
+	if _hovered:
+		return rest_position + Vector2(0, -CraftHandLayout.HOVER_LIFT_PX)
+	return rest_position
+
+
+func _shown_rotation() -> float:
+	if _hovered:
+		return 0.0
+	return rest_rotation
+
+
+func _shown_scale() -> Vector2:
+	if _hovered:
+		return Vector2(CraftHandLayout.HOVER_SCALE, CraftHandLayout.HOVER_SCALE)
+	return Vector2.ONE
+
+
+func _build() -> void:
+	_shine = ColorRect.new()
+	_shine.color = ShellTheme.SHINE_BAR
+	_shine.position = Vector2.ZERO
+	_shine.size = Vector2(CraftHandLayout.CARD_W, 4)
+	_shine.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_shine.visible = false
+	add_child(_shine)
+
+	_face_well = Panel.new()
+	_face_well.position = Vector2(
+		(CraftHandLayout.CARD_W - CraftHandLayout.FACE_PX) * 0.5,
+		18
+	)
+	_face_well.size = Vector2(CraftHandLayout.FACE_PX, CraftHandLayout.FACE_PX)
+	_face_well.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_face_well.add_theme_stylebox_override("panel", ShellTheme.chip_well(4))
+	add_child(_face_well)
+
+	_face = TextureRect.new()
+	_face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_face.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_face.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_face.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_face.visible = false
+	_face_well.add_child(_face)
+
+	_index = _label("", ShellTheme.SLOT_PX, ShellTheme.GOLD)
+	_index.position = Vector2(8, 3)
+	_index.size = Vector2(36, 14)
+	add_child(_index)
+
 	_name = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
-	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_name)
-	_meta = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
-	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_meta)
-	_blurb = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
-	_blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_blurb)
-	gui_input.connect(_on_gui)
+	_name.position = Vector2(8, 108)
+	_name.size = Vector2(CraftHandLayout.CARD_W - 16, 16)
+	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_name.clip_text = true
+	add_child(_name)
+
+	_caption = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
+	_caption.position = Vector2(8, 124)
+	_caption.size = Vector2(CraftHandLayout.CARD_W - 16, 20)
+	_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_caption.max_lines_visible = 2
+	_caption.clip_text = true
+	add_child(_caption)
 
 
-func bind(index: int, card: HandCard, cost: int, locked: bool, can_play: bool) -> void:
-	hand_index = index
-	_locked = locked or not can_play
-	mouse_filter = Control.MOUSE_FILTER_IGNORE if _locked else Control.MOUSE_FILTER_STOP
-	_shiny = card != null and card.is_enchanted()
-	_caption.text = str(index + 1)
-	_name.text = CraftCatalog.display_name(card.id, card.type)
-	var tags := CraftCatalog.tags_of(card.id, card.type)
-	var fate := "burns" if CraftRules.burns_on_play(card.type) else "to discard"
-	var meta := "%s · cost %d · %s" % [GameEnums.hand_card_type_wire(card.type), cost, fate]
-	if _shiny:
-		meta += " · shiny %s" % card.mat_enchant_id
-	_meta.text = meta
-	_blurb.text = ", ".join(tags) if tags.size() > 0 else CraftCatalog.skill_blurb(card.id)
-	_apply_style()
+func _bind_face(next: HandCard) -> void:
+	var tex: Texture2D = null
+	if next != null:
+		tex = MatFace.texture_for(next.id, next.type)
+	_face.texture = tex
+	_face.visible = tex != null and not _ghost
+	_face_well.visible = not _ghost
 
 
-func bind_empty(index: int) -> void:
-	hand_index = index
-	_locked = true
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	_shiny = false
-	_caption.text = str(index + 1)
-	_name.text = ""
-	_meta.text = ""
-	_blurb.text = ""
-	_apply_style()
+func _caption_for(next: HandCard, next_cost: int) -> String:
+	if next == null:
+		return ""
+	if next.type == GameEnums.HandCardType.SKILL:
+		return CraftCatalog.skill_blurb(next.id)
+	var tags := CraftCatalog.tags_of(next.id, next.type)
+	var kind := GameEnums.hand_card_type_wire(next.type)
+	if tags.is_empty():
+		return "%s · cost %d" % [kind, next_cost]
+	return "%s · cost %d · %s" % [kind, next_cost, ", ".join(tags)]
 
 
 func _apply_style() -> void:
 	var sb := ShellTheme.hand_shiny() if _shiny else ShellTheme.hand()
-	modulate = ShellTheme.SHINY_MODULATE if _shiny else Color(1, 1, 1)
-	if _shine_bar != null:
-		_shine_bar.visible = _shiny
 	add_theme_stylebox_override("panel", sb)
-
-
-func _get_drag_data(_at_position: Vector2) -> Variant:
-	if _locked:
-		return null
-	_dragged = true
-	var preview := _label(_name.text, ShellTheme.BODY_PX, ShellTheme.INK)
-	set_drag_preview(preview)
-	return {"kind": "craft_hand", "hand_index": hand_index}
-
-
-func _on_gui(event: InputEvent) -> void:
-	if _locked:
+	if _shine != null:
+		_shine.visible = _shiny and not _ghost
+	if _ghost:
+		_apply_ghost_look()
 		return
-	if event is InputEventMouseButton:
-		var mouse := event as InputEventMouseButton
-		if mouse.button_index != MOUSE_BUTTON_LEFT:
-			return
-		if mouse.pressed:
-			_press_pos = mouse.position
-			_dragged = false
-		elif not _dragged and _press_pos.distance_to(mouse.position) < 8.0:
-			slot_played.emit(hand_index)
+	var tint := ShellTheme.SHINY_MODULATE if _shiny else Color(1, 1, 1)
+	tint.a = 1.0
+	modulate = tint
 
 
-func _label(text: String, size: int, color: Color) -> Label:
-	return ShellTheme.label(text, size, color)
+func _apply_ghost_look() -> void:
+	if _face_well != null:
+		_face_well.visible = false
+	if _face != null:
+		_face.visible = false
+	if _shine != null:
+		_shine.visible = false
+	var tint := ShellTheme.SHINY_MODULATE if _shiny else Color(1, 1, 1)
+	tint.a = 0.35
+	modulate = tint
+
+
+func _tween_to(pos: Vector2, rot: float, next_scale: Vector2, duration: float) -> void:
+	var tw := _begin_tween()
+	tw.tween_property(self, "position", pos, duration)
+	tw.tween_property(self, "rotation", rot, duration)
+	tw.tween_property(self, "scale", next_scale, duration)
+
+
+func _begin_tween() -> Tween:
+	_kill_tween()
+	_tween = create_tween()
+	_tween.set_parallel(true)
+	_tween.set_ease(Tween.EASE_OUT)
+	_tween.set_trans(Tween.TRANS_QUAD)
+	return _tween
+
+
+func _kill_tween() -> void:
+	if _tween != null and _tween.is_valid():
+		_tween.kill()
+	_tween = null
+
+
+func _label(text: String, font_size: int, color: Color) -> Label:
+	var lab := ShellTheme.label(text, font_size, color)
+	lab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return lab

@@ -48,6 +48,13 @@ static func hand_shiny() -> StyleBoxFlat:
 	return _box(SHINY_FILL, GOLD, 2, 8, 8, 8, 8)
 
 
+## Chip fill, 1px border. Hand face well and the 32×32 played square (docs/36).
+static func chip_well(corner: int = 4) -> StyleBoxFlat:
+	var sb := _box(CHIP, BORDER, 1, 0, 0, 0, 0)
+	sb.set_corner_radius_all(corner)
+	return sb
+
+
 static func button_primary() -> StyleBoxFlat:
 	return _box(PANEL, GOLD, 2, 10, 10, 6, 6)
 
