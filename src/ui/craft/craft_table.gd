@@ -2,8 +2,8 @@ class_name CraftTable
 extends Control
 ## Dedicated stamina craft screen (docs/27, docs/34). Not the route-graph board.
 ## Shell v1: palette A, bust A. Planner chips are the 16 stamped icons.
-## Current and Potential take the same outlook png when that slot is unlocked
-## and res://assets/outlook/ has the file. A missing file hides the picture.
+## Current and Potential take the same Soft outlook png when that slot is unlocked.
+## Locked outlooks hide both. Paths are res://assets/outlook/ (docs/35 ×28).
 ## Regions stay: UPPER LEFT adventurer order detail, UPPER RIGHT zones, LOWER hand.
 ## CURRENT and POTENTIAL read the selected zone. They are not on the order column.
 ## Construction comes from the order, not a hand card.
@@ -546,8 +546,7 @@ func _outlook_socket() -> TextureRect:
 
 
 func _bind_outlook_art(preview: Dictionary, unlocked: PackedStringArray) -> void:
-	## Same file on Current and Potential when unlocked. Hide both when locked
-	## or when assets/outlook/ does not have that slot yet.
+	## Same Soft file on Current and Potential when unlocked. Hide both when locked.
 	var tex: Texture2D = null
 	if CraftReadout.potential_unlocked(preview, unlocked):
 		tex = OutlookArt.texture_for(CraftReadout.outlook_id_of(preview))
