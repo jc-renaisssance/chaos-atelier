@@ -1,15 +1,9 @@
 class_name CraftHandSlot
 extends PanelContainer
-## Hand slot 1–5. Cards display here only (docs/27). Drag into a zone, or click / 1–5.
+## Hand slot. Cards display here only (docs/27, docs/34). Drag into a zone, or click / 1–5.
+## An empty slot is still a frame: index, no name.
 
 signal slot_played(hand_index: int)
-
-const INK := Color(0.91, 0.835, 0.69)
-const MUTED := Color(0.71, 0.643, 0.541)
-const GOLD := Color(0.788, 0.635, 0.153)
-const CHIP := Color(0.227, 0.173, 0.094)
-const BORDER := Color(0.239, 0.204, 0.173)
-const SHINE := Color(0.95, 0.82, 0.22, 0.38)
 
 var hand_index: int = 0
 var _locked: bool = true
@@ -34,20 +28,20 @@ func _ready() -> void:
 	box.add_theme_constant_override("separation", 4)
 	add_child(box)
 	_shine_bar = ColorRect.new()
-	_shine_bar.color = SHINE
+	_shine_bar.color = ShellTheme.SHINE_BAR
 	_shine_bar.custom_minimum_size = Vector2(0, 8)
 	_shine_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_shine_bar.visible = false
 	box.add_child(_shine_bar)
-	_caption = _label("1", 11, GOLD)
+	_caption = _label("1", ShellTheme.SLOT_PX, ShellTheme.GOLD)
 	box.add_child(_caption)
-	_name = _label("", 14, INK)
+	_name = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_name.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_name)
-	_meta = _label("", 12, MUTED)
+	_meta = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_meta)
-	_blurb = _label("", 11, MUTED)
+	_blurb = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_blurb)
 	gui_input.connect(_on_gui)
@@ -58,7 +52,7 @@ func bind(index: int, card: HandCard, cost: int, locked: bool, can_play: bool) -
 	_locked = locked or not can_play
 	mouse_filter = Control.MOUSE_FILTER_IGNORE if _locked else Control.MOUSE_FILTER_STOP
 	_shiny = card != null and card.is_enchanted()
-	_caption.text = "SLOT %d" % (index + 1)
+	_caption.text = str(index + 1)
 	_name.text = CraftCatalog.display_name(card.id, card.type)
 	var tags := CraftCatalog.tags_of(card.id, card.type)
 	var fate := "burns" if CraftRules.burns_on_play(card.type) else "to discard"
@@ -70,19 +64,23 @@ func bind(index: int, card: HandCard, cost: int, locked: bool, can_play: bool) -
 	_apply_style()
 
 
+func bind_empty(index: int) -> void:
+	hand_index = index
+	_locked = true
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	_shiny = false
+	_caption.text = str(index + 1)
+	_name.text = ""
+	_meta.text = ""
+	_blurb.text = ""
+	_apply_style()
+
+
 func _apply_style() -> void:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.35, 0.28, 0.1) if _shiny else CHIP
-	sb.set_corner_radius_all(8)
-	sb.set_border_width_all(2 if _shiny else 1)
-	sb.border_color = GOLD if _shiny else BORDER
-	modulate = Color(1.1, 1.05, 0.82) if _shiny else Color(1, 1, 1)
+	var sb := ShellTheme.hand_shiny() if _shiny else ShellTheme.hand()
+	modulate = ShellTheme.SHINY_MODULATE if _shiny else Color(1, 1, 1)
 	if _shine_bar != null:
 		_shine_bar.visible = _shiny
-	sb.content_margin_left = 8
-	sb.content_margin_right = 8
-	sb.content_margin_top = 8
-	sb.content_margin_bottom = 8
 	add_theme_stylebox_override("panel", sb)
 
 
@@ -90,7 +88,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	if _locked:
 		return null
 	_dragged = true
-	var preview := _label(_name.text, 13, INK)
+	var preview := _label(_name.text, ShellTheme.BODY_PX, ShellTheme.INK)
 	set_drag_preview(preview)
 	return {"kind": "craft_hand", "hand_index": hand_index}
 
@@ -110,8 +108,4 @@ func _on_gui(event: InputEvent) -> void:
 
 
 func _label(text: String, size: int, color: Color) -> Label:
-	var lab := Label.new()
-	lab.text = text
-	lab.add_theme_font_size_override("font_size", size)
-	lab.add_theme_color_override("font_color", color)
-	return lab
+	return ShellTheme.label(text, size, color)
