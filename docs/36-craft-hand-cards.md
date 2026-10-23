@@ -1,6 +1,6 @@
 # Craft hand — card fan, drag, mat faces
 
-**Doc id: `36`.** **Status: Open.** Soft Design ask, 2026-10-23. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in this PR. No png copy. No PixelLab gen. No burn.
+**Doc id: `36`.** **Status: Stamped A′AAAA** on Design #83 (2026-10-23). Hand **A′**, Drag **A**, Drop **A**, Mat path **A**, Placeholder **A**. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in this PR. No png copy. No PixelLab gen. No burn. The motion Client and the 38-file export are not on the tip yet. Placeholder **A** still closes the asset lane only when those files land.
 
 The craft screen on that tip already runs the stamped rules ([27](27-craft-mode-stamina.md), shell [34](34-ui-shell-v1.md)). The lower band is five equal text panels in a row (`148×120`, gap 8). A drag preview is a `Label` of the display name. There is no fan, no arc, no overlap, no lift, no tilt, no ghost card, and no settle. Jonathan (2026-10-23 HKT): redo that hand so it reads as a card game, with production motion even while the face is still a placeholder, and put `mat_*` icons on the card and on the materials shelf.
 
@@ -13,7 +13,7 @@ AAAA ([35](35-steam-demo-cut.md), docs #79 / chips #80 / outlook #81 / Client #8
 | Lock | Where |
 |---|---|
 | StS cycle: play leaves the hand → discard; dig dumps the remaining hand, then draws; short draw reshuffles discard into draw | `27` |
-| One session, stamina **`12 × N`**, hand size **5**, dig cost **2** | `27`, [33](33-until-m2-tuning.md) |
+| One session, stamina **`12 × N`**, hand-size setting **5**, dig cost **2**. The fan reads that setting. It does not write a new integer | `27`, [33](33-until-m2-tuning.md) |
 | Regions: order upper left, zones upper right, hand lower. Max **4** zones. N > 4 stays Later | `27`, `34` |
 | Play by drag onto a zone, or select a zone and press **1–5**. **D** digs. N = 1 does not require a drag | `27` |
 | One **Finish** resolves every zone in listed order. Stamina 0 stays open | `27` |
@@ -29,7 +29,7 @@ A letter below changes presentation. It does not change a row in that table.
 
 ## What the player sees
 
-The lower band keeps **Dig · 2** and **Finish** where they are, to the right of the hand. The five slots stop being an equal `HBox`. They become a hand of portrait cards along the bottom, center-aligned.
+The lower band keeps **Dig · 2** and **Finish** where they are, to the right of the hand. The equal `HBox` of text panels becomes a hand of portrait cards along the bottom, center-aligned. The fan shows the cards in the hand this frame. It does not keep an empty frame for a card that has left.
 
 ```
 ┌────────┐
@@ -40,27 +40,69 @@ The lower band keeps **Dig · 2** and **Finish** where they are, to the right of
 └────────┘
 ```
 
-Card size is fixed: **108×148**. It does not `SIZE_EXPAND_FILL`. The face well is **88×88**, nearest, keep-aspect, centered in the upper part of the card. Under it: display name (13, `ink`) and one caption (12, `muted`) for type, cost, and tags, or the skill blurb. The slot index (11, `gold`) sits in the top-left corner. An empty slot is still in the fan: index, dim frame, no name. Keys **1–5** stay on those five positions. The row does not close up when a card leaves.
+Card size is fixed: **108×148**. It does not `SIZE_EXPAND_FILL`. The face well is **88×88**, nearest, keep-aspect, centered in the upper part of the card. Under it: display name (13, `ink`) and one caption (12, `muted`) for type, cost, and tags, or the skill blurb. The slot index (11, `gold`) sits in the top-left corner. Keys are `1` through `max_hand`. Key `k` plays the card at index `k - 1` when `k` is at most the number of cards in the fan. A higher key does nothing. After a play, the remaining cards move to the new poses from the formula below.
 
 Shell colors stay the stamped set (`chip` fill, `border`, shiny gold). This file adds no color token.
 
 ---
 
-## 1. Hand geometry
+## 1. Hand geometry — stamped A′
 
-Hand size stays **5**. Max visible cards stays **5**. There is no sixth card and no scroll. Both letters use the card size above. Hover does not change which key a slot is. Rest z-order is the slot index (the right card paints over the card to its left). A hovered card paints above the row.
+**Taken.** Jonathan amended letter **A**. The picture of a full hand is still that arc fan. The per-step angle is not a constant. **±8° is not in the Client.** At the live setting `max_hand = 5` and a full hand, the formula below evaluates to 8° per step and ±16° at the ends. That 8 is an output. A later change to the hand-size setting recomputes the step, the overlap, and the arc.
 
-### Letter A — arc fan (Design default)
+Letter **B** (flat row, no rotation) is **not taken**.
 
-Pivot is the bottom center of each card. Slot `i` is `0..4` from the left. Center slot is `i = 2`.
+There is no scroll. The fan never draws more cards than `max_hand`. Hover does not change which key a card is. Rest z-order is the slot index (the right card paints over the card to its left). A hovered card paints above the row. Pivot is the bottom center of each card.
 
-| Knob | Value |
+### Names
+
+| Name | Meaning |
 |---|---|
-| Rotation | `(i - 2) × 8°` (ends at −16° and +16°) |
-| Overlap | next card starts at `i × 78px` (108 × 0.72), so about **28%** of the width is covered |
-| Arc | `y = abs(i - 2) × 10` (ends sit 20px lower than the center card) |
-| Hover | 80ms. `y − 16`, rotation → 0, scale **1.06**. Neighbors do not reflow |
-| Hover out | 80ms back to that slot’s rest transform |
+| `max_hand` | The hand-size **setting**. Until-M2 lock is **5** ([33](33-until-m2-tuning.md)). Client reads the setting. The fan function does not contain the literal `5` |
+| `n` | Cards in the hand **this frame**. `0 ≤ n ≤ max_hand`. A card that has left is not a slot. `n` is not padded out to `max_hand` |
+| `i` | Index of a card in that fan, `0 .. n-1`, left to right |
+
+### Constants (full-hand picture, not per-step angles)
+
+These three numbers are the letter A arc at a full hand. They do not change when `max_hand` changes. The steps derived from them do.
+
+| Constant | Value | Full hand at `max_hand = 5` |
+|---|---:|---|
+| `FAN_SPAN_DEG` | **32** | End card to end card, −16° to +16° |
+| `FAN_STRIDE_PX` | **312** | Origin of the left end card to origin of the right end card. Neighbor gap 78px on a 108px card, about **28%** overlap |
+| `FAN_ARC_PX` | **20** | How far each end card sits below the center card |
+
+### Formula
+
+Use float division. `max_hand <= 1` or `n <= 1` is the upright single-card case (or an empty hand).
+
+```
+denom    = max_hand - 1
+step_deg = 0 if (n <= 1 or denom <= 0) else FAN_SPAN_DEG / denom
+x_step   = 0 if (n <= 1 or denom <= 0) else FAN_STRIDE_PX / denom
+arc_step = 0 if (n <= 1 or denom <= 0) else (2 * FAN_ARC_PX) / denom
+center   = (n - 1) / 2
+rotation(i) = (i - center) * step_deg
+x(i)        = (i - center) * x_step
+y(i)        = abs(i - center) * arc_step
+```
+
+`step_deg` is keyed off **`max_hand`**, not off `n`. Neighbors keep the spacing a full hand would use at this setting. A short hand is that same step, centered, so its total span is `(n - 1) / (max_hand - 1)` of the full span. Changing `max_hand` changes `denom`, and every step changes with it. Changing `n` recenters the same step. It does not stretch two cards out to ±16°.
+
+| `max_hand` | `n` | `step_deg` | `x_step` | `arc_step` | End rotation |
+|---:|---:|---:|---:|---:|---|
+| 5 | 5 | 8 | 78 | 10 | ±16° |
+| 5 | 2 | 8 | 78 | 10 | ±4° |
+| 5 | 1 | 0 | 0 | 0 | 0° |
+| 7 | 7 | 32/6 | 52 | 20/3 | ±16° |
+
+The first row is the letter A picture. Client checks the fan against that row. A literal `8` in the fan function fails the stamp even when `max_hand` is 5.
+
+### Hover and reflow
+
+Hover is the letter A motion, applied on top of the formula pose. 80ms. `y − 16`, rotation → 0, scale **1.06**. Neighbors do not move during the hover. Hover out returns to that card’s formula pose in 80ms.
+
+When a play commits, `n` drops by one and the remaining cards tween to the new formula poses in **80ms** (quad ease-out). That reflow runs with the zone settle. It does not wait for it to finish. Dig’s deal-in from the drag table targets these formula poses, not a fixed five-slot row.
 
 ```
             [3]
@@ -68,20 +110,7 @@ Pivot is the bottom center of each card. Slot `i` is `0..4` from the left. Cente
       [1]          [5]
 ```
 
-### Letter B — flat overlap
-
-| Knob | Value |
-|---|---|
-| Rotation | 0 |
-| Arc | 0 |
-| Overlap | next card starts at `i × 84px` (108 × 0.78), about **22%** covered |
-| Hover | 80ms. `y − 12`, scale **1.04**. No unrotate |
-
-```
-[1][2][3][4][5]
-```
-
-Write **A** or **B**. Silence is not **A**. Design recommends **A**. The screen Jonathan described is a fanned hand.
+That sketch is a full hand at `max_hand = 5`. Fewer cards use the same neighbor step and sit in the center.
 
 ---
 
@@ -89,27 +118,27 @@ Write **A** or **B**. Silence is not **A**. Design recommends **A**. The screen 
 
 Pickup spends nothing. The play commits on a successful drop, a click, or **1–5**, through the same `play` the tip already calls. Cancel spends nothing and does not call `play`. The StS move (hand → discard, tagged to that zone) happens at commit, after the settle starts. Dig’s dump rule is unchanged; letter **A** only draws the dump.
 
-The tip’s drag preview is a `Label`. Letter **A** replaces that preview with the card.
+The tip’s drag preview is a `Label`. Letter **A** is **taken**. It replaces that preview with the card. The follow tilt clamp of ±8° in the table below is drag motion. It is not the fan step. The fan step is the Hand A′ formula.
 
-### Letter A — production motion (Design default)
+### Letter A — production motion (taken)
 
 Tweens use a quad ease-out. The follower is a full card (face or placeholder well), mouse-ignore, on a layer above the zones. A `Label` preview does not meet this letter.
 
 | Beat | Motion |
 |---|---|
-| Pickup | 120ms. Scale 1 → **1.12**. Tilt **+6°** when the grab is right of the card center, **−6°** when it is left. Shadow offset `(0, 6)`, alpha 0.35. The source slot becomes a ghost: same frame, alpha **0.35**, no face. The other four cards stay put |
+| Pickup | 120ms. Scale 1 → **1.12**. Tilt **+6°** when the grab is right of the card center, **−6°** when it is left. Shadow offset `(0, 6)`, alpha 0.35. The source slot becomes a ghost: same frame, alpha **0.35**, no face. The other cards stay on their formula poses until the play commits |
 | Follow | Card origin sits **24px** above the pointer. Tilt = clamp(horizontal velocity × 0.04, **−8°**, **+8°**) |
 | Legal zone | While the pointer is inside a visible zone: that zone’s border goes 2px `gold`, an inner well at gold alpha 0.12 shows, and the zone scales to **1.03** over 80ms. Leaving reverses it. Illegal targets (order panel, the other cards, Dig, Finish, the bar) get none of this |
 | Drop | 160ms. The follower settles onto a **32×32** icon slot in that zone’s played stack, scale 1.12 → 1, tilt → 0. Then the hand slot clears. The zone becomes the selected zone |
-| Cancel | Release outside every zone, **Esc**, or drop back on the hand. 180ms snap to the slot’s rest fan transform, scale → 1. The ghost fills back in |
+| Cancel | Release outside every zone, **Esc**, or drop back on the hand. 180ms snap to that card’s formula pose, scale → 1. The ghost fills back in. `n` does not change |
 | Click / **1–5** | 200ms fly from the slot to the selected zone’s icon slot, same settle, then the play. N = 1 still does not require a drag. No selected visible zone means no play |
 | Dig | Remaining cards move down 48px and fade over 200ms, stagger **30ms** left to right. The new hand deals from scale 0.9 and `y + 24` to rest, stagger **40ms**. Then the piles are whatever the dig rule already produced |
 
 ### Letter B — instant
 
-Keep a drag that follows the pointer and a drop that plays. No scale, no tilt, no shadow, no ghost alpha, no zone pulse, no settle tween, no dig stagger. Snap is one frame. Click and **1–5** play with no fly.
+**Not taken.**
 
-Write **A** or **B**. Silence is not **A**. Design recommends **A**. Placeholder art still has to move like a finished card.
+Keep a drag that follows the pointer and a drop that plays. No scale, no tilt, no shadow, no ghost alpha, no zone pulse, no settle tween, no dig stagger. Snap is one frame. Click and **1–5** play with no fly.
 
 ---
 
@@ -117,15 +146,15 @@ Write **A** or **B**. Silence is not **A**. Design recommends **A**. Placeholder
 
 Zones stay the upper-right row. Count, order, hide-when-unused, click-to-select, and “drop selects” stay. The hit target stays the zone panel. There is no fifth zone. A drop on the inner well and a drop on the rest of the panel are the same play.
 
-### Letter A — card well (Design default)
+### Letter A — card well (taken)
 
 During a drag, the zone draws the inner well from letter 2. After a play, the zone keeps the text line it already shows (name, type, cost) and adds the **32×32** face to the left of that line. Empty zone keeps the construction-only sentence. The face is the same texture as the hand card. A missing file leaves the text line and a 32×32 `chip` square.
 
 ### Letter B — hit rect only
 
-No inner well, no zone scale, no played icon. The panel receives the drop. Played rows stay text, which is the #77 surface.
+**Not taken.**
 
-Write **A** or **B**. Silence is not **A**. Design recommends **A**. The zone should read as a place a card lands.
+No inner well, no zone scale, no played icon. The panel receives the drop. Played rows stay text, which is the #77 surface.
 
 ---
 
@@ -143,7 +172,7 @@ Two packs make the table. A third, same-day pack (prompt prefix `Chaos Atelier c
 
 One file feeds the hand well, the zone’s 32×32 icon, and the materials-shelf row. Shelf row: **32×32**, nearest, beside the text the market already shows (name, `$`, count). Tab chips stay off. A missing file leaves the text.
 
-### Letter A — export this table (Design default)
+### Letter A — export this table (taken)
 
 Dest root `assets/mat/<id>.png`. Art copies the gallery bytes (same pixels, no regen, no recompress). Client loads `res://assets/mat/<id>.png`.
 
@@ -194,9 +223,7 @@ Close pairs, if a row should swap: wirecloth (woven mesh) and chainlace (rings w
 
 ### Letter B — different root
 
-The reply names one directory. The 38 sources stay the table above. Example shape the reply can write: `assets/materials/mat_hemp_plain.png`. Silence is not a directory. Design recommends **A** (`assets/mat/`).
-
-Write **A** or **B** plus a root. This PR does not copy either way.
+**Not taken.** Dest root is `assets/mat/<id>.png`. This stamp does not copy the files.
 
 ---
 
@@ -204,26 +231,24 @@ Write **A** or **B** plus a root. This PR does not copy either way.
 
 The face well, when the png is missing, is a `ColorRect` / `StyleBoxFlat` in the stamped `chip` fill, 1px `border`, with the name still set. Nearest filter once a texture exists. A failed load keeps the well. It does not crash. It does not borrow an outlook torso.
 
-**Stamp-closes-on-Art-PR.** Stamping the five letters closes the presentation law. It does not close the asset lane. The asset lane closes when an Art PR has put the 38 files on `dev` and the tip SHA contains them. This Soft doc has no tip SHA for those pngs, so the faces are not done.
+**Stamp-closes-on-Art-PR.** This stamp closes the presentation law, including Hand A′. It does not close the asset lane. The asset lane closes when an Art PR has put the 38 files on `dev` and the tip SHA contains them. This doc has no tip SHA for those pngs, so the faces are not done.
 
-### Letter A — motion now, files after (Design default)
+### Letter A — motion now, files after (taken)
 
 Ulquiorra may ship the fan, the drag, and the zone well with placeholder faces before the pngs exist. Nnoitra’s copy is a later PR. The motion Client does not wait on that copy. After the files land, the same sockets show them. No second motion stamp.
 
 ### Letter B — wait for the files
 
-Ulquiorra does not ship the fan or the drag until the 38 files are on the tip. Placeholder wells are not the demo hand.
-
-Write **A** or **B**. Silence is not **A**. Design recommends **A**. The M2 bar already allows a placeholder picture. The controls are what have to be finished.
+**Not taken.**
 
 ---
 
-## After the letters
+## After the stamp
 
 | Who | Does | Holds |
 |---|---|---|
 | Nnoitra | If path is **A** (or **B** with a root): copy the 38 gallery ids into that root. Same pixels | A gen. The 16-image earlier pass. The nine owner ids. Any `look_armor_*`. A rune sheet. A shiny overlay |
-| Ulquiorra | Fan, drag, drop, wells, shelf `TextureRect`, skill face from `assets/m2-market/` when present | A rule change. A fifth zone. A hand size other than 5. Loading a mat png into Current / Potential |
+| Ulquiorra | Fan from the Hand A′ formula, drag **A**, drop **A**, wells, shelf `TextureRect`, skill face from `assets/m2-market/` when present | A hardcoded fan step. A rule change. A fifth zone. A new hand-size integer. Loading a mat png into Current / Potential |
 | Szayelaporro | After that Client | This docs PR |
 
 Harribel has nothing to gate in this PR. Nothing is burned. A later gen (the nine owner ids, or a rune face) is a different stamp, and Harribel gates that one.
@@ -244,41 +269,33 @@ Harribel has nothing to gate in this PR. Nothing is burned. A later gen (the nin
 | `docs/32-shop-and-events.md` | Shelf uses the same png. Text-strip chrome stays |
 | `docs/15-outlook-gen-list.md` | Outlook wire landed. Mat png is still not an outlook |
 | `docs/05-art.md` | No gen in this PR |
-| `docs/pm/phase-1-plan.md` | Open card |
+| `docs/pm/phase-1-plan.md` | Stamp recorded. Client and the export are the next seats |
 | `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Index and this card |
 
 ### Decisions
 
-Write five letters.
+The lines below are the ask as written. They are not open.
 
-1. **Hand — A or B.** **A (Design default):** arc fan, ±8° per step off center, 28% overlap, 10px arc step, hover lift 16px and unrotate, scale 1.06. **B:** flat row, 22% overlap, hover lift 12px, scale 1.04, no rotation. Max visible stays 5 either way. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+1. **Hand — A or B.** **A:** arc fan. **B:** flat row. Jonathan wrote **A′**: the arc fan, with the step computed in section 1. `step_deg = FAN_SPAN_DEG / (max_hand - 1)` with `FAN_SPAN_DEG = 32`. `n` is the cards in hand this frame. A full hand at `max_hand = 5` evaluates to 8° per step. That 8 is not a constant.
 
-2. **Drag — A or B.** **A (Design default):** the motion table (pickup scale 1.12 and ±6° tilt, ghost slot, follow tilt ±8°, 160ms settle, 180ms snap-back, 200ms key/click fly, dig stagger). **B:** instant follow and drop, no tween. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+2. **Drag — A or B.** **A:** the motion table. **B:** instant. Jonathan wrote **A**.
 
-3. **Drop — A or B.** Zones stay ≤4. **A (Design default):** inner well while dragging, 32×32 played face beside the existing text line. **B:** panel hit rect, text lines, no well. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+3. **Drop — A or B.** **A:** inner well and 32×32 played face. **B:** hit rect, text only. Jonathan wrote **A**.
 
-4. **Mat path — A or B.** **A (Design default):** the 38-row table, dest `assets/mat/<id>.png`, export only. Gap on the live catalog is **0**. **B:** the reply names another directory; sources stay. Write **A** or **B**. Silence is not a path. Design recommends **A**.
+4. **Mat path — A or B.** **A:** 38 rows → `assets/mat/<id>.png`. **B:** another directory. Jonathan wrote **A**.
 
-5. **Placeholder — A or B.** **A (Design default):** ship the motion on `chip` wells; Art PR lands the pngs later; letters do not close the asset lane. **B:** hold the motion Client until the 38 files are on the tip. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+5. **Placeholder — A or B.** **A:** motion on `chip` wells; asset lane closes on the Art PR. **B:** hold the motion for the files. Jonathan wrote **A**.
 
 ### Questions
 
-None. A swapped gallery id on letter 4 is a correction, not a new question.
+None.
 
 ### Blocks
 
-An unanswered hand letter. Silence is not **A**.
-
-An unanswered drag letter. Silence is not **A**.
-
-An unanswered drop letter. Silence is not **A**.
-
-An unanswered path letter. Silence is not a directory and is not a gen.
-
-An unanswered placeholder letter. Silence is not **A**.
+The five letters are answered. Nothing on this card blocks the motion Client or the export. The asset lane stays open until the 38 files are on `dev`.
 
 **Holds.** PR **#71**: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not open a Solenne pass. Do not revive **#62**. Posture art stays **Nov 2**. Outlook ×28 and the sixteen planner chips stay landed. Do not regen them. No gens in this PR. No `src/` in this PR.
 
-### Design recommends
+### Stamp
 
-**Hand A. Drag A. Drop A. Path A. Placeholder A.**
+**A′AAAA.** Hand A′. Drag A. Drop A. Path A. Placeholder A.

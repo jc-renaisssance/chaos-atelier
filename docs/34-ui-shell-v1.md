@@ -136,7 +136,7 @@ Click selects. A drop plays into that zone and selects it. No zoneless play. No 
 
 Five slots, left to right, keys **1–5**. An empty slot is still a frame: index, no name. A filled slot shows display name, type, cost, and tags (or the skill blurb). Play leaves the hand. The slot does not keep the card.
 
-**Card fan (open, 2026-10-23).** This section is the #77 record: five frames in a row, text on the chip fill. The redo is [36](36-craft-hand-cards.md). Palette tokens stay. Do not reopen the shell letters.
+**Card fan (stamped A′AAAA, Design #83).** This section is the #77 record: five frames in a row, text on the chip fill. The redo is [36](36-craft-hand-cards.md). The fan shows the cards in hand and takes its step from `max_hand`. Palette tokens stay. Do not reopen the shell letters.
 
 **Dig** spends **2**. Label `Dig · 2`. **D** still digs. Dig dumps the hand, then draws. It does not end the session.
 
