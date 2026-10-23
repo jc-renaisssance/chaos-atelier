@@ -1,6 +1,6 @@
 # Until-M2 tuning — stats and event pool (2026-10-22)
 
-**Status:** **Closed.** Jonathan accept **A A A A** (tables / elite pressure **A** / mission gold **A** / reps gate **A** / event attach **A**) on Design #72. Client landed (#73, `9f03c16`). **Doc id: `33`.** The decision table below is historical law. Do not reopen. No further Client on this file. No art. Does not revive #62. Does not reopen the M2 four-job Client wire (#75, landed). Open Design is the UI shell ([34](34-ui-shell-v1.md)). Posture art stays **Nov 2**.
+**Status:** **Closed.** Jonathan accept **A A A A** (tables / elite pressure **A** / mission gold **A** / reps gate **A** / event attach **A**) on Design #72. Client landed (#73, `9f03c16`). **Doc id: `33`.** The decision table below is historical law. Do not reopen. No further Client on this file. No art. Does not revive #62. Does not reopen the M2 four-job Client wire (#75, landed). UI shell v1 **shipped** ([34](34-ui-shell-v1.md), Design #76 / Client #77, stamp **A A B**). Do not reopen. Posture art stays **Nov 2**. PR #71: Solenne ×4 art **HOLD** until **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**.
 
 **Test chapter:** C1 on `map_m1` (`CHAPTER_DAY_COUNT` = **8**), `M1_JOB_POOL` only. Every number in this file is an **until-M2** lock for that test. It is not a forever-final for C2, C3, or a later map length.
 

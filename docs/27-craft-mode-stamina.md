@@ -10,7 +10,7 @@
 
 **Jonathan 2026-10-12 (piece cap GONE):** **supersedes** `crafts_max=4` / cant_craft-at-max. Unlimited pieces per chapter. Stamina per session **stays**. Live chapter = **route map** ([22](22-chapter-schedule.md)) — Days not Rounds; free `E*` board superseded 2026-10-13.
 
-**Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (Design, Jonathan stamp pending, off `873e7b2`). Layout, stamina, Finish-only, zones, hand, and Current / Potential in this file do not move.
+**Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (**shipped**, Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**). Layout, stamina, Finish-only, zones, hand, and Current / Potential in this file do not move.
 
 ## Entering craft mode
 
