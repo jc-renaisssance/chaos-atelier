@@ -4,7 +4,7 @@
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Ids unchanged (`boss_client_id`, `con_*`, `appt_*`, `adv_*`). Scrap Duelist stays `appt_*`.
 
-Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** is the **2026-10-21** stamp-ask below — battle playback + posture sockets. It is not a Later stub. Silence on that card does not stamp it.
+Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). The letter tables below are the law. Do not reopen playback.
 
 Numbers below are **test knobs** unless a row says lock. **Cross-run `unlocked_builds` is LOCKED** (Jonathan 2026-10-05). **S–F estimate letter bands stay Test knobs** — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do **not** lock the cutoff table. Closes PR #28 open question 2. Dex: [31-dex](31-dex.md).
 
@@ -265,9 +265,9 @@ On boss beat: `threat_id == chapter_boss_id` (`20` assert 23) even if the catalo
 
 ## Slice 4 — Battle playback + posture (2026-10-21)
 
-**Status:** Grimmjow Design-ready for Jonathan stamp. Docs only. No `src/` / Godot / art gens in this PR. Replaces the Later stub. Slices **1–3** stay locked (unlock key, cross-run `unlocked_builds`, estimate weights, S–F cutoffs). This section does not retune stats or events.
+**Status:** **Closed** on the Client (docs #69 / Client #70, `f083b09`). Sockets shipped (placeholders). Posture art **Later** — **Nov 2**. Not an open Design. Slices **1–3** stay locked (unlock key, cross-run `unlocked_builds`, estimate weights, S–F cutoffs). This section does not retune stats or events.
 
-**Proposed law (Gate A, Surface A, Socket A, Art B).** Other letters are on the [STAMP](STAMP.md) card. Silence does not stamp.
+**Law (Client #70: Gate A, Surface A, Socket A).** Posture art stays **Nov 2**. Other letters stay on the [STAMP](STAMP.md) card as the ask. Do not reopen playback.
 
 After a player **Finish** that already runs the mission resolver, Client plays a short deterministic timeline, then shows the mission report ([23](23-mission-report.md)). The timeline displays the stamp the resolver just returned. It does not run a second fight.
 

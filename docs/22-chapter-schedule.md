@@ -24,7 +24,7 @@ Combos are **bound multi-day blocks on the graph**, not stacked modifiers the pl
 | Shop visits / chapter | **1–3** | From **graph design** (how many `shop` nodes sit on a complete path). **Not** a hard UI ban on picking shop. |
 | Fork width | **2–4** visible next options | Only at forks. Corridor / bind / reserved → **no** options panel. Current test forks are 2 or 3. Do not add an edge to force 4. |
 
-Until-M2 numbers (person stats, pressure, gold, reps, which `evt_*` a node resolves) are [33](33-until-m2-tuning.md), awaiting stamp. This file’s graph, Day names, `crafts_max` gone, last-2 rule, and fork width stay. Event **identity** is a pool row on a `kind=event` node, not a day-strip script, and not the free `E*` board.
+Until-M2 numbers (person stats, pressure, gold, reps, which `evt_*` a node resolves) are [33](33-until-m2-tuning.md), **closed** (Design #72 / Client #73, accept **A A A A**). This file’s graph, Day names, `crafts_max` gone, last-2 rule, and fork width stay. Event **identity** is a pool row on a `kind=event` node, not a day-strip script, and not the free `E*` board.
 
 ### Reserved last-2 (relative to map length)
 

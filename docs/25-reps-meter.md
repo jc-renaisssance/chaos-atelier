@@ -12,7 +12,7 @@ Jonathan lock (2026-09-22): **reps / trust** meter. Mid picks move it; chapter h
 
 ### Phase-1 draft numbers (tune in Test)
 
-> **Until-M2 — proposed, [33](33-until-m2-tuning.md).** Decision **A** locks this table (C1 **8** / C2 **14** / C3 **20**) and replaces Client `REPS_GATE_STUB` **0**. Decision **B** moves C1 to **10**. The formula under Delta does not change. Decline **−1** is the `33` tables line (code `DECLINE_REPS_STUB`).
+> **Until-M2 — locked, [33](33-until-m2-tuning.md).** Decision **A** (Jonathan accept on #72; Client #73). This table is the gate (C1 **8** / C2 **14** / C3 **20**). `REPS_GATE_STUB` **0** is retired. Decision **B** was not taken. The formula under Delta does not change. Decline **−1** stays.
 
 | Chapter | `reps_gate` | Days (live) |
 |---|---:|---|
