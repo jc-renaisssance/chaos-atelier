@@ -1,6 +1,6 @@
 # Steam-demo cut — M2 ship bar
 
-**Doc id: `35`.** **Status: Open.** Design ask, 2026-10-23. Written off `dev` tip **`4d9fa19`** (docs #78). Client shell is **`c8a5a1a`** (#77). That pair is **not** Steam-demo ready. No `src/` in this PR. No png move. No PixelLab. No gens.
+**Doc id: `35`.** **Status: Stamped AAAA** (Current **A**, tag source **B**, vignettes **A**, copy **A**). Docs #79, chips #80, outlook ×28 #81, Client #82. Tip **`2c338ed`**. The decision text below is the ask as written. It is not open. Material shelf faces were outside this stamp. Hand faces and the materials shelf are [36](36-craft-hand-cards.md). This file still does not load a `mat_*.png` as an outlook.
 
 M2 **is** the Steam demo ship bar. A missing picture may stay a placeholder. Placeholder layout chrome is legal where art is missing. Flow, wiring, controls, map UX, boot, the 2-piece order, planner chips, outlook sockets, and the words on Brief / Estimate are **production-ready**. They are not a scaffold left for a later milestone.
 
@@ -16,7 +16,7 @@ Design recommends **accept** on each lock. The letters under [Decisions](#decisi
 
 Wire the stamped armor already at the repo root into craft **Potential**, and into **Current** when Decision 1 is **A**. Zero scripts reference these files today. This PR does not add a `.gd` load and does not move bytes.
 
-Client may copy (same pixels, no regen, no recompress) into `res://assets/outlook/<filename>.png` so Godot can load them. The source column is the byte source. A missing copy hides the `TextureRect`. The text line stays. Do not load any `mat_*.png`. Material shelf faces are not this stamp. Neither folder contains a `mat_*.png`.
+Client may copy (same pixels, no regen, no recompress) into `res://assets/outlook/<filename>.png` so Godot can load them. The source column is the byte source. A missing copy hides the `TextureRect`. The text line stays. Do not load any `mat_*.png` as an outlook. Material shelf faces were not this stamp. Hand card faces and the materials shelf are [36](36-craft-hand-cards.md). Neither armor folder contains a `mat_*.png`.
 
 `TextureRect`, **96×96**, nearest. One file per winning outlook. Locked outlook: **hide the art**. No dimmed preview. No name past “locked”. `plain` is not locked. The lock predicate is the one Potential already uses ([27](27-craft-mode-stamina.md)): hidden until that outlook is unlocked.
 

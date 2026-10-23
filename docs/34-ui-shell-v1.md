@@ -126,7 +126,7 @@ Same layout, same labels, same controls. Remove the custom color and `StyleBoxFl
 
 Max **4**. An unused zone stays hidden when the order has fewer pieces. Zone *i* is `construction_ids[i - 1]`. Title is the construction’s display name. Caption is the index. Selected reads as the gold border (letter A) or the control’s selected state (letter B). The word “selected” is not a debug suffix.
 
-Body: empty zone keeps the construction-only sentence already on the card. A played card stays a text line (display name, type, cost). No card art.
+Body: empty zone keeps the construction-only sentence already on the card. A played card stays a text line (display name, type, cost). The #77 surface has no card art. A 32×32 played face, if [36](36-craft-hand-cards.md) Drop is **A**, sits beside that line. It is not outlook art.
 
 Click selects. A drop plays into that zone and selects it. No zoneless play. No fifth zone. N > 4 stays Later / split.
 
@@ -135,6 +135,8 @@ Click selects. A drop plays into that zone and selects it. No zoneless play. No 
 ## Hand, Dig, Finish
 
 Five slots, left to right, keys **1–5**. An empty slot is still a frame: index, no name. A filled slot shows display name, type, cost, and tags (or the skill blurb). Play leaves the hand. The slot does not keep the card.
+
+**Card fan (stamped A′AAAA, Design #83).** This section is the #77 record: five frames in a row, text on the chip fill. The redo is [36](36-craft-hand-cards.md). The fan shows the cards in hand and takes its step from `max_hand`. Palette tokens stay. Do not reopen the shell letters.
 
 **Dig** spends **2**. Label `Dig · 2`. **D** still digs. Dig dumps the hand, then draws. It does not end the session.
 

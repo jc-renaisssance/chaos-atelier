@@ -10,7 +10,9 @@
 
 **Jonathan 2026-10-12 (piece cap GONE):** **supersedes** `crafts_max=4` / cant_craft-at-max. Unlimited pieces per chapter. Stamina per session **stays**. Live chapter = **route map** ([22](22-chapter-schedule.md)) — Days not Rounds; free `E*` board superseded 2026-10-13.
 
-**Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (**shipped**, Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**). Layout, stamina, Finish-only, zones, and the hand in this file do not move. Outlook pictures and icon chips are the open cut ([35](35-steam-demo-cut.md)).
+**Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (**shipped**, Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**). Layout regions, stamina, Finish-only, and the zone cap in this file do not move. Outlook pictures and planner chips landed with the Steam-demo cut ([35](35-steam-demo-cut.md), #79–#82).
+
+**Hand presentation (stamped A′AAAA, Design #83):** fan, drag, zone wells, and `mat_*` faces are [36](36-craft-hand-cards.md). The fan step is `32 / (max_hand - 1)` degrees. The hand-size setting in this file stays **5**. The cycle, the costs, the keys, and Finish do not move.
 
 ## Entering craft mode
 
@@ -113,7 +115,7 @@ Craft session shows two readouts for the **active / selected zone** (Design lock
 
 Phase-1: Current / Potential for the **selected zone** only. Per-zone simultaneous readouts = **Later** if too heavy.
 
-**Outlook art (open, 2026-10-23):** the picture for a winning outlook is a stamped `look_armor_*.png`. Potential shows it when that outlook is unlocked. Current shows the same file when the cut’s Current letter is **A**. Locked hides the picture. `mat_*.png` is not a source. Table: [35](35-steam-demo-cut.md).
+**Outlook art (landed, 2026-10-23):** the picture for a winning outlook is a stamped `look_armor_*.png` (Current **A**, #81 / #82). Locked hides the picture. `mat_*.png` is not an outlook source. Table: [35](35-steam-demo-cut.md). Hand faces are [36](36-craft-hand-cards.md).
 
 **2-piece order:** one session, one Finish, **one** fight on the combined gear. A per-piece playback vignette is not a second fight ([30](30-interactive-order.md), [35](35-steam-demo-cut.md)).
 
