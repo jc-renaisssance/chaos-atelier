@@ -1,8 +1,8 @@
 # Craft hand — card fan, drag, mat faces
 
-**Doc id: `36`.** **Status: Stamped A′AAAA** on Design #83 (2026-10-23). Hand **A′**, Drag **A**, Drop **A**, Mat path **A**, Placeholder **A**. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in this PR. No png copy. No PixelLab gen. No burn. The motion Client and the 38-file export are not on the tip yet. Placeholder **A** still closes the asset lane only when those files land.
+**Doc id: `36`.** **Status: Landed A′AAAA** (2026-10-23). Design #83 (`187911f`), art #84 (`bff62c8`), Client #85 (`1b49dd1`). Hand **A′**, Drag **A**, Drop **A**, Mat path **A**, Placeholder **A**. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in the Design PR. No png copy in the Design PR. No PixelLab gen. No burn. The motion Client (#85) and the 38-file export (#84, `assets/mat/<id>.png`) are on the tip. Placeholder **A** closed the asset lane when those files landed. Live tip is **`1b49dd1`**.
 
-The craft screen on that tip already runs the stamped rules ([27](27-craft-mode-stamina.md), shell [34](34-ui-shell-v1.md)). The lower band is five equal text panels in a row (`148×120`, gap 8). A drag preview is a `Label` of the display name. There is no fan, no arc, no overlap, no lift, no tilt, no ghost card, and no settle. Jonathan (2026-10-23 HKT): redo that hand so it reads as a card game, with production motion even while the face is still a placeholder, and put `mat_*` icons on the card and on the materials shelf.
+The craft screen on `2c338ed` already runs the stamped rules ([27](27-craft-mode-stamina.md), shell [34](34-ui-shell-v1.md)). The lower band is five equal text panels in a row (`148×120`, gap 8). A drag preview is a `Label` of the display name. There is no fan, no arc, no overlap, no lift, no tilt, no ghost card, and no settle. Jonathan (2026-10-23 HKT): redo that hand so it reads as a card game, with production motion even while the face is still a placeholder, and put `mat_*` icons on the card and on the materials shelf.
 
 AAAA ([35](35-steam-demo-cut.md), docs #79 / chips #80 / outlook #81 / Client #82) left material shelf faces outside that stamp. This file supersedes that exclusion for **hand card faces** and the **materials shelf** only. Outlook sockets stay `look_armor_*.png`. A mat file is not an outlook. Planner chips and the ×28 outlook copies stay as landed. Do not regen them. PR #71 stays held.
 
@@ -231,7 +231,7 @@ Close pairs, if a row should swap: wirecloth (woven mesh) and chainlace (rings w
 
 The face well, when the png is missing, is a `ColorRect` / `StyleBoxFlat` in the stamped `chip` fill, 1px `border`, with the name still set. Nearest filter once a texture exists. A failed load keeps the well. It does not crash. It does not borrow an outlook torso.
 
-**Stamp-closes-on-Art-PR.** This stamp closes the presentation law, including Hand A′. It does not close the asset lane. The asset lane closes when an Art PR has put the 38 files on `dev` and the tip SHA contains them. This doc has no tip SHA for those pngs, so the faces are not done.
+**Stamp-closes-on-Art-PR.** This stamp closes the presentation law, including Hand A′. The asset lane closed when art #84 (`bff62c8`) put the 38 files on `dev`. Tip SHA **`1b49dd1`** contains them. The faces are done for the live catalog (gap 0). Nine other-owner ids stay uncovered.
 
 ### Letter A — motion now, files after (taken)
 
@@ -244,6 +244,8 @@ Ulquiorra may ship the fan, the drag, and the zone well with placeholder faces b
 ---
 
 ## After the stamp
+
+**Landed.** Nnoitra’s copy is art #84 (`bff62c8`). Ulquiorra’s wire is Client #85 (`1b49dd1`): fan from Hand A′, drag A, drop A, MatFace ×38, gap 0. The table below is the ask as written.
 
 | Who | Does | Holds |
 |---|---|---|
@@ -269,7 +271,7 @@ Harribel has nothing to gate in this PR. Nothing is burned. A later gen (the nin
 | `docs/32-shop-and-events.md` | Shelf uses the same png. Text-strip chrome stays |
 | `docs/15-outlook-gen-list.md` | Outlook wire landed. Mat png is still not an outlook |
 | `docs/05-art.md` | No gen in this PR |
-| `docs/pm/phase-1-plan.md` | Stamp recorded. Client and the export are the next seats |
+| `docs/pm/phase-1-plan.md` | Landed. Design #83, art #84, Client #85 |
 | `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Index and this card |
 
 ### Decisions
@@ -292,7 +294,7 @@ None.
 
 ### Blocks
 
-The five letters are answered. Nothing on this card blocks the motion Client or the export. The asset lane stays open until the 38 files are on `dev`.
+The five letters are answered. The motion Client (#85) and the export (#84) are on `dev`. The asset lane for the 38 files is closed.
 
 **Holds.** PR **#71**: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not open a Solenne pass. Do not revive **#62**. Posture art stays **Nov 2**. Outlook ×28 and the sixteen planner chips stay landed. Do not regen them. No gens in this PR. No `src/` in this PR.
 
