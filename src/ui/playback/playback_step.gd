@@ -20,6 +20,7 @@ var _skip_btn: Button
 var _continue_btn: Button
 var _built := false
 var _report_mode := false
+var _kind := ""
 var _serial := -1
 var _piece := -1
 var _beat := 0
@@ -58,7 +59,7 @@ func _build() -> void:
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
-	_title = _label("Playback", ShellTheme.TITLE_PX, ShellTheme.GOLD)
+	_title = _label("Vignette", ShellTheme.TITLE_PX, ShellTheme.GOLD)
 	root.add_child(_title)
 	_note = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -139,6 +140,7 @@ func _build() -> void:
 
 func dismiss() -> void:
 	_built = false
+	_kind = ""
 	_serial = -1
 	_piece = -1
 	_beat = 0
@@ -151,10 +153,12 @@ func refresh() -> void:
 	var report := bool(snap.get("report", false))
 	var piece := int(snap.get("piece_index", -1))
 	var serial := int(snap.get("serial", -1))
-	if _built and _serial == serial and _report_mode == report and _piece == piece:
+	var kind := String(snap.get("kind", "vignette"))
+	if _built and _serial == serial and _report_mode == report and _piece == piece and _kind == kind:
 		return
 	_built = true
 	_report_mode = report
+	_kind = kind
 	_serial = serial
 	_piece = piece
 	_beat = 0
@@ -164,13 +168,16 @@ func refresh() -> void:
 	var raw_rows: Variant = snap.get("beats", [])
 	if raw_rows is Array:
 		_rows.assign(raw_rows)
-	_title.text = "Playback"
+	var fight := kind == "fight"
+	_title.text = "Fight" if fight else "Vignette"
 	if report:
 		_note.text = String(snap.get("note", ""))
 		_report_title.text = String(snap.get("title", ""))
 		_report_body.text = String(snap.get("body", ""))
+	elif fight:
+		_note.text = "Skip ends this fight. The report still opens."
 	else:
-		_note.text = "Skip ends this playback only. The report still opens. Later pieces still play."
+		_note.text = "Piece vignette. Skip opens this piece's report. The fight plays once after the last piece."
 	_report_title.visible = report
 	_report_body.visible = report
 	_rows_box.visible = not report
@@ -225,8 +232,11 @@ func _apply_beat() -> void:
 		if _report_mode:
 			mark = "  "
 			color = ShellTheme.MUTED
-		lab.text = "p%s  %s%s  ·  %s  ·  %s" % [
-			str(row.get("piece_index", _piece)),
+		var prefix := ""
+		if _kind != "fight":
+			prefix = "p%s  " % str(row.get("piece_index", _piece))
+		lab.text = "%s%s%s  ·  %s  ·  %s" % [
+			prefix,
 			mark,
 			String(row.get("id", "")),
 			String(row.get("slot", "")),

@@ -45,6 +45,10 @@ var playback_serial: int = 0
 var _playback_queue: Array = []
 var _playback_cursor: int = 0
 var _playback_rows: Array = []
+## One combined fight after the vignettes (docs/35 lock 5). Not a fight per piece.
+var _one_fight: bool = false
+var _fight_rows: Array = []
+var _fight_card: Dictionary = {}
 var chapter_piece_results: Array = []
 var last_mission: Dictionary = {}
 
@@ -221,6 +225,9 @@ func _reset_craft_state() -> void:
 	_playback_queue.clear()
 	_playback_cursor = 0
 	_playback_rows.clear()
+	_one_fight = false
+	_fight_rows.clear()
+	_fight_card.clear()
 	dex_order_adventurer_id = ""
 	planned_build = null
 
@@ -508,6 +515,9 @@ func _resolve_session() -> void:
 	_playback_queue.clear()
 	_playback_cursor = 0
 	_playback_rows.clear()
+	_one_fight = false
+	_fight_rows.clear()
+	_fight_card.clear()
 	var keep_zone := craft_session.selected_zone_index
 	var n := craft_session.zone_count
 	for i in range(1, n + 1):
@@ -606,14 +616,21 @@ func _show_playback_cursor() -> void:
 	playback_open = true
 	piece_report_open = false
 	last_note = (
-		"Playback · piece %d / %d. Skip ends this playback only."
+		"Vignette · piece %d / %d. Skip opens this piece's report."
 		% [_piece_index_at(index), piece_results.size()]
 	)
 
 
 func finish_playback(skipped: bool) -> void:
 	## Skip and the natural end both open this piece's report. Neither skips it.
+	## The combined fight uses the same flag so its report still opens. It does not resolve the order.
 	if not playback_open:
+		return
+	if _one_fight:
+		playback_open = false
+		piece_report_open = true
+		last_note = "One fight. Continue returns with that result."
+		board_changed.emit()
 		return
 	if _playback_cursor < 0 or _playback_cursor >= _playback_queue.size():
 		playback_open = false
@@ -625,13 +642,22 @@ func finish_playback(skipped: bool) -> void:
 	_sync_piece_stamp(index)
 	playback_open = false
 	piece_report_open = true
-	last_note = "Piece %d report (docs/23)." % _piece_index_at(index)
+	last_note = "Piece %d vignette. The fight is still ahead." % _piece_index_at(index)
 	board_changed.emit()
 
 
 func continue_piece_report() -> void:
-	## Closing this piece's report starts the next piece. The last one opens the existing report.
+	## Closing this piece's report starts the next vignette. The last one opens the one fight.
+	## Closing the fight report resolves the order once.
 	if not piece_report_open:
+		return
+	if _one_fight:
+		_one_fight = false
+		piece_report_open = false
+		playback_open = false
+		_fight_rows.clear()
+		_fight_card.clear()
+		_return_to_schedule()
 		return
 	piece_report_open = false
 	_playback_cursor += 1
@@ -640,10 +666,72 @@ func continue_piece_report() -> void:
 		board_changed.emit()
 		return
 	playback_open = false
-	_return_to_schedule()
+	_start_one_fight()
+
+
+func _start_one_fight() -> void:
+	## N pieces already had a vignette each. This grade is the fight. It runs once.
+	var mission := _combined_grade()
+	_fight_rows = _rows_for_fight(mission)
+	_fight_card = _fight_card_for(mission)
+	_one_fight = true
+	playback_open = true
+	piece_report_open = false
+	last_note = "One fight · combined gear."
+	board_changed.emit()
+
+
+func _combined_grade() -> Dictionary:
+	if _is_boss_order(craft_order):
+		var boss_id := ""
+		if board != null:
+			boss_id = board.chapter_boss_id
+		return MissionResolver.resolve_boss(piece_results, boss_id)
+	return MissionResolver.resolve_order(piece_results, craft_order)
+
+
+func _fight_card_for(mission: Dictionary) -> Dictionary:
+	if _is_boss_order(craft_order):
+		var cleared := bool(mission.get("cleared", false))
+		return ScheduleRules.build_boss_result(board, mission, not cleared, boss_job_id, boss_client_id)
+	return ScheduleRules.build_mission_return(craft_order, mission, piece_results)
+
+
+func _rows_for_fight(mission: Dictionary) -> Array:
+	var actor: Variant = _playback_actor_id()
+	var person := PlaybackBeats.open_person_label(actor, _appt_label())
+	var threat_id := _playback_threat_id()
+	var seen := true
+	if ThreatCatalog.is_boss(threat_id):
+		seen = profile.enemy_seen(threat_id)
+	var threat := PlaybackBeats.threat_label(threat_id, seen)
+	var skill := ""
+	if actor is String:
+		skill = AdventurerCatalog.skill_id(String(actor))
+	return PlaybackBeats.build(mission, person, threat, skill, piece_results.size())
 
 
 func playback_snapshot() -> Dictionary:
+	if _one_fight:
+		var fight_title := ""
+		var fight_body := ""
+		var fight_note := "One fight for the combined gear. Skip opens the report."
+		if piece_report_open:
+			fight_title = String(_fight_card.get("title", ""))
+			fight_body = String(_fight_card.get("body", ""))
+			fight_note = "Fight report. Continue returns to the route."
+		return {
+			"report": piece_report_open,
+			"beats": _fight_rows,
+			"piece_index": -1,
+			"piece_count": piece_results.size(),
+			"title": fight_title,
+			"body": fight_body,
+			"note": fight_note,
+			"actor_id": _playback_actor_id(),
+			"serial": playback_serial,
+			"kind": "fight",
+		}
 	var index := -1
 	if _playback_cursor >= 0 and _playback_cursor < _playback_queue.size():
 		index = int(_playback_queue[_playback_cursor])
@@ -666,7 +754,7 @@ func playback_snapshot() -> Dictionary:
 		title = String(card.get("title", ""))
 		body = String(card.get("body", ""))
 	if _playback_cursor + 1 < _playback_queue.size():
-		note = "Piece report. Continue starts the next piece's playback."
+		note = "Piece report. Continue starts the next piece's vignette."
 	else:
 		note = "Piece report. Continue opens the one fight."
 	return {
@@ -679,6 +767,7 @@ func playback_snapshot() -> Dictionary:
 		"note": note,
 		"actor_id": actor,
 		"serial": playback_serial,
+		"kind": "vignette",
 	}
 
 
@@ -742,17 +831,9 @@ func _playback_threat_id() -> String:
 	return ""
 
 
-func _rows_for_piece(result: Dictionary, piece_index: int, actor: Variant) -> Array:
-	var person := PlaybackBeats.open_person_label(actor, _appt_label())
-	var threat_id := _playback_threat_id()
-	var seen := true
-	if ThreatCatalog.is_boss(threat_id):
-		seen = profile.enemy_seen(threat_id)
-	var threat := PlaybackBeats.threat_label(threat_id, seen)
-	var skill := ""
-	if actor is String:
-		skill = AdventurerCatalog.skill_id(String(actor))
-	return PlaybackBeats.build(result, person, threat, skill, piece_index)
+func _rows_for_piece(result: Dictionary, piece_index: int, _actor: Variant) -> Array:
+	var con_name := CraftCatalog.construction_name(String(result.get("construction_id", "")))
+	return PlaybackBeats.vignette(result, piece_index, con_name)
 
 
 func continue_after_piece() -> void:
