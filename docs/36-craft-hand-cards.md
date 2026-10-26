@@ -1,6 +1,8 @@
 # Craft hand — card fan, drag, mat faces
 
-**Doc id: `36`.** **Status: Landed A′AAAA** (2026-10-23). Design #83 (`187911f`), art #84 (`bff62c8`), Client #85 (`1b49dd1`). Hand **A′**, Drag **A**, Drop **A**, Mat path **A**, Placeholder **A**. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in the Design PR. No png copy in the Design PR. No PixelLab gen. No burn. The motion Client (#85) and the 38-file export (#84, `assets/mat/<id>.png`) are on the tip. Placeholder **A** closed the asset lane when those files landed. Live tip is **`1b49dd1`**.
+**Doc id: `36`.** **Status: Landed A′AAAA** (2026-10-23). Design #83 (`187911f`), art #84 (`bff62c8`), Client #85 (`1b49dd1`). Hand **A′**, Drag **A**, Drop **A**, Mat path **A**, Placeholder **A**. Written off `dev` tip **`2c338ed`** (Client #82). No `src/` in the Design PR. No png copy in the Design PR. No PixelLab gen. No burn. The motion Client (#85) and the 38-file export (#84, `assets/mat/<id>.png`) are on the tip. Placeholder **A** closed the asset lane when those files landed. Live Client tip for that lane is **`1b49dd1`**. Tag chrome was written off docs tip **`0deeaa3`**.
+
+**Tag chrome: stamped A** (Jonathan, 2026-10-26 HKT). [Section 6](#6-tag-chrome). Chips on the hand and the zone played row. Tag names leave the caption. Type and cost stay. Hand **A′**, Drag **A**, Drop **A**, Path **A**, and Placeholder **A** stay stamped. Cost stays the #83 caption. No `src/` in this PR. No gen. No PixelLab. No new chip file. Do not read section 6 as open.
 
 The craft screen on `2c338ed` already runs the stamped rules ([27](27-craft-mode-stamina.md), shell [34](34-ui-shell-v1.md)). The lower band is five equal text panels in a row (`148×120`, gap 8). A drag preview is a `Label` of the display name. There is no fan, no arc, no overlap, no lift, no tilt, no ghost card, and no settle. Jonathan (2026-10-23 HKT): redo that hand so it reads as a card game, with production motion even while the face is still a placeholder, and put `mat_*` icons on the card and on the materials shelf.
 
@@ -18,7 +20,9 @@ AAAA ([35](35-steam-demo-cut.md), docs #79 / chips #80 / outlook #81 / Client #8
 | Play by drag onto a zone, or select a zone and press **1–5**. **D** digs. N = 1 does not require a drag | `27` |
 | One **Finish** resolves every zone in listed order. Stamina 0 stays open | `27` |
 | Click under **8px** of movement plays the slot. **8px** or more is a drag | tip `CraftHandSlot` |
-| Palette **A**, bust **A**, planner chips already icons | `34`, #80, #82 |
+| Palette **A**, bust **A**, planner chips already icons at the planner’s **32** control | `34`, `35`, #80, #82 |
+| Cost stays the #83 caption: type and cost, or the skill blurb. No cost badge in section 6 | this file |
+| Hand **A′**, Drag **A**, Drop **A**, Path **A**, Placeholder **A** stay. Card **108×148**. Face well **88×88**. Settle slot **32×32** | this file, #83–#85 |
 | Market tab chrome stays the text strip | UI GO item 3 |
 | Shiny is code-only modulate / gold border / shine bar | `32`, `34` |
 | `look_armor_*` is outlook art. It is not a `mat_*` face | `35` |
@@ -40,7 +44,7 @@ The lower band keeps **Dig · 2** and **Finish** where they are, to the right of
 └────────┘
 ```
 
-Card size is fixed: **108×148**. It does not `SIZE_EXPAND_FILL`. The face well is **88×88**, nearest, keep-aspect, centered in the upper part of the card. Under it: display name (13, `ink`) and one caption (12, `muted`) for type, cost, and tags, or the skill blurb. The slot index (11, `gold`) sits in the top-left corner. Keys are `1` through `max_hand`. Key `k` plays the card at index `k - 1` when `k` is at most the number of cards in the fan. A higher key does nothing. After a play, the remaining cards move to the new poses from the formula below.
+Card size is fixed: **108×148**. It does not `SIZE_EXPAND_FILL`. The face well is **88×88**, nearest, keep-aspect, centered in the upper part of the card. Under it: display name (13, `ink`) and one caption (12, `muted`). The caption is type and cost, or the skill blurb. Tag names are the chips in section 6, stamped **A**. Cost stays that caption. A Client wire to show the cost is in flight and is not section 6. The Client tip still draws the tag names as words in the caption. That wire is a later PR. The slot index (11, `gold`) sits in the top-left corner. Keys are `1` through `max_hand`. Key `k` plays the card at index `k - 1` when `k` is at most the number of cards in the fan. A higher key does nothing. After a play, the remaining cards move to the new poses from the formula below.
 
 Shell colors stay the stamped set (`chip` fill, `border`, shiny gold). This file adds no color token.
 
@@ -301,3 +305,124 @@ The five letters are answered. The motion Client (#85) and the export (#84) are 
 ### Stamp
 
 **A′AAAA.** Hand A′. Drag A. Drop A. Path A. Placeholder A.
+
+---
+
+## 6. Tag chrome
+
+**Stamped A** (Jonathan, 2026-10-26 HKT). Chips on the hand and on the zone played row. Tag names leave the caption. Type and cost stay. The paragraphs below are the ask as written. They are not an open choice.
+
+Jonathan RED (2026-10-26): the craft hand reads as tag-less faces. Steam-demo UI is almost production. The tags on a card should show. Cost is already the caption above. This section does not move it.
+
+The live catalog tags are the sixteen monostack names, and only those. A card carries **1, 2, or 3** of them. The longest rows are `mat_silver_moth` (Lunar, Silent, Silk), `mat_aureate_foil` (Solar, Metal, Royal), and `enc_sigil_ghost` (Lunar, Silent, Occult). Owner skills carry no tags. A material enchant (`mat_ench_*`) is not a tag on this row. Shiny stays the code tint on the card.
+
+The sixteen files are already on the tip (`d478823`, #80), **16×16**, nearest-ready:
+
+| Tag | File |
+|---|---|
+| Fire | `assets/ui/planner/chip_fire.png` |
+| Frost | `assets/ui/planner/chip_frost.png` |
+| Storm | `assets/ui/planner/chip_storm.png` |
+| Earth | `assets/ui/planner/chip_earth.png` |
+| Lunar | `assets/ui/planner/chip_lunar.png` |
+| Solar | `assets/ui/planner/chip_solar.png` |
+| Royal | `assets/ui/planner/chip_royal.png` |
+| Silent | `assets/ui/planner/chip_silent.png` |
+| Sticky | `assets/ui/planner/chip_sticky.png` |
+| Sharp | `assets/ui/planner/chip_sharp.png` |
+| Soft | `assets/ui/planner/chip_soft.png` |
+| Wild | `assets/ui/planner/chip_wild.png` |
+| Occult | `assets/ui/planner/chip_occult.png` |
+| Pure | `assets/ui/planner/chip_pure.png` |
+| Metal | `assets/ui/planner/chip_metal.png` |
+| Silk | `assets/ui/planner/chip_silk.png` |
+
+Slug is the tag in lower case. `Fire` loads `chip_fire.png`. The planner still draws these same pixels at **32** inside its button. This section does not resize that control. Cross stays a planner state on two of these chips. It is not a card tag and not a file.
+
+A right-edge stack inside the well is not a letter. At a full hand the card to the right covers **30px** of the card on its left, and **20px** of that card’s face. A stack on the right edge of the well hides under the neighbor. A **32** chip is not a letter either. Three of them are wider than the **88** well, and a taller card reopens Hand A′. A new glyph sheet is not a letter. The files above are the art.
+
+### Letter A — landed chips on the hand and the played row (taken)
+
+Tags leave the caption. The caption stays type and cost (`material · cost 3` on the card in the sketch), or the skill blurb. The chips are the tags.
+
+On the hand, each tag is a **16×16** texture, nearest, mouse-ignore, child of the face well, so the Drag A ghost that hides the well hides the chips. The follower is the full card, so the chips travel with it. Drag timings, the ±8° follow clamp, and the **32×32** settle slot stay. Order is the card’s tag list, left to right. Left inset **2**. Gap **2**. The row’s bottom edge sits **2** above the well’s bottom edge. Three chips end at x = **54** inside an **88** well. One tag and two tags use the same inset and grow to the right. Tooltip text is the tag word.
+
+```
+┌──────────┐
+│ 3        │
+│ ┌──────┐ │
+│ │ face │ │
+│ │ ▪ ▪ ▪│ │
+│ └──────┘ │
+│ Moth Silk│
+│ type · 3 │
+└──────────┘
+```
+
+The picture is `mat_silver_moth`: Lunar, Silent, Silk, play cost **3**. The caption string is `material · cost 3`. The sketch shortens the name and the type word so the box fits. The cost integer is the play cost that caption already shows. This section does not pick a new one.
+
+A skill has no row. An empty tag list has no row. A tag with no file keeps that one word in the caption and still draws the chips that exist. The live catalog has no such tag. Do not gen a stand-in. Do not borrow an outlook or a `mat_*` face.
+
+The zone played row keeps Drop A: the **32×32** face, then the text line (name, type, cost). The minus in the sketch is the cost mark that line already uses. Letter A adds the same **16×16** chips between the face and that line, same files, same order, gap **2**, mouse-ignore, nearest. They are not the settle target. The text line does not gain tag words. A played skill has no chips.
+
+```
+[face 32] [▪][▪][▪]  Silver Moth Silk  ·  material  ·  −3
+```
+
+The materials shelf does not gain these chips. Planner tier marks (low / mid / apex / cross) stay on the planner. A card chip does not show a tier.
+
+### Letter B — text caption
+
+**Not taken.**
+
+Tag names stay words in the #83 caption (`material · cost 3 · Lunar, Silent, Silk`). No chip texture on the card. The zone row stays Drop A with no tag words and no chips. Card size, face, fan, drag, and cost stay as stamped. This is the Client tip until Ulquiorra wires letter **A**. It is not the law.
+
+### Letter C — chips on the hand only
+
+**Not taken.**
+
+The hand row, the caption, the ghost, and the follower are letter A. The zone played row stays Drop A: **32×32** face and the text line. After the card leaves the hand, the tags are not on the zone.
+
+### This letter does not
+
+Change **108×148**, the **88×88** well, the Hand A′ formula, drag timings, the **32×32** settle, Path A, or Placeholder A. Add a cost badge. Resize the planner. Gen a chip. Copy a png. Touch PR **#71** or revive **#62**.
+
+### Stamp card — tag chrome
+
+#### Review
+
+| File | Section |
+|---|---|
+| `docs/36-craft-hand-cards.md` | Section 6. Stamped **A**. The A′AAAA card above stays the landed record |
+| `docs/27-craft-mode-stamina.md` | Pointer. Play costs stay |
+| `docs/34-ui-shell-v1.md` | Pointer. Shell letters stay. Zone text line stays |
+| `docs/pm/phase-1-plan.md` | Stamped **A**. Craft hand A′AAAA stays landed |
+| `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Index and the card below |
+
+#### Decisions
+
+The line below is the ask as written. It is not open.
+
+1. **Tag chrome — A, B, or C.** **A:** the sixteen `assets/ui/planner/chip_<tag>.png` files at native **16×16** on the hand (bottom of the face well) and on the zone played row (between the **32×32** face and the text). Tags leave the caption. Cost stays on the caption. **B:** tag names stay words in that caption. No chip on the card or the zone row. **C:** letter A on the hand only. The zone row stays Drop A. Design recommended **A**. Jonathan wrote **A** (2026-10-26 HKT). A different chip size is a rewrite of **A**: name it on the line.
+
+#### Questions
+
+None.
+
+#### Blocks
+
+The letter is answered. **A**.
+
+Ulquiorra wires letter **A** in a later PR. The files are already on the tip. This PR does not open an art seat and does not contain that wire. Nnoitra does not copy. Harribel does not gate. No burn.
+
+The cost caption is not this block. Its Client wire is already in flight.
+
+**Holds.** PR **#71**: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not open a Solenne pass. Do not revive **#62**. Posture art stays **Nov 2**. The sixteen planner chips stay landed. Do not regen them. No gens in this PR. No `src/` in this PR.
+
+#### Design recommends
+
+**A.** Jonathan wrote **A**. The planner already speaks these sixteen icons, and the longest card needs only three of them at native size inside the well the fan does not cover. The played row is where the stack is read after the card leaves the hand, and 16px chips fit beside the **32×32** face without moving the settle slot. Taking the tag words off the caption leaves the cost line #83 already named, which is the wire in flight.
+
+#### Stamp
+
+**A.** Chips on the hand and the zone played row. Landed `chip_<tag>.png` at native **16×16**. Tag names leave the caption. Type and cost stay.
