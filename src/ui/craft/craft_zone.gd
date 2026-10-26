@@ -4,6 +4,7 @@ extends PanelContainer
 ## Hidden if unused (N < 4). Selected reads as the gold border.
 ## While a card is dragged over a visible zone: 2px gold, inner well, scale 1.03.
 ## A played card keeps its text line and adds a 32×32 face on the left.
+## Soft A: native tag chips sit between that face and the text. The line does not gain tag words.
 
 signal zone_selected(zone_index: int)
 
@@ -140,6 +141,9 @@ func _played_row(card: PlayedCard) -> Control:
 	var face := _played_face(card)
 	row.add_child(face)
 	_last_face = face
+	var chips := _played_tag_chips(card)
+	if chips != null:
+		row.add_child(chips)
 	var line := "%s  ·  %s  ·  −%d" % [
 		CraftCatalog.display_name(card.id, card.type),
 		GameEnums.hand_card_type_wire(card.type),
@@ -170,6 +174,23 @@ func _played_face(card: PlayedCard) -> Control:
 	return well
 
 
+func _played_tag_chips(card: PlayedCard) -> Control:
+	if card.type == GameEnums.HandCardType.SKILL:
+		return null
+	var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_of(card.id, card.type))
+	if chips.is_empty():
+		return null
+	var box := HBoxContainer.new()
+	box.name = "TagChips"
+	box.add_theme_constant_override("separation", PlannerChipArt.CARD_GAP)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	for chip in chips:
+		box.add_child(chip)
+	return box
+
+
 func _apply_style() -> void:
 	var gold := _selected or _drop_hot
 	var sb := ShellTheme.zone_selected() if gold else ShellTheme.zone_idle()
@@ -187,6 +208,27 @@ func _tween_scale(target: float) -> void:
 
 func _on_resized() -> void:
 	pivot_offset = size * 0.5
+
+
+func _get_tooltip(at_position: Vector2) -> String:
+	return _chip_word_at(at_position)
+
+
+func _chip_word_at(local: Vector2) -> String:
+	return _chip_word_under(self, get_global_transform() * local)
+
+
+func _chip_word_under(node: Node, at: Vector2) -> String:
+	for child in node.get_children():
+		var chip := child as TextureRect
+		if chip != null and chip.visible and not chip.tooltip_text.is_empty():
+			if chip.get_global_rect().has_point(at):
+				return chip.tooltip_text
+		if child is Control and (child as Control).visible:
+			var nested := _chip_word_under(child, at)
+			if not nested.is_empty():
+				return nested
+	return ""
 
 
 func _on_gui(event: InputEvent) -> void:
