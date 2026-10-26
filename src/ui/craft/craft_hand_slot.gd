@@ -28,7 +28,8 @@ var _caption: Label
 
 
 func _ready() -> void:
-	clip_contents = true
+	## Cost sits on its own caption line. Clipping the card rect was eating that line.
+	clip_contents = false
 	custom_minimum_size = Vector2(CraftHandLayout.CARD_W, CraftHandLayout.CARD_H)
 	size = custom_minimum_size
 	pivot_offset = Vector2(size.x * 0.5, size.y)
@@ -221,18 +222,20 @@ func _build() -> void:
 	add_child(_index)
 
 	_name = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
-	_name.position = Vector2(8, 108)
-	_name.size = Vector2(CraftHandLayout.CARD_W - 16, 16)
+	_name.position = Vector2(8, 106)
+	_name.size = Vector2(CraftHandLayout.CARD_W - 16, 14)
 	_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	_name.clip_text = true
 	add_child(_name)
 
+	## Line 1 is type + tags (or the skill blurb). Line 2 is only the cost, so it cannot wrap off.
 	_caption = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
-	_caption.position = Vector2(8, 124)
-	_caption.size = Vector2(CraftHandLayout.CARD_W - 16, 20)
-	_caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_caption.position = Vector2(8, 120)
+	_caption.size = Vector2(CraftHandLayout.CARD_W - 16, 28)
+	_caption.autowrap_mode = TextServer.AUTOWRAP_OFF
 	_caption.max_lines_visible = 2
 	_caption.clip_text = true
+	_caption.add_theme_constant_override("line_spacing", 0)
 	add_child(_caption)
 
 
@@ -248,13 +251,15 @@ func _bind_face(next: HandCard) -> void:
 func _caption_for(next: HandCard, next_cost: int) -> String:
 	if next == null:
 		return ""
+	var cost_line := "cost %d" % next_cost
 	if next.type == GameEnums.HandCardType.SKILL:
-		return CraftCatalog.skill_blurb(next.id)
+		return "skill · %s\n%s" % [CraftCatalog.skill_blurb(next.id), cost_line]
 	var tags := CraftCatalog.tags_of(next.id, next.type)
 	var kind := GameEnums.hand_card_type_wire(next.type)
-	if tags.is_empty():
-		return "%s · cost %d" % [kind, next_cost]
-	return "%s · cost %d · %s" % [kind, next_cost, ", ".join(tags)]
+	var head := kind
+	if not tags.is_empty():
+		head = "%s · %s" % [kind, ", ".join(tags)]
+	return "%s\n%s" % [head, cost_line]
 
 
 func _apply_style() -> void:

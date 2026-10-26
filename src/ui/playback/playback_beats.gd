@@ -100,6 +100,22 @@ static func star_text(value: Variant) -> String:
 	return "?"
 
 
+## Piece vignette (docs/35 lock 5). Not the fight. No hp, no cleared, no in_fight opener.
+## The one fight is PlaybackBeats.build on the combined gear, once, after the last report.
+static func vignette(result: Dictionary, piece_index: int, construction_name: String) -> Array:
+	var outlook := String(result.get("outlook_id", "plain"))
+	var rarity_wire: Variant = GameEnums.craft_rarity_wire(result.get("craft_rarity", GameEnums.CraftRarity.NONE))
+	var rarity := _wire_text(rarity_wire)
+	var who := construction_name if not construction_name.is_empty() else "Piece"
+	var rows: Array = []
+	rows.append(_row("open", "defend", "%s  ·  %s" % [who, outlook], piece_index))
+	var tags := _tag_counts_line(result.get("tag_counts", {}))
+	if not tags.is_empty():
+		rows.append(_row("tags", "defend", tags, piece_index))
+	rows.append(_row("result", "defend", "%s  ·  %s" % [rarity, outlook], piece_index))
+	return rows
+
+
 static func _row(beat_id: String, slot: String, label: String, piece_index: int) -> Dictionary:
 	return {
 		"id": beat_id,
@@ -107,6 +123,27 @@ static func _row(beat_id: String, slot: String, label: String, piece_index: int)
 		"label": label,
 		"piece_index": piece_index,
 	}
+
+
+static func _tag_counts_line(value: Variant) -> String:
+	if not (value is Dictionary):
+		return ""
+	var bag: Dictionary = value
+	var bits := PackedStringArray()
+	for key in bag.keys():
+		bits.append("%s ×%s" % [String(key), str(bag[key])])
+	if bits.is_empty():
+		return ""
+	return ", ".join(bits)
+
+
+static func _wire_text(value: Variant) -> String:
+	if value == null:
+		return "?"
+	var text := String(value)
+	if text.is_empty():
+		return "?"
+	return text
 
 
 static func _as_strings(value: Variant) -> Array:

@@ -384,43 +384,31 @@ static func build_boss_result(
 	}
 
 
-## One piece's docs/23 card. Reads the stamp the resolver already returned. No second sim.
+## One piece's vignette card. grade_piece stamped the zone. It is not the fight.
 static func build_piece_report(order: ClientOrder, result: Dictionary, piece_index: int) -> Dictionary:
 	var rating = result.get("rating", GameEnums.Rating.NONE)
 	var cleared := bool(result.get("cleared", false))
-	var hp := float(result.get("hp_remaining", 0.0))
-	var aid := int(result.get("damage_aid_pct", 0))
-	var stars := int(result.get("skill_effectiveness", 1))
 	var rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
 	var outlook := String(result.get("outlook_id", "plain"))
+	var con_name := CraftCatalog.construction_name(String(result.get("construction_id", "")))
+	if con_name.is_empty():
+		con_name = "Piece"
+	var rarity_wire: Variant = GameEnums.craft_rarity_wire(rarity)
+	var rarity_label := _variant_text(rarity_wire)
+	var tags := _tag_count_line(result.get("tag_counts", {}))
+	if tags.is_empty():
+		tags = "(none)"
 	var lines: PackedStringArray = PackedStringArray()
-	lines.append(
-		"Mission result (docs/23, 24): rating %s · cleared %s · hp %s · aid %d%% · ★%d."
-		% [GameEnums.rating_wire(rating), str(cleared), _hp_text(hp), aid, stars]
-	)
-	lines.append(
-		"Gate: cleared = (hp > 0) ∧ rating ∈ {S,A,B,C}. Piece %d of this Finish."
-		% piece_index
-	)
-	lines.append(
-		"Piece %d · rarity %s · rating %s · look %s."
-		% [piece_index, GameEnums.craft_rarity_wire(rarity), GameEnums.rating_wire(rating), outlook]
-	)
-	lines.append(
-		"outcome %s · favor %s · punish %s."
-		% [
-			str(GameEnums.outcome_wire(result.get("outcome", GameEnums.Outcome.NONE))),
-			_join_tags(result.get("favor_tags_hit", PackedStringArray())),
-			_join_tags(result.get("punish_tags_hit", PackedStringArray())),
-		]
-	)
+	lines.append("Piece %d · %s." % [piece_index, con_name])
+	lines.append("Rarity %s · look %s · tags %s." % [rarity_label, outlook, tags])
+	lines.append("This vignette is not the fight. The fight is the combined gear, once, after the last piece.")
 	if order != null and order.mission_kind == GameEnums.MissionKind.PREP:
 		lines.append("Prep rack — resolver ran; no live client. Reps not applied.")
 	return {
 		"resolve_class": RESOLVE_ORDER,
 		"day_action": null,
 		"mission_kind": GameEnums.mission_kind_wire(order.mission_kind) if order != null else null,
-		"title": "Mission — %s · piece %d" % [GameEnums.rating_wire(rating), piece_index],
+		"title": "Piece %d · %s" % [piece_index, con_name],
 		"body": "\n".join(lines),
 		"stub": "",
 		"order_id": order.order_id if order != null else "",
@@ -429,6 +417,27 @@ static func build_piece_report(order: ClientOrder, result: Dictionary, piece_ind
 		"cleared": cleared,
 		"rating": GameEnums.rating_wire(rating),
 	}
+
+
+static func _tag_count_line(value: Variant) -> String:
+	if not (value is Dictionary):
+		return ""
+	var bag: Dictionary = value
+	var bits := PackedStringArray()
+	for key in bag.keys():
+		bits.append("%s ×%s" % [String(key), str(bag[key])])
+	if bits.is_empty():
+		return ""
+	return ", ".join(bits)
+
+
+static func _variant_text(value: Variant) -> String:
+	if value == null:
+		return "?"
+	var text := String(value)
+	if text.is_empty():
+		return "?"
+	return text
 
 
 static func _join_tags(value: Variant) -> String:

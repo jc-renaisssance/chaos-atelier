@@ -106,6 +106,8 @@ var _motion_left: int = 0
 var _settle_zone: CraftZone
 var _settle_sec: float = 0.0
 var _aim_tries: int = 0
+var _settle_instance: int = 0
+var _settle_gen: int = 0
 
 
 func _ready() -> void:
@@ -418,6 +420,10 @@ func refresh() -> void:
 func _process(_dt: float) -> void:
 	if _phase != _Phase.DRAG or _follower == null:
 		return
+	## Button-up can miss _input (handled motion, captured control). Poll so a drop still commits.
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_end_drag(get_global_mouse_position())
+		return
 	if not _motion_this_frame:
 		_vel_x = 0.0
 	_motion_this_frame = false
@@ -440,10 +446,14 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion:
 		var motion := event as InputEventMouseMotion
 		if _phase == _Phase.DRAG:
+			if (motion.button_mask & MOUSE_BUTTON_MASK_LEFT) == 0:
+				_end_drag(get_global_mouse_position())
+				get_viewport().set_input_as_handled()
+				return
 			_vel_x = motion.velocity.x
 			_motion_this_frame = true
-			_place_follower(motion.global_position)
-			_update_drop_hot(motion.global_position)
+			_place_follower(get_global_mouse_position())
+			_update_drop_hot(get_global_mouse_position())
 			get_viewport().set_input_as_handled()
 		elif _armed != null and _armed.can_drag and motion.global_position.distance_to(_press_global) >= _CLICK_DRAG_PX:
 			_begin_drag(motion.global_position)
@@ -594,6 +604,8 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 		leftover.queue_free()
 	_hand_fan.hold_layout = _phase != _Phase.IDLE
 	_hand_fan.present(live, max_hand, _reflow, _deal_in)
+	if _ghost != null and is_instance_valid(_ghost) and _phase != _Phase.IDLE:
+		_ghost.set_ghost(true)
 	if _deal_in:
 		for i in range(live.size()):
 			live[i].play_deal(
@@ -826,7 +838,7 @@ func _on_mouse_button(mouse: InputEventMouseButton) -> void:
 	if mouse.button_index != MOUSE_BUTTON_LEFT:
 		return
 	if _phase == _Phase.DRAG and not mouse.pressed:
-		_end_drag(mouse.global_position)
+		_end_drag(get_global_mouse_position())
 		get_viewport().set_input_as_handled()
 		return
 	if _phase != _Phase.IDLE:
@@ -904,6 +916,8 @@ func _begin_drag(pointer: Vector2) -> void:
 
 
 func _end_drag(pointer: Vector2) -> void:
+	if _phase != _Phase.DRAG:
+		return
 	var zone := _zone_at(pointer)
 	_clear_drop_hot(true)
 	if zone != null and _ghost != null and _can_commit(_ghost.hand_index, zone.zone_index):
@@ -937,20 +951,40 @@ func _begin_settle(zone: CraftZone, hand_index: int, sec: float) -> void:
 	_hand_fan.hold_layout = true
 	_kill_pickup()
 	_clear_drop_hot(true)
+	_settle_instance = 0
+	if _ghost != null and _ghost.card != null:
+		_settle_instance = _ghost.card.get_instance_id()
 	_reflow = true
 	var ok := AtelierSession.play_hand(hand_index, zone.zone_index)
 	_reflow = false
 	if not ok:
+		_settle_instance = 0
 		_begin_cancel()
 		return
 	_settle_zone = zone
 	_settle_sec = sec
 	_aim_tries = 0
+	_arm_settle_timeout(sec)
 	call_deferred("_aim_settle")
 
 
+func _arm_settle_timeout(sec: float) -> void:
+	_settle_gen += 1
+	var gen := _settle_gen
+	var timer := get_tree().create_timer(sec + 0.08)
+	timer.timeout.connect(func() -> void:
+		if gen != _settle_gen:
+			return
+		if _phase == _Phase.SETTLE:
+			_finish_settle()
+	, CONNECT_ONE_SHOT)
+
+
 func _aim_settle() -> void:
-	if _phase != _Phase.SETTLE or _follower == null:
+	if _phase != _Phase.SETTLE:
+		return
+	if _follower == null:
+		_finish_settle()
 		return
 	var rect := Rect2()
 	if _settle_zone != null and is_instance_valid(_settle_zone):
@@ -1014,16 +1048,62 @@ func _begin_cancel() -> void:
 func _finish_settle() -> void:
 	if _phase != _Phase.SETTLE:
 		return
+	## Idle before killing the tween so a finished callback cannot re-enter.
+	_phase = _Phase.IDLE
+	_settle_gen += 1
+	_kill_motion()
 	_free_follower()
-	if _ghost != null and is_instance_valid(_ghost):
-		_ghost.queue_free()
+	_release_played_from_hand()
 	_ghost = null
 	_armed = null
 	_settle_zone = null
-	_phase = _Phase.IDLE
+	_settle_instance = 0
 	if _hand_fan != null:
 		_hand_fan.hold_layout = false
 		_hand_fan.set_cards_hover_locked(false)
+
+
+func _release_played_from_hand() -> void:
+	## Commit already removed the card from the session. Drop the fan slot and the ghost.
+	if _hand_fan == null:
+		return
+	var seen: Dictionary = {}
+	var drop: Array[CraftHandSlot] = []
+	var consider: Array[CraftHandSlot] = []
+	if _ghost != null and is_instance_valid(_ghost):
+		consider.append(_ghost)
+	for child in _hand_fan.get_children():
+		if child is CraftHandSlot:
+			consider.append(child as CraftHandSlot)
+	for slot in consider:
+		if slot == null or not is_instance_valid(slot):
+			continue
+		var node_id := slot.get_instance_id()
+		if seen.has(node_id):
+			continue
+		var played := slot == _ghost or (_settle_instance != 0 and slot.tracks(_settle_instance))
+		if not played:
+			continue
+		seen[node_id] = true
+		drop.append(slot)
+	var live: Array[CraftHandSlot] = []
+	for slot in _hand_fan.cards():
+		if not is_instance_valid(slot):
+			continue
+		if seen.has(slot.get_instance_id()):
+			continue
+		live.append(slot)
+	for slot in drop:
+		slot.visible = false
+		if slot.get_parent() != null:
+			slot.get_parent().remove_child(slot)
+		slot.queue_free()
+	var max_hand := 1
+	var session := AtelierSession.craft_session
+	if session != null:
+		max_hand = session.hand_size
+	_hand_fan.hold_layout = false
+	_hand_fan.present(live, max_hand, true, false)
 
 
 func _finish_cancel() -> void:
@@ -1039,6 +1119,7 @@ func _finish_cancel() -> void:
 
 
 func _abort_motion() -> void:
+	_settle_gen += 1
 	_kill_pickup()
 	_kill_motion()
 	_free_follower()
@@ -1097,6 +1178,7 @@ func _spawn_follower(source: CraftHandSlot) -> void:
 	card.rotation = 0.0
 	card.scale = Vector2.ONE
 	card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrap.z_index = 80
 	wrap.global_position = source.global_position
 	wrap.rotation = source.rotation
 	wrap.scale = source.scale
