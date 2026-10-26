@@ -12,7 +12,7 @@
 
 **Shell (2026-10-23):** player chrome for this screen is [34](34-ui-shell-v1.md) (**shipped**, Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**). Layout regions, stamina, Finish-only, and the zone cap in this file do not move. Outlook pictures and planner chips landed with the Steam-demo cut ([35](35-steam-demo-cut.md), #79–#82).
 
-**Hand presentation (stamped A′AAAA, Design #83):** fan, drag, zone wells, and `mat_*` faces are [36](36-craft-hand-cards.md). The fan step is `32 / (max_hand - 1)` degrees. The hand-size setting in this file stays **5**. The cycle, the costs, the keys, and Finish do not move.
+**Hand presentation (stamped A′AAAA, Design #83):** fan, drag, zone wells, and `mat_*` faces are [36](36-craft-hand-cards.md). The fan step is `32 / (max_hand - 1)` degrees. The hand-size setting in this file stays **5**. The cycle, the costs, the keys, and Finish do not move. Tag chrome on the card is an open letter in that file (section 6). Play costs in this file stay.
 
 ## Entering craft mode
 
