@@ -2,6 +2,7 @@ class_name CraftHandSlot
 extends Panel
 ## Portrait hand card (docs/36). 108×148, face well 88×88, pivot at the bottom center.
 ## A missing mat png keeps the chip well. Drag threshold and play live on the table.
+## Soft A: native tag chips sit in the face well. Type stays on line 1. Cost stays on line 2.
 
 var hand_index: int = 0
 var card: HandCard
@@ -21,6 +22,7 @@ var _instance_id: int = 0
 var _tween: Tween
 var _face_well: Panel
 var _face: TextureRect
+var _tag_row: Control
 var _shine: ColorRect
 var _index: Label
 var _name: Label
@@ -52,6 +54,7 @@ func bind(index: int, next: HandCard, next_cost: int, clickable: bool, draggable
 	_name.text = CraftCatalog.display_name(next.id, next.type) if next != null else ""
 	_caption.text = _caption_for(next, next_cost)
 	_bind_face(next)
+	_bind_tag_chips(next)
 	if flight_visual or _ghost:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 	else:
@@ -79,6 +82,8 @@ func set_ghost(on: bool) -> void:
 	else:
 		_face_well.visible = true
 		_face.visible = _face.texture != null
+		if _tag_row != null:
+			_tag_row.visible = _tag_row.get_child_count() > 0
 		mouse_filter = Control.MOUSE_FILTER_IGNORE if flight_visual else Control.MOUSE_FILTER_STOP
 		_apply_style()
 
@@ -160,6 +165,23 @@ func play_dump(drop_px: float, duration: float, delay: float, done: Callable) ->
 	, CONNECT_ONE_SHOT)
 
 
+func _get_tooltip(at_position: Vector2) -> String:
+	return _chip_word_at(at_position)
+
+
+func _chip_word_at(local: Vector2) -> String:
+	if _tag_row == null or not _tag_row.visible or _face_well == null or not _face_well.visible:
+		return ""
+	var in_row := local - _face_well.position - _tag_row.position
+	for child in _tag_row.get_children():
+		var chip := child as TextureRect
+		if chip == null:
+			continue
+		if Rect2(chip.position, chip.size).has_point(in_row):
+			return chip.tooltip_text
+	return ""
+
+
 func contains_global(point: Vector2) -> bool:
 	if not is_visible_in_tree():
 		return false
@@ -216,6 +238,21 @@ func _build() -> void:
 	_face.visible = false
 	_face_well.add_child(_face)
 
+	## Bottom of the well, left inset 2. Three native chips end at x = 54 inside the 88 well.
+	_tag_row = Control.new()
+	_tag_row.name = "TagChips"
+	_tag_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tag_row.position = Vector2(
+		PlannerChipArt.CARD_INSET,
+		CraftHandLayout.FACE_PX - PlannerChipArt.CARD_INSET - PlannerChipArt.CARD_PX
+	)
+	_tag_row.size = Vector2(
+		3 * PlannerChipArt.CARD_PX + 2 * PlannerChipArt.CARD_GAP,
+		PlannerChipArt.CARD_PX
+	)
+	_tag_row.visible = false
+	_face_well.add_child(_tag_row)
+
 	_index = _label("", ShellTheme.SLOT_PX, ShellTheme.GOLD)
 	_index.position = Vector2(8, 3)
 	_index.size = Vector2(36, 14)
@@ -228,7 +265,8 @@ func _build() -> void:
 	_name.clip_text = true
 	add_child(_name)
 
-	## Line 1 is type + tags (or the skill blurb). Line 2 is only the cost, so it cannot wrap off.
+	## Line 1 is the type, or the skill blurb. Line 2 is only the cost, so it cannot wrap off.
+	## Soft A: tag names leave this caption. A tag with no chip file keeps that word on line 1.
 	_caption = _label("", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_caption.position = Vector2(8, 120)
 	_caption.size = Vector2(CraftHandLayout.CARD_W - 16, 28)
@@ -248,17 +286,35 @@ func _bind_face(next: HandCard) -> void:
 	_face_well.visible = not _ghost
 
 
+func _bind_tag_chips(next: HandCard) -> void:
+	if _tag_row == null:
+		return
+	for child in _tag_row.get_children():
+		_tag_row.remove_child(child)
+		child.free()
+	var show := false
+	if next != null and next.type != GameEnums.HandCardType.SKILL:
+		var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_of(next.id, next.type))
+		var step := PlannerChipArt.CARD_PX + PlannerChipArt.CARD_GAP
+		for i in chips.size():
+			var chip := chips[i]
+			chip.position = Vector2(i * step, 0)
+			_tag_row.add_child(chip)
+		show = not chips.is_empty()
+	_tag_row.visible = show
+
+
 func _caption_for(next: HandCard, next_cost: int) -> String:
 	if next == null:
 		return ""
 	var cost_line := "cost %d" % next_cost
 	if next.type == GameEnums.HandCardType.SKILL:
 		return "skill · %s\n%s" % [CraftCatalog.skill_blurb(next.id), cost_line]
-	var tags := CraftCatalog.tags_of(next.id, next.type)
 	var kind := GameEnums.hand_card_type_wire(next.type)
+	var words := PlannerChipArt.tags_without_chip(CraftCatalog.tags_of(next.id, next.type))
 	var head := kind
-	if not tags.is_empty():
-		head = "%s · %s" % [kind, ", ".join(tags)]
+	if not words.is_empty():
+		head = "%s · %s" % [kind, ", ".join(words)]
 	return "%s\n%s" % [head, cost_line]
 
 
