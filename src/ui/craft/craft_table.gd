@@ -619,7 +619,7 @@ func _rebuild_hand(session: CraftStaminaSession) -> void:
 		if slot == null:
 			slot = CraftHandSlot.new()
 			_hand_fan.add_child(slot)
-		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free)
+		var cost := CraftCatalog.play_cost(card, AtelierSession.next_mat_free, AtelierSession.next_cost_less)
 		slot.bind(i, card, cost, _can_click(session, i, closed), _can_drag(session, i, closed))
 		if slot == _ghost:
 			slot.set_ghost(true)
@@ -1254,13 +1254,13 @@ func _can_commit(hand_index: int, zone_index: int) -> bool:
 	var session := AtelierSession.craft_session
 	if session == null:
 		return false
-	return CraftRules.can_play(session, hand_index, AtelierSession.next_mat_free, zone_index)
+	return CraftRules.can_play(session, hand_index, AtelierSession.next_mat_free, zone_index, AtelierSession.next_cost_less)
 
 
 func _can_click(session: CraftStaminaSession, index: int, closed: bool) -> bool:
 	if closed or session == null:
 		return false
-	if not CraftRules.can_play(session, index, AtelierSession.next_mat_free, session.selected_zone_index):
+	if not CraftRules.can_play(session, index, AtelierSession.next_mat_free, session.selected_zone_index, AtelierSession.next_cost_less):
 		return false
 	var zone := _zone_by_index(session.selected_zone_index)
 	return zone != null and zone.visible and not zone.is_locked()
@@ -1270,7 +1270,7 @@ func _can_drag(session: CraftStaminaSession, index: int, closed: bool) -> bool:
 	if closed or session == null:
 		return false
 	for z in range(1, session.zone_count + 1):
-		if CraftRules.can_play(session, index, AtelierSession.next_mat_free, z):
+		if CraftRules.can_play(session, index, AtelierSession.next_mat_free, z, AtelierSession.next_cost_less):
 			return true
 	return false
 

@@ -6,19 +6,23 @@ extends Resource
 @export var type: GameEnums.HandCardType = GameEnums.HandCardType.MATERIAL
 @export var mat_enchant_id: String = "" ## docs/32 mat_ench_*; empty = unenchanted
 @export var shiny: bool = false
+## docs/39 letter A. "no_tag" withholds catalog tags on this copy. Empty keeps them.
+@export var starter_role: String = ""
 
 
 static func make(
 	id_: String,
 	type_: GameEnums.HandCardType,
 	mat_enchant_id_: String = "",
-	shiny_: bool = false
+	shiny_: bool = false,
+	starter_role_: String = ""
 ) -> HandCard:
 	var card := HandCard.new()
 	card.id = id_
 	card.type = type_
 	card.mat_enchant_id = mat_enchant_id_
 	card.shiny = shiny_
+	card.starter_role = starter_role_
 	return card
 
 
@@ -27,7 +31,7 @@ func is_enchanted() -> bool:
 
 
 func duplicate_live() -> HandCard:
-	return make(id, type, mat_enchant_id, shiny)
+	return make(id, type, mat_enchant_id, shiny, starter_role)
 
 
 func to_dict() -> Dictionary:

@@ -8,6 +8,10 @@ extends Resource
 @export var zone_index: int = 1 ## 1-based ∈ 1..zone_count
 @export var construction_id: String = "" ## construction_ids[zone_index-1]
 @export var mat_enchant_id: String = ""
+## docs/39. Copied from the hand card. Not a harness Required key.
+@export var starter_role: String = ""
+## docs/39 sk_heavy_draw. Next zone play contributes ×1.5 stats. Tags stay printed.
+@export var stat_one_and_half: bool = false
 
 
 func to_dict() -> Dictionary:

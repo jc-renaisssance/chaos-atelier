@@ -177,7 +177,7 @@ func _played_face(card: PlayedCard) -> Control:
 func _played_tag_chips(card: PlayedCard) -> Control:
 	if card.type == GameEnums.HandCardType.SKILL:
 		return null
-	var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_of(card.id, card.type))
+	var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_for_played(card))
 	if chips.is_empty():
 		return null
 	var box := HBoxContainer.new()

@@ -42,7 +42,8 @@ static func can_play(
 	session: CraftStaminaSession,
 	hand_index: int,
 	next_mat_free: bool,
-	zone_index: int = 0
+	zone_index: int = 0,
+	next_cost_less: int = 0
 ) -> bool:
 	if session == null or session.is_finished():
 		return false
@@ -54,7 +55,7 @@ static func can_play(
 	var card: HandCard = session.hand[hand_index]
 	if not _zone_accepts(session, target, card.type):
 		return false
-	var cost := CraftCatalog.play_cost(card, next_mat_free)
+	var cost := CraftCatalog.play_cost(card, next_mat_free, next_cost_less)
 	return cost <= session.stamina_remaining
 
 
@@ -106,15 +107,29 @@ static func play(
 	session: CraftStaminaSession,
 	hand_index: int,
 	next_mat_free: bool,
-	zone_index: int = 0
+	zone_index: int = 0,
+	next_cost_less: int = 0,
+	next_stat_heavy: bool = false,
+	rng: RandomNumberGenerator = null
 ) -> Dictionary:
 	if session == null:
-		return {"ok": false, "next_mat_free": next_mat_free}
+		return {
+			"ok": false,
+			"next_mat_free": next_mat_free,
+			"next_cost_less": next_cost_less,
+			"next_stat_heavy": next_stat_heavy,
+		}
 	var target := zone_index if zone_index > 0 else session.selected_zone_index
-	if not can_play(session, hand_index, next_mat_free, target):
-		return {"ok": false, "next_mat_free": next_mat_free}
+	if not can_play(session, hand_index, next_mat_free, target, next_cost_less):
+		return {
+			"ok": false,
+			"next_mat_free": next_mat_free,
+			"next_cost_less": next_cost_less,
+			"next_stat_heavy": next_stat_heavy,
+		}
 	var card: HandCard = session.hand[hand_index]
-	var cost := CraftCatalog.play_cost(card, next_mat_free)
+	var cost := CraftCatalog.play_cost(card, next_mat_free, next_cost_less)
+	## The played card leaves before a starter skill discards or draws (docs/39).
 	session.hand.remove_at(hand_index)
 	var burned := burns_on_play(card.type)
 	if not burned:
@@ -128,13 +143,39 @@ static func play(
 	played.zone_index = target
 	played.construction_id = session.construction_id_for_zone(target)
 	played.mat_enchant_id = card.mat_enchant_id
+	played.starter_role = card.starter_role
 	session.cards_played.append(played)
-	var flag := next_mat_free
-	if card.type == GameEnums.HandCardType.MATERIAL and next_mat_free:
-		flag = false
-	elif card.type == GameEnums.HandCardType.SKILL and card.id == "sk_next_mat_free":
-		flag = true
-	return {"ok": true, "next_mat_free": flag, "played": played, "burned": burned}
+	## Incoming next-card modifiers apply to this zone play, then this skill may set the next one.
+	## Dig does not enter this function. Finish ends the session and clears the flags outside.
+	var free := next_mat_free
+	var less := next_cost_less
+	var heavy := next_stat_heavy
+	if card.type == GameEnums.HandCardType.MATERIAL and free:
+		free = false
+	if less > 0:
+		less = 0
+	if heavy:
+		heavy = false
+		played.stat_one_and_half = true
+	if card.type == GameEnums.HandCardType.SKILL:
+		if card.id == "sk_next_mat_free":
+			free = true
+		elif card.id == "sk_ease_draw":
+			less = 1
+			draw_one(session, rng)
+		elif card.id == "sk_heavy_draw":
+			heavy = true
+			draw_one(session, rng)
+		elif card.id == "sk_scrap_breath":
+			_discard_one_other(session)
+	return {
+		"ok": true,
+		"next_mat_free": free,
+		"next_cost_less": less,
+		"next_stat_heavy": heavy,
+		"played": played,
+		"burned": burned,
+	}
 
 
 static func dig(
@@ -153,6 +194,32 @@ static func dig(
 	session.dig_count += 1
 	draw_up_to_hand(session, rng)
 	return {"ok": true, "dig_count": session.dig_count}
+
+
+## One card from the draw pile. A short pile shuffles discard into draw. Empty after that draws 0.
+static func draw_one(session: CraftStaminaSession, rng: RandomNumberGenerator) -> bool:
+	if session == null:
+		return false
+	if session.draw_pile.is_empty():
+		if not reshuffle_discard_into_draw(session, rng):
+			return false
+	if session.draw_pile.is_empty():
+		return false
+	session.hand.append(session.draw_pile.pop_back())
+	return true
+
+
+## docs/39 sk_scrap_breath. The skill has already left the hand.
+## Empty remaining hand: no discard, no stamina. Exactly one remaining card is that other card.
+## Soft does not name which card when more than one remains. Do not pick.
+static func _discard_one_other(session: CraftStaminaSession) -> bool:
+	if session == null or session.hand.size() != 1:
+		return false
+	var other: HandCard = session.hand[0]
+	session.hand.remove_at(0)
+	session.discard_pile.append(other)
+	session.stamina_remaining += 1
+	return true
 
 
 static func draw_up_to_hand(session: CraftStaminaSession, rng: RandomNumberGenerator) -> void:

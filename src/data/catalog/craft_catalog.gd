@@ -1,6 +1,6 @@
 class_name CraftCatalog
 extends RefCounted
-## own_basic starter + play costs + tag/stat bags (docs/11, 12, 13, 19, 27).
+## own_basic starter + play costs + tag/stat bags (docs/11, 12, 13, 19, 27, 39).
 ## Construction is order-fixed — never a hand card.
 
 const SKILL_BLURBS := {
@@ -10,6 +10,9 @@ const SKILL_BLURBS := {
 	"sk_touch_up": "+1 to one chosen stat on one played material (stub).",
 	"sk_deep_dig": "Refresh hand; draw +1 extra (clamped to hand_size this slice).",
 	"sk_steady_hand": "Ignore first negative synergy this piece (stub).",
+	"sk_ease_draw": "The next card played into a zone costs 1 less stamina, floor 0. Then draw 1",
+	"sk_scrap_breath": "Discard 1 other card from hand. If that discard happens, stamina +1",
+	"sk_heavy_draw": "The next card played into a zone contributes ×1.5 stats, each stat rounded half away from zero. Tags stay as printed. Then draw 1",
 }
 
 ## id → {name, family, dollar, HP, ATK, DEF, RES, MOB, PRE, tags}
@@ -90,17 +93,18 @@ const ENCHANTMENTS := {
 	"enc_sigil_vow": {"name": "Vow Sigil", "dollar": 5, "HP": 1, "ATK": 0, "DEF": 0, "RES": 1, "MOB": 0, "PRE": 2, "tags": ["Royal", "Pure"]},
 }
 
-## docs/19 — 8 mats. Tiny skill stub: sk_next_mat_free (docs/27: 0–2 unlocked).
+## docs/39 letter B — 10 cards. 3 tagged / 4 no-tag / 3 skills. Replaces the docs/19 list at run start.
 const OWN_BASIC_STARTER := [
-	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL],
-	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL],
-	["mat_cotton_spring", GameEnums.HandCardType.MATERIAL],
-	["mat_leather_tan", GameEnums.HandCardType.MATERIAL],
-	["mat_wool_grey", GameEnums.HandCardType.MATERIAL],
-	["mat_iron_scrap", GameEnums.HandCardType.MATERIAL],
-	["mat_stone_shard", GameEnums.HandCardType.MATERIAL],
-	["mat_silk_pale", GameEnums.HandCardType.MATERIAL],
-	["sk_next_mat_free", GameEnums.HandCardType.SKILL],
+	["mat_ember_silk", GameEnums.HandCardType.MATERIAL, "tagged"],
+	["mat_wool_grey", GameEnums.HandCardType.MATERIAL, "tagged"],
+	["mat_iron_scrap", GameEnums.HandCardType.MATERIAL, "tagged"],
+	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
+	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
+	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
+	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
+	["sk_ease_draw", GameEnums.HandCardType.SKILL, "skill"],
+	["sk_scrap_breath", GameEnums.HandCardType.SKILL, "skill"],
+	["sk_heavy_draw", GameEnums.HandCardType.SKILL, "skill"],
 ]
 
 
@@ -108,7 +112,7 @@ static func own_basic_starter() -> Array[HandCard]:
 	var out: Array[HandCard] = []
 	for row in OWN_BASIC_STARTER:
 		var kind: GameEnums.HandCardType = row[1]
-		out.append(HandCard.make(String(row[0]), kind))
+		out.append(HandCard.make(String(row[0]), kind, "", false, String(row[2])))
 	return out
 
 
@@ -142,6 +146,39 @@ static func construction_name(id: String) -> String:
 
 static func skill_blurb(id: String) -> String:
 	return String(SKILL_BLURBS.get(id, "Owner skill — manipulates the session, then leaves."))
+
+
+## Shop hemp keeps Soft. A starter no_tag copy withholds the catalog list (docs/39 A).
+static func tags_for_card(card: HandCard) -> PackedStringArray:
+	if card == null or card.starter_role == "no_tag":
+		return PackedStringArray()
+	return tags_of(card.id, card.type)
+
+
+static func tags_for_played(card: PlayedCard) -> PackedStringArray:
+	if card == null or card.starter_role == "no_tag":
+		return PackedStringArray()
+	return tags_of(card.id, card.type)
+
+
+## n × 1.5, half away from zero (docs/39 sk_heavy_draw). 1 → 2, 2 → 3, −1 → −2.
+static func scale_half_away(n: int) -> int:
+	var mag := absi(n * 3)
+	var rounded := (mag + 1) // 2
+	if n < 0:
+		return -rounded
+	return rounded
+
+
+static func scaled_stat_bag(bag: Dictionary) -> Dictionary:
+	return {
+		"HP": scale_half_away(int(bag.get("HP", 0))),
+		"ATK": scale_half_away(int(bag.get("ATK", 0))),
+		"DEF": scale_half_away(int(bag.get("DEF", 0))),
+		"RES": scale_half_away(int(bag.get("RES", 0))),
+		"MOB": scale_half_away(int(bag.get("MOB", 0))),
+		"PRE": scale_half_away(int(bag.get("PRE", 0))),
+	}
 
 
 static func tags_of(id: String, type: GameEnums.HandCardType) -> PackedStringArray:
@@ -235,18 +272,25 @@ static func dollar_to_play_rarity(dollar: int) -> GameEnums.CraftRarity:
 	return GameEnums.CraftRarity.COMMON
 
 
-static func play_cost(card: HandCard, next_mat_free: bool) -> int:
+## AP and stamina are one meter (docs/39 lock 3). next_cost_less is sk_ease_draw: −1, floor 0.
+## Dig is not a card. next_mat_free still zeroes the next material (the bought skill).
+static func play_cost(card: HandCard, next_mat_free: bool, next_cost_less: int = 0) -> int:
 	if card == null:
 		return 0
+	var cost := 0
 	match card.type:
 		GameEnums.HandCardType.SKILL:
-			return int(GameConstants.OWNER_SKILL_DRAFT_COSTS.get(card.id, 1))
+			cost = int(GameConstants.OWNER_SKILL_DRAFT_COSTS.get(card.id, 1))
 		GameEnums.HandCardType.RUNE:
-			return GameConstants.ENC_PLAY_COST
+			cost = GameConstants.ENC_PLAY_COST
 		_:
 			if next_mat_free:
-				return 0
-			return GameConstants.material_play_cost(dollar_to_play_rarity(effective_dollar(card)))
+				cost = 0
+			else:
+				cost = GameConstants.material_play_cost(dollar_to_play_rarity(effective_dollar(card)))
+	if next_cost_less > 0:
+		cost = maxi(0, cost - next_cost_less)
+	return cost
 
 
 static func type_label(type: GameEnums.HandCardType) -> String:
