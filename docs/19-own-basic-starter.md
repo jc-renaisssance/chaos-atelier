@@ -4,7 +4,7 @@ Phase-1 player clothier = **`own_basic`** only (see `16-shop-owners.md`).
 
 ## Starter deck (run start)
 
-> **Replaced in flight — [39](39-starter-deck.md).** The eight rows below were written as a fixed hand. Jonathan (2026-10-27): the starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**, and the hand of **5** is a draw from that deck. Soft’s recommend is the **10-card** starter deck in `39`, which replaces this list. Bought cards join that same deck. The rows stay as the record until letter B is stamped. Shop weights further down stay the offer table.
+> **Replaced — [39](39-starter-deck.md), letter B stamped A.** The eight rows below were written as a fixed hand. Jonathan (2026-10-27): the starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**, and the hand of **5** is a draw from that deck. The **10-card** starter deck in `39` replaces this list. Bought cards join that same deck. These rows stay as history. Shop weights further down stay the offer table.
 
 **Historical list — 8 mats:**
 

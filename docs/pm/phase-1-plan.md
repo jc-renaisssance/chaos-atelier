@@ -194,13 +194,13 @@ Does not reopen Soft A′AAAA, tag chrome **A**, Drop A, Path A, #88, shell lett
 
 ---
 
-## Open — Soft Design starter deck
+## Stamped — Soft Design starter deck
 
-**Stamp open. Doc id 39.** Law: [39](../39-starter-deck.md). Stamp card: [STAMP](../STAMP.md). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Nnoitra has no seat. Soft height [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92) owns doc id **38** (`docs/38-solenne-height-body.md`, tip `14482e1`). That card stays open beside this one. Soft PASS there waits on Jonathan’s Height A|B. This section does not fold it in.
+**Stamped C′ · D′ · A. Doc id 39.** Law: [39](../39-starter-deck.md). Stamp card: [STAMP](../STAMP.md). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Nnoitra has no seat. Soft height [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92) owns doc id **38** (`docs/38-solenne-height-body.md`, tip `14482e1`). That card stays open beside this one. Soft PASS there waits on Jonathan’s Height A|B. This section does not fold it in.
 
-The starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**. Soft recommends **10** cards, and that list replaces the 8-mat starter in [19](../19-own-basic-starter.md). The hand stays **5** and is a draw from that deck. AP and stamina are one meter. “Next card” is a craft play into a zone. The combat kits replace the [14](../14-synergies.md) passive rows for `own_basic`. The fight Soft PASS bar is burn chip, HP tick, burn-stack counter, ascend, and heal pop. Solar, Lunar, and Occult stay out.
+The starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**. The stamped deck is **10** cards, and that list replaces the 8-mat starter in [19](../19-own-basic-starter.md). The hand stays **5** and is a draw from that deck. AP and stamina are one meter. “Next card” is a craft play into a zone. The combat kits replace the [14](../14-synergies.md) passive rows for `own_basic`. Burn stacks have no cap (**C′**). Survive is once per craft: **N** Fire-apex pieces mint **N** charges (**D′**). The fight Soft PASS bar is burn chip, HP tick, burn-stack counter with no ceiling, ascend, heal pop, and the charge spend. Solar, Lunar, and Occult stay out.
 
-Letters A–G are open. Soft’s recommends are filled on the stamp card. Silence is not a letter. Ulquiorra and Szayelaporro hold the Client until Soft PASS, Jonathan stamps, and Aizen merges. This does not reopen #91, A′AAAA, tag chrome **A**, or Drop A. It does not edit the height card.
+Letters A, B, C′, D′, E, F, and G are stamped. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS. Ulquiorra and Szayelaporro hold the Client until Soft QC PASS and that brief. This does not reopen #91, A′AAAA, tag chrome **A**, or Drop A. It does not edit the height card.
 
 ---
 

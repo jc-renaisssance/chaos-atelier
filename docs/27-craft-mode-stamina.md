@@ -14,7 +14,7 @@
 
 **Hand presentation (stamped A′AAAA, Design #83):** fan, drag, zone wells, and `mat_*` faces are [36](36-craft-hand-cards.md). The fan step is `32 / (max_hand - 1)` degrees. The hand-size setting in this file stays **5**. The cycle, the costs, the keys, and Finish do not move. Tag chrome on the card is stamped **A** in that file (section 6): landed 16×16 chips on the hand and the zone played row. Play costs in this file stay. Player-facing words on this screen (ids, the hollow Brief, the zone’s harness sentence) are [37](37-player-facing-chrome.md). The rules in this file do not move.
 
-**Starter deck (Soft Design in flight, [39](39-starter-deck.md)):** hand size here stays **5**. The 3 / 4 / 3 composition is the starter deck. Each run draws 5 from that deck. Dig, discard, and reshuffle in this file are the cycle. Dig cost stays **2** (letter G recommends keep). AP and stamina are the one meter this file already spends.
+**Starter deck (stamped C′ · D′ · A, [39](39-starter-deck.md)):** hand size here stays **5**. The 3 / 4 / 3 composition is the starter deck. Each run draws 5 from that deck. Dig, discard, and reshuffle in this file are the cycle. Dig cost stays **2** (letter G, stamped **A**). AP and stamina are the one meter this file already spends.
 
 ## Entering craft mode
 
@@ -141,7 +141,7 @@ Not a harness dump assert unless Test later stamps fields in [20](20-harness-sta
 | `sk_deep_dig` | 3 | Refresh hand; draw +1 extra |
 | `sk_steady_hand` | 1 | Ignore first negative synergy roll hint this **target** piece (does **not** skip rarity rules — still full neg skip only on rare/leg) |
 
-`own_basic` starts with **0** skills until [39](39-starter-deck.md) is stamped. That draft puts `sk_ease_draw`, `sk_scrap_breath`, and `sk_heavy_draw` in the starter deck and draws them with this file’s hand / draw / discard. **M2** market Skills tab sells these six `sk_*` into the run deck (buy-into-kit, run-long via reshuffle — not one-shot burn) — [32](32-shop-and-events.md). The three starter ids are not on that shelf. Do not invent a parallel skill catalog. Gold prices on that tab are Test knobs.
+`own_basic` starts with the three skills in [39](39-starter-deck.md) (stamped): `sk_ease_draw`, `sk_scrap_breath`, and `sk_heavy_draw`, drawn with this file’s hand / draw / discard. **M2** market Skills tab sells these six `sk_*` into the run deck (buy-into-kit, run-long via reshuffle — not one-shot burn) — [32](32-shop-and-events.md). The three starter ids are not on that shelf. Do not invent a parallel skill catalog. Gold prices on that tab are Test knobs.
 
 **M2 staff caps:** equipped `staff_*` raises `max_materials` / `max_runes` ([12b](12b-craft-slots.md) / [32](32-shop-and-events.md)). M2 Client treats those as per-zone bag limits. Stamina still gates. Do **not** revive 2m1r slot-fill UI. The “no hard material-slot cap” line above is the **M1-until-staff** gap.
 

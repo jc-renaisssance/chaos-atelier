@@ -1,12 +1,12 @@
 # Starter deck — basic owner combat (Soft Design)
 
-**Doc id: `39`.** **Status: Soft Design, stamp open.** Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens.
+**Doc id: `39`.** **Status: Stamped C′ · D′ · A** (Jonathan, Aizen Soft amend). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire.
 
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
 Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height is a parallel open card: [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92), doc id **38**, `docs/38-solenne-height-body.md`, tip `14482e1`. Soft PASS on that card is waiting on Jonathan’s Height A|B. This file does not edit that law, posture art, or PR #71.
 
-Ulquiorra and Szayelaporro **hold** the Client until Soft PASS, Jonathan stamps, and Aizen merges. Nnoitra has no seat.
+Ulquiorra and Szayelaporro **hold** the Client until Soft QC PASS and Aizen’s re-stamp brief. C′ and D′ changed the letters, so that brief is the Client gate. Nnoitra has no seat.
 
 ---
 
@@ -15,7 +15,7 @@ Ulquiorra and Szayelaporro **hold** the Client until Soft PASS, Jonathan stamps,
 | Lock | Where |
 |---|---|
 | Hand size **5** (`max_hand`) | [27](27-craft-mode-stamina.md), [36](36-craft-hand-cards.md). Fan step stays `32 / (max_hand - 1)` |
-| Dig cost **2**, session stamina **`12 * N`**, Finish-only, StS cycle | [27](27-craft-mode-stamina.md). Letter G below recommends keeping dig at 2 |
+| Dig cost **2**, session stamina **`12 * N`**, Finish-only, StS cycle | [27](27-craft-mode-stamina.md). Letter G is stamped **A**: dig stays 2 |
 | Soft A′AAAA, tag chrome **A**, Drop A, cost caption, N=2 one fight | [36](36-craft-hand-cards.md) #83–#89. Client #88 (`e9f503f`) |
 | Player-facing chrome **Node A′ · Brief A · Event A** | [37](37-player-facing-chrome.md) #91 |
 | Gate **A** / Surface **A** / Socket **A**, vignettes **A**, one fight | [30](30-interactive-order.md), [35](35-steam-demo-cut.md). The PASS bar below is the fight. It does not reopen those letters |
@@ -26,7 +26,7 @@ Ulquiorra and Szayelaporro **hold** the Client until Soft PASS, Jonathan stamps,
 
 ## Jonathan locks (2026-10-27)
 
-Written as locks. Letters A–G under them are the open lines. Silence is not a letter.
+Written as locks. Letters A–G under them are stamped. Silence was not a letter.
 
 ### 1. Hand 5. Starter deck is 3 / 4 / 3
 
@@ -42,7 +42,7 @@ Every run starts with the same cards. The draw order changes. The composition do
 
 ### 3. AP and stamina are one meter
 
-Skills spend stamina. Dig spends stamina. Material plays spend stamina. Session start stays **`12 * N`**. There is no second action meter. Dig stays **2** unless letter G is rewritten.
+Skills spend stamina. Dig spends stamina. Material plays spend stamina. Session start stays **`12 * N`**. There is no second action meter. Dig stays **2** (letter G, stamped **A**).
 
 ### 4. “Next card” is a craft play
 
@@ -50,7 +50,7 @@ Skills spend stamina. Dig spends stamina. Material plays spend stamina. Session 
 
 ### 5. Replace [14](14-synergies.md)
 
-For `own_basic`, the combat kits in this file **replace** the live monostack ladders, the report-hint quotes, and the passive effect cells. They are the same rows, rewritten. A report-hint string beside a kit is not a second layer. History stays printed in `14` until this card is stamped. After the stamp, `own_basic` reads the kits here. Tags with no kit in this file do not keep the old passive.
+For `own_basic`, the combat kits in this file **replace** the live monostack ladders, the report-hint quotes, and the passive effect cells. They are the same rows, rewritten. A report-hint string beside a kit is not a second layer. `own_basic` reads the kits here. History stays printed in `14`. Tags with no kit in this file do not keep the old passive.
 
 ### 6. Playback Soft PASS bar
 
@@ -60,9 +60,10 @@ On the **one fight** ([35](35-steam-demo-cut.md) lock 5: combined gear, after th
 |---|---|
 | Burn chip | A damage number leaves the unit that is burning, on the tick beat |
 | HP tick | That unit’s HP integer changes on the same beat, by the kit’s amount |
-| Sun counter | A stack integer on the unit, changing when stacks are applied or spent. In these kits the integer is **burn stacks** |
-| Ascend | Its own beat when a ladder’s highest met tier is 3, 5, or 8 |
+| Sun counter | A stack integer on the unit, changing when stacks are applied or spent. In these kits the integer is **burn stacks**. It has no ceiling |
+| Ascend | Its own beat when a ladder’s highest met tier is 3, 5, or 8. Fire **≥ 8** is the Fire-apex tier beat. It is not the survive spend |
 | Heal pop | A number rising off the healed unit, equal to the HP gained, on the heal beat |
+| Survive | The craft’s charge integer, minted from Fire-apex pieces (letter D′). A spend shows HP become **1** and the integer drop by **1** on that hit |
 
 A report-hint sentence fails this bar. Gate A vignettes stay the shipped beat list. They are not this fight. The resolver’s `hp_remaining` float stays the report field until a Client stamp adds these beats into it. Soft PASS watches the fight integers below.
 
@@ -82,7 +83,7 @@ Solar’s combat example stays out. Fire stays in when the tagged mats include F
 
 ## Starter skills (Soft draft)
 
-Costs are the lock (1 / 0 / 1). Ids are Soft’s draft. Same `sk_*` cards as [27](27-craft-mode-stamina.md): they enter the starter deck, shuffle, play into a zone, then discard. Letter F recommends that cycle. They are not on `market_skill_bank_c1`. The six sold skills stay the buy list.
+Costs are the lock (1 / 0 / 1). Ids are Soft’s draft. Same `sk_*` cards as [27](27-craft-mode-stamina.md): they enter the starter deck, shuffle, play into a zone, then discard. Letter F is stamped **A** on that cycle. They are not on `market_skill_bank_c1`. The six sold skills stay the buy list.
 
 A play still has to name a zone ([27](27-craft-mode-stamina.md)). The “next card” modifier is for the next zone play in the session, whichever zone that play uses.
 
@@ -102,13 +103,13 @@ Draw **1** uses the draw pile. A short pile shuffles discard into draw, then con
 
 ---
 
-## Letters (open — Soft recommends)
+## Letters (stamped)
 
-Jonathan writes each line. The recommend is filled so the stamp can copy it.
+Jonathan stamped **C′** and **D′**, and **A** on the rest (Aizen Soft amend). Silence was not a letter. The text under each letter is the stamp.
 
 ### A. What “tagged” means
 
-**Recommend A.** A mat is **tagged** when its tag list contains any of the **16** monostack tags in [14](14-synergies.md). A mat is **no-tag** when that list is empty.
+**Stamped A.** A mat is **tagged** when its tag list contains any of the **16** monostack tags in [14](14-synergies.md). A mat is **no-tag** when that list is empty.
 
 **B** (only Soft / Earth / Metal / Wild / Silk / Pure count as tagged) would put a Fire-only mat in the no-tag seats. Fire is the combat example that belongs in the tagged seats. **A** counts Fire.
 
@@ -116,7 +117,7 @@ Jonathan writes each line. The recommend is filled so the stamp can copy it.
 
 ### B. How big the starter deck is
 
-**Recommend: 10 cards. The whole starter deck.** 3 tagged + 4 no-tag + 3 skills. It **replaces** the 8-mat list in [19](19-own-basic-starter.md) for run start. It is not an 11-card deck of those 8 mats plus 3 skills (that mix is not 3 / 4 / 3). Shop weights stay the offer table. A buy appends a card to this deck.
+**Stamped A. 10 cards. The whole starter deck.** 3 tagged + 4 no-tag + 3 skills. It **replaces** the 8-mat list in [19](19-own-basic-starter.md) for run start. Shop weights stay the offer table. A buy appends a card to this deck. The old 8 mats plus 3 skills would be 11 cards and would miss 3 / 4 / 3.
 
 | # | id | `starter_role` | Tags on this copy | Feeds |
 |---:|---|---|---|---|
@@ -132,48 +133,50 @@ One copy of a tagged mat reaches a **≥ 3** ladder by cycling discard → reshu
 
 Starting gold **12** and the unlocked constructions (`con_tunic`, `con_cloak`, `con_armor`, `con_robe`, `con_coat`) stay.
 
-### C. Burn
+### C′. Burn
 
-**Recommend these numbers.** Soft QC can count them on the fight.
+**Stamped C′.** No stack cap. Stacks grow with every apply. An apply is not clamped, and a later apply is not discarded.
 
 The unit that **holds** the stacks is the one that ticks. At the **start** of each of that unit’s actions, while stacks **> 0**:
 
 1. Deal **1 HP × stacks**.
 2. Then stacks **− 1**.
 
-**Cap 5.** An apply that would pass 5 sets the counter to 5. Extra stacks are lost.
-
 **Lifesteal.** When the stacks were applied by the adventurer’s Fire kit and the tick hits the foe: heal the adventurer for **floor(tick damage / 2)**. A heal of **0** does not pop. A heal **≥ 1** pops.
 
 **Cleanse.** On a Soft heal pop, the healed unit (the adventurer) loses **1** burn stack after the pop. A muted heal does not cleanse. Full cleanse of every stack is a Pure effect. Pure is outside this deck’s buy list, so this pass cleanses **1** stack per pop.
 
-Worked tick: **2** stacks → **2** damage, counter **2 → 1**, lifesteal **1**, heal pop **1**.
+Worked tick: **2** stacks → **2** damage, counter **2 → 1**, lifesteal **1**, heal pop **1**. A later apply that reaches **6** stays **6**.
 
-### D. Survive once
+### D′. Survive
 
-**Recommend: once per fight**, and only on `syn_soft_8`.
+**Stamped D′. Once per craft. Charges come from Fire apex.**
 
-When a hit would move the adventurer from **≥ 1** HP to **≤ 0**, HP becomes **1** and the charge is spent. The beat shows HP **1** and an ascend beat `survive`. A later lethal in that same fight goes to **0**. The next fight has the charge again. Piece vignettes are not fights, so they do not spend it.
+A **Fire-apex piece** is a piece whose own tag bag is **Fire ≥ 8** (`syn_fire_8`). The combined bag can show the Fire apex tier when no single piece is at 8. Charges ignore that sum. **N** Fire-apex pieces in this craft mint **N** charges for this craft session.
 
-Order on an incoming hit: Earth reduces the number, then this check, then the HP integer changes.
+The fight shows the integer before the first hit. A hit that would move the adventurer from **≥ 1** HP to **≤ 0** spends **one** charge and sets HP to **1**. The spend is its own beat: HP **1**, charges drop by **1**. When charges are **0**, that hit sets HP to **0**.
+
+The next craft mints from its own pieces. Piece vignettes are not the fight, so they do not spend charges. Soft apex does not mint a charge. `syn_soft_8` is heal and cleanse only.
+
+Order on an incoming hit: Earth reduces the number, then this charge check, then the HP integer changes.
 
 ### E. First combat kits
 
-**Recommend: Fire, Soft, Earth, Metal, and Silk.**
+**Stamped A: Fire, Soft, Earth, Metal, and Silk.**
 
-The three tagged cards feed those five tags. Fire is the combat example. Silk is on `mat_ember_silk`, so a Silk ladder with no kit would leave that tag on the old passive row. **Wild** and **Pure** stay on the historical weight table and off the buy list for this pass, so their old rows do not fire and this pass does not draft their kits. **Solar, Lunar, Occult** stay out.
+The three tagged cards feed those five tags. Fire is the combat example. Silk is on `mat_ember_silk`, so a Silk ladder with no kit would leave that tag on the old passive row. **Wild** and **Pure** stay on the historical weight table and off the buy list this pass, so their old rows do not fire and this pass does not draft their kits. **Solar, Lunar, Occult** stay out.
 
-Highest met tier is the one that applies. Tiers do not stack their numbers. The apex **adds** its rider (survive, the extra burn stack, the full block) on top of the mid number.
+Highest met tier is the one that applies. Tiers do not stack their numbers. The apex adds its rider on top of the mid number. Fire apex’s rider is the survive charge in D′ (one per Fire-apex piece). Metal apex adds one burn stack, uncapped. Earth apex is the full block. Soft apex is the heal and the cleanse.
 
 Construction tags still enter the bag ([12](12-constructions.md)). The one fight reads the **combined** bag ([35](35-steam-demo-cut.md)): tag counts sum across pieces. A pair neg sees both tags when the two mats were played on different pieces.
 
 ### F. Where skills are drawn
 
-**Recommend: the same draw, hand, and discard as [27](27-craft-mode-stamina.md).** The three skills are cards in the starter deck. Dig dumps the hand, including skills, then draws up to 5. Soft’s pick is that shared cycle.
+**Stamped A: the same draw, hand, and discard as [27](27-craft-mode-stamina.md).** The three skills are cards in the starter deck. Dig dumps the hand, including skills, then draws up to 5.
 
 ### G. Dig cost
 
-**Recommend: keep 2.** No alternate number. Session-wide, not × N.
+**Stamped A: keep 2.** Session-wide, not × N.
 
 ---
 
@@ -220,7 +223,7 @@ Beat order:
 3. **Soft heal**, if Soft **≥ 3**. Pop, then cleanse 1 stack on the adventurer if any remain.
 4. Each action. **Tick first** if that unit’s stacks are **> 0**, then the action body.
 5. `adv_1` body: Fire **applies** stacks to the foe (counter changes; apply is not HP). Metal’s bonus is HP damage on this same action. Silk’s bonus damage is on the adventurer’s **first** attack, which is `adv_1` when Silk **≥ 3** and `adv_1` still when Silk **< 3** (the first adventurer action either way).
-6. Each foe action body: one incoming hit of **3** HP, then Earth, then survive, then the HP integer.
+6. Each foe action body: one incoming hit of **3** HP, then Earth, then the survive charge check (D′), then the HP integer. The charge-spend count below uses a labeled incoming of **12** on its `foe_1` only. The skeleton’s default stays **3**.
 
 `adv_2` has no second Fire apply and no second Metal bonus. It still ticks if the adventurer is burning.
 
@@ -236,7 +239,7 @@ Outlook art does not move. No gen. A new cross id has no png; the look falls thr
 |---|---:|---|
 | Fire **≥ 3** | **2** stacks | — |
 | Fire **≥ 5** | **3** | — |
-| Fire **≥ 8** | **4** | — |
+| Fire **≥ 8** | **4** | One survive charge for this craft, per piece whose own bag is Fire **≥ 8** (D′). The combined sum does not mint a charge |
 
 Then the burn rules. The old lines (“Cloth drank the heat.”, “Seams smoking.”, “They wore a kiln.”) do not satisfy the PASS bar.
 
@@ -246,7 +249,7 @@ Then the burn rules. The old lines (“Cloth drank the heat.”, “Seams smokin
 |---|---:|---|
 | Soft **≥ 3** | **2** | Cleanse **1** self stack |
 | Soft **≥ 5** | **3** | Cleanse **1** |
-| Soft **≥ 8** | **3** | Cleanse **1**, and **survive once per fight** (letter D) |
+| Soft **≥ 8** | **3** | Cleanse **1**. No survive |
 
 ### Earth — `syn_earth_3` / `syn_earth_5` / `syn_earth_8`
 
@@ -264,7 +267,7 @@ The first incoming hit is reduced. A reduction to **0** still shows a **0** chip
 |---|---:|---|
 | Metal **≥ 3** | **2** | — |
 | Metal **≥ 5** | **4** | — |
-| Metal **≥ 8** | **4** | Also **+1** burn stack on that apply (cap 5 after) |
+| Metal **≥ 8** | **4** | Also **+1** burn stack on that apply. No cap |
 
 ### Silk — `syn_silk_3` / `syn_silk_5` / `syn_silk_8`
 
@@ -278,7 +281,7 @@ The first incoming hit is reduced. A reduction to **0** still shows a **0** chip
 
 | id | When | Effect | `outlook_order` |
 |---|---|---|---:|
-| `syn_fire_metal` | Fire **≥ 1** ∧ Metal **≥ 1** | Fire apply **+1** stack, then cap 5 | 89 |
+| `syn_fire_metal` | Fire **≥ 1** ∧ Metal **≥ 1** | Fire apply **+1** stack. No cap | 89 |
 | `syn_fire_earth` | Fire **≥ 1** ∧ Earth **≥ 1** | The first burn tick this fight deals **+1** HP | 88 |
 | `syn_soft_metal` | Soft **≥ 1** ∧ Metal **≥ 1** | Metal’s `adv_1` damage **+1** | 9 |
 | `syn_soft_silk` | Soft **≥ 1** ∧ Silk **≥ 1** | Silk’s first-attack bonus **+1** | 8 |
@@ -307,19 +310,35 @@ Other `14` negs name a tag outside this set (`Silent`, `Sharp`, `Royal`, `Sticky
 
 ## One fight Soft can count
 
-Combined bag **Fire ≥ 3**, **Soft ≥ 3**, Earth and Metal and Silk under 3. `syn_neg_fire_soft` is live. Silk **< 3**, so the foe acts first. Playback HP starts at 12.
+Two counts. Silk **< 3** on both, so the foe acts first. Playback HP starts at **12**. A report-hint line fails both.
+
+### Count 1 — no cap
+
+One piece, own bag **Fire ≥ 8** and **Metal ≥ 8**. `syn_fire_metal` is live. Soft, Earth, and Silk are under 3. Apply on `adv_1` is **4 + 1** (Metal apex) **+ 1** (the cross) = **6**. The counter shows **6**. Charges = **1** because that piece is Fire-apex. The two hits of **3** from 12 are not lethal, so the charge stays **1**.
 
 | Beat | What is on screen |
 |---|---|
-| Ascend | Fire **3**, then Soft **3** |
-| Open | Adventurer burn counter **1** |
-| Heal | Pop **1** (2 halved). Counter **1 → 0** |
-| `foe_1` | Incoming **3**. Adventurer HP **12 → 9**. No tick (counter is 0) |
-| `adv_1` | Apply **2** on the foe. Counter **2**. No Metal damage |
-| `foe_2` | Tick **2** first. Foe HP **12 → 10**. Counter **2 → 1**. Heal pop **1** on the adventurer (floor(2 / 2)). Then incoming **3**. Adventurer HP **10 → 7** |
+| Ascend | Fire **8**, then Metal **8**. The Fire beat is the tier. It is not a charge spend |
+| Open | Charges **1**. Burn counters **0** |
+| `foe_1` | Incoming **3**. Adventurer HP **12 → 9**. Charges stay **1** |
+| `adv_1` | Apply **6** on the foe. Counter **6**. Metal damage **4**. Foe HP **12 → 8** |
+| `foe_2` | Tick **6** first. Foe HP **8 → 2**. Counter **6 → 5**. Lifesteal **3**. Heal pop **3** (adventurer HP **9 → 12**). No cleanse (this pop is lifesteal, not Soft). Then incoming **3**. Adventurer HP **12 → 9**. Charges stay **1** |
 | `adv_2` | No tick. No second apply |
 
-A report line that only says the cloth drank the heat fails this count.
+### Count 2 — charge spend
+
+One Fire-apex piece. Soft, Earth, Metal, and Silk are off. Charges show **1** before the first hit. This count’s `foe_1` incoming is **12**, so the spend fits the four-action fight. The skeleton’s default incoming stays **3**.
+
+| Beat | What is on screen |
+|---|---|
+| Ascend | Fire **8** |
+| Open | Charges **1** |
+| `foe_1` | Incoming **12**. Would move **12 → 0**. Spend: HP becomes **1**, charges **1 → 0**. Survive beat |
+| `adv_1` | Apply **4**. Foe counter **4** |
+| `foe_2` | Tick **4**. Foe HP **12 → 8**. Counter **4 → 3**. Lifesteal **2**. Heal pop **2** (adventurer HP **1 → 3**). Then incoming **3**. Charges are **0**, so HP **3 → 0** |
+| `adv_2` | No tick. No second apply |
+
+Two pieces at Fire **4** each: the combined bag is Fire **≥ 8**, so the apex apply can show, and charges are **0** because neither piece is Fire-apex. A lethal hit on that craft sets HP to **0**.
 
 ---
 
@@ -331,4 +350,4 @@ No new Required key in [20](20-harness-stamp.md). When a Client follows the stam
 
 ## Holds
 
-Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft PASS, Jonathan’s stamp, and Aizen’s merge. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**.
+Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card.
