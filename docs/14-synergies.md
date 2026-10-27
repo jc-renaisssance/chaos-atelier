@@ -2,7 +2,7 @@
 
 Resolver input: **tag counts** + **construction id** + **craft rarity**. Output: `powers[]` (positive + negative) for the adventure sim + report, and **outlook_id** for art.
 
-> **Replaced for `own_basic` — [39](39-starter-deck.md), stamped C′ · D′ · A.** For `own_basic`, the monostack ladders, the report-hint quotes, and the passive effect cells below are history. Do not delete them in this pass. `own_basic` reads the kits in `39` and does not also read these passive cells. Burn has no stack cap. Survive charges come from Fire-apex pieces, once per craft. Solar, Lunar, and Occult stay in this file as history. They do not enter the starter deck.
+> **Replaced for `own_basic` — [39](39-starter-deck.md), stamped A B C′ D′ E F G.** For `own_basic`, the monostack ladders, the report-hint quotes, and the passive effect cells below are history. Do not delete them in this pass. `own_basic` reads the kits in `39` and does not also read these passive cells. Burn has no stack cap. Survive charges come from Fire-apex pieces, once per craft. Solar, Lunar, and Occult stay in this file as history. They do not enter the starter deck.
 
 ## Outlook rule (Jonathan lock)
 

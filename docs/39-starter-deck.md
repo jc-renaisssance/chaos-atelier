@@ -1,6 +1,6 @@
 # Starter deck — basic owner combat (Soft Design)
 
-**Doc id: `39`.** **Status: Stamped C′ · D′ · A** (Jonathan, Aizen Soft amend). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire.
+**Doc id: `39`.** **Status: Stamped A B C′ D′ E F G** (Jonathan, Aizen Soft amend). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire.
 
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
@@ -103,13 +103,13 @@ Draw **1** uses the draw pile. A short pile shuffles discard into draw, then con
 
 ---
 
-## Letters (stamped)
+## Letters (locked)
 
-Jonathan stamped **C′** and **D′**, and **A** on the rest (Aizen Soft amend). Silence was not a letter. The text under each letter is the stamp.
+Jonathan locked **A B C′ D′ E F G** (Aizen Soft amend). Silence is not a letter. The text under each letter is the lock.
 
 ### A. What “tagged” means
 
-**Stamped A.** A mat is **tagged** when its tag list contains any of the **16** monostack tags in [14](14-synergies.md). A mat is **no-tag** when that list is empty.
+**Locked.** A mat is **tagged** when its tag list contains any of the **16** monostack tags in [14](14-synergies.md). A mat is **no-tag** when that list is empty.
 
 **B** (only Soft / Earth / Metal / Wild / Silk / Pure count as tagged) would put a Fire-only mat in the no-tag seats. Fire is the combat example that belongs in the tagged seats. **A** counts Fire.
 
@@ -117,7 +117,7 @@ Jonathan stamped **C′** and **D′**, and **A** on the rest (Aizen Soft amend)
 
 ### B. How big the starter deck is
 
-**Stamped A. 10 cards. The whole starter deck.** 3 tagged + 4 no-tag + 3 skills. It **replaces** the 8-mat list in [19](19-own-basic-starter.md) for run start. Shop weights stay the offer table. A buy appends a card to this deck. The old 8 mats plus 3 skills would be 11 cards and would miss 3 / 4 / 3.
+**Locked. 10 cards. The whole starter deck.** 3 tagged + 4 no-tag + 3 skills. It **replaces** the 8-mat list in [19](19-own-basic-starter.md) for run start. Shop weights stay the offer table. A buy appends a card to this deck. The old 8 mats plus 3 skills would be 11 cards and would miss 3 / 4 / 3.
 
 | # | id | `starter_role` | Tags on this copy | Feeds |
 |---:|---|---|---|---|
@@ -135,7 +135,7 @@ Starting gold **12** and the unlocked constructions (`con_tunic`, `con_cloak`, `
 
 ### C′. Burn
 
-**Stamped C′.** No stack cap. Stacks grow with every apply. An apply is not clamped, and a later apply is not discarded.
+**Locked.** No stack cap. Stacks grow with every apply. An apply is not clamped, and a later apply is not discarded.
 
 The unit that **holds** the stacks is the one that ticks. At the **start** of each of that unit’s actions, while stacks **> 0**:
 
@@ -150,19 +150,21 @@ Worked tick: **2** stacks → **2** damage, counter **2 → 1**, lifesteal **1**
 
 ### D′. Survive
 
-**Stamped D′. Once per craft. Charges come from Fire apex.**
+**Locked. Once per craft. Charges come from Fire apex.**
 
-A **Fire-apex piece** is a piece whose own tag bag is **Fire ≥ 8** (`syn_fire_8`). The combined bag can show the Fire apex tier when no single piece is at 8. Charges ignore that sum. **N** Fire-apex pieces in this craft mint **N** charges for this craft session.
+**N** is the number of pieces whose **own** Fire tag count meets Fire apex (**Fire ≥ 8** on that piece). Each such piece grants **1** survive charge for that craft session. The combined bag can show the Fire apex tier when no single piece is at 8. That sum does not add a charge. Two pieces at Fire **4** are combined Fire **≥ 8** and **N = 0**.
+
+Once per craft is the craft session. Charges mint when that craft’s pieces are fixed. They do not refresh on a fight beat inside the session. The demo has one fight per craft, so these charges are for that fight. The next craft mints from its own pieces. Piece vignettes are not the fight, so they do not spend charges.
+
+Soft **≥ 8** keeps heal **3** and cleanse **1**. It does not mint a charge. `syn_soft_8` is not the survive rider.
 
 The fight shows the integer before the first hit. A hit that would move the adventurer from **≥ 1** HP to **≤ 0** spends **one** charge and sets HP to **1**. The spend is its own beat: HP **1**, charges drop by **1**. When charges are **0**, that hit sets HP to **0**.
-
-The next craft mints from its own pieces. Piece vignettes are not the fight, so they do not spend charges. Soft apex does not mint a charge. `syn_soft_8` is heal and cleanse only.
 
 Order on an incoming hit: Earth reduces the number, then this charge check, then the HP integer changes.
 
 ### E. First combat kits
 
-**Stamped A: Fire, Soft, Earth, Metal, and Silk.**
+**Locked: Fire, Soft, Earth, Metal, and Silk.**
 
 The three tagged cards feed those five tags. Fire is the combat example. Silk is on `mat_ember_silk`, so a Silk ladder with no kit would leave that tag on the old passive row. **Wild** and **Pure** stay on the historical weight table and off the buy list this pass, so their old rows do not fire and this pass does not draft their kits. **Solar, Lunar, Occult** stay out.
 
@@ -172,11 +174,11 @@ Construction tags still enter the bag ([12](12-constructions.md)). The one fight
 
 ### F. Where skills are drawn
 
-**Stamped A: the same draw, hand, and discard as [27](27-craft-mode-stamina.md).** The three skills are cards in the starter deck. Dig dumps the hand, including skills, then draws up to 5.
+**Locked: the same draw, hand, and discard as [27](27-craft-mode-stamina.md).** The three skills are cards in the starter deck. Dig dumps the hand, including skills, then draws up to 5.
 
 ### G. Dig cost
 
-**Stamped A: keep 2.** Session-wide, not × N.
+**Locked: keep 2.** Session-wide, not × N.
 
 ---
 

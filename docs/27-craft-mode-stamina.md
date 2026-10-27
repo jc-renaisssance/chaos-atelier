@@ -14,7 +14,7 @@
 
 **Hand presentation (stamped A′AAAA, Design #83):** fan, drag, zone wells, and `mat_*` faces are [36](36-craft-hand-cards.md). The fan step is `32 / (max_hand - 1)` degrees. The hand-size setting in this file stays **5**. The cycle, the costs, the keys, and Finish do not move. Tag chrome on the card is stamped **A** in that file (section 6): landed 16×16 chips on the hand and the zone played row. Play costs in this file stay. Player-facing words on this screen (ids, the hollow Brief, the zone’s harness sentence) are [37](37-player-facing-chrome.md). The rules in this file do not move.
 
-**Starter deck (stamped C′ · D′ · A, [39](39-starter-deck.md)):** hand size here stays **5**. The 3 / 4 / 3 composition is the starter deck. Each run draws 5 from that deck. Dig, discard, and reshuffle in this file are the cycle. Dig cost stays **2** (letter G, stamped **A**). AP and stamina are the one meter this file already spends.
+**Starter deck (stamped A B C′ D′ E F G, [39](39-starter-deck.md)):** hand size here stays **5**. The 3 / 4 / 3 composition is the starter deck. Each run draws 5 from that deck. Dig, discard, and reshuffle in this file are the cycle. Dig cost stays **2** (letter G, stamped **A**). AP and stamina are the one meter this file already spends.
 
 ## Entering craft mode
 
