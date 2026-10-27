@@ -97,6 +97,7 @@ func _apply_bind() -> void:
 			fork_ids.has(node.node_id),
 			node.is_bound()
 		)
+	_fit_width()
 	queue_redraw()
 	call_deferred("queue_redraw")
 
@@ -141,6 +142,13 @@ func _ensure_columns(n: int) -> void:
 		var col: Variant = _columns.pop_back()
 		if col is Node:
 			(col as Node).queue_free()
+
+
+func _fit_width() -> void:
+	var width := 0.0
+	if _row != null:
+		width = _row.get_combined_minimum_size().x
+	custom_minimum_size = Vector2(width, 292)
 
 
 func _on_picked(node_id: String) -> void:

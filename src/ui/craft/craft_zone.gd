@@ -74,7 +74,7 @@ func bind(
 	_apply_style()
 	_title.text = CraftCatalog.construction_name(construction_id)
 	_index.text = str(zone_index)
-	if cards.is_empty():
+	if cards.is_empty() and AtelierSession.dev_tools:
 		_body.text = "Empty — Finish uses the construction-only bag."
 	else:
 		_body.text = ""

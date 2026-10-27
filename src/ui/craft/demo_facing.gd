@@ -16,9 +16,22 @@ const NEG_NAMES := {
 
 
 static func brief_text(seen: bool, display_name: String, environment: String, flavor: String) -> String:
+	## Brief A: a cli_* row with no environment and no flavor is the name only.
+	## Boss Copy A still has both lines. Blank lines are never legal.
 	if not seen:
 		return "?"
-	return "%s\n%s\n%s" % [display_name, environment, flavor]
+	if environment.is_empty() and flavor.is_empty():
+		return display_name if not display_name.is_empty() else "?"
+	var lines := PackedStringArray()
+	if not display_name.is_empty():
+		lines.append(display_name)
+	if not environment.is_empty():
+		lines.append(environment)
+	if not flavor.is_empty():
+		lines.append(flavor)
+	if lines.is_empty():
+		return "?"
+	return "\n".join(lines)
 
 
 static func locked_estimate() -> String:

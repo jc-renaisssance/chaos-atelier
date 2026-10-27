@@ -4,10 +4,11 @@ extends Control
 ## Staffs, Skills, and Gear shelves show stamped assets/m2-market icons.
 ## Materials shelf lights assets/mat/<id>.png at 32×32 (docs/36, Art #84).
 ## A mat id with no file leaves the text. Tab chips stay the text strip.
-## Skill deck rows stay sk_* text. Enchant + refresh stay materials-only.
+## Player rows use the display name or the skill blurb. Enchant + refresh stay materials-only.
 ## Shiny tint stays on enchanted mats.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const INK := Color(0.91, 0.835, 0.69)
 const MUTED := Color(0.71, 0.643, 0.541)
 const GOLD := Color(0.788, 0.635, 0.153)
@@ -84,12 +85,12 @@ func _build() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 8)
 	root.add_child(head)
-	_title = _label("market · —", 22, GOLD)
+	_title = _label("Market" if not AtelierSession.dev_tools else "market · —", 22, GOLD)
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(_title)
 	head.add_child(_btn("Exit", _on_exit))
 
-	_meta = _label("gold 0   ·   refresh next $2", 15, INK)
+	_meta = _label("Gold 0" if not AtelierSession.dev_tools else "gold 0   ·   refresh next $2", 15, INK)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_meta)
 	_note = _label("Materials | Staffs | Skills | Gear", 13, MUTED)
@@ -160,7 +161,10 @@ func _build() -> void:
 	_refresh_btn = _btn("Refresh $2", _on_refresh)
 	actions.add_child(_refresh_btn)
 	actions.add_child(_btn("Exit", _on_exit))
-	var hint := _label("Refresh / Enchant = materials only. Exit resolves the day.", 12, MUTED)
+	var hint_text := "Refresh / Enchant = materials only. Exit resolves the day."
+	if not AtelierSession.dev_tools:
+		hint_text = "Enchant is for materials."
+	var hint := _label(hint_text, 12, MUTED)
 	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	actions.add_child(hint)
@@ -180,23 +184,30 @@ func _sync_header() -> void:
 	var node_id := AtelierSession.market_node_id
 	if node_id.is_empty():
 		node_id = "—"
-	_title.text = "market · %s" % node_id
 	var next_cost := MarketCatalog.refresh_cost(AtelierSession.market_refresh_count)
 	var tab := AtelierSession.market_tab
-	_meta.text = (
-		"gold %d   ·   refresh next $%d   ·   count %d   ·   mats %d   ·   skills %d   ·   max_m %d  max_r %d   ·   gear %d/2"
-		% [
-			AtelierSession.gold,
-			next_cost,
-			AtelierSession.market_refresh_count,
-			AtelierSession.stock.material_count() if AtelierSession.stock != null else 0,
-			AtelierSession.stock.skill_count() if AtelierSession.stock != null else 0,
-			AtelierSession.live_max_materials(),
-			AtelierSession.live_max_runes(),
-			AtelierSession.artifact_equipped_ids.size(),
-		]
-	)
-	_note.text = AtelierSession.last_note
+	if AtelierSession.dev_tools:
+		_title.text = "market · %s" % node_id
+		_meta.text = (
+			"gold %d   ·   refresh next $%d   ·   count %d   ·   mats %d   ·   skills %d   ·   max_m %d  max_r %d   ·   gear %d/2"
+			% [
+				AtelierSession.gold,
+				next_cost,
+				AtelierSession.market_refresh_count,
+				AtelierSession.stock.material_count() if AtelierSession.stock != null else 0,
+				AtelierSession.stock.skill_count() if AtelierSession.stock != null else 0,
+				AtelierSession.live_max_materials(),
+				AtelierSession.live_max_runes(),
+				AtelierSession.artifact_equipped_ids.size(),
+			]
+		)
+		_note.visible = true
+		_note.text = AtelierSession.last_note
+	else:
+		_title.text = "Market"
+		_meta.text = "Gold %d" % AtelierSession.gold
+		_note.visible = false
+		_note.text = ""
 	if _refresh_btn != null:
 		_refresh_btn.text = "Refresh $%d" % next_cost
 		_refresh_btn.disabled = not AtelierSession.can_refresh_market()
@@ -220,24 +231,25 @@ func _rebuild_shelf() -> void:
 	for child in _shelf_box.get_children():
 		child.queue_free()
 	var tab := AtelierSession.market_tab
+	var player := not AtelierSession.dev_tools
 	match tab:
 		GameConstants.MARKET_TAB_STAFFS:
-			_shelf_caption.text = "SHELF  ·  market_staff_bank_c1  ·  unique owned"
+			_shelf_caption.text = "For sale" if player else "SHELF  ·  market_staff_bank_c1  ·  unique owned"
 			for item in AtelierSession.market_staff_stock:
 				if item is Dictionary:
 					_shelf_box.add_child(_staff_shelf_row(item as Dictionary))
 		GameConstants.MARKET_TAB_SKILLS:
-			_shelf_caption.text = "SHELF  ·  market_skill_bank_c1  ·  buy into own_basic kit"
+			_shelf_caption.text = "For sale" if player else "SHELF  ·  market_skill_bank_c1  ·  buy into own_basic kit"
 			for item in AtelierSession.market_skill_stock:
 				if item is Dictionary:
 					_shelf_box.add_child(_skill_shelf_row(item as Dictionary))
 		GameConstants.MARKET_TAB_GEAR:
-			_shelf_caption.text = "SHELF  ·  market_artifact_bank_c1  ·  unique owned"
+			_shelf_caption.text = "For sale" if player else "SHELF  ·  market_artifact_bank_c1  ·  unique owned"
 			for item in AtelierSession.market_artifact_stock:
 				if item is Dictionary:
 					_shelf_box.add_child(_artifact_shelf_row(item as Dictionary))
 		_:
-			_shelf_caption.text = "SHELF  ·  buy from market_bank_c1"
+			_shelf_caption.text = "For sale" if player else "SHELF  ·  buy from market_bank_c1"
 			for item in AtelierSession.market_stock:
 				if item is Dictionary:
 					_shelf_box.add_child(_mat_shelf_row(item as Dictionary))
@@ -249,20 +261,24 @@ func _rebuild_deck() -> void:
 	for child in _deck_box.get_children():
 		child.queue_free()
 	var tab := AtelierSession.market_tab
+	var player := not AtelierSession.dev_tools
 	match tab:
 		GameConstants.MARKET_TAB_STAFFS:
 			var equipped := AtelierSession.staff_equipped_id
 			var eq_bit := equipped if not equipped.is_empty() else "none"
-			_deck_caption.text = (
-				"KIT  equipped: %s    max_m %d  max_r %d"
-				% [eq_bit, AtelierSession.live_max_materials(), AtelierSession.live_max_runes()]
-			)
+			if player:
+				_deck_caption.text = PlayerChrome.staff_kit_caption(equipped)
+			else:
+				_deck_caption.text = (
+					"KIT  equipped: %s    max_m %d  max_r %d"
+					% [eq_bit, AtelierSession.live_max_materials(), AtelierSession.live_max_runes()]
+				)
 			if AtelierSession.staff_owned.is_empty():
 				_deck_box.add_child(_label("No staff owned.", 13, MUTED))
 			for staff_id in AtelierSession.staff_owned:
 				_deck_box.add_child(_staff_kit_row(String(staff_id)))
 		GameConstants.MARKET_TAB_SKILLS:
-			_deck_caption.text = "DECK (skills)  ·  sell copies  ·  no equip"
+			_deck_caption.text = "Your skills" if player else "DECK (skills)  ·  sell copies  ·  no equip"
 			if AtelierSession.stock == null:
 				return
 			var any := false
@@ -275,13 +291,16 @@ func _rebuild_deck() -> void:
 			if not any:
 				_deck_box.add_child(_label("No skill cards in the run kit.", 13, MUTED))
 		GameConstants.MARKET_TAB_GEAR:
-			_deck_caption.text = "KIT  slots %d/2" % AtelierSession.artifact_equipped_ids.size()
+			if player:
+				_deck_caption.text = "Gear %d / 2" % AtelierSession.artifact_equipped_ids.size()
+			else:
+				_deck_caption.text = "KIT  slots %d/2" % AtelierSession.artifact_equipped_ids.size()
 			if AtelierSession.artifact_owned.is_empty():
 				_deck_box.add_child(_label("No artifacts owned.", 13, MUTED))
 			for artifact_id in AtelierSession.artifact_owned:
 				_deck_box.add_child(_artifact_kit_row(String(artifact_id)))
 		_:
-			_deck_caption.text = "DECK  ·  sell / enchant owned mat_*"
+			_deck_caption.text = "Your cloth" if player else "DECK  ·  sell / enchant owned mat_*"
 			if AtelierSession.stock == null:
 				return
 			for i in range(AtelierSession.stock.cards.size()):
@@ -305,11 +324,11 @@ func _mat_shelf_row(offer: Dictionary) -> Control:
 	var face := _mat_shelf_face(mat_id)
 	if face != null:
 		box.add_child(face)
-	var lab := _label(
-		"%s     $%d   own %d   qty %d" % [mat_id, price, own, qty],
-		13,
-		INK
-	)
+	var mat_title := mat_id if AtelierSession.dev_tools else PlayerChrome.mat_name(mat_id)
+	var mat_line := "%s     $%d   own %d   qty %d" % [mat_id, price, own, qty]
+	if not AtelierSession.dev_tools:
+		mat_line = PlayerChrome.shelf_line(mat_title, price, own, qty)
+	var lab := _label(mat_line, 13, INK)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
@@ -335,8 +354,14 @@ func _mat_deck_row(index: int, card: HandCard) -> Control:
 	var gain := AtelierSession.material_sell_gain(card.id)
 	var shiny_bit := ""
 	if card.is_enchanted():
-		shiny_bit = "   shiny %s" % card.mat_enchant_id
-	var lab := _label("%s     sell +%d%s" % [card.id, gain, shiny_bit], 13, INK)
+		if AtelierSession.dev_tools:
+			shiny_bit = "   shiny %s" % card.mat_enchant_id
+		else:
+			var shiny := PlayerChrome.shiny_suffix(card.mat_enchant_id)
+			if not shiny.is_empty():
+				shiny_bit = "   %s" % shiny
+	var row_title := card.id if AtelierSession.dev_tools else PlayerChrome.mat_name(card.id)
+	var lab := _label("%s     sell +%d%s" % [row_title, gain, shiny_bit], 13, INK)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
 	var btns := HBoxContainer.new()
@@ -363,11 +388,11 @@ func _staff_shelf_row(offer: Dictionary) -> Control:
 	row.add_child(box)
 	box.add_child(_shelf_icon(staff_id))
 	var own_bit := "owned" if AtelierSession.owns_staff(staff_id) else "own 0"
-	var lab := _label(
-		"%s     $%d   %s   %s" % [staff_id, price, MarketCatalog.staff_delta_bit(staff_id), own_bit],
-		13,
-		INK
-	)
+	var staff_line := "%s     $%d   %s   %s" % [staff_id, price, MarketCatalog.staff_delta_bit(staff_id), own_bit]
+	if not AtelierSession.dev_tools:
+		var owned_n := 1 if AtelierSession.owns_staff(staff_id) else 0
+		staff_line = PlayerChrome.shelf_line(PlayerChrome.staff_face(staff_id), price, owned_n, -1)
+	var lab := _label(staff_line, 13, INK)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
@@ -385,11 +410,10 @@ func _staff_kit_row(staff_id: String) -> Control:
 	row.add_child(box)
 	var mark := "equipped" if equipped else "owned"
 	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.staff_price(staff_id))
-	var lab := _label(
-		"%s     %s   %s   sell +%d" % [staff_id, mark, MarketCatalog.staff_delta_bit(staff_id), gain],
-		13,
-		INK
-	)
+	var staff_line := "%s     %s   %s   sell +%d" % [staff_id, mark, MarketCatalog.staff_delta_bit(staff_id), gain]
+	if not AtelierSession.dev_tools:
+		staff_line = "%s     %s   sell +%d" % [PlayerChrome.staff_face(staff_id), mark, gain]
+	var lab := _label(staff_line, 13, INK)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
 	var btns := HBoxContainer.new()
@@ -420,11 +444,12 @@ func _skill_shelf_row(offer: Dictionary) -> Control:
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
 	box.add_child(_shelf_icon(skill_id))
-	var lab := _label(
-		"%s     $%d   own %d   %s" % [skill_id, price, own, CraftCatalog.skill_blurb(skill_id)],
-		13,
-		INK
-	)
+	var blurb := CraftCatalog.skill_blurb(skill_id)
+	var skill_line := "%s     $%d   own %d   %s" % [skill_id, price, own, blurb]
+	if not AtelierSession.dev_tools:
+		blurb = PlayerChrome.skill_blurb(skill_id)
+		skill_line = PlayerChrome.shelf_line(blurb, price, own, -1)
+	var lab := _label(skill_line, 13, INK)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
@@ -440,7 +465,10 @@ func _skill_deck_row(index: int, card: HandCard) -> Control:
 	box.add_theme_constant_override("separation", 8)
 	row.add_child(box)
 	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.skill_price(card.id))
-	var lab := _label("%s     sell +%d" % [card.id, gain], 13, INK)
+	var skill_title := card.id
+	if not AtelierSession.dev_tools:
+		skill_title = PlayerChrome.skill_blurb(card.id)
+	var lab := _label("%s     sell +%d" % [skill_title, gain], 13, INK)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
@@ -459,11 +487,11 @@ func _artifact_shelf_row(offer: Dictionary) -> Control:
 	row.add_child(box)
 	box.add_child(_shelf_icon(artifact_id))
 	var own_bit := "owned" if AtelierSession.owns_artifact(artifact_id) else "own 0"
-	var lab := _label(
-		"%s     $%d   %s   %s" % [artifact_id, price, MarketCatalog.artifact_label(artifact_id), own_bit],
-		13,
-		INK
-	)
+	var gear_line := "%s     $%d   %s   %s" % [artifact_id, price, MarketCatalog.artifact_label(artifact_id), own_bit]
+	if not AtelierSession.dev_tools:
+		var owned_n := 1 if AtelierSession.owns_artifact(artifact_id) else 0
+		gear_line = PlayerChrome.shelf_line(PlayerChrome.artifact_face(artifact_id), price, owned_n, -1)
+	var lab := _label(gear_line, 13, INK)
 	lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
@@ -481,11 +509,10 @@ func _artifact_kit_row(artifact_id: String) -> Control:
 	row.add_child(box)
 	var mark := "equipped" if equipped else "owned"
 	var gain := MarketCatalog.kit_sell_gain(MarketCatalog.artifact_price(artifact_id))
-	var lab := _label(
-		"%s     %s   %s   sell +%d" % [artifact_id, mark, MarketCatalog.artifact_label(artifact_id), gain],
-		13,
-		INK
-	)
+	var gear_line := "%s     %s   %s   sell +%d" % [artifact_id, mark, MarketCatalog.artifact_label(artifact_id), gain]
+	if not AtelierSession.dev_tools:
+		gear_line = "%s     %s   sell +%d" % [PlayerChrome.artifact_face(artifact_id), mark, gain]
+	var lab := _label(gear_line, 13, INK)
 	lab.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(lab)
 	var btns := HBoxContainer.new()
