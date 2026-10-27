@@ -108,6 +108,12 @@ func bind(
 	_kind_lab.text = node.display_kind()
 	_ref_lab.text = node.ref_id
 	_ref_lab.visible = not node.ref_id.is_empty()
+	_kind_lab.visible = true
+	## Node A′: one production line. Kind chip and elite badge stay. Ids stay off the player card.
+	if not AtelierSession.dev_tools:
+		_id_lab.text = PlayerChrome.node_line(node)
+		_kind_lab.visible = false
+		_ref_lab.visible = false
 	if is_current:
 		_style.bg_color = Color(0.227, 0.173, 0.094)
 		_style.border_color = Color(0.788, 0.635, 0.153)

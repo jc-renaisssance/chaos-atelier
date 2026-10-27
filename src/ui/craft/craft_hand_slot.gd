@@ -309,7 +309,12 @@ func _caption_for(next: HandCard, next_cost: int) -> String:
 		return ""
 	var cost_line := "cost %d" % next_cost
 	if next.type == GameEnums.HandCardType.SKILL:
-		return "skill · %s\n%s" % [CraftCatalog.skill_blurb(next.id), cost_line]
+		var blurb := CraftCatalog.skill_blurb(next.id)
+		if not AtelierSession.dev_tools:
+			blurb = PlayerChrome.skill_blurb(next.id)
+		if blurb.is_empty():
+			return "skill\n%s" % cost_line
+		return "skill · %s\n%s" % [blurb, cost_line]
 	var kind := GameEnums.hand_card_type_wire(next.type)
 	var words := PlannerChipArt.tags_without_chip(CraftCatalog.tags_of(next.id, next.type))
 	var head := kind

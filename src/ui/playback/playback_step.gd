@@ -171,13 +171,26 @@ func refresh() -> void:
 	var fight := kind == "fight"
 	_title.text = "Fight" if fight else "Vignette"
 	if report:
-		_note.text = String(snap.get("note", ""))
-		_report_title.text = String(snap.get("title", ""))
-		_report_body.text = String(snap.get("body", ""))
-	elif fight:
-		_note.text = "Skip ends this fight. The report still opens."
+		if AtelierSession.dev_tools:
+			_note.visible = true
+			_note.text = String(snap.get("note", ""))
+			_report_title.text = String(snap.get("title", ""))
+			_report_body.text = String(snap.get("body", ""))
+		else:
+			_note.visible = false
+			_note.text = ""
+			var faced := PlayerChrome.playback_report(snap)
+			_report_title.text = String(faced.get("title", ""))
+			_report_body.text = String(faced.get("body", ""))
+	elif AtelierSession.dev_tools:
+		_note.visible = true
+		if fight:
+			_note.text = "Skip ends this fight. The report still opens."
+		else:
+			_note.text = "Piece vignette. Skip opens this piece's report. The fight plays once after the last piece."
 	else:
-		_note.text = "Piece vignette. Skip opens this piece's report. The fight plays once after the last piece."
+		_note.visible = false
+		_note.text = ""
 	_report_title.visible = report
 	_report_body.visible = report
 	_rows_box.visible = not report
@@ -235,13 +248,16 @@ func _apply_beat() -> void:
 		var prefix := ""
 		if _kind != "fight":
 			prefix = "p%s  " % str(row.get("piece_index", _piece))
-		lab.text = "%s%s%s  ·  %s  ·  %s" % [
-			prefix,
-			mark,
-			String(row.get("id", "")),
-			String(row.get("slot", "")),
-			String(row.get("label", "")),
-		]
+		if AtelierSession.dev_tools:
+			lab.text = "%s%s%s  ·  %s  ·  %s" % [
+				prefix,
+				mark,
+				String(row.get("id", "")),
+				String(row.get("slot", "")),
+				String(row.get("label", "")),
+			]
+		else:
+			lab.text = PlayerChrome.beat_label(row)
 		lab.add_theme_color_override("font_color", color)
 		if i == _beat:
 			slot = String(row.get("slot", ""))
@@ -259,13 +275,20 @@ func _bind_actor(slot: String) -> void:
 	var tex: Texture2D = still.get("texture") as Texture2D
 	var slot_name := String(still.get("slot", slot))
 	_actor_tex.texture = tex
-	_actor_tex.visible = tex != null
-	_actor_name.visible = placeholder or fallback or tex == null
-	_actor_name.text = slot_name
-	var who := "—"
-	if _actor_id is String and not String(_actor_id).is_empty():
-		who = String(_actor_id)
-	_actor_caption.text = "%s  ·  %s" % [slot_name, who]
+	if AtelierSession.dev_tools:
+		_actor_tex.visible = tex != null
+		_actor_name.visible = placeholder or fallback or tex == null
+		_actor_name.text = slot_name
+		var who := "—"
+		if _actor_id is String and not String(_actor_id).is_empty():
+			who = String(_actor_id)
+		_actor_caption.text = "%s  ·  %s" % [slot_name, who]
+	else:
+		var missing := placeholder or fallback or tex == null
+		_actor_tex.visible = tex != null and not missing
+		_actor_name.visible = false
+		_actor_name.text = ""
+		_actor_caption.text = PlayerChrome.actor_caption(_actor_id)
 
 
 func _on_skip() -> void:

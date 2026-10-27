@@ -52,7 +52,9 @@ var _order_skill: Label
 var _order_body: Label
 var _tag_chips: Dictionary = {}
 var _planner_list: Label
+var _brief_header: Label
 var _brief_body: Label
+var _estimate_header: Label
 var _estimate_body: Label
 var _stam_label: Label
 var _stam_bar: ProgressBar
@@ -246,11 +248,13 @@ func _build() -> void:
 	_planner_list = _label("?", ShellTheme.CAPTION_PX, ShellTheme.MUTED)
 	_planner_list.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_planner_list)
-	left_box.add_child(_section("Brief"))
+	_brief_header = _section("Brief")
+	left_box.add_child(_brief_header)
 	_brief_body = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_brief_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_brief_body)
-	left_box.add_child(_section("Estimate"))
+	_estimate_header = _section("Estimate")
+	left_box.add_child(_estimate_header)
 	_estimate_body = _label("", ShellTheme.BODY_PX, ShellTheme.INK)
 	_estimate_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	left_box.add_child(_estimate_body)
@@ -391,6 +395,17 @@ func _bind_in_shop(adv_id: String) -> void:
 	_shop_posture.texture = still.get("texture") as Texture2D
 
 
+func _set_session_headers(on: bool) -> void:
+	if _brief_header != null:
+		_brief_header.visible = on
+	if _estimate_header != null:
+		_estimate_header.visible = on
+	if _brief_body != null:
+		_brief_body.visible = on
+	if _estimate_body != null:
+		_estimate_body.visible = on
+
+
 func _section(text: String) -> Label:
 	return _label(text, ShellTheme.SECTION_PX, ShellTheme.GOLD)
 
@@ -468,10 +483,16 @@ func _refresh() -> void:
 	_title.text = "Craft"
 	if session == null or order == null:
 		_bind_order_portrait("")
-		_order_title.text = "No session."
+		if AtelierSession.dev_tools:
+			_order_title.text = "No session."
+			_order_body.text = "Leave the route graph to sew an order here."
+			_set_session_headers(true)
+		else:
+			_order_title.text = ""
+			_order_body.text = ""
+			_set_session_headers(false)
 		_order_stats.text = ""
 		_order_skill.text = ""
-		_order_body.text = "Leave the route graph to sew an order here."
 		_planner_list.text = "?"
 		_brief_body.text = ""
 		_estimate_body.text = ""
@@ -491,6 +512,7 @@ func _refresh() -> void:
 			zone.visible = false
 		_paint_tag_chips(null)
 		return
+	_set_session_headers(true)
 	_bind_order_portrait(AdventurerCatalog.order_adventurer_id(order))
 	_fill_order(session, order)
 	_stam_label.text = "Stamina  %d / %d" % [session.stamina_remaining, session.stamina_start]
@@ -526,7 +548,11 @@ func _fill_order(session: CraftStaminaSession, order: ClientOrder) -> void:
 			BossClientCatalog.display_name(String(person.get("job_id", ""))),
 		]
 		_order_stats.text = AdventurerCatalog.stats_line(adv_id)
-		_order_skill.text = AdventurerCatalog.skill_panel_line(adv_id)
+		var raw_skill := AdventurerCatalog.skill_panel_line(adv_id)
+		if AtelierSession.dev_tools:
+			_order_skill.text = raw_skill
+		else:
+			_order_skill.text = PlayerChrome.skill_line(adv_id)
 	else:
 		_order_title.text = ScheduleCatalog.order_title(order)
 		_order_stats.text = ""
@@ -646,7 +672,12 @@ func _refresh_readout(session: CraftStaminaSession) -> void:
 	_current_body.text = CraftReadout.current_line(preview)
 	var unlocked := AtelierSession.unlocked_outlooks
 	var open := CraftReadout.potential_unlocked(preview, unlocked)
-	_potential_body.text = CraftReadout.potential_label(preview, unlocked)
+	if AtelierSession.dev_tools:
+		_potential_body.text = CraftReadout.potential_label(preview, unlocked)
+	elif not open:
+		_potential_body.text = "locked"
+	else:
+		_potential_body.text = PlayerChrome.outlook_name(CraftReadout.outlook_id_of(preview))
 	_potential_body.add_theme_color_override("font_color", ShellTheme.INK if open else ShellTheme.MUTED)
 	_bind_outlook_art(preview, unlocked)
 

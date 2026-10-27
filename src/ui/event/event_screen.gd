@@ -47,9 +47,9 @@ func _build() -> void:
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
-	_title = _label("event · —", 22, GOLD)
+	_title = _label("On the road" if not AtelierSession.dev_tools else "event · —", 22, GOLD)
 	root.add_child(_title)
-	_event_id = _label("evt_*", 16, INK)
+	_event_id = _label("On the road" if not AtelierSession.dev_tools else "evt_*", 16, INK)
 	root.add_child(_event_id)
 	_blurb = _label("", 15, MUTED)
 	_blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -63,7 +63,7 @@ func _build() -> void:
 	_choices.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	panel.add_child(_choices)
 
-	_result = _label("result: —", 15, GOLD)
+	_result = _label("" if not AtelierSession.dev_tools else "result: —", 15, GOLD)
 	_result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	root.add_child(_result)
 
@@ -78,15 +78,30 @@ func refresh() -> void:
 	var node_id := ""
 	if AtelierSession.board != null:
 		node_id = AtelierSession.board.current_node_id
-	_title.text = "event · %s" % (node_id if not node_id.is_empty() else "—")
-	_event_id.text = AtelierSession.event_id if not AtelierSession.event_id.is_empty() else "evt_*"
 	_blurb.text = EventCatalog.blurb(AtelierSession.event_id)
-	if AtelierSession.event_resolved:
-		_result.text = "result: %s" % AtelierSession.event_result_line
-		_continue_btn.visible = true
+	if AtelierSession.dev_tools:
+		_title.text = "event · %s" % (node_id if not node_id.is_empty() else "—")
+		_event_id.text = AtelierSession.event_id if not AtelierSession.event_id.is_empty() else "evt_*"
+		if AtelierSession.event_resolved:
+			_result.visible = true
+			_result.text = "result: %s" % AtelierSession.event_result_line
+			_continue_btn.visible = true
+		else:
+			_result.visible = true
+			_result.text = "result: —"
+			_continue_btn.visible = false
 	else:
-		_result.text = "result: —"
-		_continue_btn.visible = false
+		## Event A: header and the node line are both On the road. Choice label only.
+		_title.text = "On the road"
+		_event_id.text = "On the road"
+		if AtelierSession.event_resolved:
+			_result.visible = true
+			_result.text = AtelierSession.event_result_line
+			_continue_btn.visible = true
+		else:
+			_result.visible = false
+			_result.text = ""
+			_continue_btn.visible = false
 	if _rebuild_queued:
 		return
 	_rebuild_queued = true
@@ -106,7 +121,10 @@ func _rebuild_choices() -> void:
 		var ch: Dictionary = item
 		var cid := String(ch.get("id", ""))
 		var label := String(ch.get("label", cid))
-		var btn := _btn("%s    %s" % [cid, label], _on_choice.bind(cid))
+		var text := "%s    %s" % [cid, label]
+		if not AtelierSession.dev_tools:
+			text = label if not label.is_empty() and not label.begins_with("choice_") else ""
+		var btn := _btn(text, _on_choice.bind(cid))
 		btn.disabled = resolved or not AtelierSession.can_pick_event_choice(cid)
 		_choices.add_child(btn)
 	var purse := _label(

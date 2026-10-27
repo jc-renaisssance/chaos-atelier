@@ -15,8 +15,11 @@ var _note: Label
 var _planner_caption: Label
 var _graph: RouteGraphView
 var _draft_lab: Label
+var _today_caption: Label
 var _today_title: Label
 var _actions: HFlowContainer
+var _resolve_caption: Label
+var _resolve_panel: PanelContainer
 var _resolve_title: Label
 var _resolve_body: Label
 var _stamp: Label
@@ -67,7 +70,7 @@ func _build() -> void:
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	margin.add_child(root)
 
-	_title = _label("WOMBASTE  ·  travelling wagon", 26, GOLD)
+	_title = _label("Wombaste" if not AtelierSession.dev_tools else "WOMBASTE  ·  travelling wagon", 26, GOLD)
 	root.add_child(_title)
 	_meta = _label("", 15, INK)
 	_meta.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -79,6 +82,7 @@ func _build() -> void:
 	root.add_child(_note)
 
 	_planner_caption = _caption("ROUTE GRAPH  ·  map_m1  ·  nodes + edges  ·  ugly M1")
+	_planner_caption.visible = AtelierSession.dev_tools
 	root.add_child(_planner_caption)
 	var graph_panel := _panel()
 	graph_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -104,7 +108,9 @@ func _build() -> void:
 	_draft_lab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(_draft_lab)
 
-	body.add_child(_caption("TODAY  ·  one primary action from the current node"))
+	_today_caption = _caption("TODAY  ·  one primary action from the current node")
+	_today_caption.visible = AtelierSession.dev_tools
+	body.add_child(_today_caption)
 	var today := _panel()
 	today.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(today)
@@ -112,7 +118,7 @@ func _build() -> void:
 	today_box.add_theme_constant_override("separation", 8)
 	today_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today.add_child(today_box)
-	_today_title = _label("D1 is N1. Click the graph to commit the next node.", 16, INK)
+	_today_title = _label("" if not AtelierSession.dev_tools else "D1 is N1. Click the graph to commit the next node.", 16, INK)
 	_today_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_today_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	today_box.add_child(_today_title)
@@ -131,9 +137,13 @@ func _build() -> void:
 	_continue_btn = _btn("Continue", _on_continue)
 	today_row.add_child(_continue_btn)
 
-	body.add_child(_caption("RESOLVE  ·  mission (23/24)  ·  no lineup cards"))
+	_resolve_caption = _caption("RESOLVE  ·  mission (23/24)  ·  no lineup cards")
+	_resolve_caption.visible = AtelierSession.dev_tools
+	body.add_child(_resolve_caption)
 	var resolve := _panel()
+	_resolve_panel = resolve
 	resolve.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	resolve.visible = AtelierSession.dev_tools
 	body.add_child(resolve)
 	var resolve_box := VBoxContainer.new()
 	resolve_box.add_theme_constant_override("separation", 6)
@@ -287,28 +297,49 @@ func _redraw() -> void:
 		return
 	var n := board.day_count
 	var boss := ScheduleCatalog.boss_title(board.chapter_boss_id)
-	_title.text = "WOMBASTE  ·  travelling wagon  ·  %s" % board.player_owner_id
-	_planner_caption.text = "ROUTE GRAPH  ·  %s  ·  %d days (map.day_count)  ·  last 2 reserved  ·  nodes + edges" % [board.map_id, n]
-	_meta.text = (
-		"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   gold %d   ·   reps %d (gate %d)   ·   decline %s   ·   seed %d"
-		% [
+	if _today_caption != null:
+		_today_caption.visible = AtelierSession.dev_tools
+	if _resolve_caption != null:
+		_resolve_caption.visible = AtelierSession.dev_tools
+	if _planner_caption != null:
+		_planner_caption.visible = AtelierSession.dev_tools
+	if not AtelierSession.dev_tools:
+		_title.text = "Wombaste"
+		var day_text := "—" if AtelierSession.newspaper_open else str(board.day_index)
+		_meta.text = PlayerChrome.hud_line(
 			board.chapter_id,
-			GameConstants.CHAPTERS_PER_RUN,
-			boss,
-			board.boss_pool_id,
-			"—" if AtelierSession.newspaper_open else str(board.day_index),
+			day_text,
 			n,
-			board.days_left,
-			board.current_node_id if not board.current_node_id.is_empty() else "—",
-			board.crafts_done,
 			AtelierSession.gold,
 			AtelierSession.reps,
-			GameConstants.reps_gate_for(board.chapter_id),
-			"used" if board.appt_decline_used else "open (once / chapter)",
-			AtelierSession.chapter_seed,
-		]
-	)
-	_note.text = AtelierSession.last_note
+			PlayerChrome.boss_name(board.chapter_boss_id)
+		)
+		_note.visible = false
+		_note.text = ""
+	else:
+		_title.text = "WOMBASTE  ·  travelling wagon  ·  %s" % board.player_owner_id
+		_planner_caption.text = "ROUTE GRAPH  ·  %s  ·  %d days (map.day_count)  ·  last 2 reserved  ·  nodes + edges" % [board.map_id, n]
+		_note.visible = true
+		_meta.text = (
+			"Chapter %d / %d   ·   boss %s (%s)   ·   day %s / %d   ·   %d left   ·   node %s   ·   pieces %d   ·   gold %d   ·   reps %d (gate %d)   ·   decline %s   ·   seed %d"
+			% [
+				board.chapter_id,
+				GameConstants.CHAPTERS_PER_RUN,
+				boss,
+				board.boss_pool_id,
+				"—" if AtelierSession.newspaper_open else str(board.day_index),
+				n,
+				board.days_left,
+				board.current_node_id if not board.current_node_id.is_empty() else "—",
+				board.crafts_done,
+				AtelierSession.gold,
+				AtelierSession.reps,
+				GameConstants.reps_gate_for(board.chapter_id),
+				"used" if board.appt_decline_used else "open (once / chapter)",
+				AtelierSession.chapter_seed,
+			]
+		)
+		_note.text = AtelierSession.last_note
 	if _graph != null:
 		_graph.bind(board)
 	_rebuild_actions()
@@ -321,6 +352,10 @@ func _redraw() -> void:
 func _refresh_draft() -> void:
 	var board: ChapterSchedule = AtelierSession.board
 	if _draft_lab == null or board == null:
+		return
+	if not AtelierSession.dev_tools:
+		_draft_lab.text = ""
+		_draft_lab.visible = false
 		return
 	if board.draft_path.is_empty() or AtelierSession.newspaper_open:
 		_draft_lab.text = ""
@@ -341,6 +376,9 @@ func _rebuild_actions() -> void:
 	_take_btn.disabled = legal.is_empty()
 	_continue_btn.visible = AtelierSession.resolve_open or AtelierSession.chapter_over or AtelierSession.run_over
 	_continue_btn.disabled = not AtelierSession.resolve_open
+	if not AtelierSession.dev_tools:
+		_paint_player_today(board, legal)
+		return
 	if AtelierSession.newspaper_open:
 		_today_title.text = "Kingdom newspaper — boss announced. Dismiss into the route graph."
 		_continue_btn.text = "Open the route graph"
@@ -407,7 +445,108 @@ func _rebuild_actions() -> void:
 		_actions.add_child(btn)
 
 
+func _paint_player_today(board: ChapterSchedule, legal: Array[GameEnums.RoundAction]) -> void:
+	if AtelierSession.newspaper_open:
+		var boss := ""
+		if board != null:
+			boss = PlayerChrome.boss_name(board.chapter_boss_id)
+		_today_title.text = PlayerChrome.today_newspaper(boss)
+		_continue_btn.text = "Continue"
+		_continue_btn.visible = true
+		_continue_btn.disabled = false
+		_take_btn.visible = false
+		return
+	if AtelierSession.boss_open:
+		if AtelierSession.run_over:
+			_today_title.text = PlayerChrome.today_run_over()
+			_continue_btn.text = "Run over"
+		else:
+			_today_title.text = ""
+			_continue_btn.text = "Continue"
+		_continue_btn.visible = true
+		_take_btn.visible = false
+		return
+	if AtelierSession.awaiting_boss:
+		_today_title.text = PlayerChrome.today_awaiting()
+		_continue_btn.text = "Sew for the fight"
+		_continue_btn.visible = true
+		_continue_btn.disabled = false
+		_take_btn.visible = false
+		return
+	if AtelierSession.chapter_over or AtelierSession.run_over:
+		if AtelierSession.run_over:
+			_today_title.text = PlayerChrome.today_run_over()
+			_continue_btn.text = "Run over"
+		else:
+			_today_title.text = PlayerChrome.today_chapter_closed()
+			_continue_btn.text = "Chapter closed"
+		_continue_btn.visible = true
+		_continue_btn.disabled = true
+		_take_btn.visible = false
+		return
+	if AtelierSession.resolve_open:
+		_today_title.text = ""
+		_continue_btn.text = "Continue"
+		_continue_btn.visible = true
+		_take_btn.visible = false
+		return
+	if board == null:
+		return
+	var pin: AppointmentPin = board.current_pin()
+	var node: RouteNode = board.node_for_day(board.day_index)
+	if not board.day_node_confirmed():
+		_today_title.text = PlayerChrome.today_unconfirmed()
+		_take_btn.visible = false
+		_continue_btn.visible = false
+		return
+	var take_text := "Sew"
+	if pin != null and node != null and node.kind == "appointment" and not AtelierSession.declined_this_day:
+		_today_title.text = PlayerChrome.today_appointment(pin.appointment_id)
+	elif board.is_reserved_day(board.day_index):
+		if board.day_index == board.day_count:
+			_today_title.text = PlayerChrome.today_approach(PlayerChrome.boss_name(board.chapter_boss_id))
+		else:
+			_today_title.text = PlayerChrome.today_travel()
+		take_text = "Continue"
+	elif node != null and node.display_kind() == "market":
+		_today_title.text = PlayerChrome.today_market()
+		take_text = "Shop"
+	elif node != null and node.kind == "event":
+		_today_title.text = PlayerChrome.today_event()
+		take_text = "Look"
+	elif node != null and node.kind == "adventurer":
+		_today_title.text = PlayerChrome.today_adventurer()
+	else:
+		_today_title.text = ""
+	_take_btn.text = take_text
+	_take_btn.visible = true
+	_continue_btn.visible = false
+	for action in legal:
+		if node != null and action == ScheduleRules.action_for_kind(node.kind) and not AtelierSession.declined_this_day:
+			continue
+		if board.is_reserved_day(board.day_index) and action == GameEnums.RoundAction.REST_DIG:
+			continue
+		var label := ScheduleCatalog.action_title(action)
+		if action == GameEnums.RoundAction.APPOINTMENT and pin != null:
+			label = PlayerChrome.appointment_face(pin.appointment_id)
+		if PlayerChrome.hides_id(label):
+			continue
+		var btn := _btn(label, _on_pick.bind(action))
+		_actions.add_child(btn)
+
+
 func _refresh_resolve() -> void:
+	if not AtelierSession.dev_tools:
+		var faced := PlayerChrome.board_report(AtelierSession.last_resolve)
+		var show := bool(faced.get("show", false))
+		if _resolve_panel != null:
+			_resolve_panel.visible = show
+		if show:
+			_resolve_title.text = String(faced.get("title", ""))
+			_resolve_body.text = String(faced.get("body", ""))
+		return
+	if _resolve_panel != null:
+		_resolve_panel.visible = true
 	if AtelierSession.last_resolve.is_empty() and not AtelierSession.resolve_open:
 		if AtelierSession.chapter_over or AtelierSession.run_over:
 			_resolve_title.text = "Run over" if AtelierSession.run_over else "Chapter closed"
