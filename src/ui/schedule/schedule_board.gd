@@ -2,6 +2,7 @@ extends Control
 ## Travelling-atelier route graph (docs/22). Craft is a dedicated screen (docs/27).
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const INK := Color(0.91, 0.835, 0.69)
 const MUTED := Color(0.71, 0.643, 0.541)
 const GOLD := Color(0.788, 0.635, 0.153)
@@ -87,9 +88,15 @@ func _build() -> void:
 	var graph_panel := _panel()
 	graph_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(graph_panel)
+	## Wide node faces scroll sideways. The body scroll below stays vertical-only.
+	var graph_scroll := ScrollContainer.new()
+	graph_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	graph_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	graph_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	graph_panel.add_child(graph_scroll)
 	_graph = RouteGraphView.new()
 	_graph.node_picked.connect(_on_graph_pick)
-	graph_panel.add_child(_graph)
+	graph_scroll.add_child(_graph)
 
 	## 1280×720: graph stays put; TODAY / RESOLVE scroll.
 	## A click on the graph commits or drafts. There is no options panel.

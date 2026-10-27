@@ -13,6 +13,7 @@ extends Control
 ## Name + job stay if the texture is missing. in_shop sits beside the bust.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const PORTRAIT_PX := 96
 ## Stamped busts (M1 art #54, M2 art #65). PNG-only; Godot imports locally.
 ## Job stubs have no file — resolve_id maps them onto these named rows.

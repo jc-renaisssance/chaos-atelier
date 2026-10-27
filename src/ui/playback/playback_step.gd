@@ -5,6 +5,7 @@ extends Control
 ## The stamp JSON panel is not on this screen. Test logs stay in the harness.
 
 ## Beat length is a client constant. Not a stamp field.
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const BEAT_SEC := 0.7
 
 var _title: Label

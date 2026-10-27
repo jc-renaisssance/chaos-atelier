@@ -1,6 +1,6 @@
-class_name PlayerChrome
 extends RefCounted
 ## Player words while dev_tools is false (docs/37). Stamped tables only.
+## No class_name: a cold boot has not registered one yet. Callers preload this file.
 
 
 const OUTLOOK_NAMES := {

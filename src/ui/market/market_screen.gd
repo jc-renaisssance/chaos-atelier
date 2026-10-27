@@ -8,6 +8,7 @@ extends Control
 ## Shiny tint stays on enchanted mats.
 
 ## Godot 4.7: Color.html is not a constant expression — use Color(r, g, b) literals.
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const INK := Color(0.91, 0.835, 0.69)
 const MUTED := Color(0.71, 0.643, 0.541)
 const GOLD := Color(0.788, 0.635, 0.153)

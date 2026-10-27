@@ -4,6 +4,8 @@ extends Panel
 ## A missing mat png keeps the chip well. Drag threshold and play live on the table.
 ## Soft A: native tag chips sit in the face well. Type stays on line 1. Cost stays on line 2.
 
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
+
 var hand_index: int = 0
 var card: HandCard
 var cost: int = 0

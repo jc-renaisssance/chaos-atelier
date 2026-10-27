@@ -8,6 +8,7 @@ extends PanelContainer
 
 signal picked(node_id: String)
 
+const PlayerChrome := preload("res://src/ui/player_chrome.gd")
 const KIND_PX := 48
 const ELITE_CARD_PX := 20
 const ELITE_ROW_PX := 16
@@ -109,11 +110,17 @@ func bind(
 	_ref_lab.text = node.ref_id
 	_ref_lab.visible = not node.ref_id.is_empty()
 	_kind_lab.visible = true
-	## Node A′: one production line. Kind chip and elite badge stay. Ids stay off the player card.
+	custom_minimum_size = Vector2(108, 72)
+	_id_lab.custom_minimum_size = Vector2.ZERO
+	_id_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_id_lab.clip_text = true
+	_id_lab.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_id_lab.autowrap_mode = TextServer.AUTOWRAP_OFF
+	## Node A′: one production line beside the chip. Full stamped words, no ellipsis.
 	if not AtelierSession.dev_tools:
-		_id_lab.text = PlayerChrome.node_line(node)
 		_kind_lab.visible = false
 		_ref_lab.visible = false
+		_fit_player_face(PlayerChrome.node_line(node), wears_elite_badge(node))
 	if is_current:
 		_style.bg_color = Color(0.227, 0.173, 0.094)
 		_style.border_color = Color(0.788, 0.635, 0.153)
@@ -285,6 +292,28 @@ func _kind_modulate(
 	if reserved:
 		return Color(0.62, 0.58, 0.52)
 	return Color.WHITE
+
+
+## One line, wide enough for the stamped string. Chip stays 48. Badge keeps its corner.
+func _fit_player_face(text: String, elite: bool) -> void:
+	_id_lab.text = text
+	_id_lab.clip_text = false
+	_id_lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_id_lab.autowrap_mode = TextServer.AUTOWRAP_OFF
+	_id_lab.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
+	var size := _id_lab.get_theme_font_size("font_size")
+	if size <= 0:
+		size = 16
+	var font := _id_lab.get_theme_font("font")
+	var text_w := 0.0
+	if font != null:
+		text_w = font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+	if text_w <= 0.0:
+		text_w = float(maxi(text.length(), 1)) * float(size) * 0.7
+	_id_lab.custom_minimum_size = Vector2(text_w, 0)
+	var badge := float(ELITE_CARD_PX) if elite else 0.0
+	var content := float(KIND_PX) + 4.0 + text_w + badge + 2.0
+	custom_minimum_size = Vector2(maxf(108.0, content + 12.0), 72.0)
 
 
 func _line(size: int) -> Label:
