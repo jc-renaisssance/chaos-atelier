@@ -6,7 +6,7 @@
 
 Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). The letter tables below are the law. Do not reopen playback.
 
-**Shell (2026-10-23):** player chrome for slices 1–3, and the playback frame, is [34](34-ui-shell-v1.md) (**shipped**, Design #76 / Client #77, stamp **A A B**). Slice rules, unlock, estimate knobs, and Gate / Surface / Socket **A** do not move. Bust **A** supersedes this file’s “do not show portraits” line on the order panel only. Planner chips are text (letter **B** interim). Icon chips stay Later.
+**Shell (2026-10-23):** player chrome for slices 1–3, and the playback frame, is [34](34-ui-shell-v1.md) (**shipped**, Design #76 / Client #77, stamp **A A B**). Slice rules, unlock, estimate knobs, and Gate / Surface / Socket **A** do not move. Bust **A** supersedes this file’s “do not show portraits” line on the order panel only. Planner chips are icons ([35](35-steam-demo-cut.md)). Beat-row words a player reads are [37](37-player-facing-chrome.md). Gate / Surface / Socket stay **A**. Do not reopen playback.
 
 Numbers below are **test knobs** unless a row says lock. **Cross-run `unlocked_builds` is LOCKED** (Jonathan 2026-10-05). **S–F estimate letter bands stay Test knobs** — **LOCKED leave-as-knobs** (Jonathan 2026-10-08); do **not** lock the cutoff table. Closes PR #28 open question 2. Dex: [31-dex](31-dex.md).
 

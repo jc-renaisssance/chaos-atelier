@@ -4,6 +4,8 @@
 
 **Demo override (2026-10-23).** Planner chips **B** shipped as text interim, icon chips Later. That interim is **not** live law for the Steam demo. Chips are icons. The files are **not** on the tip — source letter is [35](35-steam-demo-cut.md) Decision 2. Outlook art on Current / Potential, the title screen, graph commit, one fight, and Brief / Estimate sentences live in `35`. This file does not reopen them as shell letters.
 
+**Word strip (2026-10-27).** Ids and scaffold sentences still on the board, market, event screen, Brief, and battle row are [37](37-player-facing-chrome.md). Palette, bust, and this frame stay. Do not read 37 as a shell reopen.
+
 This file is the **presentation** law for the dedicated craft screen. Rules stay in [27](27-craft-mode-stamina.md) and [30](30-interactive-order.md). A stamp here does not retune stamina, unlocks, estimate cutoffs, or `M2_JOB_POOL`.
 
 ---
