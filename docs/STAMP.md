@@ -1107,13 +1107,6 @@ Locks 1–7 stand. Letters are stamped. Silence was not a letter.
 13. **G. Dig — locked.** Keep 2.
 
 Starter skill costs are the lock: `sk_ease_draw` **1**, `sk_scrap_breath` **0**, `sk_heavy_draw` **1**. Ids are the Soft draft.
-
-## 3. Questions
-
-None.
-
-## 4. Blockers
-
 Letters A, B, C′, D′, E, F, and G are stamped. They do not block.
 
 Soft QC has not passed. That is the next gate on this card.
@@ -1160,3 +1153,43 @@ Soft Count for the pick path is Soft-visible (the player chooses among the remai
 ## Stamp
 
 **scrap_breath A.** Cost **0**. Discard **1** other card from hand. If that discard happens, stamina **+1** (AP). **0** remaining: no discard, no gain. **Exactly 1**: that card, then **+1**. **2 or more**: the player picks one other card, then **+1**.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-27 (Solenne height / body)
+
+**Open.** Docs only. Written off `d51d47e` (Soft chrome #91). Law: [38](38-solenne-height-body.md). The letter is not written. Silence is not **A**. No `src/`. No assets. No PixelLab. No gens. No #71 png edits. Soft chrome **Node A′ · Brief A · Event A**, Soft A′AAAA, tag chrome **A**, and IO4 Gate / Surface / Socket **A** stay landed. Do not reopen them. Mechanism review stays parked. Soft #93 / #96 starter-deck letters stay closed beside this card.
+
+#71 Solenne reads chibi / short next to Halden KEEP `12f50ee` and Vex KEEP `2cb74a4`. The 96 bust is not the height. Jonathan’s 2026-10-22 proportion target on Solenne `0ae24bb` (the following commit is `d20bbfa`) is the bar this card locks: **3–3.5 heads** in the 64×64 full figure. Shop ACCEPT on #71 does not skip the next in_shop loop.
+
+## 1. Files to review
+
+| File | Section |
+|---|---|
+| `docs/38-solenne-height-body.md` | Problem, KEEP bar, Height A / B, phase order |
+| `docs/30-interactive-order.md` | Pointer. Playback stays closed. Canvas stays 64 |
+| `docs/05-art.md` | Pointer. No gens |
+| `docs/pm/phase-1-plan.md` | Open card. ×4 stays **HOLD** |
+| `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Index and this card |
+
+`29` is read-only. Solenne’s row has no lean-versus-stocky fork. This PR does not edit it.
+
+## 2. Decisions
+
+1. **Height — A or B.** **A (Design recommend):** lock Solenne to the Halden / Vex adult scale. **3–3.5 heads**, crown to feet, in the 64×64 full figure. Head about one third of the figure at 3 heads. Court-knight lean is inside A when that count and the KEEP in_shop crown-to-feet scale match. Soft QC later front + back against `12f50ee` and `2cb74a4` before any further Solenne posture burn. **B:** Jonathan writes a different head-count or crown-to-feet scale on the line. Write **A** or **B**. Silence is not **A**. Design recommends **A**.
+
+Body shape is not a letter. A stocky-versus-lean fork is not in the catalog.
+
+## 3. Questions
+
+None.
+
+## 4. Blockers
+
+An unanswered Height line (**A** or **B**). Silence is not **A**. **B** without a number does not stamp.
+
+**Holds.** Ulquiorra, Nnoitra, and Szayelaporro hold gens until the letter, Soft letter PASS, and Aizen RELEASE. Phase A after that, and only on or after **2026-11-02**, is full-body front + back. Not ×5. #71 Solenne ×4 stays **HOLD**. Halden + Vex **KEEP**. Shop ACCEPT stays the record of that pass. No gens in this PR. No `src/` in this PR. The chrome Client is a separate hold. This card does not release it.
+
+## Design recommends
+
+**Height A.** Court-knight lean folded in. Match Halden / Vex. Do not match the #71 chibi read.

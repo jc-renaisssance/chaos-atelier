@@ -7,7 +7,7 @@
 | Content catalogs | `11`, `12`, `13`, `17`, `28`, `29` (outlook ids in `15`); M2 `staff_*` / `sk_*` / `artifact_*` live in `32` |
 | Player / meta | `04`, `16`, `19`, `31` (Dex) |
 | Chapter / run flow | `03`, `21`, `22` (route map), `23` mission-report, `24` win-con, `25` reps, `26` newspaper, `28` boss-client pool, `30` interactive-order, `32` market visit + event resolve, `33` until-M2 stat / event tuning |
-| Art | `05`, `15` |
+| Art | `05`, `15`, `38` (Solenne height / body — **open**, recommend **Height A**; #71 ×4 stays **HOLD**) |
 | Phases / PM | `06`, `pm/*` (**live roadmap** = [pm/phase-1-plan](pm/phase-1-plan.md), 2026-10-05) |
 | Harness / Test | `20` |
 
