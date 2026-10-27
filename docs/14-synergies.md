@@ -2,6 +2,8 @@
 
 Resolver input: **tag counts** + **construction id** + **craft rarity**. Output: `powers[]` (positive + negative) for the adventure sim + report, and **outlook_id** for art.
 
+> **Soft rewrite in flight — [38](38-starter-deck.md).** For `own_basic`, the monostack ladders, the report-hint quotes, and the passive effect cells below are the history that file replaces. Do not delete them in this pass. Once Jonathan stamps `38`, `own_basic` reads those kits and does not also read the passive cells. Solar, Lunar, and Occult stay in this file as history. They do not enter the starter deck.
+
 ## Outlook rule (Jonathan lock)
 
 - **Every** synergy that should change look — **positive and negative** — has an `outlook_order` (integer).

@@ -194,6 +194,16 @@ Does not reopen Soft A′AAAA, tag chrome **A**, Drop A, Path A, #88, shell lett
 
 ---
 
+## Open — Soft Design starter deck
+
+**Stamp open.** Law: [38](../38-starter-deck.md). Stamp card: [STAMP](../STAMP.md). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Nnoitra has no seat.
+
+The starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**. Soft recommends **10** cards, and that list replaces the 8-mat starter in [19](../19-own-basic-starter.md). The hand stays **5** and is a draw from that deck. AP and stamina are one meter. “Next card” is a craft play into a zone. The combat kits replace the [14](../14-synergies.md) passive rows for `own_basic`. The fight Soft PASS bar is burn chip, HP tick, burn-stack counter, ascend, and heal pop. Solar, Lunar, and Occult stay out.
+
+Letters A–G are open. Soft’s recommends are filled on the stamp card. Silence is not a letter. Ulquiorra and Szayelaporro hold the Client until Soft PASS, Jonathan stamps, and Aizen merges. This does not reopen #91, A′AAAA, tag chrome **A**, Drop A, or the Solenne height note.
+
+---
+
 ## Park / Later (not M1 exit)
 
 - Elite N5 is shipped — do not list it here. Slice 4 docs #69 / Client #70 are on the tip — do not list playback as open. Posture art stays **Nov 2** (PixelLab reset **2026-11-02**). PR #71: Solenne ×4 art **HOLD** until that reset; Halden + Vex **KEEP**; shop **ACCEPT**. Do not open a Solenne pass

@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-27**; `dev` tip **`78d1837`**, docs #90). Client wire on that tip is **`274a8d6`** (#89). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. Elite telegraph N5 is **shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not read that ask card as open. Do not reopen it. Interactive-order slice 4 is on the tip (docs #69 / Client #70). Sockets shipped. Posture art stays **Nov 2**. Do not read the slice 4 ask as the open card. Until-M2 stat / event tuning is **closed** (Design #72 / Client #73, accept **A A A A**). Do not read that ask as open. Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done**: docs tip catch-up #74 landed, M2 four-job Client wire #75 landed at **`873e7b2`**. Do not read #72, #73, #74, or #75 as open. Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo **UI shell v1** **shipped** (Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** — text interim; icon chips Later). Do not read that shell ask as open. Do not reopen the shell letters. Not slice 4. Not tuning. Not the M2 pool wire. Tip **`4d9fa19`** (docs #78) and Client shell **`c8a5a1a`** are **not** Steam-demo ready. Steam-demo cut **AAAA** landed (#79–#82, `2c338ed`). Craft hand **landed** (Design #83 `187911f` / art #84 `bff62c8` / Client #85 `1b49dd1`, Soft A′AAAA: fan from `max_hand`, drag, drop, `assets/mat/<id>.png` ×38, MatFace gap 0). Do not read #83, #84, or #85 as open. Craft-card **tag chrome landed A** (Soft #87 `ebf6583`, Jonathan 2026-10-26 HKT; Client #89 `274a8d6`, [36](36-craft-hand-cards.md) §6). Native **16×16** `assets/ui/planner/chip_<tag>.png` on the hand and the zone played row. Tag names leave the caption. Type and cost stay. Do not read #87 or #89 as open. Client #88 (`e9f503f`) landed drop clear, the cost caption, and N=2 as one fight. Cost stays the #83 caption. Hand A′ / Drag A / Drop A / Path A / Placeholder A stay. No gen. **Soft player-facing chrome letters are stamped Node A′ · Brief A · Event A** (Jonathan, Soft #91, [37](37-player-facing-chrome.md)). The adventurer stop reads `Adventurer`, not the catalog name. Appointment titles still show. The letters are not an open A|B. Silence is not **A**. Soft QC is next. Ulquiorra holds the Client until that PASS and Aizen merges. It does not reopen Soft A′AAAA, tag chrome **A**, Drop A, Path A, #88, or #71. No PixelLab. PR #71: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not revive #62. `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-27**; `dev` tip **`78d1837`**, docs #90). Client wire on that tip is **`274a8d6`** (#89). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. Elite telegraph N5 is **shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not read that ask card as open. Do not reopen it. Interactive-order slice 4 is on the tip (docs #69 / Client #70). Sockets shipped. Posture art stays **Nov 2**. Do not read the slice 4 ask as the open card. Until-M2 stat / event tuning is **closed** (Design #72 / Client #73, accept **A A A A**). Do not read that ask as open. Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done**: docs tip catch-up #74 landed, M2 four-job Client wire #75 landed at **`873e7b2`**. Do not read #72, #73, #74, or #75 as open. Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo **UI shell v1** **shipped** (Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** — text interim; icon chips Later). Do not read that shell ask as open. Do not reopen the shell letters. Not slice 4. Not tuning. Not the M2 pool wire. Tip **`4d9fa19`** (docs #78) and Client shell **`c8a5a1a`** are **not** Steam-demo ready. Steam-demo cut **AAAA** landed (#79–#82, `2c338ed`). Craft hand **landed** (Design #83 `187911f` / art #84 `bff62c8` / Client #85 `1b49dd1`, Soft A′AAAA: fan from `max_hand`, drag, drop, `assets/mat/<id>.png` ×38, MatFace gap 0). Do not read #83, #84, or #85 as open. Craft-card **tag chrome landed A** (Soft #87 `ebf6583`, Jonathan 2026-10-26 HKT; Client #89 `274a8d6`, [36](36-craft-hand-cards.md) §6). Native **16×16** `assets/ui/planner/chip_<tag>.png` on the hand and the zone played row. Tag names leave the caption. Type and cost stay. Do not read #87 or #89 as open. Client #88 (`e9f503f`) landed drop clear, the cost caption, and N=2 as one fight. Cost stays the #83 caption. Hand A′ / Drag A / Drop A / Path A / Placeholder A stay. No gen. **Soft player-facing chrome letters are stamped Node A′ · Brief A · Event A** (Jonathan, Soft #91, [37](37-player-facing-chrome.md)). The adventurer stop reads `Adventurer`, not the catalog name. Appointment titles still show. The letters are not an open A|B. Silence is not **A**. Soft QC is next. Ulquiorra holds the Client until that PASS and Aizen merges. It does not reopen Soft A′AAAA, tag chrome **A**, Drop A, Path A, #88, or #71. No PixelLab. PR #71: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not revive #62. `main` is not promoted (`353f1d4`). **Open:** starter deck Soft Design [38](38-starter-deck.md), written off this tip **`d51d47e`**. The 3 / 4 / 3 composition is the starter deck. The hand draws 5. Letters A–G are open. Ulquiorra and Szayelaporro hold until Soft PASS, Jonathan’s stamp, and Aizen’s merge. Nnoitra has no seat.
 
 ---
 
@@ -1066,3 +1066,72 @@ Soft QC has not passed. That is the next gate. Ulquiorra holds the Client until 
 ## Stamp
 
 **Node A′ · Brief A · Event A.** The adventurer stop reads `Adventurer`. The appointment stop still reads the appointment title.
+
+---
+
+# Grimmjow stamp-ask — 2026-10-27 (starter deck + basic combat)
+
+Docs only. Written off tip **`d51d47e`** (Soft chrome #91). Law: [38](38-starter-deck.md). No `src/`. No assets. No PixelLab. No gens. Does not reopen #91, A′AAAA, tag chrome **A**, Drop A, or the Solenne height note. Ulquiorra and Szayelaporro **hold** until Soft PASS, Jonathan stamps, and Aizen merges. Nnoitra has no seat.
+
+Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition. The hand of **5** is a draw from that deck.
+
+## 1. Files
+
+| File | Section |
+|---|---|
+| `docs/38-starter-deck.md` | Locks, letters A–G with recommends, the 10-card deck, kits, PASS bar |
+| `docs/14-synergies.md` | Rewrite-in-flight banner. Rows kept |
+| `docs/19-own-basic-starter.md` | 8-mat list marked historical. Shop weights stay the offer table |
+| `docs/27-craft-mode-stamina.md` | Hand 5, dig 2, one stamina meter, three starter `sk_*` |
+| `docs/01-core-loop.md` | Draw 5 from the starter deck |
+| `docs/30-interactive-order.md` | PASS bar on the one fight. Gate / Surface / Socket stay |
+| `docs/11-materials.md` · `docs/16-shop-owners.md` · `docs/32-shop-and-events.md` | Pointers |
+| `docs/README.md` · `docs/00-doc-categories.md` · `docs/pm/phase-1-plan.md` · `docs/STAMP.md` | Index and this card |
+
+## 2. Decisions
+
+Locks 1–7 are written. Letters A–G are open. Silence is not a letter.
+
+1. **Hand and deck — locked.** `max_hand` stays **5**. The starter deck composition is tagged / no-tag / skill ≈ **3 / 4 / 3**. Each run draws 5 from that deck. The composition does not re-roll. The 8-mat list in `19` is the list this deck replaces. Buys join the same deck.
+2. **AP and stamina — locked.** One meter. Skills spend it. Dig spends it.
+3. **Next card — locked.** The next hand card played into a zone. A craft play.
+4. **Replace `14` — locked.** For `own_basic`, the kits in `38` replace the monostack ladders, report hints, and passive cells. History stays printed until this card is stamped.
+5. **Playback PASS — locked.** On the one fight, Soft needs to see the burn chip, the HP integer change, the burn-stack counter, the ascend beat, and the heal pop. A report-hint line fails.
+6. **Basic owner first — locked.** Occult, Solar, and Lunar stay out. Pipeline: syns for `own_basic`, then their crosses and negs, then the cards that enter the deck and feed them.
+7. **A. Tagged — open.** **Recommend A.** Any of the 16 monostack tags counts as tagged. An empty tag list is no-tag. The four no-tag cards are `mat_hemp_plain` with tags withheld on those starter copies. Shop hemp keeps Soft.
+8. **B. Deck size — open.** **Recommend the 10-card deck** in `38` (ember silk, wool, iron, hemp ×4 no-tag, `sk_ease_draw`, `sk_scrap_breath`, `sk_heavy_draw`). It is the whole starter deck and it replaces the 8-mat list.
+9. **C. Burn — open.** **Recommend:** tick at the start of each action of the unit that holds stacks; damage **1 × stacks**, then stacks **− 1**; cap **5**; lifesteal **floor(damage / 2)** on the adventurer when their Fire kit is the source; a Soft heal pop cleanses **1** stack on that unit.
+10. **D. Survive — open.** **Recommend once per fight**, on `syn_soft_8` only. HP becomes **1**. The next lethal in that fight goes to **0**.
+11. **E. First kits — open.** **Recommend Fire, Soft, Earth, Metal, and Silk.** Silk is on the Fire mat. Wild and Pure stay off the buy list this pass. Solar, Lunar, and Occult stay out.
+12. **F. Skill draw — open.** **Recommend the same draw, hand, and discard as `27`.**
+13. **G. Dig — open.** **Recommend keep 2.**
+
+Starter skill costs are the lock: `sk_ease_draw` **1**, `sk_scrap_breath` **0**, `sk_heavy_draw` **1**. Ids are the Soft draft.
+
+## 3. Questions
+
+None.
+
+## 4. Blockers
+
+An unanswered letter **A**. Silence is not **A**.
+
+An unanswered letter **B**. Silence is not the 10-card deck.
+
+An unanswered letter **C**. Silence is not the burn numbers.
+
+An unanswered letter **D**. Silence is not per fight.
+
+An unanswered letter **E**. Silence is not Fire / Soft / Earth / Metal / Silk.
+
+An unanswered letter **F**. Silence is not the `27` cycle.
+
+An unanswered letter **G**. Silence is not dig **2**.
+
+Nothing else blocks. #71 does not block. Posture art does not block. Nnoitra has no seat. No gens in this PR. No `src/` in this PR.
+
+## Design recommends
+
+**A** (any monostack tag). **10-card deck.** Burn as drafted (cap 5, 1 HP per stack, then −1, lifesteal floor half, cleanse 1 on a Soft pop). Survive once per fight. Kits: Fire, Soft, Earth, Metal, Silk. Skill draw matches `27`. Dig stays 2.
+
+Soft QC, when a fight’s combined bag meets Fire ≥ 3 and Soft ≥ 3: the playback shows the burn-stack counter, a burn chip with the HP integer changing on that tick, a heal pop, and an ascend beat. A report-hint line does not pass.
