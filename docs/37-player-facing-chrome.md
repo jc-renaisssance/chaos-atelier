@@ -1,6 +1,6 @@
 # Player-facing chrome — Soft strip
 
-**Doc id: `37`.** **Status: Open.** Written off `dev` tip **`78d1837`** (docs #90). Client wire on that tip is **`274a8d6`** (#89). No `src/` in this PR. No assets. No PixelLab. No burn.
+**Doc id: `37`.** **Status: Stamped Node A′ · Brief A · Event A** (Jonathan, Soft #91). Written off `dev` tip **`78d1837`** (docs #90). Client wire on that parent is **`274a8d6`** (#89). The letters are not open. Silence is not **A**. Plain node **A** (a catalog name on an adventurer stop) is not the stamp. No `src/` in this amend. No assets. No PixelLab. No burn. Soft QC is next. Ulquiorra holds the Client until that PASS and Aizen merges.
 
 Jonathan (2026-10-26): the M2 Steam demo is almost-production UI and gameplay. Placeholder art is legal. A gap that leaves a broken drop or missing card chrome does not clear. M2 and the full product differ by locked owners and by which map is authored. They do not differ by a debug skin.
 
@@ -229,10 +229,10 @@ Hide the route caption, the draft id line, the Today caption, and the Resolve ca
 |---|---|---|
 | Newspaper | `The paper names {boss display name}.` | `Continue` |
 | Day not confirmed | `Choose the next stop.` | hidden |
-| Adventurer confirmed | `{display name} is waiting.` | `Sew` |
+| Adventurer confirmed | `An adventurer is waiting.` | `Sew` |
 | Appointment confirmed | `{appointment title}. You may decline once this chapter.` | `Sew` |
 | Market confirmed | `The market is open.` | `Shop` |
-| Event confirmed | the event header from letter 3 | `Look` |
+| Event confirmed | `On the road.` | `Look` |
 | Reserved, not the last day | `A day on the road.` | `Continue` |
 | Reserved, last day | `The road runs to {boss display name}.` | `Continue` |
 | Awaiting boss | `The days are spent. Sew for the fighter.` | `Sew for the fight` |
@@ -251,7 +251,7 @@ Mission return title: `Read {S|A|B|C|D|F}`. Body is the letter and `Won` or `Los
 
 Boss title stays `Boss clear — {display name}` or `Run over — {display name}`. Body is `{fighter display name} against {boss display name}.` plus the letter. No `adv_*` in parentheses. No newspaper-chrome id.
 
-Market exit title: `Market`. Body: `Back on the road.` Gold is the HUD. Event exit title is the letter 3 header. Body is the result sentence. Reps-gate title: `Run over`. Body: `There is no retry.`
+Market exit title: `Market`. Body: `Back on the road.` Gold is the HUD. Event exit title is `On the road`. Body is the result sentence. Reps-gate title: `Run over`. Body: `There is no retry.`
 
 ### Craft words
 
@@ -318,54 +318,50 @@ Hide the explainer notes (`Skip ends this fight…`, `Piece vignette…`, `One f
 
 ## Letters
 
-Design recommends **A** on each. Write the letter. Silence is not **A**.
+**Stamped Node A′ · Brief A · Event A.** Jonathan, Soft #91. These lines are the stamp. They are not an open A|B. Silence is not **A**.
 
-### 1. Node face — A or B
+### 1. Node face — stamped A′
 
-The kind chip and the elite badge stay either way. `node_id` and `ref_id` hide either way.
+The kind chip and the elite badge stay. `node_id` and `ref_id` still hide.
 
-**A (Design default).** One production line on the card, beside the chip.
+**A′ (taken).** One production line on the card, beside the chip. This is Jonathan’s amend of the Design **A** table. A normal adventurer stop does not print `AdventurerCatalog.display_name`. It labels the stop type, the way a shop labels the kind of stop and not the person inside.
 
 | Kind | Line |
 |---|---|
-| Adventurer | `AdventurerCatalog.display_name`. Unknown id → `Adventurer` |
-| Appointment | `ScheduleCatalog.appointment_title`. Unknown → `Appointment` |
+| Adventurer | `Adventurer`. Kind word only. Not the catalog display name |
+| Appointment | `ScheduleCatalog.appointment_title`. Unknown id → `Appointment`. The title still shows |
 | Market | `Market` |
-| Event | the letter 3 header |
+| Event | `On the road` (Event **A**) |
 | Reserved, not last | `Travel` |
 | Reserved, last | `Approach` |
 
-**B.** Chip and badge only. No text line on the card. Column heads stay.
+The Today line for a confirmed adventurer is `An adventurer is waiting.` It does not print the catalog name. The appointment Today line still uses the appointment title. The order panel, after the player enters craft, still shows the person. That panel is not this card.
 
-Design recommends **A**. Day 2 on the current map is three different stops. A chip-only card does not say which.
+**B** (chip and badge only, no text line) is not taken. Plain **A** (display name on the adventurer card) is not taken.
 
-### 2. Client Brief — A or B
+### 2. Client Brief — stamped A
 
 Boss rows keep Copy A (three lines, or `?`). Empty threat stays `?`. Blank lines are never legal.
 
-**A (Design default).** A `cli_*` row with no environment and no flavor prints the display name only. One line. The header `Brief` stays. This PR does not write flavor.
+**A (taken).** A `cli_*` row with no environment and no flavor prints the display name only. One line. The header `Brief` stays. No flavor was written.
 
-**B.** Jonathan writes `environment` and `flavor` for the client rows he wants as posters. Paste them on the stamp line. A row he does not fill uses **A** for that row. This PR does not draft the 23 lines.
+**B** (pasted environment and flavor) is not taken.
 
-Design recommends **A**. The name is the poster. Twenty-three invented lines are a catalog stamp, not this strip.
+### 3. Event header — stamped A
 
-### 3. Event header — A or B
+Node id, `evt_*`, and `choice_*` hide. The blurb stays. The button is the choice label only. `result: —` hides until the pick; then the result sentence shows, with no `result:` prefix.
 
-Node id, `evt_*`, and `choice_*` hide either way. The blurb stays. The button is the choice label only. `result: —` hides until the pick; then the result sentence shows, with no `result:` prefix.
+**A (taken).** Every event’s header is `On the road`. The node line uses those same words. No new title field.
 
-**A (Design default).** Every event’s header is `On the road`. The node line under letter 1 **A** uses the same words. No new title field.
-
-**B.** Jonathan writes one short title for each live id: `evt_c1_heat_mirage`, `evt_c1_ashfall`, `evt_c1_scrap_market`, `evt_c1_salt_spray`, `evt_c1_kind_stranger`, `evt_c1_wagon_rattle`, `evt_c1_toll_post`. The header and the node line use that title. Silence is not a title. This PR does not invent the seven.
-
-Design recommends **A**. The blurb is already the sentence. One header keeps the screen from printing `evt_*`.
+**B** (seven titles) is not taken.
 
 ---
 
-## Client (after the stamp — not this PR)
+## Client (after Soft QC — not this amend)
 
-Ulquiorra holds until Jonathan writes the three letters. Szayelaporro holds until that Client. Nnoitra has no seat. Harribel does not gate. No gen.
+The letters are stamped. Ulquiorra still holds until Soft QC passes and Aizen merges. Szayelaporro holds until that Client. Nnoitra has no seat. Harribel does not gate. No gen. This amend is the stamp record. It is not the QC and it is not the Client.
 
-The Client replaces strings and hides controls. It does not retune rules, banks, chips, mat faces, or the fan. It does not delete the dev panel; it deletes the title setter.
+The Client replaces strings and hides controls. It does not retune rules, banks, chips, mat faces, or the fan. It does not delete the dev panel; it deletes the title setter. The adventurer route line is the word `Adventurer`.
 
 ---
 
@@ -375,7 +371,7 @@ The Client replaces strings and hides controls. It does not retune rules, banks,
 
 | File | What |
 |---|---|
-| `docs/37-player-facing-chrome.md` | This law. Inventory, hide list, three letters |
+| `docs/37-player-facing-chrome.md` | This law. Inventory, hide list, stamped **Node A′ · Brief A · Event A** |
 | `docs/22-chapter-schedule.md` | Pointer. Type + id is the #41 record. Player words are here |
 | `docs/21-app-flow.md` | Title has no Dev check |
 | `docs/32-shop-and-events.md` | Pointer. Id labels are the ugly record. Tabs stay **A** |
@@ -385,18 +381,18 @@ The Client replaces strings and hides controls. It does not retune rules, banks,
 | `docs/27-craft-mode-stamina.md` | Pointer. Rules stay |
 | `docs/36-craft-hand-cards.md` | Pointer. `(stub).` leaves the blurb. Caption layout stays |
 | `docs/05-art.md` | No gens |
-| `docs/pm/phase-1-plan.md` | Open card. Parent tip `78d1837` |
+| `docs/pm/phase-1-plan.md` | Stamped letters. Parent tip `78d1837`. Soft QC next |
 | `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Index and this card |
 
 ### 2. Decisions
 
-The hide list and the stay list are accepts. Write the three letters.
+The hide list and the stay list are accepts. The three letters are written. Silence is not **A**.
 
-1. **Node face — A or B.** **A:** one production line (name, appointment title, Market, event header, Travel, Approach). **B:** chip and badge only. Both hide `N1` and `adv_*`. Design recommends **A**. Day 2 is three stops; the chip does not name them.
+1. **Node face — stamped A′.** One production line beside the kind chip. Adventurer line is the word `Adventurer`, not `AdventurerCatalog.display_name`. Appointment line is `ScheduleCatalog.appointment_title` (unknown → `Appointment`). Market is `Market`. Event is `On the road`. Reserved is `Travel` or `Approach`. Chip and elite badge stay. `node_id` and `ref_id` hide. Plain **A** and **B** are not taken.
 
-2. **Client Brief — A or B.** **A:** display name only when the row has no environment and no flavor. **B:** Jonathan pastes those two lines per `cli_*` he wants. Unfilled rows use **A**. Boss Copy A stays. Blank lines do not ship. Design recommends **A**.
+2. **Client Brief — stamped A.** Display name only when the `cli_*` row has no environment and no flavor. Boss Copy A stays. Blank lines do not ship. **B** is not taken.
 
-3. **Event header — A or B.** **A:** `On the road` for every event. **B:** seven titles, written on the stamp, not in this file. Ids hide either way. Design recommends **A**.
+3. **Event header — stamped A.** `On the road` for every event. **B** is not taken.
 
 ### 3. Questions
 
@@ -404,14 +400,12 @@ None.
 
 ### 4. Blockers
 
-An unanswered node line (**A** or **B**). Silence is not **A**.
+The letters are answered. **Node A′ · Brief A · Event A.**
 
-An unanswered Brief line (**A** or **B**). Silence is not **A**. Letter **B** without pasted lines does not invent flavor.
+Soft QC has not passed. That is the next gate. Ulquiorra holds the Client until Soft PASS and Aizen merge. This amend does not start the Client.
 
-An unanswered event line (**A** or **B**). Silence is not **A**. Letter **B** without seven titles is not a header.
+**Holds.** PR **#71**: Solenne ×4 art **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not revive **#62**. Posture art stays **Nov 2**. No gens in this amend. No `src/` in this amend. Soft A′AAAA, tag chrome **A**, Drop A, Path A, and #88 stay landed. Do not read them as open.
 
-**Holds.** PR **#71**: Solenne ×4 art **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not revive **#62**. Posture art stays **Nov 2**. Nnoitra, Ulquiorra, and Szayelaporro **hold** until Jonathan stamps this card. No gens in this PR. No `src/` in this PR. Soft A′AAAA, tag chrome **A**, Drop A, Path A, and #88 stay landed. Do not read them as open.
+### Stamp
 
-### Design recommends
-
-**Node A. Brief A. Event A.** Hide the id strip, the hollow Brief, and the scaffold sentences in the tables above. Keep the production labels this tip already has.
+**Node A′ · Brief A · Event A.** The adventurer stop reads `Adventurer`. The appointment stop still reads the appointment title.
