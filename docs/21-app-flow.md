@@ -14,7 +14,7 @@ Client adds `res://src/ui/title/title_screen.tscn` and sets `project.godot` `run
 
 Word on the screen: **Wombaste**. No seed field. No stamp dump.
 
-`dev_tools` defaults **false**. Dex, **Reroll this chapter**, **Demo next chapter**, and the STAMP JSON dump are off that flag, on the board, never on the title. A demo boot does not show them.
+`dev_tools` defaults **false**. Dex, **Reroll this chapter**, **Demo next chapter**, and the STAMP JSON dump are off that flag, on the board, never on the title. A demo boot does not show them. The title **Dev** check on tip `78d1837` is not a player control. [37](37-player-facing-chrome.md) removes it. Nothing on the title writes the flag.
 # Application flow (pseudocode) — Phase-1 `own_basic`
 
 ```

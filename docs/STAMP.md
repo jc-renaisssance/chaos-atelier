@@ -1,6 +1,6 @@
 # Live status
 
-Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-26**; `dev` tip **`274a8d6`**). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. Elite telegraph N5 is **shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not read that ask card as open. Do not reopen it. Interactive-order slice 4 is on the tip (docs #69 / Client #70). Sockets shipped. Posture art stays **Nov 2**. Do not read the slice 4 ask as the open card. Until-M2 stat / event tuning is **closed** (Design #72 / Client #73, accept **A A A A**). Do not read that ask as open. Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done**: docs tip catch-up #74 landed, M2 four-job Client wire #75 landed at **`873e7b2`**. Do not read #72, #73, #74, or #75 as open. Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo **UI shell v1** **shipped** (Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** — text interim; icon chips Later). Do not read that shell ask as open. Do not reopen the shell letters. Not slice 4. Not tuning. Not the M2 pool wire. Tip **`4d9fa19`** (docs #78) and Client shell **`c8a5a1a`** are **not** Steam-demo ready. Steam-demo cut **AAAA** landed (#79–#82, `2c338ed`). Craft hand **landed** (Design #83 `187911f` / art #84 `bff62c8` / Client #85 `1b49dd1`, Soft A′AAAA: fan from `max_hand`, drag, drop, `assets/mat/<id>.png` ×38, MatFace gap 0). Do not read #83, #84, or #85 as open. Craft-card **tag chrome landed A** (Soft #87 `ebf6583`, Jonathan 2026-10-26 HKT; Client #89 `274a8d6`, [36](36-craft-hand-cards.md) §6). Native **16×16** `assets/ui/planner/chip_<tag>.png` on the hand and the zone played row. Tag names leave the caption. Type and cost stay. Do not read #87 or #89 as open. Client #88 (`e9f503f`) landed drop clear, the cost caption, and N=2 as one fight. Cost stays the #83 caption. Hand A′ / Drag A / Drop A / Path A / Placeholder A stay. No gen. PR #71: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not revive #62. `main` is not promoted (`353f1d4`).
+Historical stamps below are the record **as written**. **Live PM** is [pm/phase-1-plan](pm/phase-1-plan.md) (refreshed **2026-10-27**; `dev` tip **`78d1837`**, docs #90). Client wire on that tip is **`274a8d6`** (#89). The **M2 four-job catalog** card is **stamped** (Jonathan 2026-10-21, #61): roster accepted; draw **B** (`M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only, disjoint from `M1_JOB_POOL`). Earlier “stamp pending” notes (2026-10-16 market, 2026-10-20 visual leftovers, route-board + Dex art) are **not** current law. Market M2 Design #46, Client #47, and `staff_*` / `artifact_*` icons #48 / #49 have **landed**. M2 visual leftovers #51–#55 have **landed** (skills shelf Design #51 / art #52 / Client #53; adventurer portraits art #54 / Client #55; tab chrome stamped **A**, no gens). Route-board + Dex art has **landed** (Design #57 @ `ddbe8b5` → art #58 @ `d432fc2` → Client #59 @ `1765a29`). Do not reopen market chrome, the landed kind faces, or the route/Dex art lane. Do not read “Jonathan stamp pending” or “Ulquiorra holds the M2 Client” in the 2026-10-16 note, the 2026-10-20 visual-leftovers card, or the route-board + Dex art card, as current law. The 2026-10-21 catalog card is the **locked** draw-B record, not an open ask. Portrait uniqueness is **stamped** (#63 ACCEPT all 24). Redraws landed (#64 M1, #65 M2). Do not regen. Do not revive #62. Do not read the uniqueness card’s “hold / Nnoitra holds” or the route-board card’s “elite question stays open” as current law. Elite telegraph N5 is **shipped** (#66 Design / #67 art / #68 Client, Marker **A**, Scope **A**). Do not read that ask card as open. Do not reopen it. Interactive-order slice 4 is on the tip (docs #69 / Client #70). Sockets shipped. Posture art stays **Nov 2**. Do not read the slice 4 ask as the open card. Until-M2 stat / event tuning is **closed** (Design #72 / Client #73, accept **A A A A**). Do not read that ask as open. Jonathan remaining-to-M2 cut **A A B** (2026-10-23) is **done**: docs tip catch-up #74 landed, M2 four-job Client wire #75 landed at **`873e7b2`**. Do not read #72, #73, #74, or #75 as open. Jonathan UI GO **A A A A** (2026-10-23 HKT) is locked. Steam-demo **UI shell v1** **shipped** (Design #76 `daa0280` / Client #77 `c8a5a1a`, stamp **A A B**: palette **A** / bust **A** / planner chips **B** — text interim; icon chips Later). Do not read that shell ask as open. Do not reopen the shell letters. Not slice 4. Not tuning. Not the M2 pool wire. Tip **`4d9fa19`** (docs #78) and Client shell **`c8a5a1a`** are **not** Steam-demo ready. Steam-demo cut **AAAA** landed (#79–#82, `2c338ed`). Craft hand **landed** (Design #83 `187911f` / art #84 `bff62c8` / Client #85 `1b49dd1`, Soft A′AAAA: fan from `max_hand`, drag, drop, `assets/mat/<id>.png` ×38, MatFace gap 0). Do not read #83, #84, or #85 as open. Craft-card **tag chrome landed A** (Soft #87 `ebf6583`, Jonathan 2026-10-26 HKT; Client #89 `274a8d6`, [36](36-craft-hand-cards.md) §6). Native **16×16** `assets/ui/planner/chip_<tag>.png` on the hand and the zone played row. Tag names leave the caption. Type and cost stay. Do not read #87 or #89 as open. Client #88 (`e9f503f`) landed drop clear, the cost caption, and N=2 as one fight. Cost stays the #83 caption. Hand A′ / Drag A / Drop A / Path A / Placeholder A stay. No gen. **Soft player-facing chrome is the open card** ([37](37-player-facing-chrome.md), written off this tip). It strips raw ids, the hollow `cli_*` Brief, and scaffolding labels. It does not reopen Soft A′AAAA, tag chrome **A**, Drop A, Path A, #88, or #71. No PixelLab. PR #71: Solenne ×4 art **HOLD** until the PixelLab reset **2026-11-02**; Halden + Vex **KEEP**; shop **ACCEPT**. Do not revive #62. `main` is not promoted (`353f1d4`).
 
 ---
 
@@ -1019,3 +1019,52 @@ Client #89 (`274a8d6`) wired letter **A**. The files were already on the tip. Nn
 ## Stamp
 
 **A.** Chips on the hand and the zone played row. Landed `chip_<tag>.png` at native **16×16**. Tag names leave the caption. Type and cost stay. Client #89 (`274a8d6`).
+
+---
+
+# Grimmjow stamp-ask — 2026-10-27 (player-facing chrome)
+
+**Open.** Written off `dev` tip **`78d1837`** (docs #90). Client wire **`274a8d6`** (#89). Law: [37](37-player-facing-chrome.md). The A′AAAA card and the tag-chrome card above stay the landed record. Do not reopen Hand A′ / Drag A / Drop A / Path A / Placeholder A. Do not read #83, #84, #85, #87, #88, or #89 as open. No gen. No PixelLab. No `src/` in this PR.
+
+A Steam player never sees a raw id, an empty Brief, or a scaffolding label. Placeholder art stays legal. M2 and the full product differ by locked owners and map routes, not by a debug skin.
+
+## 1. Files to review
+
+| File | Section |
+|---|---|
+| `docs/37-player-facing-chrome.md` | Inventory, hide list, three letters, stamp card |
+| `docs/22-chapter-schedule.md` | Pointer. Type + id is the #41 record |
+| `docs/21-app-flow.md` | No Dev check on the title |
+| `docs/32-shop-and-events.md` | Pointer. Id labels are the ugly record. Tabs stay **A** |
+| `docs/35-steam-demo-cut.md` | Boss Brief stays Copy A. Hollow `cli_*` poster is letter 2 |
+| `docs/34-ui-shell-v1.md` · `docs/30-interactive-order.md` · `docs/27-craft-mode-stamina.md` · `docs/36-craft-hand-cards.md` | Pointers. Those stamps stay |
+| `docs/05-art.md` | No gens |
+| `docs/pm/phase-1-plan.md` · `docs/README.md` · `docs/00-doc-categories.md` · `docs/STAMP.md` | Open card and this ask |
+
+## 2. Decisions
+
+The hide list and the stay list in `37` are accepts. Write three letters. Silence is not **A**.
+
+1. **Node face — A or B.** **A (Design default):** one production line beside the kind chip (display name, appointment title, Market, event header, Travel, Approach). **B:** chip and elite badge only. Both hide `N1` and `ref_id`. Design recommends **A**. Day 2 is three stops. The chip does not name them.
+
+2. **Client Brief — A or B.** Boss Copy A stays. **A (Design default):** a `cli_*` row with no environment and no flavor prints the display name only. No blank lines. **B:** Jonathan pastes environment and flavor for the rows he wants. Unfilled rows use **A**. Design recommends **A**.
+
+3. **Event header — A or B.** Ids hide either way. **A (Design default):** header `On the road` for every event. **B:** seven titles, written on the stamp. Design recommends **A**.
+
+## 3. Questions
+
+None.
+
+## 4. Blockers
+
+An unanswered node line (**A** or **B**). Silence is not **A**.
+
+An unanswered Brief line (**A** or **B**). Silence is not **A**. Letter **B** without pasted lines does not invent flavor.
+
+An unanswered event line (**A** or **B**). Silence is not **A**. Letter **B** without seven titles is not a header.
+
+**Holds.** #71 Solenne ×4 **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Do not revive #62. Posture art stays **Nov 2**. Nnoitra, Ulquiorra, and Szayelaporro **hold** until this card is stamped. No gens in this PR. No `src/` in this PR.
+
+## Design recommends
+
+**Node A. Brief A. Event A.**

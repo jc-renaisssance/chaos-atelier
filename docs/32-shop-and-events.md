@@ -2,7 +2,7 @@
 
 **Status:** **M2 visual leftovers landed** (#51–#55; tab chrome stamped **A**, no gens). **Doc id: `32`.** Filename kept (`32-shop-and-events`) — one market bible. **M1 market is closed.** M2 catalogs and the Staffs / Gear shelf-icon wire already landed (#46 Design, #47 Client, #48 art, #49 icon wire). Skills shelf icons landed (#51 Design, #52 art, #53 Client). Adventurer portrait sockets are [29](29-adventurer-catalog.md) and landed (#54 art / #55 Client), not a market catalog. Elite telegraph (N5) is the route-board badge in [22](22-chapter-schedule.md) — not a market socket.
 
-**M1 is closed.** Materials tab + refresh + `market_bank_c1` + mat Enchant (`mat_ench_*`) + code-only shiny + text `evt_*` stay as stamped in #44 / shipped Client #45. Do **not** reopen M1.
+**M1 is closed.** Materials tab + refresh + `market_bank_c1` + mat Enchant (`mat_ench_*`) + code-only shiny + text `evt_*` stay as stamped in #44 / shipped Client #45. Do **not** reopen M1. Screen labels that print those ids are the ugly record. Player words are [37](37-player-facing-chrome.md). Tab chrome **A**, banks, prices, and shiny-as-code stay.
 
 **M2 (this revision):** three new tabs on the **same** market shell — **Staffs / Skills / Gear**. Catalogs below.
 

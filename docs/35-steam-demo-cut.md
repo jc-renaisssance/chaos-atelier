@@ -101,6 +101,8 @@ Letter under Decision 4. Same gates as slice 3. Weight integers stay in the test
 
 Unseen: the body is `?`.
 
+A `cli_*` row on this tip has a name and no `environment` or `flavor` (23 rows). Printing the three-line shape there is a header over blank lines. That hollow poster is [37](37-player-facing-chrome.md) letter 2. Boss rows keep the three lines above. Copy **A** is not open.
+
 **Estimate.** One field per line. A locked field is `?` on that line only.
 
 | Line | Unlocked text |
