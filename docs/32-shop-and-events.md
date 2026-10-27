@@ -334,7 +334,7 @@ The market is where the owner looks for **materials, staffs, skill cards, or gea
 | `mat_*` / bought `sk_*` | Between-beats **run deck** (`WagonStock` / `27`) | Yes — shuffle into hand. `type=material` / `type=skill` |
 | `staff_*` / `artifact_*` | **Run kit** (owned list + equip slots). **Not** the craft deck. Do **not** invent a second deck type | **No** — never `cards_played`. Staff raises caps; artifacts apply owner utility |
 
-`own_basic` starts with **empty** staff / artifact kit and **0** `sk_*` ([16](16-shop-owners.md) / [19](19-own-basic-starter.md)) until [38](38-starter-deck.md) is stamped. That draft adds `sk_ease_draw`, `sk_scrap_breath`, and `sk_heavy_draw` to the starter deck. They are not rows on the Skills shelf.
+`own_basic` starts with **empty** staff / artifact kit and **0** `sk_*` ([16](16-shop-owners.md) / [19](19-own-basic-starter.md)) until [39](39-starter-deck.md) is stamped. That draft adds `sk_ease_draw`, `sk_scrap_breath`, and `sk_heavy_draw` to the starter deck. They are not rows on the Skills shelf.
 
 ### Enchant cut (M2 restated)
 
@@ -428,7 +428,7 @@ Labels = ids + `$` + Δ + equipped mark. No Refresh / Enchant on this tab. No ow
 
 ### Skill cards tab
 
-**Job:** market offers for owner **skill cards** tied to `16` / `27` (`sk_*`). Phase-1 player is `own_basic` (starts with **none** until [38](38-starter-deck.md) stamps the three starter skills into the deck). Other owners Later. The three starter ids are not shelf rows.
+**Job:** market offers for owner **skill cards** tied to `16` / `27` (`sk_*`). Phase-1 player is `own_basic` (starts with **none** until [39](39-starter-deck.md) stamps the three starter skills into the deck). Other owners Later. The three starter ids are not shelf rows.
 
 Investigated: [16](16-shop-owners.md) is the owner-skill **law** (kit on the clothier) but has **no** `sk_*` ids. [27](27-craft-mode-stamina.md) already stamped six draft `sk_*` (session cards, stamina cost). [29](29-adventurer-catalog.md) / [10](10-catalog-overview.md): `sk_*` = owner craft skills; `ask_*` = adventurer battle skills. Do **not** invent a second skill system.
 

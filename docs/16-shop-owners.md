@@ -29,7 +29,7 @@ Jonathan lock (2026-09-21, corrected): an **owner is the player character** — 
 
 Skill-leaning owners still have a pool (usually basic); their fantasy is the **player skill**, not a different shopkeeper.
 
-**Phase-1 numbers:** starter deck + shop weights for `own_basic` → **[19-own-basic-starter](19-own-basic-starter.md)**. The M2 starter deck (3 / 4 / 3, draw a hand of 5) is **[38-starter-deck](38-starter-deck.md)**, which replaces the 8-mat list for run start. `own_basic`’s “none” skill cell stays the landed line until that stamp.
+**Phase-1 numbers:** starter deck + shop weights for `own_basic` → **[19-own-basic-starter](19-own-basic-starter.md)**. The M2 starter deck (3 / 4 / 3, draw a hand of 5) is **[39-starter-deck](39-starter-deck.md)**, which replaces the 8-mat list for run start. `own_basic`’s “none” skill cell stays the landed line until that stamp.
 
 ## Sci‑fi / high-tech material stubs (Later — `own_tech` pool)
 

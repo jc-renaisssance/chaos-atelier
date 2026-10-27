@@ -4,7 +4,7 @@
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Ids unchanged (`boss_client_id`, `con_*`, `appt_*`, `adv_*`). Scrap Duelist stays `appt_*`.
 
-Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). The letter tables below are the law. Do not reopen playback. The fight’s Soft PASS bar (burn chip, HP tick, burn-stack counter, ascend, heal pop) is [38](38-starter-deck.md). It sits on the one combined fight. It does not move Gate, Surface, or Socket.
+Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). The letter tables below are the law. Do not reopen playback. The fight’s Soft PASS bar (burn chip, HP tick, burn-stack counter, ascend, heal pop) is [39](39-starter-deck.md). It sits on the one combined fight. It does not move Gate, Surface, or Socket.
 
 **Shell (2026-10-23):** player chrome for slices 1–3, and the playback frame, is [34](34-ui-shell-v1.md) (**shipped**, Design #76 / Client #77, stamp **A A B**). Slice rules, unlock, estimate knobs, and Gate / Surface / Socket **A** do not move. Bust **A** supersedes this file’s “do not show portraits” line on the order panel only. Planner chips are icons ([35](35-steam-demo-cut.md)). Beat-row words a player reads are [37](37-player-facing-chrome.md). Gate / Surface / Socket stay **A**. Do not reopen playback.
 

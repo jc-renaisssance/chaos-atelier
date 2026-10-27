@@ -1,10 +1,10 @@
 # Starter deck — basic owner combat (Soft Design)
 
-**Doc id: `38`.** **Status: Soft Design, stamp open.** Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Doc id `38` was free on that tip.
+**Doc id: `39`.** **Status: Soft Design, stamp open.** Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens.
 
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
-Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. The Solenne height note is a different file. This file does not edit posture art, PR #71, or a height doc.
+Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height is a parallel open card: [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92), doc id **38**, `docs/38-solenne-height-body.md`, tip `14482e1`. Soft PASS on that card is waiting on Jonathan’s Height A|B. This file does not edit that law, posture art, or PR #71.
 
 Ulquiorra and Szayelaporro **hold** the Client until Soft PASS, Jonathan stamps, and Aizen merges. Nnoitra has no seat.
 

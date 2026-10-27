@@ -4,7 +4,7 @@ Phase-1 player clothier = **`own_basic`** only (see `16-shop-owners.md`).
 
 ## Starter deck (run start)
 
-> **Replaced in flight — [38](38-starter-deck.md).** The eight rows below were written as a fixed hand. Jonathan (2026-10-27): the starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**, and the hand of **5** is a draw from that deck. Soft’s recommend is the **10-card** starter deck in `38`, which replaces this list. Bought cards join that same deck. The rows stay as the record until letter B is stamped. Shop weights further down stay the offer table.
+> **Replaced in flight — [39](39-starter-deck.md).** The eight rows below were written as a fixed hand. Jonathan (2026-10-27): the starter deck composition is tagged mats / no-tag mats / skills at about **3 / 4 / 3**, and the hand of **5** is a draw from that deck. Soft’s recommend is the **10-card** starter deck in `39`, which replaces this list. Bought cards join that same deck. The rows stay as the record until letter B is stamped. Shop weights further down stay the offer table.
 
 **Historical list — 8 mats:**
 
@@ -72,4 +72,4 @@ Historical draft (not live): sell owned mats for **⌊$ / 2⌋** gold (min 1 if 
 
 Stamp `starter_deck_hash` or explicit `material_ids` at run start; shop rolls may be seeded for Mid/Mid smoke.
 
-Starter tags on these mats: **Soft, Earth, Metal, Wild, Silk, Pure**. C1 bosses may still be approachable on those staples. **C2 / C3 de-favor them** — punish Soft / Earth / Metal / Wild / Silk / Pure and/or favor tags outside this set (`17`). That de-favor sentence stays. Which of these tags the M2 starter deck feeds, and which rows `own_basic` may buy, is [38](38-starter-deck.md).
+Starter tags on these mats: **Soft, Earth, Metal, Wild, Silk, Pure**. C1 bosses may still be approachable on those staples. **C2 / C3 de-favor them** — punish Soft / Earth / Metal / Wild / Silk / Pure and/or favor tags outside this set (`17`). That de-favor sentence stays. Which of these tags the M2 starter deck feeds, and which rows `own_basic` may buy, is [39](39-starter-deck.md).
