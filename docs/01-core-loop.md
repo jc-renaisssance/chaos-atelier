@@ -11,6 +11,8 @@
 
 Goal: adjust the deck knowing the boss (StS-style). Different **player owners** (Later) change your material access and skills (Balatro-style character fantasy).
 
+**Starter deck (stamped A B C′ D′ E F G, [39](39-starter-deck.md)):** `own_basic` starts from one fixed deck, composition tagged / no-tag / skill at about 3 / 4 / 3. Each run draws a hand of **5** from that deck (`max_hand` in [27](27-craft-mode-stamina.md)). The eight-mat list in [19](19-own-basic-starter.md) is the historical starter that file replaces.
+
 ## Single client beat (inside a day)
 
 1. **Adventurer** arrives with a clear threat (or appointment / walk-in from the current route node).
