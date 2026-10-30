@@ -771,6 +771,9 @@ func _play_slot(index: int) -> void:
 	var session := AtelierSession.craft_session
 	if session == null or index < 0 or index >= session.hand.size() or index >= session.hand_size:
 		return
+	if AtelierSession.scrap_pick_open:
+		AtelierSession.pick_scrap(index)
+		return
 	for slot in _hand_fan.cards():
 		if slot.hand_index == index:
 			_begin_fly(slot)
@@ -950,6 +953,9 @@ func _begin_drag(pointer: Vector2) -> void:
 func _end_drag(pointer: Vector2) -> void:
 	if _phase != _Phase.DRAG:
 		return
+	if AtelierSession.scrap_pick_open:
+		_begin_cancel()
+		return
 	var zone := _zone_at(pointer)
 	_clear_drop_hot(true)
 	if zone != null and _ghost != null and _can_commit(_ghost.hand_index, zone.zone_index):
@@ -960,6 +966,10 @@ func _end_drag(pointer: Vector2) -> void:
 
 func _begin_fly(slot: CraftHandSlot) -> void:
 	if _phase != _Phase.IDLE or slot == null or not slot.can_click:
+		return
+	## scrap_breath A: a click names one other card. It is not a zone play.
+	if AtelierSession.scrap_pick_open:
+		AtelierSession.pick_scrap(slot.hand_index)
 		return
 	var session := AtelierSession.craft_session
 	if session == null:
@@ -1260,6 +1270,8 @@ func _can_commit(hand_index: int, zone_index: int) -> bool:
 func _can_click(session: CraftStaminaSession, index: int, closed: bool) -> bool:
 	if closed or session == null:
 		return false
+	if AtelierSession.scrap_pick_open:
+		return index >= 0 and index < session.hand.size()
 	if not CraftRules.can_play(session, index, AtelierSession.next_mat_free, session.selected_zone_index, AtelierSession.next_cost_less):
 		return false
 	var zone := _zone_by_index(session.selected_zone_index)
@@ -1267,7 +1279,7 @@ func _can_click(session: CraftStaminaSession, index: int, closed: bool) -> bool:
 
 
 func _can_drag(session: CraftStaminaSession, index: int, closed: bool) -> bool:
-	if closed or session == null:
+	if closed or session == null or AtelierSession.scrap_pick_open:
 		return false
 	for z in range(1, session.zone_count + 1):
 		if CraftRules.can_play(session, index, AtelierSession.next_mat_free, z, AtelierSession.next_cost_less):

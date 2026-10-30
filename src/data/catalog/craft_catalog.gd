@@ -11,7 +11,7 @@ const SKILL_BLURBS := {
 	"sk_deep_dig": "Refresh hand; draw +1 extra (clamped to hand_size this slice).",
 	"sk_steady_hand": "Ignore first negative synergy this piece (stub).",
 	"sk_ease_draw": "The next card played into a zone costs 1 less stamina, floor 0. Then draw 1",
-	"sk_scrap_breath": "Discard 1 other card from hand. If that discard happens, stamina +1",
+	"sk_scrap_breath": "Discard 1 other card from hand. If that discard happens, stamina +1 (AP).",
 	"sk_heavy_draw": "The next card played into a zone contributes ×1.5 stats, each stat rounded half away from zero. Tags stay as printed. Then draw 1",
 }
 

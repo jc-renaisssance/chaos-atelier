@@ -40,6 +40,8 @@ var next_mat_free: bool = false
 var next_cost_less: int = 0
 ## docs/39 sk_heavy_draw. Next zone play contributes ×1.5 stats. Tags stay as printed.
 var next_stat_heavy: bool = false
+## docs/39 scrap_breath A. True while the player still has to pick one other card.
+var scrap_pick_open: bool = false
 var last_piece_result: Dictionary = {}
 var piece_results: Array = []
 var piece_stamps: Array = []
@@ -224,6 +226,7 @@ func _reset_craft_state() -> void:
 	next_mat_free = false
 	next_cost_less = 0
 	next_stat_heavy = false
+	scrap_pick_open = false
 	last_piece_result = {}
 	piece_results.clear()
 	piece_stamps.clear()
@@ -414,6 +417,7 @@ func _begin_craft(order: ClientOrder) -> bool:
 	next_mat_free = false
 	next_cost_less = 0
 	next_stat_heavy = false
+	scrap_pick_open = false
 	craft_open = true
 	resolve_open = false
 	planned_build = null
@@ -429,6 +433,7 @@ func _open_session() -> void:
 	next_mat_free = false
 	next_cost_less = 0
 	next_stat_heavy = false
+	scrap_pick_open = false
 	craft_session = craft_order.open_session()
 	_apply_session_kit(craft_session)
 	CraftRules.opening_draw(craft_session, stock, rng)
@@ -463,7 +468,7 @@ func select_zone(zone_index: int) -> bool:
 
 
 func play_hand(hand_index: int, zone_index: int = 0) -> bool:
-	if not craft_open or craft_session == null or order_craft_done:
+	if not craft_open or craft_session == null or order_craft_done or scrap_pick_open:
 		return false
 	var target := zone_index if zone_index > 0 else craft_session.selected_zone_index
 	if not craft_session.is_legal_zone(target):
@@ -482,6 +487,7 @@ func play_hand(hand_index: int, zone_index: int = 0) -> bool:
 	next_mat_free = bool(out.get("next_mat_free", false))
 	next_cost_less = int(out.get("next_cost_less", 0))
 	next_stat_heavy = bool(out.get("next_stat_heavy", false))
+	scrap_pick_open = bool(out.get("scrap_pick", false))
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
@@ -497,12 +503,26 @@ func play_hand(hand_index: int, zone_index: int = 0) -> bool:
 	return true
 
 
+func pick_scrap(hand_index: int) -> bool:
+	## scrap_breath A: the player names one other card. That card is discarded, then stamina +1.
+	if not scrap_pick_open or not craft_open or craft_session == null or order_craft_done:
+		return false
+	if not CraftRules.discard_scrap_other(craft_session, hand_index):
+		return false
+	scrap_pick_open = false
+	last_stamp = _make_craft_stamp()
+	craft_changed.emit()
+	return true
+
+
 func dig() -> bool:
 	if not craft_open or craft_session == null or order_craft_done:
 		return false
 	var out := CraftRules.dig(craft_session, stock, rng)
 	if not bool(out.get("ok", false)):
 		return false
+	## Dig is not the scrap discard. A dump that is not that one card grants no +1.
+	scrap_pick_open = false
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
@@ -523,6 +543,7 @@ func finish_early() -> bool:
 		return false
 	if not CraftRules.early_finish(craft_session):
 		return false
+	scrap_pick_open = false
 	_resolve_session()
 	return true
 

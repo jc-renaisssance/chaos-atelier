@@ -455,7 +455,7 @@ def check_source() -> None:
         fail("shop hemp keeps Soft")
     for blurb in (
         "The next card played into a zone costs 1 less stamina, floor 0. Then draw 1",
-        "Discard 1 other card from hand. If that discard happens, stamina +1",
+        "Discard 1 other card from hand. If that discard happens, stamina +1 (AP).",
         "The next card played into a zone contributes ×1.5 stats, each stat rounded half away from zero. Tags stay as printed. Then draw 1",
     ):
         if blurb not in catalog:
@@ -465,7 +465,7 @@ def check_source() -> None:
     chrome = read(SRC / "ui" / "player_chrome.gd")
     for blurb in (
         "The next card played into a zone costs 1 less stamina, floor 0. Then draw 1",
-        "Discard 1 other card from hand. If that discard happens, stamina +1",
+        "Discard 1 other card from hand. If that discard happens, stamina +1 (AP).",
     ):
         if blurb not in chrome:
             fail("player chrome missing a docs/39 skill sentence")
@@ -479,8 +479,16 @@ def check_source() -> None:
     if "var ap_" in constants or "AP_START" in constants:
         fail("AP is the stamina meter; do not add a second meter")
     rules = read(SRC / "craft" / "craft_rules.gd")
-    if "session.hand.size() != 1" not in rules:
-        fail("scrap breath must not pick a card when more than one other card remains")
+    if "session.hand.size() != 1" not in rules or "discard_scrap_other" not in rules:
+        fail("scrap breath auto-discards only the single remaining card")
+    if "return true" not in rules.split("func _scrap_breath_after_leave", 1)[-1].split("static func discard_scrap_other", 1)[0]:
+        fail("two or more other cards must wait for the player pick")
+    table = read(SRC / "ui" / "craft" / "craft_table.gd")
+    if "scrap_pick_open" not in table or "pick_scrap" not in table:
+        fail("the hand click and key must be the scrap_breath pick")
+    fly = table.split("func _begin_fly", 1)[-1].split("func _begin_settle", 1)[0]
+    if fly.find("scrap_pick_open") > fly.find("_can_commit") or "scrap_pick_open" not in fly:
+        fail("the pick must not play the chosen card into a zone")
     if "draw_one(session, rng)" not in rules or 'card.id == "sk_ease_draw"' not in rules:
         fail("ease draw sets the next-card discount and draws 1")
     if 'card.id == "sk_heavy_draw"' not in rules or "stat_one_and_half = true" not in rules:
@@ -496,6 +504,8 @@ def check_source() -> None:
         fail("dev_tools stays false on the player path")
     if "next_cost_less" not in session or "next_stat_heavy" not in session:
         fail("next-card modifiers live on the session and clear with it")
+    if "func pick_scrap" not in session or "scrap_pick_open" not in session:
+        fail("the session must hold the scrap_breath pick until the player names a card")
     fight_gd = read(SRC / "ui" / "playback" / "own_basic_fight.gd")
     if "const HP_START := 12" not in fight_gd or "const INCOMING := 3" not in fight_gd:
         fail("playback HP starts at 12 and the skeleton incoming stays 3")

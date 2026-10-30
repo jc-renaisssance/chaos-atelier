@@ -150,6 +150,7 @@ static func play(
 	var free := next_mat_free
 	var less := next_cost_less
 	var heavy := next_stat_heavy
+	var scrap_pick := false
 	if card.type == GameEnums.HandCardType.MATERIAL and free:
 		free = false
 	if less > 0:
@@ -167,12 +168,13 @@ static func play(
 			heavy = true
 			draw_one(session, rng)
 		elif card.id == "sk_scrap_breath":
-			_discard_one_other(session)
+			scrap_pick = _scrap_breath_after_leave(session)
 	return {
 		"ok": true,
 		"next_mat_free": free,
 		"next_cost_less": less,
 		"next_stat_heavy": heavy,
+		"scrap_pick": scrap_pick,
 		"played": played,
 		"burned": burned,
 	}
@@ -209,14 +211,24 @@ static func draw_one(session: CraftStaminaSession, rng: RandomNumberGenerator) -
 	return true
 
 
-## docs/39 sk_scrap_breath. The skill has already left the hand.
-## Empty remaining hand: no discard, no stamina. Exactly one remaining card is that other card.
-## Soft does not name which card when more than one remains. Do not pick.
-static func _discard_one_other(session: CraftStaminaSession) -> bool:
-	if session == null or session.hand.size() != 1:
+## docs/39 scrap_breath A. The skill has already left the hand.
+## 0 other cards: no discard, no stamina. Exactly 1: that card, then +1.
+## 2 or more: the player picks. This returns true and does not choose a card.
+static func _scrap_breath_after_leave(session: CraftStaminaSession) -> bool:
+	if session == null or session.hand.is_empty():
 		return false
-	var other: HandCard = session.hand[0]
-	session.hand.remove_at(0)
+	if session.hand.size() != 1:
+		return true
+	discard_scrap_other(session, 0)
+	return false
+
+
+## The picked other card leaves the hand to discard, then stamina +1.
+static func discard_scrap_other(session: CraftStaminaSession, hand_index: int) -> bool:
+	if session == null or hand_index < 0 or hand_index >= session.hand.size():
+		return false
+	var other: HandCard = session.hand[hand_index]
+	session.hand.remove_at(hand_index)
 	session.discard_pile.append(other)
 	session.stamina_remaining += 1
 	return true
