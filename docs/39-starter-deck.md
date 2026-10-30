@@ -1,12 +1,12 @@
 # Starter deck — basic owner combat (Soft Design)
 
-**Doc id: `39`.** **Status: Stamped A B C′ D′ E F G** (Jonathan, Aizen Soft amend). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire.
+**Doc id: `39`.** **Status: Stamped A B C′ D′ E F G** (Jonathan, Aizen Soft amend) and **scrap_breath A** (Jonathan, 2026-10-27/29). A–G stay written off tip **`d51d47e`** (Soft chrome #91). This amend is written off tip **`0675d2c`** (#93). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges.
 
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
 Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height is a parallel open card: [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92), doc id **38**, `docs/38-solenne-height-body.md`, tip `14482e1`. Soft PASS on that card is waiting on Jonathan’s Height A|B. This file does not edit that law, posture art, or PR #71.
 
-Ulquiorra and Szayelaporro **hold** the Client until Soft QC PASS and Aizen’s re-stamp brief. C′ and D′ changed the letters, so that brief is the Client gate. Nnoitra has no seat.
+Ulquiorra and Szayelaporro **hold** the Client until Soft QC PASS and Aizen’s re-stamp brief. C′ and D′ changed the letters, so that brief is the Client gate. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges. Nnoitra has no seat.
 
 ---
 
@@ -90,12 +90,22 @@ A play still has to name a zone ([27](27-craft-mode-stamina.md)). The “next ca
 | id | Cost | Effect |
 |---|---:|---|
 | `sk_ease_draw` | **1** | The next card played into a zone costs **1** less stamina, floor **0**. Then draw **1** |
-| `sk_scrap_breath` | **0** | Discard **1** other card from hand. If that discard happens, stamina **+1** |
+| `sk_scrap_breath` | **0** | Discard **1** other card from hand. If that discard happens, stamina **+1** (AP). **scrap_breath A** |
 | `sk_heavy_draw` | **1** | The next card played into a zone contributes **×1.5** stats, each stat rounded half away from zero. Tags stay as printed. Then draw **1** |
 
 Draw **1** uses the draw pile. A short pile shuffles discard into draw, then continues. An empty deck after that shuffle draws **0**.
 
-`sk_scrap_breath` leaves the hand before its discard. The discarded card is a different card. An empty remaining hand discards nothing and does not gain stamina. This is the one cost-**0** card in the draft. The Later line in `27` (no 0-cost catalog) stays for every other card.
+**scrap_breath A** (Jonathan, 2026-10-27/29). `sk_scrap_breath` costs **0**. Discard **1** other card from hand. If that discard happens, stamina **+1** (AP). The skill leaves the hand before that discard. The discarded card is a different card. After it leaves, the remaining other cards:
+
+| Remaining other cards | Result |
+|---|---|
+| **0** | Discard nothing. No stamina gain. Already stamped |
+| **Exactly 1** | That card is discarded automatically, then stamina **+1** |
+| **2 or more** | The **player picks one other card**, then stamina **+1** |
+
+Soft Count for the pick path is Soft-visible (the player chooses among the remaining hand cards; **+1** AP after the pick).
+
+This is the one cost-**0** card in the draft. The Later line in `27` (no 0-cost catalog) stays for every other card. This letter does not reopen letter A (tagged). It does not open a 0-cost catalog.
 
 `sk_heavy_draw` examples: hemp HP **1** → **2**, DEF **1** → **2**. Ember ATK **2** → **3**, RES **−1** → **−2**. Wool MOB **−1** → **−2**. Heavy (`mat_ench_heavy`) still doubles tags. This skill does not.
 
@@ -105,7 +115,7 @@ Draw **1** uses the draw pile. A short pile shuffles discard into draw, then con
 
 ## Letters (locked)
 
-Jonathan locked **A B C′ D′ E F G** (Aizen Soft amend). Silence is not a letter. The text under each letter is the lock.
+Jonathan locked **A B C′ D′ E F G** (Aizen Soft amend). Silence is not a letter. The text under each letter is the lock. **scrap_breath A** is the discard on `sk_scrap_breath`, written above. It is not letter A.
 
 ### A. What “tagged” means
 
@@ -126,7 +136,7 @@ Jonathan locked **A B C′ D′ E F G** (Aizen Soft amend). Silence is not a let
 | 3 | `mat_iron_scrap` | tagged | Metal | Metal |
 | 4–7 | `mat_hemp_plain` ×4 | no-tag | *(withheld)* | Stats only. HP 1, DEF 1, play cost 1 |
 | 8 | `sk_ease_draw` | skill | — | Next-card −1, draw 1 |
-| 9 | `sk_scrap_breath` | skill | — | Discard 1, +1 stamina |
+| 9 | `sk_scrap_breath` | skill | — | Discard 1 other, +1 stamina if that discard happens |
 | 10 | `sk_heavy_draw` | skill | — | Next-card ×1.5 stats, draw 1 |
 
 One copy of a tagged mat reaches a **≥ 3** ladder by cycling discard → reshuffle inside the session ([27](27-craft-mode-stamina.md)), and by later buys of the same id. The starter deck does not re-roll to print three Embers.
@@ -352,4 +362,4 @@ No new Required key in [20](20-harness-stamp.md). When a Client follows the stam
 
 ## Holds
 
-Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card.
+Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card. This amend does not edit that card, Soft chrome, or the Client #95 wire.

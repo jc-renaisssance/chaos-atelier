@@ -85,7 +85,7 @@ Skills manipulate the craft session (costs, converts, doubles, digs), then leave
 - **Stamina 0 ≠ finish.** When stamina hits 0 the session **stays open**. Hand / draw / discard stay. Cards do **not** vanish. The resolver does **not** run.
 - **Only Finish** (player click) ends the **whole** session and proceeds to resolve. Phase-1 legal end = **Finish only** — `finish_reason: player_finish` (`20`).
 - **One Finish** → resolve **each zone’s piece** in **order-listed sequence**. Still **one harness stamp per piece** for Test. No auto-finish on stamina 0.
-- **0-cost cards** and further **owner abilities** that could still fire at 0 stamina = **Later**. Do not invent a catalog this stamp. The one draft exception is `sk_scrap_breath` at cost **0** in [39](39-starter-deck.md). It does not open a 0-cost catalog.
+- **0-cost cards** and further **owner abilities** that could still fire at 0 stamina = **Later**. Do not invent a catalog this stamp. The one draft exception is `sk_scrap_breath` at cost **0** in [39](39-starter-deck.md) (**scrap_breath A**). Discard **1** other card from hand. If that discard happens, stamina **+1** (AP). After it leaves the hand: **0** remaining discards nothing and gains no stamina; **exactly 1** discards that card, then **+1**; **2 or more**, the player picks one other card, then **+1**. It does not open a 0-cost catalog.
 - **Supersedes** any `27` / `20` rule that auto-finishes on `stamina_0` / `finish_reason: stamina_0` as the craft-end trigger. If a dump still carries `stamina_0`, it is a **session state flag** (`stamina_remaining == 0`) — **not** auto-craft.
 - **Supersedes** sequential multi-piece: N stamina pools, N enter-craft, resolve N before starting N+1.
 
