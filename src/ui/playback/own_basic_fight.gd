@@ -143,7 +143,7 @@ static func _numbers(bag: Dictionary, pieces: Array) -> Dictionary:
 	elif soft >= 3:
 		heal = 2
 	if not skip and fire >= 1 and soft >= 1:
-		heal = heal // 2
+		heal = heal / 2
 	var adv_first := silk >= 3
 	if not skip and metal >= 3 and silk >= 3:
 		adv_first = false
@@ -253,7 +253,7 @@ static func _tick(rows: Array, state: Dictionary, unit: String, tick_plus: bool)
 	_row(rows, "counter", slot, "Counter %d → %d" % [stacks, stacks - 1])
 	if unit != "foe" or not bool(state["fire_applied"]):
 		return
-	var leech := dmg // 2
+	var leech := dmg / 2
 	if leech < 1:
 		return
 	var adv_before := int(state["adv_hp"])

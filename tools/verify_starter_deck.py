@@ -460,7 +460,7 @@ def check_source() -> None:
     ):
         if blurb not in catalog:
             fail(f"catalog missing Soft skill sentence: {blurb}")
-    if "(mag + 1) // 2" not in catalog:
+    if "(mag + 1) / 2" not in catalog:
         fail("heavy draw must round half away from zero")
     chrome = read(SRC / "ui" / "player_chrome.gd")
     for blurb in (

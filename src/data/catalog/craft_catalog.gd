@@ -164,7 +164,7 @@ static func tags_for_played(card: PlayedCard) -> PackedStringArray:
 ## n × 1.5, half away from zero (docs/39 sk_heavy_draw). 1 → 2, 2 → 3, −1 → −2.
 static func scale_half_away(n: int) -> int:
 	var mag := absi(n * 3)
-	var rounded := (mag + 1) // 2
+	var rounded := (mag + 1) / 2
 	if n < 0:
 		return -rounded
 	return rounded
