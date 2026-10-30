@@ -13,6 +13,7 @@ const RESERVED_FINAL_DAY_COUNT := 2 ## last 2 of N; player assigns D1..(N-2)
 const PRIMARY_ACTIONS_PER_DAY := 1
 
 ## docs/27 — stamina craft (replaces 2m1r). One session pool: start = 12 * N.
+## docs/39 lock 3: AP and stamina are this meter. No second action meter.
 const STAMINA_START := 12 ## per-piece base; session stamina_start = 12 * piece_count
 const ZONE_COUNT_MAX := 4 ## unused zones hidden if N < 4; N > 4 = Later / split
 const HAND_SIZE := 5
@@ -49,7 +50,7 @@ const BOSS_POOLS := {
 	3: ["boss_gilded_warden", "boss_ivory_judge", "boss_sunspear_captain"],
 }
 
-## docs/27 draft owner skills — costs only, no effects.
+## docs/27 market skills stay cost-only. docs/39 starter skills are 1 / 0 / 1.
 const OWNER_SKILL_DRAFT_COSTS := {
 	"sk_next_mat_free": 1,
 	"sk_metal_str_double": 2,
@@ -57,6 +58,9 @@ const OWNER_SKILL_DRAFT_COSTS := {
 	"sk_touch_up": 1,
 	"sk_deep_dig": 3,
 	"sk_steady_hand": 1,
+	"sk_ease_draw": 1,
+	"sk_scrap_breath": 0,
+	"sk_heavy_draw": 1,
 }
 
 ## docs/25 formula. docs/33 gate table — not scaled by CHAPTER_DAY_COUNT.

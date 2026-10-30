@@ -296,7 +296,7 @@ func _bind_tag_chips(next: HandCard) -> void:
 		child.free()
 	var show := false
 	if next != null and next.type != GameEnums.HandCardType.SKILL:
-		var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_of(next.id, next.type))
+		var chips := PlannerChipArt.make_card_chips(CraftCatalog.tags_for_card(next))
 		var step := PlannerChipArt.CARD_PX + PlannerChipArt.CARD_GAP
 		for i in chips.size():
 			var chip := chips[i]
@@ -318,7 +318,7 @@ func _caption_for(next: HandCard, next_cost: int) -> String:
 			return "skill\n%s" % cost_line
 		return "skill · %s\n%s" % [blurb, cost_line]
 	var kind := GameEnums.hand_card_type_wire(next.type)
-	var words := PlannerChipArt.tags_without_chip(CraftCatalog.tags_of(next.id, next.type))
+	var words := PlannerChipArt.tags_without_chip(CraftCatalog.tags_for_card(next))
 	var head := kind
 	if not words.is_empty():
 		head = "%s · %s" % [kind, ", ".join(words)]

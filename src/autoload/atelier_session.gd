@@ -10,6 +10,8 @@ signal craft_changed
 signal piece_finished(result: Dictionary)
 signal craft_order_finished
 
+const OwnBasicFight := preload("res://src/ui/playback/own_basic_fight.gd")
+
 ## docs/22 + docs/33 — decline −1 once / chapter. Gate is GameConstants.reps_gate_for.
 const DECLINE_REPS_STUB := -1
 
@@ -34,6 +36,12 @@ var craft_session: CraftStaminaSession
 var craft_open: bool = false
 var order_craft_done: bool = false
 var next_mat_free: bool = false
+## docs/39. Next zone play costs 1 less (floor 0). Not dig. Cleared when that card resolves, or the session ends.
+var next_cost_less: int = 0
+## docs/39 sk_heavy_draw. Next zone play contributes ×1.5 stats. Tags stay as printed.
+var next_stat_heavy: bool = false
+## docs/39 scrap_breath A. True while the player still has to pick one other card.
+var scrap_pick_open: bool = false
 var last_piece_result: Dictionary = {}
 var piece_results: Array = []
 var piece_stamps: Array = []
@@ -216,6 +224,9 @@ func _reset_craft_state() -> void:
 	craft_open = false
 	order_craft_done = false
 	next_mat_free = false
+	next_cost_less = 0
+	next_stat_heavy = false
+	scrap_pick_open = false
 	last_piece_result = {}
 	piece_results.clear()
 	piece_stamps.clear()
@@ -404,6 +415,9 @@ func _begin_craft(order: ClientOrder) -> bool:
 	last_piece_result = {}
 	order_craft_done = false
 	next_mat_free = false
+	next_cost_less = 0
+	next_stat_heavy = false
+	scrap_pick_open = false
 	craft_open = true
 	resolve_open = false
 	planned_build = null
@@ -417,6 +431,9 @@ func _begin_craft(order: ClientOrder) -> bool:
 
 func _open_session() -> void:
 	next_mat_free = false
+	next_cost_less = 0
+	next_stat_heavy = false
+	scrap_pick_open = false
 	craft_session = craft_order.open_session()
 	_apply_session_kit(craft_session)
 	CraftRules.opening_draw(craft_session, stock, rng)
@@ -451,15 +468,26 @@ func select_zone(zone_index: int) -> bool:
 
 
 func play_hand(hand_index: int, zone_index: int = 0) -> bool:
-	if not craft_open or craft_session == null or order_craft_done:
+	if not craft_open or craft_session == null or order_craft_done or scrap_pick_open:
 		return false
 	var target := zone_index if zone_index > 0 else craft_session.selected_zone_index
 	if not craft_session.is_legal_zone(target):
 		return false
-	var out := CraftRules.play(craft_session, hand_index, next_mat_free, target)
+	var out := CraftRules.play(
+		craft_session,
+		hand_index,
+		next_mat_free,
+		target,
+		next_cost_less,
+		next_stat_heavy,
+		rng
+	)
 	if not bool(out.get("ok", false)):
 		return false
 	next_mat_free = bool(out.get("next_mat_free", false))
+	next_cost_less = int(out.get("next_cost_less", 0))
+	next_stat_heavy = bool(out.get("next_stat_heavy", false))
+	scrap_pick_open = bool(out.get("scrap_pick", false))
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
@@ -475,12 +503,26 @@ func play_hand(hand_index: int, zone_index: int = 0) -> bool:
 	return true
 
 
+func pick_scrap(hand_index: int) -> bool:
+	## scrap_breath A: the player names one other card. That card is discarded, then stamina +1.
+	if not scrap_pick_open or not craft_open or craft_session == null or order_craft_done:
+		return false
+	if not CraftRules.discard_scrap_other(craft_session, hand_index):
+		return false
+	scrap_pick_open = false
+	last_stamp = _make_craft_stamp()
+	craft_changed.emit()
+	return true
+
+
 func dig() -> bool:
 	if not craft_open or craft_session == null or order_craft_done:
 		return false
 	var out := CraftRules.dig(craft_session, stock, rng)
 	if not bool(out.get("ok", false)):
 		return false
+	## Dig is not the scrap discard. A dump that is not that one card grants no +1.
+	scrap_pick_open = false
 	last_stamp = _make_craft_stamp()
 	## Stamina 0 does not finish. Only Finish (finish_early) crafts.
 	if craft_session.is_finished():
@@ -501,6 +543,7 @@ func finish_early() -> bool:
 		return false
 	if not CraftRules.early_finish(craft_session):
 		return false
+	scrap_pick_open = false
 	_resolve_session()
 	return true
 
@@ -698,6 +741,10 @@ func _fight_card_for(mission: Dictionary) -> Dictionary:
 
 
 func _rows_for_fight(mission: Dictionary) -> Array:
+	## docs/39 kits on the one combined fight. Vignettes stay PlaybackBeats.vignette.
+	## No kit live → the shipped Surface A fight. Gate A / N=2 one fight stays.
+	if OwnBasicFight.kits_live(piece_results):
+		return OwnBasicFight.build(piece_results)
 	var actor: Variant = _playback_actor_id()
 	var person := PlaybackBeats.open_person_label(actor, _appt_label())
 	var threat_id := _playback_threat_id()
@@ -2100,12 +2147,15 @@ func _write_run_save() -> void:
 		for card in stock.cards:
 			if card == null:
 				continue
-			cards.append({
+			var row := {
 				"id": card.id,
 				"type": GameEnums.hand_card_type_wire(card.type),
 				"mat_enchant_id": card.mat_enchant_id,
 				"shiny": card.shiny,
-			})
+			}
+			if not card.starter_role.is_empty():
+				row["starter_role"] = card.starter_role
+			cards.append(row)
 	var payload := {
 		"run_id": run_id,
 		"chapter_seed": chapter_seed,
@@ -2214,7 +2264,8 @@ func _load_run_save() -> bool:
 				String(row.get("id", "")),
 				_card_type_from_wire(String(row.get("type", "material"))),
 				String(row.get("mat_enchant_id", "")),
-				bool(row.get("shiny", false))
+				bool(row.get("shiny", false)),
+				String(row.get("starter_role", ""))
 			))
 	board = ChapterSchedule.make_empty(chapter_id)
 	board.begin_live(String(data.get("chapter_boss_id", "")), String(data.get("boss_pool_id", "")))

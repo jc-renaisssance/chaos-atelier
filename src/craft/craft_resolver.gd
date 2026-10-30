@@ -84,9 +84,10 @@ static func tag_counts(
 		var copies := 1
 		if card.type == GameEnums.HandCardType.MATERIAL:
 			copies = CraftCatalog.tag_copies(card.mat_enchant_id)
-		_add_tags(bag, CraftCatalog.tags_of(card.id, card.type))
+		var played_tags := CraftCatalog.tags_for_played(card)
+		_add_tags(bag, played_tags)
 		if copies > 1:
-			_add_tags(bag, CraftCatalog.tags_of(card.id, card.type))
+			_add_tags(bag, played_tags)
 	return bag
 
 
@@ -220,9 +221,12 @@ static func resolve(
 		var copies := 1
 		if card.type == GameEnums.HandCardType.MATERIAL:
 			copies = CraftCatalog.tag_copies(card.mat_enchant_id)
-		stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
+		var bag_stats := CraftCatalog.stat_bag(card.id, card.type)
+		if card.stat_one_and_half:
+			bag_stats = CraftCatalog.scaled_stat_bag(bag_stats)
+		stats.add_bag(bag_stats)
 		if copies > 1:
-			stats.add_bag(CraftCatalog.stat_bag(card.id, card.type))
+			stats.add_bag(bag_stats)
 	var played_n := zone_played.size()
 	return {
 		"tag_counts": bag,

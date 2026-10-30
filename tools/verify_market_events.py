@@ -692,9 +692,10 @@ def check_formulas() -> None:
         fail("heavy doubles $")
     if 12 - 2 < 0 or 12 - 3 < 0:
         fail("start gold must afford one enchant")
-    mats = 8
-    if mats - 5 < 3:
-        fail("starter 8 materials allows 5 sells before floor 3")
+    # docs/39 starter deck: 3 tagged + 4 no-tag mats. The 3 skills are not materials.
+    mats = 7
+    if mats - 4 < 3:
+        fail("starter 7 materials allows 4 sells before floor 3")
     # event pay-gold illegal when short
     if not (1 > 0):
         fail("choice_buy_scrap costs 1")
