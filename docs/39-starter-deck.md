@@ -2,6 +2,8 @@
 
 **Doc id: `39`.** **Status: Stamped A B C′ D′ E F G** (Jonathan, Aizen Soft amend). Written off tip **`d51d47e`** (Soft chrome #91). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire.
 
+**`sk_scrap_breath` A** is stamped (Jonathan, 2026-10-27/29), written off tip **`0675d2c`**. The discard after that skill leaves the hand is the lock in the starter-skills section. Letters A B C′ D′ E F G stay the deck and kit stamp. The kit Soft PASS bar stays.
+
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
 Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height is a parallel open card: [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92), doc id **38**, `docs/38-solenne-height-body.md`, tip `14482e1`. Soft PASS on that card is waiting on Jonathan’s Height A|B. This file does not edit that law, posture art, or PR #71.
@@ -90,12 +92,34 @@ A play still has to name a zone ([27](27-craft-mode-stamina.md)). The “next ca
 | id | Cost | Effect |
 |---|---:|---|
 | `sk_ease_draw` | **1** | The next card played into a zone costs **1** less stamina, floor **0**. Then draw **1** |
-| `sk_scrap_breath` | **0** | Discard **1** other card from hand. If that discard happens, stamina **+1** |
+| `sk_scrap_breath` | **0** | Letter **A**. After this card leaves: **2+** others, the player picks **1**, discard, stamina **+1**. **1** other: discard it, then stamina **+1**. **0**: no discard, no gain |
 | `sk_heavy_draw` | **1** | The next card played into a zone contributes **×1.5** stats, each stat rounded half away from zero. Tags stay as printed. Then draw **1** |
 
 Draw **1** uses the draw pile. A short pile shuffles discard into draw, then continues. An empty deck after that shuffle draws **0**.
 
-`sk_scrap_breath` leaves the hand before its discard. The discarded card is a different card. An empty remaining hand discards nothing and does not gain stamina. This is the one cost-**0** card in the draft. The Later line in `27` (no 0-cost catalog) stays for every other card.
+### `sk_scrap_breath` A
+
+**Locked.** Jonathan, 2026-10-27/29. The skill leaves the hand first. The discard, when there is one, is a different card still in hand. Stamina and AP are the one meter in lock 3. A gain is stamina **+1**.
+
+| Other cards still in hand | Lock |
+|---|---|
+| **2 or more** | The player picks **one** of them. Discard that card. Stamina **+1** |
+| **Exactly 1** | Discard that card. Then stamina **+1**. Existing tip |
+| **0** | Discard nothing. No stamina gain. Already stamped |
+
+The pick is one card from the hand that remains. Cost stays **0**. This is the one cost-**0** card in the draft. The Later line in `27` (no 0-cost catalog) stays for every other card.
+
+#### Soft Count
+
+Count the other cards after `sk_scrap_breath` leaves. The opening hand is **5**.
+
+| Hand at play | Others after the skill leaves | Row | What the count shows |
+|---|---:|---|---|
+| Opening hand of **5**: this skill and **4** others | **4** | **2 or more** | The player picks one of the four. Discard that card. Stamina **+1** |
+| This skill and **exactly 1** other | **1** | **Exactly 1** | That card is discarded. No pick. Stamina **+1** |
+| This skill alone | **0** | **0** | Discard nothing. No stamina gain |
+
+**4** is the 2+ row, so an opening hand of 5 that holds this skill and four others requires a pick. **1** is the auto row. **0** gains nothing.
 
 `sk_heavy_draw` examples: hemp HP **1** → **2**, DEF **1** → **2**. Ember ATK **2** → **3**, RES **−1** → **−2**. Wool MOB **−1** → **−2**. Heavy (`mat_ench_heavy`) still doubles tags. This skill does not.
 
@@ -126,7 +150,7 @@ Jonathan locked **A B C′ D′ E F G** (Aizen Soft amend). Silence is not a let
 | 3 | `mat_iron_scrap` | tagged | Metal | Metal |
 | 4–7 | `mat_hemp_plain` ×4 | no-tag | *(withheld)* | Stats only. HP 1, DEF 1, play cost 1 |
 | 8 | `sk_ease_draw` | skill | — | Next-card −1, draw 1 |
-| 9 | `sk_scrap_breath` | skill | — | Discard 1, +1 stamina |
+| 9 | `sk_scrap_breath` | skill | — | A: pick among 2+; auto the one; empty gains nothing |
 | 10 | `sk_heavy_draw` | skill | — | Next-card ×1.5 stats, draw 1 |
 
 One copy of a tagged mat reaches a **≥ 3** ladder by cycling discard → reshuffle inside the session ([27](27-craft-mode-stamina.md)), and by later buys of the same id. The starter deck does not re-roll to print three Embers.
@@ -352,4 +376,4 @@ No new Required key in [20](20-harness-stamp.md). When a Client follows the stam
 
 ## Holds
 
-Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card.
+Soft QC is next on the kit PASS bar. `sk_scrap_breath` **A** is counted in the starter-skills section. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card.
