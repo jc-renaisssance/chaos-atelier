@@ -4,7 +4,7 @@
 
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
-Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height is a parallel open card: [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92), doc id **38**, `docs/38-solenne-height-body.md`, tip `14482e1`. Soft PASS on that card is waiting on Jonathan’s Height A|B. This file does not edit that law, posture art, or PR #71.
+Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92) owns doc id **38** (`docs/38-solenne-height-body.md`) and is **stamped height-split** (Soft Design PASS). This file does not edit that law, posture art, or PR #71.
 
 Ulquiorra and Szayelaporro **hold** the Client until Soft QC PASS and Aizen’s re-stamp brief. C′ and D′ changed the letters, so that brief is the Client gate. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges. Nnoitra has no seat.
 
@@ -362,4 +362,4 @@ No new Required key in [20](20-harness-stamp.md). When a Client follows the stam
 
 ## Holds
 
-Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 stays a parallel card. This amend does not edit that card, Soft chrome, or the Client #95 wire.
+Soft QC is next. Ulquiorra holds the Client. Szayelaporro holds smoke. Both wait for Soft QC PASS and Aizen’s re-stamp brief, because C′ and D′ changed the letters. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges. Nnoitra has no seat. No gens. #71 Solenne ×4 stays **HOLD** until **2026-11-02**. Halden + Vex **KEEP**. Shop **ACCEPT**. Posture art stays **Nov 2**. Soft height #92 / doc id 38 is **stamped height-split** beside this card. This amend does not reopen that letter, Soft chrome, or the Client #95 wire.

@@ -4,7 +4,7 @@
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Ids unchanged (`boss_client_id`, `con_*`, `appt_*`, `adv_*`). Scrap Duelist stays `appt_*`.
 
-Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). The letter tables below are the law. Do not reopen playback. The fight’s Soft PASS bar (burn chip, HP tick, burn-stack counter with no ceiling, ascend, heal pop, Fire-apex survive charge) is [39](39-starter-deck.md) (stamped A B C′ D′ E F G). It sits on the one combined fight. It does not move Gate, Surface, or Socket.
+Slices **1–3** are **LOCKED** (Design-then-Client, on `dev`). Slice **4** **Client shipped** (docs #69 / Client #70) — battle playback + posture sockets. Gate **A**, Surface **A**, Socket **A**. Sockets shipped. Posture art stays **Later** (**Nov 2**). Solenne height / body is **stamped height-split** in [38](38-solenne-height-body.md) (Soft #92 Soft Design PASS). #71 Solenne ×4 stays **HOLD**. Halden + Vex **KEEP**. The letter tables below are the law. Do not reopen playback. Do not open a gen. The fight’s Soft PASS bar (burn chip, HP tick, burn-stack counter with no ceiling, ascend, heal pop, Fire-apex survive charge) is [39](39-starter-deck.md) (stamped A B C′ D′ E F G). It sits on the one combined fight. It does not move Gate, Surface, or Socket.
 
 **Shell (2026-10-23):** player chrome for slices 1–3, and the playback frame, is [34](34-ui-shell-v1.md) (**shipped**, Design #76 / Client #77, stamp **A A B**). Slice rules, unlock, estimate knobs, and Gate / Surface / Socket **A** do not move. Bust **A** supersedes this file’s “do not show portraits” line on the order panel only. Planner chips are icons ([35](35-steam-demo-cut.md)). Beat-row words a player reads are [37](37-player-facing-chrome.md). Gate / Surface / Socket stay **A**. Do not reopen playback.
 
@@ -269,7 +269,7 @@ On boss beat: `threat_id == chapter_boss_id` (`20` assert 23) even if the catalo
 
 **Status:** **Closed** on the Client (docs #69 / Client #70, `f083b09`). Sockets shipped (placeholders). Posture art **Later** — **Nov 2**. Not an open Design. Slices **1–3** stay locked (unlock key, cross-run `unlocked_builds`, estimate weights, S–F cutoffs). This section does not retune stats or events.
 
-**Law (Client #70: Gate A, Surface A, Socket A).** Posture art stays **Nov 2**. Other letters stay on the [STAMP](STAMP.md) card as the ask. Do not reopen playback.
+**Law (Client #70: Gate A, Surface A, Socket A).** Posture art stays **Nov 2**. Other letters stay on the [STAMP](STAMP.md) card as the ask. Do not reopen playback. Solenne’s 96 bust is not her height. Height and body are [38](38-solenne-height-body.md). #71 Solenne ×4 stays **HOLD** until **2026-11-02** and until that gate. Halden KEEP `12f50ee`. Vex KEEP `2cb74a4`. This section does not burn.
 
 After a player **Finish** that already runs the mission resolver, Client plays a short deterministic timeline, then shows the mission report ([23](23-mission-report.md)). The timeline displays the stamp the resolver just returned. It does not run a second fight.
 
@@ -367,7 +367,7 @@ This PR stamps the socket and the playback law only. It does not gen.
 
 Write **A** or **B**. Silence is not **B**. Design recommends **B**. Client may ship placeholders either way. Writing **B** does not block the Client wire. Writing **A** does not pull gens ahead of that wire. If Decision 3 is **C**, there are no files to gen — write art **B**.
 
-Stance lines above are the socket contract. They are not a PixelLab prompt batch. A gen PR, if art is **A**, still passes Harribel before any burn. Subject of each still is that named person from the landed bust, full figure at 64, transparent ground, no text, no card frame, no second face.
+Stance lines above are the socket contract. They are not a PixelLab prompt batch. A gen PR, if art is **A**, still passes Harribel before any burn. Subject of each still is that named person from the landed bust, full figure at 64, transparent ground, no text, no card frame, no second face. For Solenne, that bust is not the height lock. The height lock is [38](38-solenne-height-body.md).
 
 ### Client needs
 
