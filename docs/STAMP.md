@@ -1194,3 +1194,47 @@ The Soft letter is answered. **height-split.** Soft Design **PASS**.
 ## Stamp
 
 **height-split.** Posture arts follow Halden / Vex **64×64** scale. Full-body front + back use real character settings (**cm / kg**), not the KEEP head-count / chibi bar. Height A / B stamp card dropped. Soft Design **PASS**. Aizen squash-merges Soft #92.
+
+The Phase A hold in this card (full-body front + back from a gen after RELEASE) is the record of Soft #92 as written. The method amend below supersedes that path. The height-split letter in this card stands.
+
+---
+
+# Jonathan stamp — 2026-11-02 (Solenne Gate 1 sheet F+B KEEP) — Soft method amend
+
+Soft method amend of [38](38-solenne-height-body.md). Docs only. Written off tip **`c4f5794`**. **Doc id 38.** Height-split letter stays locked (Jonathan 2026-10-27, Soft #92). Height A / B stamp card stays **dropped**. Jonathan **ACCEPT** Solenne Gate 1 sheet F+B KEEP (2026-11-02, via Nnoitra). Soft Design **PASS**. No `src/`. No assets. No PixelLab. No gens. No #71 png edits. Soft chrome **Node A′ · Brief A · Event A**, Soft A′AAAA, tag chrome **A**, IO4 Gate / Surface / Socket **A**, and starter-deck **A B C′ D′ E F G · scrap_breath A** stay landed. Do not reopen them. Mechanism review stays parked.
+
+F+B KEEP is Jonathan’s authored Front+Back sheet (box path `/workspace/solenne-gate1/jonathan_fb_reference.png`, jonathan_front / jonathan_back). Soft QC on that sheet is **Soft PASS** adult-not-chibi vs Soft #92. PixelLab is for posture assets only, after sheet ACCEPT, this Soft Design PASS, Aizen squash-merge, Harribel Gate 2 soft-clear, and Aizen RELEASE.
+
+## 1. Files
+
+| File | Section |
+|---|---|
+| `docs/38-solenne-height-body.md` | Method and phase order. Height-split Soft letter unchanged. No Height A / B stamp card |
+| `docs/05-art.md` | Pointer. Gate 1 sheet KEEP. No gens |
+| `docs/pm/phase-1-plan.md` | Live gate. ×4 stays **HOLD**. PixelLab starts at Gate 2 postures |
+| `docs/README.md` · `docs/STAMP.md` | Index and this card |
+
+`29` is read-only. This PR does not edit it.
+
+## 2. Decisions
+
+1. **Height-split — still locked.** Jonathan, 2026-10-27. No A/B reopen.
+   - **Posture arts** follow Halden / Vex **64×64** scale.
+   - **Full-body front + back** use real character settings (**cm / kg**), not the KEEP head-count / chibi bar.
+2. **Gate 1 F+B — sheet KEEP.** Jonathan’s authored Front+Back sheet. Soft QC **Soft PASS** adult-not-chibi vs Soft #92. Jonathan ACCEPT 2026-11-02. Phase A F+B deliverable. `create_character_pro_flash` F+B gens are not this deliverable. Bust-extend is not this deliverable.
+3. **PixelLab F+B gens — parked.** `e88c2732` and `6bac40b5`. Not Soft stamp targets. Not the F+B KEEP.
+4. **Gate 2 postures — after RELEASE.** `create_character_pro_flash` at **64×64**, `style_image` = the accepted Jonathan F+B sheet (style-from-sheet), Soft #92 **cm / kg** as applicable for body. That call produces the `character_id`. Then **in_shop** to Jonathan art-style ACCEPT. Then `create_character_state` **×4** remaining states from that same `character_id`. Facing rules from #71 unchanged.
+
+## 3. Questions
+
+None.
+
+## 4. Blockers
+
+The height-split letter is already answered. This method amend is the Gate path. Soft Design **PASS**.
+
+**Holds.** Ulquiorra, Nnoitra, and Szayelaporro hold gens until Aizen RELEASE (squash-merge of this amend, then Harribel Gate 2 soft-clear, then RELEASE). PixelLab starts at posture / `character_id` after that RELEASE. #71 Solenne ×4 stays **HOLD**. Halden + Vex **KEEP**. Shop ACCEPT stays the record of that pass and does not skip the next in_shop. No gens in this PR. No `src/` in this PR. The chrome Client is a separate hold. This card does not release it.
+
+## Stamp
+
+**Height-split stands. Gate 1 F+B is Jonathan’s sheet KEEP. PixelLab F+B gens stay parked. Gate 2 postures are style-from-sheet after RELEASE.** Soft Design **PASS**. Aizen squash-merges.
