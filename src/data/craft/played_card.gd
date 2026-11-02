@@ -12,6 +12,11 @@ extends Resource
 @export var starter_role: String = ""
 ## docs/39 sk_heavy_draw. Next zone play contributes ×1.5 stats. Tags stay printed.
 @export var stat_one_and_half: bool = false
+## Deterministic production effects for the six market skills.
+@export var double_atk: bool = false
+@export var stat_bonus_key: String = ""
+@export var tag_pip_bonus: Dictionary = {}
+@export var suppressed_tags: PackedStringArray = PackedStringArray()
 
 
 func to_dict() -> Dictionary:
@@ -25,6 +30,18 @@ func to_dict() -> Dictionary:
 	if not mat_enchant_id.is_empty():
 		out["mat_enchant_id"] = mat_enchant_id
 		out["shiny"] = true
+	if not starter_role.is_empty():
+		out["starter_role"] = starter_role
+	if stat_one_and_half:
+		out["stat_one_and_half"] = true
+	if double_atk:
+		out["double_atk"] = true
+	if not stat_bonus_key.is_empty():
+		out["stat_bonus_key"] = stat_bonus_key
+	if not tag_pip_bonus.is_empty():
+		out["tag_pip_bonus"] = tag_pip_bonus.duplicate()
+	if not suppressed_tags.is_empty():
+		out["suppressed_tags"] = Array(suppressed_tags)
 	return out
 
 

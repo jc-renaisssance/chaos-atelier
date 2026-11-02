@@ -1,15 +1,17 @@
 class_name MapCatalog
 extends RefCounted
 ## Map settings for the route graph (docs/22, docs/20).
-## Day count is per-map — not global law. Current map = 8.
-## M1 panel = type + id only. No display titles this stamp.
+## Day count is per-map — not global law. Both demo and regression maps = 8.
+## map_m1 stays available for historical regression. Live Steam-demo runs use map_m2_demo.
 
-const CURRENT_MAP_ID := "map_m1"
+const M1_MAP_ID := "map_m1"
+const M2_DEMO_MAP_ID := "map_m2_demo"
+const CURRENT_MAP_ID := M2_DEMO_MAP_ID
 const NODE_KINDS := ["shop", "adventurer", "appointment", "event", "reserved"]
 const START_NODE_ID := "N1"
 const BIND_COMBO_MARKET := "combo_market"
 
-## Current-map graph LOCKED (docs/22). Later maps stamp their own nodes + edges + day_count.
+## The M2 demo preserves the stamped graph topology and changes only adventurer refs.
 const MAPS := {
 	"map_m1": {
 		"map_id": "map_m1",
@@ -29,6 +31,58 @@ const MAPS := {
 			{"node_id": "N12", "day_index": 5, "kind": "shop"},
 			{"node_id": "N13", "day_index": 5, "kind": "adventurer", "ref_id": "adv_quill_lumen"},
 			{"node_id": "N14", "day_index": 6, "kind": "adventurer", "ref_id": "adv_kite_thornreel"},
+			{"node_id": "N15", "day_index": 6, "kind": "shop"},
+			{"node_id": "N16", "day_index": 5, "kind": "shop"},
+			{"node_id": "N17", "day_index": 6, "kind": "event", "ref_id": "evt_c1_salt_spray"},
+			{"node_id": "R7", "day_index": 7, "kind": "reserved"},
+			{"node_id": "R8", "day_index": 8, "kind": "reserved"},
+		],
+		"edges": [
+			{"from": "N1", "to": "N2"},
+			{"from": "N1", "to": "N3"},
+			{"from": "N1", "to": "N4"},
+			{"from": "N2", "to": "N5"},
+			{"from": "N3", "to": "N5"},
+			{"from": "N3", "to": "N6"},
+			{"from": "N4", "to": "N6"},
+			{"from": "N5", "to": "N7"},
+			{"from": "N5", "to": "N10"},
+			{"from": "N5", "to": "N11"},
+			{"from": "N6", "to": "N7"},
+			{"from": "N6", "to": "N11"},
+			{"from": "N7", "to": "N8"},
+			{"from": "N8", "to": "N9"},
+			{"from": "N10", "to": "N12"},
+			{"from": "N10", "to": "N13"},
+			{"from": "N12", "to": "N14"},
+			{"from": "N13", "to": "N15"},
+			{"from": "N11", "to": "N16"},
+			{"from": "N16", "to": "N17"},
+			{"from": "N9", "to": "R7"},
+			{"from": "N14", "to": "R7"},
+			{"from": "N15", "to": "R7"},
+			{"from": "N17", "to": "R7"},
+			{"from": "R7", "to": "R8"},
+		],
+	},
+	"map_m2_demo": {
+		"map_id": "map_m2_demo",
+		"day_count": 8,
+		"nodes": [
+			{"node_id": "N1", "day_index": 1, "kind": "adventurer", "ref_id": "adv_vesper_cant"},
+			{"node_id": "N2", "day_index": 2, "kind": "shop"},
+			{"node_id": "N3", "day_index": 2, "kind": "adventurer", "ref_id": "adv_nyx_vellum"},
+			{"node_id": "N4", "day_index": 2, "kind": "event", "ref_id": "evt_c1_heat_mirage"},
+			{"node_id": "N5", "day_index": 3, "kind": "appointment", "ref_id": "appt_scrap_duelist"},
+			{"node_id": "N6", "day_index": 3, "kind": "event", "ref_id": "evt_c1_ashfall"},
+			{"node_id": "N7", "day_index": 4, "kind": "shop", "bound_block_id": "combo_market"},
+			{"node_id": "N8", "day_index": 5, "kind": "adventurer", "ref_id": "adv_soot_cord", "bound_block_id": "combo_market"},
+			{"node_id": "N9", "day_index": 6, "kind": "adventurer", "ref_id": "adv_tar_veil", "bound_block_id": "combo_market"},
+			{"node_id": "N10", "day_index": 4, "kind": "event", "ref_id": "evt_c1_scrap_market"},
+			{"node_id": "N11", "day_index": 4, "kind": "adventurer", "ref_id": "adv_harrow_gale"},
+			{"node_id": "N12", "day_index": 5, "kind": "shop"},
+			{"node_id": "N13", "day_index": 5, "kind": "adventurer", "ref_id": "adv_aurel_vow"},
+			{"node_id": "N14", "day_index": 6, "kind": "adventurer", "ref_id": "adv_clarion_mantle"},
 			{"node_id": "N15", "day_index": 6, "kind": "shop"},
 			{"node_id": "N16", "day_index": 5, "kind": "shop"},
 			{"node_id": "N17", "day_index": 6, "kind": "event", "ref_id": "evt_c1_salt_spray"},

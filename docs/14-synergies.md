@@ -2,7 +2,7 @@
 
 Resolver input: **tag counts** + **construction id** + **craft rarity**. Output: `powers[]` (positive + negative) for the adventure sim + report, and **outlook_id** for art.
 
-> **Replaced for `own_basic` — [39](39-starter-deck.md), stamped A B C′ D′ E F G.** For `own_basic`, the monostack ladders, the report-hint quotes, and the passive effect cells below are history. Do not delete them in this pass. `own_basic` reads the kits in `39` and does not also read these passive cells. Burn has no stack cap. Survive charges come from Fire-apex pieces, once per craft. Solar, Lunar, and Occult stay in this file as history. They do not enter the starter deck.
+> **Live `own_basic` law — [40](40-item-trait-affinity.md), 2026-11-02.** Resolve `3 / 5 / 8` from authored `tag_pips` **on each item separately**. Active tier is the highest per-item tier; two partial items never combine into a tier. Only individually qualifying items contribute positive tagged stats and intensity to the scalable Fire, Soft, Earth, Metal, and Silk formulas. Values above 8 improve magnitude but do not create Tier 4. Heavy doubles that copy's pips and stat contribution. The fixed kit cells in [39](39-starter-deck.md) and the passive tables below are history for `own_basic`.
 
 ## Outlook rule (Jonathan lock)
 

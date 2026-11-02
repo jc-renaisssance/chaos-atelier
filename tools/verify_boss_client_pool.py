@@ -361,8 +361,8 @@ def run_spec() -> None:
     knight_n = len(JOBS["job_knight"]["construction_ids"])
     if knight_n != 2:
         fail("Phase-1 jobs are N=2")
-    if 12 * knight_n != 24:
-        fail("boss-client session stamina_start must be 12 * N")
+    if 8 * knight_n + 2 != 18:
+        fail("boss-client session stamina_start must be 8 * N + 2")
     dump = {
         "mission_kind": "boss",
         "chapter_boss_id": "boss_ash_drake",

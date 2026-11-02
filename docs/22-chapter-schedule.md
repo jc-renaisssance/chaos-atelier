@@ -1,6 +1,6 @@
 # Chapter route map — travelling atelier (Jonathan stamp 2026-10-13)
 
-**Status:** Route map **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). Kind faces landed ([Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20), #57–#59). **Elite telegraph shipped** (#66 / #67 / #68, Marker A, Scope A). Do not reopen. It does not add a screen.
+**Status:** Route topology **LOCKED** (Jonathan 2026-10-13). **Doc id: `22`.** Filename kept; live spine is a **hand-authored route map with forks**. Timetable board shows that graph. Product display name **Wombaste** (repo `chaos-atelier`). Ugly nodes + edges shipped Client [#41](https://github.com/jc-renaisssance/chaos-atelier/pull/41) (`144c151`). Kind faces landed ([Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20), #57–#59). **Elite telegraph shipped** (#66 / #67 / #68, Marker A, Scope A). Do not reopen. It does not add a screen. **M2 content-boundary repair (2026-11-02):** `map_m1` remains the historical regression map; live Steam-demo runs use `map_m2_demo`, the same topology with M2-only adventurer refs.
 
 **Supersedes** the free per-day **`E*` options board** from Design [#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36) / Client [#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37) (preview every windowed event per day, assign D1..(N−2) from an identical-shaped list). **Still superseded:** 2026-09-28 Round / schedule board (`CHAPTER_ROUND_COUNT=8` as global law, R1..R8, `crafts_max=4`); 1-of-3 card lineup ([22-chapter-flow](22-chapter-flow.md)).
 
@@ -23,7 +23,7 @@ Combos are **bound multi-day blocks on the graph**, not stacked modifiers the pl
 | Key | Value | Notes |
 |---|---|---|
 | Chapters per run | 3 | Unchanged |
-| Day count | **`map.day_count`** / dump **`CHAPTER_DAY_COUNT`** | **Map setting — not global law.** Current wagon map = **8**. Later maps may be **3** or **12**. |
+| Day count | **`map.day_count`** / dump **`CHAPTER_DAY_COUNT`** | **Map setting — not global law.** `map_m1` and `map_m2_demo` are both **8**. Later maps may be **3** or **12**. |
 | Piece cap / `crafts_max` | **GONE** | Unlimited pieces per chapter. Stamina per craft session **stays** ([27](27-craft-mode-stamina.md)). |
 | Boss telegraph | Chapter start | Boss announced before spend |
 | Reserved days | Last **2** relative to `N = map.day_count` | Graph days = **D1..(N−2)**. Current 8-day map: **D7** travel / final prep, **D8** boss approach. Appointments cannot claim reserved days. |
@@ -122,9 +122,27 @@ N is per map. This stamp authors **one** concrete graph for the current wagon ma
 
 ---
 
-## Sample map — C1 / current wagon (`day_count` = 8)
+## Steam-demo map boundary (2026-11-02)
 
-**Map id:** `map_m1` (C1 current wagon). Graph days **D1..D6**. **D7–D8 reserved** on every path.
+The topology, node ids, events, market positions, appointment, bind, and reserved days stay identical. Only authored adventurer refs differ.
+
+| Node | `map_m1` regression | `map_m2_demo` live |
+|---|---|---|
+| N1 | `adv_halden_rook` | `adv_vesper_cant` |
+| N3 | `adv_vex_bramble` | `adv_nyx_vellum` |
+| N8 | `adv_quill_lumen` | `adv_soot_cord` |
+| N9 | `adv_kite_thornreel` | `adv_tar_veil` |
+| N11 | `adv_tide_glass` | `adv_harrow_gale` |
+| N13 | `adv_quill_lumen` | `adv_aurel_vow` |
+| N14 | `adv_kite_thornreel` | `adv_clarion_mantle` |
+
+New runs select `map_m2_demo`. Run saves persist `map_id`; old saves without that key load `map_m1` so a historical route does not silently change cast. Test must reject an M1 `adv_*` on any `kind=adventurer` node in `map_m2_demo`.
+
+---
+
+## Sample map — C1 / M1 regression (`day_count` = 8)
+
+**Map id:** `map_m1` (historical C1 regression). `map_m2_demo` reuses this graph. Graph days **D1..D6**. **D7–D8 reserved** on every path.
 
 Locks for this sample: D1 = fixed first-customer adventurer; ≥2 forks; ≥1 bound multi-day combo; appointment = StS-elite analog; every complete path has 1–3 shops (this map lands **1 or 2**).
 
@@ -314,7 +332,7 @@ Phase-1: **one** primary action per day.
 ## Boss
 
 - Announced at chapter start (favor / punish / environment from `17`). Newspaper announces the **boss**, not the client (`26`).
-- After the day budget (including reserved last-2), **draw one adventurer from the M1 4-job pool** (`28` / `29`: Knight, Mage, Blade Dancer, Lagoon — **LOCKED** Jonathan 2026-10-08) → **craft that job’s order constructions** → that **adventurer** fights the announced boss. Sim uses **that client's gear**. Player is not the fighter (`03`, `17`, `28`). Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1.
+- After the day budget (including reserved last-2), draw one adventurer from the map’s content pool → **craft that job’s order constructions** → that **adventurer** fights the announced boss. `map_m1` regression uses M1 Knight / Mage / Blade Dancer / Lagoon. Live `map_m2_demo` uses M2 Wizard / Hexer / Outrider / Oathbound. Sim uses that adventurer's gear. Player is not the fighter (`03`, `17`, `28`).
 - Pool is **shared across all bosses / chapters**, by **job title**. Draw is **independent** of `chapter_boss_id`. Order constructions are the listed `con_*` for that job.
 - Boss fail (boss-client / adventurer dead / hard loss): **`run_over`**, no retry (Phase-1 hardcore).
 - **Appointments stay appointments.** Scrap Duelist and other mid-chapter named clients are `appt_*`. They are **not** the boss-client. Do not pin Scrap Duelist to reserved days or the boss beat. Do **not** put `appt_*` on the Dex Adventurers tab (`31`).
@@ -330,7 +348,7 @@ Docs only this stamp — sketch for the next Client PR. No `src/` here.
 2. **Day labels.** Timeline says **D1..DN** (N = `map.day_count`). Never R1. Current map N=8.
 3. **Replace the free `E*` options board** ([#36](https://github.com/jc-renaisssance/chaos-atelier/pull/36)/[#37](https://github.com/jc-renaisssance/chaos-atelier/pull/37)). Do **not** list every windowed event whose day includes today. Do **not** assign all of D1..(N−2) from that list at chapter start.
 4. **Graph board now, art Later (Nnoitra).** M1 Client ships a **simple route-graph layout** — nodes + edges, ugly — so later art / UI can plug in. **Not** a day strip that hides the map. Do not invent chrome or node art this stamp. **Shipped:** ugly layout Client #41 (`144c151`). Kind-face sockets for that layout are [Route-graph board art (2026-10-20)](#route-graph-board-art-2026-10-20). Wire them only after Jonathan stamps. Do not build a second board.
-5. **Route graph data.** Load the authored C1 map (`map_m1` nodes + edges + `combo_market`). D1 = N1. D7–D8 reserved.
+5. **Route graph data.** Live Steam demo loads `map_m2_demo`; historical regression may explicitly load `map_m1`. Both use the authored nodes + edges + `combo_market`. D1 = N1. D7–D8 reserved.
 6. **Options panel — superseded as the player path (2026-10-23).** The 2026-10-13 need was: fork or unbound remaining picks **on the current day**, 2–4 next nodes, **M1 type + id**. **Demo law:** the player commits by clicking the graph node ([Graph commit](#graph-commit-2026-10-23) at the top of this file). The FORK OPTIONS panel is not shown. **No choice → no extra control** (corridor, bind, reserved, D1, frozen past). A future draft is still a graph highlight, not a panel.
 7. **Draft future.** Player may ghost a legal unbound path. Draft is **not** a confirm. Confirm when that day is current. Do not write drafts into `route_path`.
 8. **Binds.** Entering N7 pins N8 and N9. Bound days are frozen — not drafts, not re-pickable.
@@ -350,7 +368,7 @@ Log on chapter-start (graph loaded), on each fork pick, on bind enter, and on ea
 |---|---|
 | `CHAPTER_DAY_COUNT` | = `map.day_count` (current map **8**) |
 | `day_index` / `days_left` | Live day; remaining including reserved |
-| `route_map_id` | `map_m1` on current wagon |
+| `route_map_id` | `map_m2_demo` on a live new run; `map_m1` only on explicit regression or a legacy save |
 | `route_nodes` | `{ node_id, day_index, kind, ref_id, bound_block_id }` — `ref_id` = `adv_*` / `appt_*` / `evt_*` / null. Market shelf is **not** `ref_id` — `market_bank_c1` ([32](32-shop-and-events.md)). Wire `kind=shop` = display Market |
 | `route_edges` | `{ from, to }[]` |
 | `route_path` | Node ids **confirmed**, in order (includes reserved R7/R8 once reached). Never drafts. |

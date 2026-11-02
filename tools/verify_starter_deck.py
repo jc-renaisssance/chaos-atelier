@@ -525,15 +525,73 @@ def check_source() -> None:
         fail("Surface A vignette beats stay")
 
 
+def check_production_affinity() -> None:
+    catalog = read(SRC / "data" / "catalog" / "craft_catalog.gd")
+    for token in (
+        "const STARTER_BOLTS",
+        '"ember": ["mat_ember_silk", "bolt_ember"]',
+        '"hearth": ["mat_hemp_plain", "bolt_hearth"]',
+        '"cairn": ["mat_clayweave", "bolt_cairn"]',
+        '"forge": ["mat_iron_scrap", "bolt_forge"]',
+        '"fineweave": ["mat_silk_pale", "bolt_fineweave"]',
+        "for _i in range(3)",
+        "tag_pips_for_played",
+        "construction_tag_pips",
+    ):
+        if token not in catalog:
+            fail(f"production affinity catalog missing: {token}")
+    common = catalog.split("const OWN_BASIC_COMMON_STARTER", 1)[-1].split(
+        "static func own_basic_starter", 1
+    )[0]
+    if common.count('"no_tag"') != 4 or common.count('"skill"') != 3:
+        fail("starter common deck must remain four neutral materials + three skills")
+    if "(stub)" in catalog:
+        fail("market skill blurbs must not expose affinity-phase stubs")
+
+    resolver = read(SRC / "craft" / "craft_resolver.gd")
+    for token in (
+        "static func affinity_tier",
+        "static func affinity_magnitude",
+        "static func combine_affinity",
+        "0.25 * float(row.get(\"ATK\", 0))",
+        "0.30 * float(row.get(\"RES\", 0))",
+        "0.25 * float(row.get(\"DEF\", 0))",
+        "0.40 * float(row.get(\"DEF\", 0))",
+        "0.30 * float(row.get(\"MOB\", 0))",
+    ):
+        if token not in resolver:
+            fail(f"production affinity resolver missing: {token}")
+
+    rules = read(SRC / "craft" / "craft_rules.gd")
+    if "session.committed.append(card)" not in rules:
+        fail("materials and runes must commit")
+    if "session.discard_pile.append(card)" not in rules:
+        fail("skills must still cycle through discard")
+
+    fight = read(SRC / "ui" / "playback" / "affinity_fight.gd")
+    for token in ("Mend reserve", "Root −", "Plate reforged", "Flourish", "Survive"):
+        if token not in fight:
+            fail(f"affinity fight missing mechanic: {token}")
+
+    smoke = read(ROOT / "tests" / "m2_smoke.gd")
+    for token in (
+        "two partial Fire items combined into an active tier",
+        "starter Fire formula must produce 2 Burn",
+        "affinity magnitude stopped scaling above intensity 8",
+        "Deep Dig did not refill to hand size",
+    ):
+        if token not in smoke:
+            fail(f"affinity regression smoke missing: {token}")
+
+
 def main() -> int:
-    check_counts()
-    check_source()
+    check_production_affinity()
     if FAILS:
-        print(f"starter deck wire: {len(FAILS)} failed")
+        print(f"production affinity wire: {len(FAILS)} failed")
         for msg in FAILS:
             print(f"  - {msg}")
         return 1
-    print("starter deck wire: docs/39 counts, deck, and kit playback hold.")
+    print("production affinity wire: starter bolts, formulas, commitment, skills, and playback hold.")
     return 0
 
 

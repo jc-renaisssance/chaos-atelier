@@ -18,6 +18,8 @@ const POSITIVE_TAG_ROWS := [
 	{"id": "syn_sticky_3", "tag": "Sticky", "tier": 1, "outlook_order": 40},
 	{"id": "syn_sharp_3", "tag": "Sharp", "tier": 1, "outlook_order": 45},
 	{"id": "syn_soft_3", "tag": "Soft", "tier": 1, "outlook_order": 12},
+	{"id": "syn_soft_5", "tag": "Soft", "tier": 2, "outlook_order": 13},
+	{"id": "syn_soft_8", "tag": "Soft", "tier": 3, "outlook_order": 14},
 	{"id": "syn_wild_3", "tag": "Wild", "tier": 1, "outlook_order": 60},
 	{"id": "syn_occult_3", "tag": "Occult", "tier": 1, "outlook_order": 85},
 	{"id": "syn_pure_3", "tag": "Pure", "tier": 1, "outlook_order": 65},
@@ -25,7 +27,12 @@ const POSITIVE_TAG_ROWS := [
 	{"id": "syn_metal_5", "tag": "Metal", "tier": 2, "outlook_order": 32},
 	{"id": "syn_metal_8", "tag": "Metal", "tier": 3, "outlook_order": 34},
 	{"id": "syn_silk_3", "tag": "Silk", "tier": 1, "outlook_order": 10},
+	{"id": "syn_silk_5", "tag": "Silk", "tier": 2, "outlook_order": 11},
+	{"id": "syn_silk_8", "tag": "Silk", "tier": 3, "outlook_order": 12},
 ]
+
+const BASIC_AFFINITY_TAGS := ["Fire", "Soft", "Earth", "Metal", "Silk"]
+const STAT_KEYS := ["HP", "ATK", "DEF", "RES", "MOB", "PRE"]
 
 const CROSS_ROWS := [
 	{"id": "syn_fire_frost_clash", "a": "Fire", "b": "Frost", "outlook_order": 15},
@@ -75,25 +82,19 @@ static func tag_counts(
 	zone_index: int = 0
 ) -> Dictionary:
 	var bag := {}
-	_add_tags(bag, CraftCatalog.construction_tags(construction_id))
+	_add_pips(bag, CraftCatalog.construction_tag_pips(construction_id))
 	if session == null:
 		return bag
 	for card in zone_cards(session, zone_index):
 		if card.type == GameEnums.HandCardType.SKILL:
 			continue
-		var copies := 1
-		if card.type == GameEnums.HandCardType.MATERIAL:
-			copies = CraftCatalog.tag_copies(card.mat_enchant_id)
-		var played_tags := CraftCatalog.tags_for_played(card)
-		_add_tags(bag, played_tags)
-		if copies > 1:
-			_add_tags(bag, played_tags)
+		_add_pips(bag, CraftCatalog.tag_pips_for_played(card))
 	return bag
 
 
-static func _add_tags(bag: Dictionary, tags: PackedStringArray) -> void:
-	for tag in tags:
-		bag[tag] = int(bag.get(tag, 0)) + 1
+static func _add_pips(bag: Dictionary, pips: Dictionary) -> void:
+	for tag in pips.keys():
+		bag[tag] = int(bag.get(tag, 0)) + int(pips[tag])
 
 
 static func _count(bag: Dictionary, tag: String) -> int:
@@ -190,6 +191,11 @@ static func resolve(
 		rarity == GameEnums.CraftRarity.RARE
 		or rarity == GameEnums.CraftRarity.LEGENDARY
 	)
+	var ignore_first_neg := false
+	for card in zone_cards(session, zone_index):
+		if card.type == GameEnums.HandCardType.SKILL and card.id == "sk_steady_hand":
+			ignore_first_neg = true
+			break
 	if not skip_neg:
 		for row in NEG_ROWS:
 			var fired := false
@@ -204,6 +210,9 @@ static func resolve(
 					and _count(bag, String(row["b"])) >= int(row["bmin"])
 				)
 			if fired:
+				if ignore_first_neg:
+					ignore_first_neg = false
+					continue
 				negatives.append(String(row["id"]))
 				if int(row["outlook_order"]) > outlook_order:
 					outlook_order = int(row["outlook_order"])
@@ -213,7 +222,14 @@ static func resolve(
 		outlook_id = uniq
 		outlook_order = 200
 	var stats := GearStats.new()
-	stats.add_bag(CraftCatalog.construction_stats(construction_id))
+	var construction_stats := CraftCatalog.construction_stats(construction_id)
+	stats.add_bag(construction_stats)
+	var affinity := _empty_affinity()
+	_add_affinity_layer(
+		affinity,
+		CraftCatalog.construction_tag_pips(construction_id),
+		construction_stats
+	)
 	var zone_played := zone_cards(session, zone_index)
 	for card in zone_played:
 		if card.type == GameEnums.HandCardType.SKILL:
@@ -224,12 +240,28 @@ static func resolve(
 		var bag_stats := CraftCatalog.stat_bag(card.id, card.type)
 		if card.stat_one_and_half:
 			bag_stats = CraftCatalog.scaled_stat_bag(bag_stats)
+		if card.double_atk:
+			bag_stats["ATK"] = int(bag_stats.get("ATK", 0)) * 2
+		if not card.stat_bonus_key.is_empty():
+			var stat_key := card.stat_bonus_key
+			bag_stats[stat_key] = int(bag_stats.get(stat_key, 0)) + 1
 		stats.add_bag(bag_stats)
 		if copies > 1:
 			stats.add_bag(bag_stats)
+		var affinity_stats := bag_stats.duplicate()
+		if copies > 1:
+			for stat in STAT_KEYS:
+				affinity_stats[stat] = int(affinity_stats.get(stat, 0)) * copies
+		_add_affinity_layer(
+			affinity,
+			CraftCatalog.tag_pips_for_played(card),
+			affinity_stats
+		)
+	_finalize_affinity(affinity)
 	var played_n := zone_played.size()
 	return {
 		"tag_counts": bag,
+		"affinity": affinity,
 		"craft_rarity": rarity,
 		"powers_positive": positives,
 		"powers_negative": negatives,
@@ -240,6 +272,110 @@ static func resolve(
 		"cards_played_n": played_n,
 		"mission_stub": false,
 	}
+
+
+static func affinity_tier(intensity: int) -> int:
+	if intensity >= GameConstants.SYN_THRESHOLD_APEX:
+		return 3
+	if intensity >= GameConstants.SYN_THRESHOLD_TIER_2:
+		return 2
+	if intensity >= GameConstants.SYN_THRESHOLD_TIER_1:
+		return 1
+	return 0
+
+
+static func affinity_magnitude(tag: String, row: Dictionary) -> int:
+	var intensity := int(row.get("intensity", 0))
+	var value := 0.0
+	match tag:
+		"Fire":
+			value = 0.25 * float(row.get("ATK", 0)) + 0.20 * intensity
+		"Soft":
+			value = (
+				0.15 * float(row.get("HP", 0))
+				+ 0.30 * float(row.get("RES", 0))
+				+ 0.20 * intensity
+			)
+		"Earth":
+			value = (
+				0.10 * float(row.get("HP", 0))
+				+ 0.25 * float(row.get("DEF", 0))
+				+ 0.15 * intensity
+			)
+		"Metal":
+			value = (
+				0.15 * float(row.get("HP", 0))
+				+ 0.40 * float(row.get("DEF", 0))
+				+ 0.20 * intensity
+			)
+		"Silk":
+			value = (
+				0.30 * float(row.get("MOB", 0))
+				+ 0.20 * float(row.get("PRE", 0))
+				+ 0.20 * intensity
+			)
+	return maxi(1, int(floor(value + 0.5)))
+
+
+static func _empty_affinity() -> Dictionary:
+	var out := {}
+	for tag in BASIC_AFFINITY_TAGS:
+		var row := {"intensity": 0, "tier": 0, "magnitude": 0}
+		for stat in STAT_KEYS:
+			row[stat] = 0
+		out[tag] = row
+	return out
+
+
+static func _add_affinity_layer(
+	affinity: Dictionary,
+	pips: Dictionary,
+	stats: Dictionary
+) -> void:
+	for tag in BASIC_AFFINITY_TAGS:
+		var pip_n := int(pips.get(tag, 0))
+		if pip_n <= 0:
+			continue
+		var row: Dictionary = affinity[tag]
+		row["intensity"] = int(row["intensity"]) + pip_n
+		for stat in STAT_KEYS:
+			row[stat] = int(row[stat]) + maxi(0, int(stats.get(stat, 0)))
+
+
+static func _finalize_affinity(affinity: Dictionary) -> void:
+	for tag in BASIC_AFFINITY_TAGS:
+		var row: Dictionary = affinity[tag]
+		row["tier"] = affinity_tier(int(row["intensity"]))
+		if int(row["tier"]) > 0:
+			row["magnitude"] = affinity_magnitude(tag, row)
+
+
+## Combined fight payload: tier is the highest item tier; magnitude sums inputs
+## only from items that individually reached Tier 1.
+static func combine_affinity(piece_results: Array) -> Dictionary:
+	var out := _empty_affinity()
+	for piece in piece_results:
+		if not (piece is Dictionary):
+			continue
+		var piece_affinity: Dictionary = Dictionary(piece.get("affinity", {}))
+		for tag in BASIC_AFFINITY_TAGS:
+			var source: Dictionary = Dictionary(piece_affinity.get(tag, {}))
+			var source_tier := int(source.get("tier", 0))
+			if source_tier <= 0:
+				continue
+			var target: Dictionary = out[tag]
+			target["tier"] = maxi(int(target["tier"]), source_tier)
+			target["intensity"] = int(target["intensity"]) + int(source.get("intensity", 0))
+			target["apex_items"] = int(target.get("apex_items", 0))
+			if source_tier >= 3:
+				target["apex_items"] = int(target["apex_items"]) + 1
+			for stat in STAT_KEYS:
+				target[stat] = int(target[stat]) + int(source.get(stat, 0))
+	for tag in BASIC_AFFINITY_TAGS:
+		var row: Dictionary = out[tag]
+		if int(row["tier"]) > 0:
+			row["magnitude"] = affinity_magnitude(tag, row)
+	return out
 
 
 static func cant_craft_result() -> Dictionary:

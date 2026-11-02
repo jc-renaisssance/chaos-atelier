@@ -2,6 +2,8 @@
 
 **Status:** Design stamped. **Doc id: `27`** (renamed from provisional `23` to avoid collision with `23-mission-report.md`). Supersedes form-fill craft (pick construction + fill `material_slots` / default 2m1r) as the live craft UX.
 
+**Production affinity amend (2026-11-02; [40](40-item-trait-affinity.md)):** session stamina is **`8 * item_count + 2`**. Played materials and runes move to **committed** and cannot re-enter draw/hand during that craft; played skills still enter discard and may cycle. Dig discards only the unplayed hand. Finish or abort returns hand + draw + discard + committed to `WagonStock`. Duplicate owned cards remain distinct playable copies. Commitment and stamina replace hard per-zone material/rune caps; legacy `max_materials` / `max_runes` staff fields remain compatibility telemetry until staff effects are re-authored.
+
 **Jonathan 2026-10-02 (correction):** **supersedes durable-in-hand (#17).** Craft is **Slay the Spire–like** — play leaves the hand; discard / draw / reshuffle. Stamp 2 live readout (Current + Potential) **unchanged**. Stamina still costs on play.
 
 **Jonathan 2026-10-02 (stamina 0 ≠ finish):** **supersedes** `27` / `20` auto-finish on `stamina_0` / `finish_reason: stamina_0`. When stamina hits 0 the session **stays open**. Cards do **not** disappear or auto-resolve. Only the player clicking **Finish** crafts and runs the resolver. StS cycle + Current/Potential **unchanged**.
@@ -18,7 +20,7 @@
 
 ## Entering craft mode
 
-Player takes an **order** (appointment / walk-in / **boss-client**) on the **route map** → leave the timetable → enter **dedicated craft UI**. Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); craft that job’s **order constructions**; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter. Do not draw Wizard / Hexer / Outrider / Oathbound.
+Player takes an **order** (appointment / walk-in / **boss-client**) on the **route map** → leave the timetable → enter **dedicated craft UI**. Boss beat: draw from the active map's content pool; live `map_m2_demo` draws Wizard / Hexer / Outrider / Oathbound, while explicit `map_m1` regression draws Knight / Mage / Blade Dancer / Lagoon. Craft that job’s order constructions; the adventurer fights the announced boss (`17`, `22`) — player is not the fighter.
 
 One order = **one** craft session. Multi-piece does **not** re-enter craft per piece. **No chapter piece cap** — do not refuse craft because of `crafts_done`.
 
@@ -48,7 +50,7 @@ Phase-1: Design UX lock. Not a Client widget spec this stamp.
 - **Construction comes from the client order**, not from a hand card.
 - **No construction cards** in the deck/hand.
 - An order may list **multiple constructions** (e.g. armor + gloves), like a multi-enemy encounter.
-- **Law (supersedes sequential multi-piece):** craft **all listed pieces in one session**. One shared stamina pool (`12 * N`, draft). **Not** resolve piece N, then open a new session for N+1.
+- **Law (supersedes sequential multi-piece):** craft **all listed pieces in one session**. One shared stamina pool (`8 * N + 2`). **Not** resolve piece N, then open a new session for N+1.
 - **Max zones = 4.** Order with **>4** constructions = **Later / split**. Do not invent a fifth zone or auto-split this stamp.
 - Each zone is one piece = `construction_ids[zone_index-1]`. Zone 1 = first listed construction.
 
@@ -67,21 +69,21 @@ Materials / runes / skills apply to **that piece’s bag only**. Skills that say
 
 | Type | Role |
 |---|---|
-| **Material** | Stats + tags; same id may stack across plays (copies, or after discard→reshuffle). Play costs **stamina**; card **leaves the hand** → discard |
-| **Enchantment / rune** | Extra tags / powers. Play → discard (same cycle) |
+| **Material** | Stats + tag pips; duplicate owned copies may stack. Play costs **stamina**; card leaves hand → **committed** |
+| **Enchantment / rune** | Extra tag pips / powers. Play → **committed** |
 | **Owner skill** | Player/owner skill — **not** an equipment power. Play → discard (same cycle). Target zone’s bag only (Phase-1) |
 | **Consumable** | **Later.** Day-generated that day; **burns** on use (exception to discard). Distinct from `material` — not in Phase-1 `cards_played` type enum; no fake field |
 
-**Law (supersedes durable-in-hand, #17):** Play **any** craft hand card (material included) → it **leaves the hand**. Played cards go to the **discard pile**, unless a special card says otherwise. Cards remain in the **run deck** via discard→reshuffle — they are **not** deleted from the atelier. That is **not** “stay in hand after play.” Day-generated **consumable** cards (Later, distinct type) **burn** on use. Do not treat `material` as a burn type.
+**Law:** every played card leaves the hand. Materials and runes move to **committed**; skills move to **discard**; Later consumables burn. Committed cards cannot reshuffle during this craft and return to stock when the session ends.
 
 Skills manipulate the craft session (costs, converts, doubles, digs), then leave to discard. They are not sewn into the garment unless a skill explicitly says so (none in Phase-1 draft). Phase-1: if a skill edits a bag, it edits the **target zone** only.
 
 ## Stamina (one pool, whole session)
 
-- **One** stamina pool for the session. Start = **`12 * N`** (Phase-1 **draft** — same per-piece base as mono, summed for parallel play). [33](33-until-m2-tuning.md) **accepts** `12 * N`, hand **5**, dig **2**, and the play costs as the until-M2 lock (Jonathan #72, Client #73; no integer change).
+- **One** stamina pool for the session. Start = **`8 * N + 2`**. Mono = 10; two items = 18; three = 26; four = 34.
 - Dig cost stays **2** (session-wide, not × N).
 - Each play costs **stamina** (card-defined cost ≥ 0 after modifiers). Stamina craft UX is unchanged for costs; this lock is **when the session ends**.
-- A play (material included) spends stamina **and** the card **leaves the hand** → discard (unless a special card says otherwise). A **consumable** play (Later, distinct type) burns the card.
+- A play spends stamina and leaves the hand. Material/rune → committed; skill → discard; Later consumable → burn.
 - **Stamina 0 ≠ finish.** When stamina hits 0 the session **stays open**. Hand / draw / discard stay. Cards do **not** vanish. The resolver does **not** run.
 - **Only Finish** (player click) ends the **whole** session and proceeds to resolve. Phase-1 legal end = **Finish only** — `finish_reason: player_finish` (`20`).
 - **One Finish** → resolve **each zone’s piece** in **order-listed sequence**. Still **one harness stamp per piece** for Test. No auto-finish on stamina 0.
@@ -95,12 +97,12 @@ Zone with **zero plays** at Finish = existing empty-piece path (mono Finish with
 
 ### Hand cycle (Slay the Spire–like)
 
-Piles this **session** (shared across zones): **hand** · **draw** · **discard**. Together they **are** the run deck. **Between beats** the same cards live on `WagonStock`. Shop buy / sell / **enchant** / event ±1 mat ([32](32-shop-and-events.md)) change that stock — do **not** invent a second deck. Enchanted copies carry `mat_enchant_id` (+ optional `shiny`); Thrift / Heavy change effective `$` and (Heavy) tag contribution when craft reads the card — existing bag-count law, not a new combat system. Shop sell / explicit loss still change stock between beats.
+Piles this **session** (shared across zones): **hand** · **draw** · **discard** · **committed**. Together they account for the cards allocated to this craft. Only hand + draw + discard cycle. **Between beats** all copies return to `WagonStock`. Shop buy / sell / **enchant** / event ±1 mat ([32](32-shop-and-events.md)) change that stock — do **not** invent a second deck.
 
-1. **Play** any hand card → it leaves the hand → **discard** (unless a special card says otherwise). Play is tagged to the **target zone**.
+1. **Play** material/rune → committed; play skill → discard. Every play is tagged to the target zone.
 2. **Refresh / dig** → remaining hand cards drop to **discard**, then draw a new hand (up to hand size from the **draw** pile).
-3. If the draw pile has **not enough cards mid-draw** → **shuffle discard into draw**, then continue drawing.
-4. Cards stay in the atelier by cycling discard→reshuffle — **not** by sitting in hand after play.
+3. If the draw pile has **not enough cards mid-draw** → **shuffle discard into draw**, then continue drawing. Committed cards are excluded.
+4. Finish/abort returns every pile, including committed, to the atelier.
 
 ### Refresh (no auto-refill)
 
@@ -127,7 +129,7 @@ Not a harness dump assert unless Test later stamps fields in [20](20-harness-sta
 
 - No hard material-slot cap in craft mode.
 - Depth is gated by **stamina + refresh tax + skill economy + deck contents**.
-- Same id may stack across plays (multiple copies, or the same card after it cycles discard→reshuffle). You **cannot** replay one in-hand card without it leaving first. Stacks are **per zone bag** — playing the same id into two zones does not merge bags.
+- Same id may stack only through distinct owned copies. A committed material/rune cannot cycle back during that craft. Stacks are **per zone bag** — playing the same id into two zones does not merge bags.
 - Synergy breakpoints still gate readable power and **outlook art** (see [14-synergies](14-synergies.md); RETUNE thresholds merged).
 
 ## Phase-1 draft owner skills (examples — not full catalog)
@@ -135,15 +137,15 @@ Not a harness dump assert unless Test later stamps fields in [20](20-harness-sta
 | id | Cost | Effect (draft) |
 |---|---:|---|
 | `sk_next_mat_free` | 1 | Next material play costs 0 stamina |
-| `sk_metal_str_double` | 2 | Double STR contribution from Metal-tagged materials already in the **target** piece |
-| `sk_wild_to_earth` | 2 | Consume 1 Wild material in session → add 1 random Earth material into hand |
-| `sk_touch_up` | 1 | +1 to one chosen stat on one already-played material **in the target zone** |
-| `sk_deep_dig` | 3 | Refresh hand; draw +1 extra |
-| `sk_steady_hand` | 1 | Ignore first negative synergy roll hint this **target** piece (does **not** skip rarity rules — still full neg skip only on rare/leg) |
+| `sk_metal_str_double` | 2 | Double ATK from committed Metal materials in the target item |
+| `sk_wild_to_earth` | 2 | Convert the latest committed Wild material in the target item from Wild pips to Earth pips |
+| `sk_touch_up` | 1 | Add +1 to the strongest positive stat on the latest committed material in the target item (tie order HP, ATK, DEF, RES, MOB, PRE) |
+| `sk_deep_dig` | 3 | Discard the unplayed hand and refill to hand size |
+| `sk_steady_hand` | 1 | Ignore the first negative synergy on the target item; rare/legendary still skip all negatives |
 
 `own_basic` starts with the three skills in [39](39-starter-deck.md) (stamped): `sk_ease_draw`, `sk_scrap_breath`, and `sk_heavy_draw`, drawn with this file’s hand / draw / discard. **M2** market Skills tab sells these six `sk_*` into the run deck (buy-into-kit, run-long via reshuffle — not one-shot burn) — [32](32-shop-and-events.md). The three starter ids are not on that shelf. Do not invent a parallel skill catalog. Gold prices on that tab are Test knobs.
 
-**M2 staff caps:** equipped `staff_*` raises `max_materials` / `max_runes` ([12b](12b-craft-slots.md) / [32](32-shop-and-events.md)). M2 Client treats those as per-zone bag limits. Stamina still gates. Do **not** revive 2m1r slot-fill UI. The “no hard material-slot cap” line above is the **M1-until-staff** gap.
+**M2 staff compatibility:** `max_materials` / `max_runes` remain in the market and harness schema during migration, but no longer reject a play. Re-author those five staff effects as stamina/draw/discount/affinity tools before release; do not sell their old cap copy as a live benefit.
 
 ## Resolver (unchanged spine)
 
@@ -165,7 +167,7 @@ After **one Finish:** for each zone in **listed order**, bag tags from that zone
 
 | Knob | Value |
 |---|---|
-| Stamina start (session) | **`12 * N`** (N = `piece_count`; mono = 12) |
+| Stamina start (session) | **`8 * N + 2`** (N = `piece_count`; mono = 10) |
 | Max zones | **4** (>4 constructions = Later / split — do not invent) |
 | Hand size | 5 |
 | Dig refresh cost | 2 stamina (not × N) |
@@ -179,4 +181,4 @@ After **one Finish:** for each zone in **listed order**, bag tags from that zone
 | Rare mat play cost | 3 |
 | Enchantment play cost | 2 |
 
-**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = **one session**, stamina **`12 * N`**, up to **4** zones. **One Finish** resolves listed pieces in order — **N harness stamps**, not N sessions. Play any card → leave hand → discard (unless special); play is tagged to a zone. Refresh dumps remaining hand to discard, then draws; mid-draw shortfall shuffles discard into draw. Cards stay in the run deck via reshuffle — **not** in hand after play. Consumables (Later) burn. Live readout = Current + Potential for the **selected zone** (locked if outlook not unlocked). **Stamina 0 ≠ finish** — session stays open; only **Finish** crafts (`player_finish`). `stamina_0` is state, not auto-craft. **No chapter piece cap** (`crafts_max` GONE). Live chapter spine = **route map** ([22](22-chapter-schedule.md)). **Slice 4** ([30](30-interactive-order.md), Client #70): after this Finish’s resolver return, a short playback, then the mission report (`23`). Abort / non-Finish does not play. Sockets shipped. Posture art stays **Nov 2**. This file does not own the gate.
+**Law:** stamina craft replaces 2m1r slot UI. Multi-piece = **one session**, stamina **`8 * N + 2`**, up to **4** zones. **One Finish** resolves listed pieces in order — **N harness stamps**, not N sessions. Material/rune plays commit; skill plays discard and may cycle. Refresh dumps the unplayed hand to discard, then draws; committed cards stay out until Finish/abort returns all piles to stock. Consumables (Later) burn. Live readout = Current + Potential for the **selected zone** (locked if outlook not unlocked). **Stamina 0 ≠ finish** — session stays open; only **Finish** crafts (`player_finish`). `stamina_0` is state, not auto-craft. **No chapter piece cap** (`crafts_max` GONE). Live chapter spine = **route map** ([22](22-chapter-schedule.md)). **Slice 4** ([30](30-interactive-order.md), Client #70): after this Finish’s resolver return, a short playback, then the mission report (`23`). Abort / non-Finish does not play. Sockets shipped. Posture art stays **Nov 2**. This file does not own the gate.

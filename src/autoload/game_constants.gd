@@ -12,9 +12,11 @@ const CHAPTERS_PER_RUN := 3
 const RESERVED_FINAL_DAY_COUNT := 2 ## last 2 of N; player assigns D1..(N-2)
 const PRIMARY_ACTIONS_PER_DAY := 1
 
-## docs/27 — stamina craft (replaces 2m1r). One session pool: start = 12 * N.
+## docs/40 — one session pool: 8 stamina per ordered item plus 2 session-wide.
 ## docs/39 lock 3: AP and stamina are this meter. No second action meter.
-const STAMINA_START := 12 ## per-piece base; session stamina_start = 12 * piece_count
+const STAMINA_PER_ITEM := 8
+const STAMINA_SESSION_BONUS := 2
+const STAMINA_START := STAMINA_PER_ITEM + STAMINA_SESSION_BONUS ## mono default
 const ZONE_COUNT_MAX := 4 ## unused zones hidden if N < 4; N > 4 = Later / split
 const HAND_SIZE := 5
 const DIG_REFRESH_COST := 2 ## session-wide, not × N
@@ -27,9 +29,9 @@ const HAND_AUTO_REFILL := false ## dig dumps hand → discard then draws; empty 
 ## docs/14 — retuned thresholds. Gen-list outlook ids stay _2/_3 through 1C.
 const SYN_THRESHOLD_TIER_1 := 3 ## old ≥2
 const SYN_THRESHOLD_TIER_2 := 5 ## old ≥3
-const SYN_THRESHOLD_APEX := 8 ## Fire · Metal · Earth only
+const SYN_THRESHOLD_APEX := 8
 const SYN_CROSS_TAG_MIN := 1
-const SYN_APEX_TAGS := ["Fire", "Metal", "Earth"]
+const SYN_APEX_TAGS := ["Fire", "Soft", "Earth", "Metal", "Silk"]
 
 ## Nullable int/float sentinels on Resources (Godot has no Option).
 const NULL_INT := -1
@@ -133,7 +135,7 @@ static func is_schedule_day(day_index: int, day_count: int) -> bool:
 
 
 static func session_stamina_start(piece_count: int) -> int:
-	return STAMINA_START * maxi(1, piece_count)
+	return STAMINA_PER_ITEM * maxi(1, piece_count) + STAMINA_SESSION_BONUS
 
 
 static func is_legal_zone_count(zone_count: int) -> bool:

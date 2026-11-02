@@ -5,7 +5,7 @@ extends Resource
 @export var tier_1: int = 3 ## old ≥2
 @export var tier_2: int = 5 ## old ≥3
 @export var apex: int = 8
-@export var apex_tags: PackedStringArray = PackedStringArray(["Fire", "Metal", "Earth"])
+@export var apex_tags: PackedStringArray = PackedStringArray(["Fire", "Soft", "Earth", "Metal", "Silk"])
 @export var cross_tag_min: int = 1
 
 

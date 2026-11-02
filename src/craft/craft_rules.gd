@@ -1,9 +1,9 @@
 class_name CraftRules
 extends RefCounted
 ## Stamina session mutations (docs/27, docs/20 asserts 12–17).
-## StS hand cycle (#19): play leaves the hand → discard. Dig dumps remaining
-## hand to discard, then draws. Mid-draw shortfall shuffles discard into draw.
-## Cards stay in the run deck via reshuffle — not in hand after play.
+## Skills cycle through discard. Played materials/runes commit until Finish/abort.
+## Dig dumps the unplayed hand to discard, then draws. Mid-draw shortfall
+## shuffles discard into draw.
 ## Consumable (Later / not in the stamp type enum) burns instead of discarding.
 ## No auto-refill. Construction is not a card.
 ## Stamina 0 ≠ finish (docs/20 assert 14): play / dig never auto-craft.
@@ -19,6 +19,7 @@ static func opening_draw(
 		return
 	session.hand.clear()
 	session.discard_pile.clear()
+	session.committed.clear()
 	session.draw_pile = stock.take_all()
 	_shuffle_pile(session.draw_pile, rng)
 	draw_up_to_hand(session, rng)
@@ -33,9 +34,12 @@ static func return_run_deck(session: CraftStaminaSession, stock: WagonStock) -> 
 		stock.add(card)
 	for card in session.discard_pile:
 		stock.add(card)
+	for card in session.committed:
+		stock.add(card)
 	session.hand.clear()
 	session.draw_pile.clear()
 	session.discard_pile.clear()
+	session.committed.clear()
 
 
 static func can_play(
@@ -86,16 +90,16 @@ static func _zone_accepts(
 	zone_index: int,
 	card_type: GameEnums.HandCardType
 ) -> bool:
-	if card_type == GameEnums.HandCardType.MATERIAL:
-		return zone_type_count(session, zone_index, card_type) < session.max_materials
-	if card_type == GameEnums.HandCardType.RUNE:
-		return zone_type_count(session, zone_index, card_type) < session.max_runes
-	return true
+	## docs/40: commitment + stamina replace hard material/rune slot caps.
+	return session.is_legal_zone(zone_index) and card_type in [
+		GameEnums.HandCardType.MATERIAL,
+		GameEnums.HandCardType.RUNE,
+		GameEnums.HandCardType.SKILL,
+	]
 
 
 static func burns_on_play(type: GameEnums.HandCardType) -> bool:
 	## Consumable (Later, distinct type, not in the stamp enum) burns.
-	## Materials / runes / skills leave the hand → discard. Materials never burn.
 	return (
 		type != GameEnums.HandCardType.MATERIAL
 		and type != GameEnums.HandCardType.RUNE
@@ -131,8 +135,14 @@ static func play(
 	var cost := CraftCatalog.play_cost(card, next_mat_free, next_cost_less)
 	## The played card leaves before a starter skill discards or draws (docs/39).
 	session.hand.remove_at(hand_index)
+	var committed := (
+		card.type == GameEnums.HandCardType.MATERIAL
+		or card.type == GameEnums.HandCardType.RUNE
+	)
 	var burned := burns_on_play(card.type)
-	if not burned:
+	if committed:
+		session.committed.append(card)
+	elif not burned:
 		session.discard_pile.append(card)
 	_spend(session, cost)
 	session.focus_zone(target)
@@ -155,12 +165,20 @@ static func play(
 		free = false
 	if less > 0:
 		less = 0
-	if heavy:
+	if heavy and card.type == GameEnums.HandCardType.MATERIAL:
 		heavy = false
 		played.stat_one_and_half = true
 	if card.type == GameEnums.HandCardType.SKILL:
 		if card.id == "sk_next_mat_free":
 			free = true
+		elif card.id == "sk_metal_str_double":
+			_double_committed_metal_atk(session, target)
+		elif card.id == "sk_wild_to_earth":
+			_convert_latest_wild_to_earth(session, target)
+		elif card.id == "sk_touch_up":
+			_touch_up_latest_material(session, target)
+		elif card.id == "sk_deep_dig":
+			_refresh_hand_free(session, rng)
 		elif card.id == "sk_ease_draw":
 			less = 1
 			draw_one(session, rng)
@@ -177,7 +195,67 @@ static func play(
 		"scrap_pick": scrap_pick,
 		"played": played,
 		"burned": burned,
+		"committed": committed,
 	}
+
+
+static func _double_committed_metal_atk(
+	session: CraftStaminaSession,
+	zone_index: int
+) -> void:
+	for played in session.cards_played:
+		if played.type != GameEnums.HandCardType.MATERIAL or played.zone_index != zone_index:
+			continue
+		if int(CraftCatalog.tag_pips_for_played(played).get("Metal", 0)) > 0:
+			played.double_atk = true
+
+
+static func _convert_latest_wild_to_earth(
+	session: CraftStaminaSession,
+	zone_index: int
+) -> void:
+	for i in range(session.cards_played.size() - 1, -1, -1):
+		var played: PlayedCard = session.cards_played[i]
+		if played.type != GameEnums.HandCardType.MATERIAL or played.zone_index != zone_index:
+			continue
+		var raw_pips := CraftCatalog.tag_pips_of(played.id, played.type)
+		var wild_pips := int(raw_pips.get("Wild", 0))
+		if wild_pips <= 0 or "Wild" in played.suppressed_tags:
+			continue
+		played.suppressed_tags.append("Wild")
+		played.tag_pip_bonus["Earth"] = int(played.tag_pip_bonus.get("Earth", 0)) + wild_pips
+		return
+
+
+static func _touch_up_latest_material(
+	session: CraftStaminaSession,
+	zone_index: int
+) -> void:
+	for i in range(session.cards_played.size() - 1, -1, -1):
+		var played: PlayedCard = session.cards_played[i]
+		if played.type != GameEnums.HandCardType.MATERIAL or played.zone_index != zone_index:
+			continue
+		var stats := CraftCatalog.stat_bag(played.id, played.type)
+		var best_key := ""
+		var best_value := 0
+		for stat in ["HP", "ATK", "DEF", "RES", "MOB", "PRE"]:
+			var value := int(stats.get(stat, 0))
+			if value > best_value:
+				best_value = value
+				best_key = stat
+		if not best_key.is_empty():
+			played.stat_bonus_key = best_key
+		return
+
+
+static func _refresh_hand_free(
+	session: CraftStaminaSession,
+	rng: RandomNumberGenerator
+) -> void:
+	for remaining in session.hand:
+		session.discard_pile.append(remaining)
+	session.hand.clear()
+	draw_up_to_hand(session, rng)
 
 
 static func dig(

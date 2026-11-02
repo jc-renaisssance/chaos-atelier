@@ -6,9 +6,12 @@ extends RefCounted
 
 const HP_START := 12
 const INCOMING := 3
+const AffinityFight := preload("res://src/ui/playback/affinity_fight.gd")
 
 
 static func kits_live(pieces: Array) -> bool:
+	if _has_affinity_payload(pieces):
+		return AffinityFight.kits_live(pieces)
 	if pieces.is_empty():
 		return false
 	var num := _numbers(_combined(pieces), pieces)
@@ -27,6 +30,8 @@ static func kits_live(pieces: Array) -> bool:
 
 ## foe_1_incoming stays 3 on the player fight. Count 2 labels 12 on foe_1 only.
 static func build(pieces: Array, foe_1_incoming: int = INCOMING) -> Array:
+	if _has_affinity_payload(pieces):
+		return AffinityFight.build(pieces, foe_1_incoming)
 	var num := _numbers(_combined(pieces), pieces)
 	var rows: Array = []
 	for tag in ["Fire", "Soft", "Earth", "Metal", "Silk"]:
@@ -82,6 +87,8 @@ static func build(pieces: Array, foe_1_incoming: int = INCOMING) -> Array:
 
 
 static func survive_charges(pieces: Array) -> int:
+	if _has_affinity_payload(pieces):
+		return AffinityFight.survive_charges(pieces)
 	## N = pieces whose own Fire is ≥ 8. The combined sum does not mint a charge.
 	var n := 0
 	for piece in pieces:
@@ -309,6 +316,13 @@ static func _any_cloak(pieces: Array) -> bool:
 		if not (piece is Dictionary):
 			continue
 		if String(piece.get("construction_id", "")) == "con_cloak":
+			return true
+	return false
+
+
+static func _has_affinity_payload(pieces: Array) -> bool:
+	for piece in pieces:
+		if piece is Dictionary and piece.has("affinity"):
 			return true
 	return false
 

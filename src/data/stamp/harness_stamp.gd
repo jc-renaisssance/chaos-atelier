@@ -47,6 +47,7 @@ extends Resource
 
 @export_group("Resolver outputs")
 @export var tag_counts: Dictionary = {}
+@export var affinity: Dictionary = {}
 @export var craft_rarity: GameEnums.CraftRarity = GameEnums.CraftRarity.NONE
 @export var powers_positive: PackedStringArray = PackedStringArray()
 @export var powers_negative: PackedStringArray = PackedStringArray()
@@ -209,6 +210,7 @@ func apply_piece_session(order: ClientOrder, piece_session: CraftStaminaSession)
 
 func apply_resolver(result: Dictionary) -> void:
 	tag_counts = Dictionary(result.get("tag_counts", {})).duplicate()
+	affinity = Dictionary(result.get("affinity", {})).duplicate(true)
 	craft_rarity = result.get("craft_rarity", GameEnums.CraftRarity.NONE)
 	powers_positive = PackedStringArray(result.get("powers_positive", PackedStringArray()))
 	powers_negative = PackedStringArray(result.get("powers_negative", PackedStringArray()))
@@ -406,6 +408,7 @@ func to_dict() -> Dictionary:
 	if emit_resolver():
 		var stat_bag: Dictionary = stats.to_dict() if stats != null else GearStats.new().to_dict()
 		dump["tag_counts"] = tag_counts.duplicate()
+		dump["affinity"] = affinity.duplicate(true)
 		dump["craft_rarity"] = GameEnums.craft_rarity_wire(craft_rarity)
 		dump["powers_positive"] = Array(powers_positive)
 		dump["powers_negative"] = Array(powers_negative)
@@ -423,6 +426,7 @@ func to_dict() -> Dictionary:
 		dump["punish_tags_hit"] = Array(punish_tags_hit)
 	else:
 		dump["tag_counts"] = {}
+		dump["affinity"] = {}
 		dump["craft_rarity"] = null
 		dump["powers_positive"] = []
 		dump["powers_negative"] = []

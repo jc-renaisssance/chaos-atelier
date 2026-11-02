@@ -46,7 +46,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 | `day_index` | int\|null | 1..N on timetable / craft stamps; null on chapter-start newspaper. Labels **D1..DN** |
 | `days_left` | int | Remaining days (includes reserved) |
 | `day_action` | enum\|null | `adventurer` \| `shop` \| `appointment` \| `event` \| `reserved` — the **one** primary action this day (from `current_node_id`). Null before D1 play / on newspaper. Old `walk_in` / `wagon_shop` / `wagon_event` names are **superseded aliases** — do not emit as live Required |
-| `route_map_id` | string | Current wagon **`map_m1`**. Later maps stamp their own id |
+| `route_map_id` | string | Live Steam demo **`map_m2_demo`**. Historical regression and legacy saves may stamp **`map_m1`** |
 | `route_nodes` | object[] | `{ node_id, day_index, kind, ref_id, bound_block_id }`. `node_id` = `N1`… ; `kind` ∈ {`shop`, `adventurer`, `appointment`, `event`, `reserved`}; `ref_id` = `adv_*` / `appt_*` / `evt_*` / null. Market shelf is **not** `ref_id` — see market block. M1 panel display type = **market** (wire `kind=shop`). C1 graph in [22](22-chapter-schedule.md). Event `ref_id` rows in [32](32-shop-and-events.md). Elite badge is **not** a column under the 2026-10-21 Design default (`kind=appointment` is the predicate). Do not emit `elite` unless that stamp writes Scope **C** |
 | `route_edges` | object[] | `{ from, to }` — authored, not seeded |
 | `route_path` | string[] | Node ids **confirmed**, in order. Never a draft |
@@ -63,7 +63,7 @@ Headless **client × threat × build** dumps — same job as the 1A row: readabl
 
 **Lock:** no piece cap. `crafts_done_this_chapter` may count pieces (armor + gloves = +2) after the **one** Finish — it does **not** block the next craft. `cant_craft` because `crafts_done == crafts_max` is **GONE**.
 
-`phase` **does not** include `shop` or `craft_task` (old lineup shell). Market visit is a `day_action=shop` on `phase=schedule` (timetable; **display Market**) — buy/sell/**refresh**/**enchant** + chapter bank + **M2** staff / skill / gear tabs in [32](32-shop-and-events.md). Travel events are `day_action=event` (text resolve, same doc). Boss beat: draw from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08), then craft **that job’s order constructions** (`phase=craft` + `mission_kind=boss`), then `phase=boss` for the sim — that **adventurer** fights, not the player (`17`). Do not draw Wizard / Hexer / Outrider / Oathbound.
+`phase` **does not** include `shop` or `craft_task` (old lineup shell). Market visit is a `day_action=shop` on `phase=schedule` (timetable; **display Market**) — buy/sell/**refresh**/**enchant** + chapter bank + **M2** staff / skill / gear tabs in [32](32-shop-and-events.md). Travel events are `day_action=event` (text resolve, same doc). Boss beat draws from the active map's pool (`map_m2_demo` = M2; explicit regression `map_m1` = M1), then crafts that job's order constructions before the adventurer—not the player—fights.
 
 ### Gold (run purse)
 
@@ -150,7 +150,7 @@ Null the event block when `day_action` is not `event`. Do **not** emit `cleared`
 
 Prep (`mission_kind=prep`) is **Later** on the C1 sample (no prep nodes). Walk-in / appointment enter craft as `order`. Route-map event that does not enter craft stays `phase=schedule` with session fields null — **M1 text events are [32](32-shop-and-events.md)**, not `mission_kind=event`.
 
-**Boss-client (Jonathan 2026-10-02):** a **client is responsible for the boss event**. Player crafts **for that client**; the **client fights** the announced boss — player is not the fighter. On the boss beat: `mission_kind=boss`; `boss_client_id` = named `adv_*` drawn from the **M1 4-job pool** (`28` / `29` — Knight, Mage, Blade Dancer, Lagoon; **LOCKED** Jonathan 2026-10-08); `boss_job_id` = matching `job_*`; `order_id` = that job’s `ord_*`; `construction_ids` = that job’s **order constructions** (listed `con_*`, in sequence — e.g. knight = `con_armor`, `con_gloves`); `threat_id` = announced `chapter_boss_id`. Draw is **independent** of which boss was announced. Do **not** draw Wizard / Hexer / Outrider / Oathbound in M1. Sim uses **that client's gear**. `boss_client_id` is **never** an `appt_*` (Scrap Duelist and other appointments stay on the **route map**, not Dex Adventurers). Finish-only / multi-piece / StS craft **unchanged**. Portraits / extra Client UI widgets = **Later**.
+**Boss-client:** a client is responsible for the boss event. Player crafts for that client; the client fights the announced boss. `boss_client_id` and `boss_job_id` come from the active map's matching content pool (`map_m2_demo` = M2; `map_m1` = M1). `order_id` and `construction_ids` come from that job, while `threat_id` is the announced `chapter_boss_id`. Draw is independent of the announced boss. Sim uses that client's gear; `boss_client_id` is never an `appt_*`.
 
 ### Stamina craft session (when `phase=craft`)
 
@@ -159,13 +159,13 @@ Prep (`mission_kind=prep`) is **Later** on the C1 sample (no prep nodes). Walk-i
 | `piece_index` | int | 1-based; this stamp's piece (`construction_ids[piece_index-1]`) |
 | `piece_count` | int | `len(construction_ids)` — N pieces → **N stamps, one session** |
 | `zone_count` | int | Live drop zones this session. Phase-1: **`== piece_count`**, ∈ 1..4 |
-| `stamina_start` | int | Phase-1 draft **`12 * piece_count`** — **session** pool, not per piece |
+| `stamina_start` | int | **`8 * piece_count + 2`** — shared **session** pool, not per piece |
 | `stamina_remaining` | int | ≥ 0 at stamp — **session** value (shared); repeated on each piece stamp |
 | `stamina_spent` | int | Plays + digs (after modifiers) — **session** value |
 | `hand_size` | int | Phase-1 draft **5** |
 | `dig_refresh_cost` | int | Phase-1 draft **2** (not × N) |
 | `dig_count` | int | Refresh / dig calls this **session** |
-| `cards_played` | object[] | `{ id, type, cost, zone_index, construction_id }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers; `zone_index` 1-based ∈ 1..`zone_count`; `construction_id` = `construction_ids[zone_index-1]`. Play of any type **leaves the hand** → discard (unless a special card says otherwise). Stamp may list the **session** plays or this piece's bag only; Test filters by `zone_index` for the bag |
+| `cards_played` | object[] | `{ id, type, cost, zone_index, construction_id }` — `type` ∈ {`material`, `rune`, `skill`}; `cost` ≥ 0 after modifiers; `zone_index` 1-based ∈ 1..`zone_count`; `construction_id` = `construction_ids[zone_index-1]`. Every play leaves hand: material/rune → committed, skill → discard. Stamp may list the session plays or this piece's bag only; Test filters by `zone_index` |
 | `early_finish` | bool | **Superseded as a distinct end.** If emitted: player clicked Finish (same as `player_finish`). Not “stop before empty.” |
 | `finish_reason` | enum | **`player_finish` only** — one Finish ends the **session**. Every piece stamp from that Finish uses `player_finish`. |
 
@@ -175,9 +175,9 @@ Skills in `cards_played` are owner skills (manipulate the session, then leave). 
 
 **Finish only (supersedes stamina_0 auto-finish):** session ends when the player clicks **Finish** — `finish_reason == player_finish`. **One Finish** resolves every zone in listed order and emits **one stamp per piece**. `stamina_remaining == 0` / `stamina_0` is **state**, not end. Cards stay; resolver waits. `finish_reason: stamina_0` and “empty stamina auto-crafts” are **superseded**. Prefer `player_finish` over `early_finish` — Finish is the only button, whether stamina is 0 or not. **0-cost cards** / further owner abilities at 0 stamina = **Later** (`27`) — do not invent catalog or assert them.
 
-**Parallel multi-piece (supersedes sequential N sessions):** one shared stamina pool (`stamina_start == 12 * N`). Do **not** emit a stamp mid-session when piece N is “done” and then start N+1 with a fresh 12. Empty zone at Finish = construction-only bag for that stamp — **not** `cant_craft`. Do not invent a harsh empty-piece fail.
+**Parallel multi-piece:** one shared stamina pool (`stamina_start == 8 * N + 2`). Do **not** emit a stamp mid-session when piece N is “done” and then start N+1 with a fresh pool. Empty zone at Finish = construction-only bag for that stamp — **not** `cant_craft`.
 
-**Hand cycle (supersedes durable-in-hand, #17):** play any card → it **leaves the hand** → **discard** (unless a special card says otherwise). Refresh / dig: remaining hand drops to discard, then draw up to `hand_size` from the **draw** pile; if draw is short mid-draw, **shuffle discard into draw** and continue. Cards remain in the **run deck** via reshuffle — not deleted from the atelier, and **not** “stay in hand after play.” Stamina still costs on play. Hand / draw / discard pile arrays are Design law in [27](27-craft-mode-stamina.md) — not extra Required dump fields unless Test later stamps them.
+**Hand cycle:** material/rune plays move to committed; skill plays move to discard. Refresh / dig drops the unplayed hand to discard, then draws up to `hand_size`; only discard reshuffles. Finish/abort returns hand + draw + discard + committed to stock. These pile arrays are Design law in [27](27-craft-mode-stamina.md), not extra Required dump fields.
 
 Day-generated **consumable** cards (Later; distinct type, **not** in this enum) **burn** on use when stamped. Do not emit a fake consumable field.
 
@@ -187,7 +187,8 @@ Day-generated **consumable** cards (Later; distinct type, **not** in this enum) 
 
 | Field | Type | Notes |
 |---|---|---|
-| `tag_counts` | object | Tag → int (played mats + order construction + played runes) |
+| `tag_counts` | object | Tag → authored pip intensity for this item (played mats + construction + runes; Heavy doubles its copy) |
+| `affinity` | object | Per Fire/Soft/Earth/Metal/Silk item payload: `intensity`, `tier`, positive tagged stat inputs, and formula `magnitude`. Tier is never computed from combined items |
 | `craft_rarity` | enum | `common` \| `uncommon` \| `rare` \| `legendary` (`18`) |
 | `powers_positive` | string[] | `syn_*` / `uniq_*` fired |
 | `powers_negative` | string[] | `syn_neg_*` fired; **must be []** if rarity ∈ {rare, legendary} |
@@ -244,7 +245,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 14. Session ends iff the player clicks **Finish** — `finish_reason == player_finish` on **every** piece stamp from that Finish. `stamina_remaining == 0` does **not** end the session or run the resolver. `finish_reason: stamina_0` is **superseded** (must not mean auto-craft). Empty hand / empty stamina is legal until Finish. If `early_finish` is still emitted, it must agree with `player_finish` (Finish click) — not a second path.
 15. Each dig spends `dig_refresh_cost` stamina. `stamina_spent` includes play costs + `dig_count * dig_refresh_cost` (after skill modifiers). Hand does **not** auto-refill. On dig: remaining hand cards drop to discard, then draw up to `hand_size` from the draw pile; if draw is short mid-draw, shuffle discard into draw and continue. Empty hand is legal until a dig or finish. Dig is **session-wide** (not per zone).
 16. `piece_count` ≥ 1; `zone_count == piece_count`; `zone_count` ∈ 1..4. Multi-piece = **one session**. Finish emits **one stamp per piece** (`piece_index` 1..`piece_count`) in **listed sequence**. Do **not** start a new session / new stamina pool per piece. `cards_played` entries carry `zone_index` + `construction_id`. N > 4 = Later — do not assert a fifth zone.
-17. Phase-1 draft knobs on the session: `stamina_start == 12 * piece_count`, `hand_size == 5`, `dig_refresh_cost == 2` unless a skill this session changed a cost.
+17. Production session knobs: `stamina_start == 8 * piece_count + 2`, `hand_size == 5`, `dig_refresh_cost == 2` unless equipped gear changes a knob.
 
 ### cant_craft / reps / newspaper (prior intent kept)
 
@@ -253,7 +254,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 20. Mid death (`hp_remaining ≤ 0`, not `cant_craft`) → large −reps (`−3 * card_difficulty` per `25`).
 21. Always `apply_reps` after an order mission (including `cant_craft`).
 22. Newspaper fields set when the beat applies (`26`): chapter start → `boss_announce`; mid fail → `mid_fail`; chapter end / run over as listed.
-23. On `mission_kind=boss`: `boss_client_id` is a named `adv_*` from the **M1 4-job catalog** ([29](29-adventurer-catalog.md)) or that job’s default alias; `boss_job_id` ∈ `{job_knight, job_mage, job_blade_dancer, job_lagoon}` (**LOCKED** Jonathan 2026-10-08 — not Wizard / Hexer / Outrider / Oathbound); `construction_ids` equals that job’s **order constructions** (listed `con_*`, in sequence); `threat_id == chapter_boss_id`; `boss_client_id` is never an `appt_*`. Draw is independent of `chapter_boss_id`.
+23. On `mission_kind=boss`: `boss_client_id` is a named `adv_*` from the active map's content pool and `boss_job_id` belongs to that same pool. Live `map_m2_demo` is M2-only; explicit `map_m1` regression is M1-only. `construction_ids` equals that job’s listed order constructions; `threat_id == chapter_boss_id`; `boss_client_id` is never an `appt_*`.
 
 ### Market visit / event resolve ([32](32-shop-and-events.md))
 
@@ -288,7 +289,7 @@ Test checks these. Lineup length / pick-1-of-3 / 2m1r slot caps are **not** asse
 | Assert: `material` play does not decrement inventory / stock | Durable-in-hand (#17) — superseded: play → discard; persist via reshuffle ([27](27-craft-mode-stamina.md)) |
 | `finish_reason: stamina_0` as craft-end / auto-resolver | **Stamina 0 ≠ finish** — session stays open; only Finish crafts ([27](27-craft-mode-stamina.md)) |
 | `early_finish` as a distinct end path vs `stamina_0` | Finish is the only legal Phase-1 end (`player_finish`) |
-| Multi-piece = N sessions / `stamina_start == 12` per piece / resolve N then start N+1 | **One session**, `stamina_start == 12 * N`, one Finish → N stamps ([27](27-craft-mode-stamina.md)) |
+| Multi-piece = N sessions / fixed stamina per piece / resolve N then start N+1 | **One session**, `stamina_start == 8 * N + 2`, one Finish → N stamps ([27](27-craft-mode-stamina.md)) |
 | `cards_played` as `{ id, type, cost }` with no zone | Plays **must** target a zone: `{ id, type, cost, zone_index, construction_id }` |
 
 Do **not** emit these as Required. History only.

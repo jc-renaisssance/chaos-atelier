@@ -42,6 +42,8 @@ func to_dict() -> Dictionary:
 	if is_enchanted():
 		out["mat_enchant_id"] = mat_enchant_id
 		out["shiny"] = true
+	if not starter_role.is_empty():
+		out["starter_role"] = starter_role
 	return out
 
 

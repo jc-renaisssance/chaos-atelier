@@ -1,7 +1,7 @@
 class_name CraftStaminaSession
 extends Resource
 ## One parallel stamina session for an order (docs/27 / docs/20).
-## N pieces share one pool (stamina_start = 12 * N) and up to 4 zones.
+## N pieces share one pool (stamina_start = 8 * N + 2) and up to 4 zones.
 ## Stamina 0 is state, not a finish. Only Finish sets finish_reason: player_finish.
 
 @export var order_id: String = ""
@@ -17,7 +17,8 @@ extends Resource
 @export var hand_size: int = GameConstants.HAND_SIZE
 @export var hand: Array[HandCard] = [] ## mats + runes + skills; no auto-refill
 @export var draw_pile: Array[HandCard] = [] ## run deck remainder this session (docs/27)
-@export var discard_pile: Array[HandCard] = [] ## play + dig dump; reshuffles into draw
+@export var discard_pile: Array[HandCard] = [] ## skills + dig dump; reshuffles into draw
+@export var committed: Array[HandCard] = [] ## played materials/runes; cannot cycle this craft
 @export var dig_refresh_cost: int = GameConstants.DIG_REFRESH_COST
 @export var max_materials: int = GameConstants.DEFAULT_MAX_MATERIALS ## docs/32 staff-raised per-zone bag
 @export var max_runes: int = GameConstants.DEFAULT_MAX_RUNES
@@ -49,6 +50,7 @@ func apply_order(order: ClientOrder) -> void:
 	hand.clear()
 	draw_pile.clear()
 	discard_pile.clear()
+	committed.clear()
 	cards_played.clear()
 	focus_zone(1)
 
@@ -88,6 +90,10 @@ func run_deck_count() -> int:
 	return hand.size() + draw_pile.size() + discard_pile.size()
 
 
+func available_card_count() -> int:
+	return run_deck_count() + committed.size()
+
+
 func to_session_dict() -> Dictionary:
 	var played: Array = []
 	for card in cards_played:
@@ -101,6 +107,9 @@ func to_session_dict() -> Dictionary:
 	var discard_rows: Array = []
 	for card in discard_pile:
 		discard_rows.append(card.to_dict())
+	var committed_rows: Array = []
+	for card in committed:
+		committed_rows.append(card.to_dict())
 	return {
 		"piece_index": piece_index,
 		"piece_count": piece_count,
@@ -112,6 +121,7 @@ func to_session_dict() -> Dictionary:
 		"hand": hand_rows,
 		"draw_pile": draw_rows,
 		"discard_pile": discard_rows,
+		"committed": committed_rows,
 		"dig_refresh_cost": dig_refresh_cost,
 		"dig_count": dig_count,
 		"cards_played": played,
@@ -142,7 +152,7 @@ func schema_errors() -> PackedStringArray:
 		errs.append("stamina_remaining < 0")
 	var expect_start := GameConstants.session_stamina_start(piece_count)
 	if stamina_start < expect_start:
-		errs.append("stamina_start %d < 12 * piece_count %d" % [stamina_start, expect_start])
+		errs.append("stamina_start %d < 8 * piece_count + 2 (%d)" % [stamina_start, expect_start])
 	if hand_size < GameConstants.HAND_SIZE:
 		errs.append("hand_size %d < %d" % [hand_size, GameConstants.HAND_SIZE])
 	if dig_refresh_cost < 1:
@@ -158,6 +168,8 @@ func schema_errors() -> PackedStringArray:
 	for card in draw_pile:
 		errs.append_array(card.schema_errors())
 	for card in discard_pile:
+		errs.append_array(card.schema_errors())
+	for card in committed:
 		errs.append_array(card.schema_errors())
 	for card in cards_played:
 		errs.append_array(card.schema_errors())

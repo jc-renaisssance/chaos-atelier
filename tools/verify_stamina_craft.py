@@ -2,7 +2,7 @@
 """Source + spec checks for Client 1B stamina craft (docs/27, docs/20).
 
 Godot is not required. This does not open the editor.
-Parallel multi-piece: one session, stamina_start = 12 * N, ≤4 zones.
+Parallel multi-piece: one session, stamina_start = 8 * N + 2, ≤4 zones.
 """
 from __future__ import annotations
 
@@ -67,6 +67,7 @@ def check_source_symbols(blob: str) -> None:
         "func session_stamina_start",
         "draw_pile",
         "discard_pile",
+        "committed",
         "unlocked_outlooks",
         "LOCKED_LABEL",
         "CURRENT",
@@ -87,8 +88,8 @@ def check_source_symbols(blob: str) -> None:
         "player_finish",
         "docs/27",
         "docs/20",
-        "_get_drag_data",
-        "_drop_data",
+        "_begin_drag",
+        "_end_drag",
         "KEY_D",
         "KEY_1",
     ]
@@ -123,8 +124,10 @@ def check_source_symbols(blob: str) -> None:
         rules,
     ):
         fail("materials must also leave the hand — do not gate remove_at on burns_on_play")
+    if "session.committed.append(card)" not in rules:
+        fail("played materials/runes must enter committed")
     if "session.discard_pile.append(card)" not in rules:
-        fail("played cards must go to discard unless they burn")
+        fail("played skills must enter discard")
     if "reshuffle_discard_into_draw" not in rules:
         fail("mid-draw shortfall must shuffle discard into draw")
     if "return_hand_copies" in rules:
@@ -156,9 +159,9 @@ def check_source_symbols(blob: str) -> None:
         fail("Finish is the only button — do not label it Early finish")
     session_src = (SRC / "data" / "craft" / "craft_stamina_session.gd").read_text(encoding="utf-8")
     if "session_stamina_start" not in session_src:
-        fail("session stamina_start must be 12 * piece_count")
+        fail("session stamina_start must be 8 * piece_count + 2")
     if "stamina_start != GameConstants.STAMINA_START" in session_src:
-        fail("do not assert stamina_start == 12; session pool is 12 * N")
+        fail("do not assert one fixed stamina value; session pool is 8 * N + 2")
     played = (SRC / "data" / "craft" / "played_card.gd").read_text(encoding="utf-8")
     if "zone_index" not in played or "construction_id" not in played:
         fail("cards_played rows must include zone_index and construction_id")
@@ -186,7 +189,8 @@ def check_gd_balance() -> None:
 
 # --- spec sim (docs/27 + 20 asserts 13–17) -----------------------------------
 
-STAMINA_PER_PIECE = 12
+STAMINA_PER_PIECE = 8
+STAMINA_SESSION_BONUS = 2
 HAND_SIZE = 5
 DIG_COST = 2
 ZONE_COUNT_MAX = 4
@@ -218,7 +222,7 @@ class Session:
         self.selected_zone_index = 1
         self.piece_index = 1
         self.construction_id = self.construction_ids[0]
-        self.stamina_start = STAMINA_PER_PIECE * self.piece_count
+        self.stamina_start = STAMINA_PER_PIECE * self.piece_count + STAMINA_SESSION_BONUS
         self.stamina_remaining = self.stamina_start
         self.stamina_spent = 0
         self.hand_size = HAND_SIZE
@@ -227,6 +231,7 @@ class Session:
         self.hand: list[str] = []
         self.draw_pile: list[str] = []
         self.discard_pile: list[str] = []
+        self.committed: list[str] = []
         self.cards_played: list[dict] = []
         self.early_finish = False
         self.finish_reason = None
@@ -259,7 +264,9 @@ class Session:
         cost = self.play_cost(card_id)
         assert cost <= self.stamina_remaining
         kind = CATALOG[card_id]["type"]
-        if not burns_on_play(kind):
+        if kind in {"material", "rune"}:
+            self.committed.append(card_id)
+        elif not burns_on_play(kind):
             self.discard_pile.append(card_id)
         if kind == "material" and self.next_mat_free:
             self.next_mat_free = False
@@ -310,6 +317,9 @@ class Session:
 
     def run_deck(self) -> list[str]:
         return list(self.hand) + list(self.draw_pile) + list(self.discard_pile)
+
+    def allocated_cards(self) -> list[str]:
+        return self.run_deck() + list(self.committed)
 
     def finish_early(self) -> list[dict]:
         assert self.finish_reason is None
@@ -377,11 +387,11 @@ def run_spec() -> None:
     ]
     crafts_done = 0
 
-    # One session for armor + gloves — stamina 24, two zones
+    # One session for armor + gloves — stamina 18, two zones
     s = Session(["con_armor", "con_gloves"])
-    if s.stamina_start != 24 or s.zone_count != 2 or s.piece_count != 2:
+    if s.stamina_start != 18 or s.zone_count != 2 or s.piece_count != 2:
         fail(
-            f"multi-piece session should be stamina 24 / 2 zones, got start={s.stamina_start} zones={s.zone_count}"
+            f"multi-piece session should be stamina 18 / 2 zones, got start={s.stamina_start} zones={s.zone_count}"
         )
     if s.zone_count > ZONE_COUNT_MAX:
         fail("zone_count must be ≤ 4")
@@ -393,22 +403,24 @@ def run_spec() -> None:
     if len(leftover_draw) != len(deck) - HAND_SIZE:
         fail("opening draw must leave remainder on the draw pile")
 
-    # play first hemp into zone 1 — leaves hand → discard; stays in run deck
+    # play first hemp into zone 1 — leaves hand → committed
     hemp_i = s.hand.index("mat_hemp_plain")
     hemp_in_hand = s.hand.count("mat_hemp_plain")
-    deck_before = s.run_deck()
+    deck_before = s.allocated_cards()
     s.play(hemp_i, 1)
-    if s.stamina_remaining != 23 or s.stamina_spent != 1:
-        fail(f"hemp play should spend 1 from 24, got rem={s.stamina_remaining} spent={s.stamina_spent}")
+    if s.stamina_remaining != 17 or s.stamina_spent != 1:
+        fail(f"hemp play should spend 1 from 18, got rem={s.stamina_remaining} spent={s.stamina_spent}")
     last = s.cards_played[-1]
     if last.get("zone_index") != 1 or last.get("construction_id") != "con_armor":
         fail("play must stamp zone_index + construction_id")
     if s.hand.count("mat_hemp_plain") != hemp_in_hand - 1:
         fail("material play must leave the hand (StS cycle, not durable-in-hand)")
-    if "mat_hemp_plain" not in s.discard_pile:
-        fail("played material must go to discard")
-    if sorted(s.run_deck()) != sorted(deck_before):
-        fail("play must keep the card in the run deck (discard), not delete it")
+    if "mat_hemp_plain" not in s.committed:
+        fail("played material must go to committed")
+    if "mat_hemp_plain" in s.discard_pile:
+        fail("played material must not enter discard")
+    if sorted(s.allocated_cards()) != sorted(deck_before):
+        fail("play must keep the committed copy allocated, not delete it")
     if leftover_draw != s.draw_pile:
         fail("material play must not pull from the draw pile")
     if any(c["id"].startswith("con_") for c in s.cards_played):
@@ -476,8 +488,8 @@ def run_spec() -> None:
         if s.cards_played[-1]["construction_id"] != "con_gloves":
             fail("zone 2 play must tag construction_id=con_gloves")
         if s.stamina_remaining != rem_before - 1:
-            fail("zone 2 play spends the shared session pool — not a fresh 12")
-        if s.stamina_start != 24:
+            fail("zone 2 play spends the shared session pool — not a fresh pool")
+        if s.stamina_start != 18:
             fail("playing into zone 2 must not reset stamina_start")
 
     stamps = s.finish_early()
@@ -489,8 +501,8 @@ def run_spec() -> None:
         fail("one Finish must emit one stamp per piece (N stamps, one session)")
     if [row["piece_index"] for row in stamps] != [1, 2]:
         fail("Finish stamps must be listed sequence 1..N")
-    if any(row["stamina_start"] != 24 for row in stamps):
-        fail("each piece stamp repeats the session stamina_start = 12 * N")
+    if any(row["stamina_start"] != 18 for row in stamps):
+        fail("each piece stamp repeats the session stamina_start = 8 * N + 2")
     if any(row["finish_reason"] != "player_finish" for row in stamps):
         fail("every piece stamp from that Finish uses player_finish")
     if stamps[0]["bag"].get("Metal", 0) < 1:
@@ -518,11 +530,11 @@ def run_spec() -> None:
 
     # stamina 0 is state — session stays open until Finish
     s0 = Session(["con_tunic"])
-    if s0.stamina_start != 12:
-        fail("mono session stamina_start should be 12 * 1")
+    if s0.stamina_start != 10:
+        fail("mono session stamina_start should be 8 * 1 + 2")
     s0.hand = ["mat_hemp_plain"]
     s0.stamina_remaining = 2
-    s0.stamina_spent = 10
+    s0.stamina_spent = 8
     deck_at_zero = s0.run_deck()
     s0.dig()
     if s0.finish_reason is not None:
@@ -538,7 +550,7 @@ def run_spec() -> None:
     s0.finish_early()
     if s0.finish_reason != "player_finish":
         fail("Finish at stamina 0 must set player_finish")
-    if "mat_hemp_plain" not in s0.hand and "mat_hemp_plain" not in s0.discard_pile and "mat_hemp_plain" not in s0.draw_pile:
+    if "mat_hemp_plain" not in s0.allocated_cards():
         fail("Finish is what ends the session — cards stay until then")
 
     s3 = Session(["con_tunic"])
@@ -564,19 +576,19 @@ def run_spec() -> None:
     if MAT_COST[4] != 3:
         fail("rare mat play cost must be 3")
 
-    # Same id via copies or after reshuffle — not by replaying one in-hand card
+    # Same id stacks only through distinct owned copies; committed copies cannot reshuffle.
     s5 = Session(["con_armor"])
     s5.hand = ["mat_iron_scrap", "mat_iron_scrap", "sk_next_mat_free", "oil_round"]
     s5.play(0, 1)
-    if "mat_iron_scrap" not in s5.discard_pile:
-        fail("played material must sit in discard")
+    if "mat_iron_scrap" not in s5.committed:
+        fail("played material must sit in committed")
     s5.play(0, 1)
     if [c["id"] for c in s5.cards_played] != ["mat_iron_scrap", "mat_iron_scrap"]:
         fail("same material id may stack via copies (each play leaves the hand)")
     if "mat_iron_scrap" in s5.hand:
         fail("cannot replay one in-hand card — it already left")
-    if s5.discard_pile.count("mat_iron_scrap") != 2:
-        fail("both iron copies must be in discard")
+    if s5.committed.count("mat_iron_scrap") != 2:
+        fail("both iron copies must be committed separately")
     s5.play(0, 1)
     if "sk_next_mat_free" in s5.hand:
         fail("skill leaves the hand")
@@ -603,14 +615,14 @@ def run_spec() -> None:
         fail("reshuffle dig should increment dig_count")
     if s6.draw_pile and len(s6.hand) < HAND_SIZE:
         fail("draw should continue after reshuffle until hand_size or empty")
-    if len(s6.hand) != 5:
-        fail(f"reshuffle mid-draw should refill to 5, got {len(s6.hand)}")
+    if len(s6.hand) != 4:
+        fail(f"committed material must leave only 4 cycling cards, got {len(s6.hand)}")
     if s6.discard_pile:
         fail("after full redraw from reshuffled discard, discard should be empty")
     if "mat_silk_pale" not in s6.hand:
         fail("dumped leftover hand must cycle back via reshuffle")
-    if "mat_hemp_plain" not in s6.hand:
-        fail("played hemp must cycle discard → draw → hand")
+    if s6.committed.count("mat_hemp_plain") != 1:
+        fail("the played hemp copy must remain committed")
 
     # N > 4 is Later — do not invent a fifth zone
     if ZONE_COUNT_MAX != 4:
@@ -629,8 +641,8 @@ def main() -> int:
             print(" -", item)
         return 1
     print("OK stamina craft source + spec (docs/27, docs/20)")
-    print("Parallel multi-piece: one session, stamina_start=12*N, ≤4 zones, one Finish.")
-    print("Finish-only craft (player_finish). Stamina 0 stays open. StS + selected-zone Current/Potential.")
+    print("Parallel multi-piece: one session, stamina_start=8*N+2, ≤4 zones, one Finish.")
+    print("Finish-only craft. Materials/runes commit; skills cycle; selected-zone Current/Potential.")
     print("Godot editor was not opened.")
     return 0
 

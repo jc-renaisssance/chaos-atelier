@@ -2,6 +2,8 @@
 
 **Doc id: `39`.** **Status: Stamped A B C′ D′ E F G** (Jonathan, Aizen Soft amend) and **scrap_breath A** (Jonathan, 2026-10-27/29). A–G stay written off tip **`d51d47e`** (Soft chrome #91). This amend is written off tip **`0675d2c`** (#93). Docs only. No `src/`. No assets. No PixelLab. No gens. Soft QC is next. Because C′ and D′ rewrote the letters, Aizen’s re-stamp brief follows that PASS before the Client wire. Ulquiorra holds the Client #95 `sk_scrap_breath` rewire until this Soft merges.
 
+**Production supersession (2026-11-02; [40](40-item-trait-affinity.md)):** keep the 10-card **3 / 4 / 3** shape, hand 5, three starter skills, and dig cost 2. Replace the three different tagged materials with **three copies of one selected starter bolt**. Default until the scenario-select phase is **Ember**: three `mat_ember_silk` starter printings carrying Fire only; normal market Ember Silk remains Fire + Silk. Materials/runes commit instead of cycling, stamina is `8 * N + 2`, and the formula-driven per-item affinity rules in `40` replace every fixed combat number below. The old letter tables remain historical.
+
 This file is the starter **deck** and the basic-owner combat kits. The hand is a draw from that deck. Jonathan (2026-10-27): the **3 / 4 / 3** is the starter deck composition.
 
 Separate from Soft chrome [37](37-player-facing-chrome.md) (#91), craft hand [36](36-craft-hand-cards.md) (A′AAAA), tag chrome **A**, and Drop A. Those stay closed. Soft height [#92](https://github.com/jc-renaisssance/chaos-atelier/pull/92) owns doc id **38** (`docs/38-solenne-height-body.md`) and is **stamped height-split** (Soft Design PASS). This file does not edit that law, posture art, or PR #71.
@@ -15,7 +17,7 @@ Ulquiorra and Szayelaporro **hold** the Client until Soft QC PASS and Aizen’s 
 | Lock | Where |
 |---|---|
 | Hand size **5** (`max_hand`) | [27](27-craft-mode-stamina.md), [36](36-craft-hand-cards.md). Fan step stays `32 / (max_hand - 1)` |
-| Dig cost **2**, session stamina **`12 * N`**, Finish-only, StS cycle | [27](27-craft-mode-stamina.md). Letter G is stamped **A**: dig stays 2 |
+| Dig cost **2**, session stamina **`8 * N + 2`**, Finish-only, committed materials/runes | [27](27-craft-mode-stamina.md), [40](40-item-trait-affinity.md) |
 | Soft A′AAAA, tag chrome **A**, Drop A, cost caption, N=2 one fight | [36](36-craft-hand-cards.md) #83–#89. Client #88 (`e9f503f`) |
 | Player-facing chrome **Node A′ · Brief A · Event A** | [37](37-player-facing-chrome.md) #91 |
 | Gate **A** / Surface **A** / Socket **A**, vignettes **A**, one fight | [30](30-interactive-order.md), [35](35-steam-demo-cut.md). The PASS bar below is the fight. It does not reopen those letters |
@@ -42,7 +44,7 @@ Every run starts with the same cards. The draw order changes. The composition do
 
 ### 3. AP and stamina are one meter
 
-Skills spend stamina. Dig spends stamina. Material plays spend stamina. Session start stays **`12 * N`**. There is no second action meter. Dig stays **2** (letter G, stamped **A**).
+Skills spend stamina. Dig spends stamina. Material plays spend stamina. Session start is **`8 * N + 2`**. There is no second action meter. Dig stays **2**.
 
 ### 4. “Next card” is a craft play
 

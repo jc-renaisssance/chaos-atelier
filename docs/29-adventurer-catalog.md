@@ -1,8 +1,8 @@
 # M1 + M2 adventurer catalog
 
-**Status:** M1 roster **unchanged** (2026-10-05 / 2026-10-08). M2 roster **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`, accepted as written. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. Portrait uniqueness on all **24** (Race / Visual / Outfit / Character / Hook) is **stamped** (Jonathan ACCEPT on #63). M1 redraws landed (#64). M2 redraws landed (#65) and replace the held #62 outlook. Do not regen. Do not revive #62. Elite telegraph is [22](22-chapter-schedule.md), not this catalog.
+**Status:** M1 roster mechanics **unchanged** (2026-10-05 / 2026-10-08). M2 roster mechanics **stamped** (Jonathan 2026-10-21, #61): Wizard, Hexer, Outrider, Oathbound × 3 = **12** named `adv_*`. Character identity, backgrounds, and Public display names were expanded 2026-11-02 without changing ids, jobs, stats, skills, or constructions. Two **disjoint** 4-job draws. `M1_JOB_POOL` = Knight, Mage, Blade Dancer, Lagoon. `M2_JOB_POOL` = Wizard, Hexer, Outrider, Oathbound only (**draw B**). Text-first UI stays legal until a portrait file exists. Docs only — no `src/` / Godot / art gens. **M1 market is closed** ([32](32-shop-and-events.md)); this file does not reopen it. Portrait uniqueness on all **24** (Race / Visual / Outfit / Character / Hook) is **stamped** (Jonathan ACCEPT on #63). M1 redraws landed (#64). M2 redraws landed (#65) and replace the held #62 outlook. Do not regen. Do not revive #62. Elite telegraph is [22](22-chapter-schedule.md), not this catalog.
 
-**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21; portrait uniqueness 2026-10-21 (ACCEPT all 24 on #63; art #64 / #65). Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
+**Doc id: `29`.** Grimmjow 2026-10-05; M2 people 2026-10-21; portrait uniqueness 2026-10-21 (ACCEPT all 24 on #63; art #64 / #65); identity and background pass 2026-11-02. Interactive-order slices 1–3: **[30-interactive-order](30-interactive-order.md)**. Jobs / constructions: **[28-boss-client-pool](28-boss-client-pool.md)**.
 
 **Terminology:** UI / prose says **adventurer**. **Client** = Godot Client seat / codebase. Internal ids stay (`boss_client_id`, `con_*`, `appt_*`, `adv_*`, `ord_*`, `job_*`) so saves and Test smokes do not churn. Do not mass-rename existing ids. Scrap Duelist stays `appt_*`.
 
@@ -132,26 +132,60 @@ Exactly **one** `ask_*` per adventurer. Skill text is the battle / estimate hook
 
 ---
 
+## Character identity and reveal
+
+The roster uses three player-facing name layers. Internal `adv_*` ids do not change.
+
+| Layer | Use |
+|---|---|
+| **True name** | Birth name, legal name, order name, or construct designation. It may be unknown at first and is shown only when the fiction has earned it |
+| **Public name** | The short, memorable name used on order cards, combat UI, reports, and ordinary dialogue |
+| **Epithet** | Optional reputation text used for introductions, newspaper headlines, mastery results, or relationship moments. It is not appended to every UI label |
+
+Only four people use a true middle or lineage name: **Halden Baruk Rook**, **Solenne Aurelia Ward**, **Kitarian Sableclaw Thornreel**, and **Pell Severin White**. Those names communicate clan or noble history. Everyone else stays shorter, uses an order-name, or has a construct designation.
+
+### Presentation law
+
+1. **First meeting:** show portrait, Public name, job, one-line Hook, and the immediate garment ask. Do not front-load biography.
+2. **During the order:** reveal personality through requirement wording, inspection comments, and one reactive bark when a favored or refused trait enters the plan.
+3. **Result:** show an epithet only when the outcome supports it. A successful signature build may earn the epithet as a Dex title; an ordinary result keeps the Public name.
+4. **Trust or story reveal:** add the True name and one short background paragraph to the Dex. Secretive people and constructs reveal theirs through a specific event, not an automatic affinity level.
+5. **Later encounters:** change one or two barks after the reveal. Do not replay the biography.
+
+`Display` below is the intended **Public name**. Existing ids, jobs, stats, constructions, skills, and portrait sockets remain stable.
+
+---
+
 ## M1 roster (12)
 
 Every job: one **monostack** brief, one **cross-tag** brief, one **defensive / neg-avoid** brief. C2 / C3 punish starter tags (**Soft, Earth, Metal, Wild, Silk, Pure** — `17` / `19`). Non-starter briefs go to C2 / C3; one Silk-mid mage vs Ivory Judge is the **starter-tag trap**.
 
 Outlook names / tiers from `14` / `15`. Cross-tags have **no** 3/5/8 power ladder — one chrome (`cross`). Storm / Beastbloom / Snaretooth / Masked Crown / Dawn / Pale Hex are the stamped cross / storm outlook set.
 
-Each of these 12 has a **Portrait uniqueness** subsection: **Race**, **Visual**, **Outfit**, **Character**, **Hook**. That block is a docs lock on the landed files. It does not open an M1 regen. Gen rules and the stamp line: [M2 portrait uniqueness](#m2-portrait-uniqueness). Ids, display names, jobs, and `construction_ids` stay as written.
+Each of these 12 has a **Portrait uniqueness** subsection: **Race**, **Visual**, **Outfit**, **Character**, **Hook**. That block is a docs lock on the landed files. It does not open an M1 regen. Gen rules and the stamp line: [M2 portrait uniqueness](#m2-portrait-uniqueness). Ids, jobs, and `construction_ids` stay as written; the identity pass changes text-facing Public names only.
 
 ### Knight — `job_knight` · `ord_knight` · `con_armor` + `con_gloves` (gauntlet)
 
 Job-default alias: `adv_knight` → `adv_halden_rook`.
 
-#### `adv_halden_rook` — Ser Halden Rook
+#### `adv_halden_rook` — Ser Halden
 
 Oath steel who still thinks a gorge-wyrm is a siege problem.
+
+| Identity | Value |
+|---|---|
+| True name | **Ser Halden Baruk Rook** — `Baruk` is the ancestor-name carried by Rookhold wall-oath heirs |
+| Public name | **Ser Halden** |
+| Epithet | **The Walking Keep** |
+
+**Background.** Halden comes from Rookhold breach-engineers, a dwarf clan that measures courage in walls held rather than foes slain. He took his grandfather Baruk's name when he inherited an unpaid wall-oath, and now treats every monster as a siege problem that can be solved with preparation and enough plate.
+
+**In-game presentation.** His first order arrives as a sealed military requisition with blunt diagrams instead of personal history. `Baruk Rook` appears on the oath-signature after the player absorbs a major physical punish for him; **The Walking Keep** becomes a result-card and Dex title after a successful Metal signature build.
 
 | Field | Value |
 |---|---|
 | id | `adv_halden_rook` |
-| Display | Ser Halden Rook |
+| Display | Ser Halden |
 | Job | Knight (`job_knight`) |
 | Build intent | **Monostack** — Metal mid |
 | Requirement tags | Metal **mid** (≥5). Sharp welcome, not required |
@@ -175,14 +209,24 @@ Oath steel who still thinks a gorge-wyrm is a siege problem.
 | Character | Brave & straight |
 | Hook | Oath steel who still thinks a gorge-wyrm is a siege problem. |
 
-#### `adv_vex_bramble` — Vex Bramble
+#### `adv_vex_bramble` — Vex
 
 Dock-hired plate who wants teeth in the hem, not a church bell.
+
+| Identity | Value |
+|---|---|
+| True name | **Vexel Bramble** |
+| Public name | **Vex** |
+| Epithet | **Bramblebite** |
+
+**Background.** Vexel was a dock runner and hired breaker before a Salt Widow raid left him holding a pier with a hooked mooring chain. The knight order gave him plate but never polished away the dock slang, opportunism, or delight he takes in making armor fight dirty.
+
+**In-game presentation.** He scratches **Vex** across the printed name on his order and immediately comments on Sticky or Sharp materials. `Vexel Bramble` is revealed by an old dock warrant during a repeat visit; **Bramblebite** appears in dockside gossip and is earned in the Dex after Snaretooth succeeds.
 
 | Field | Value |
 |---|---|
 | id | `adv_vex_bramble` |
-| Display | Vex Bramble |
+| Display | Vex |
 | Job | Knight (`job_knight`) |
 | Build intent | **Cross-tag** — Snaretooth |
 | Requirement tags | Sticky ≥1 ∧ Sharp ≥1 (`syn_sticky_sharp`) |
@@ -206,14 +250,24 @@ Dock-hired plate who wants teeth in the hem, not a church bell.
 | Character | Dangerous (playful menace) |
 | Hook | Dock-hired plate who wants teeth in the hem, not a church bell. |
 
-#### `adv_solenne_ward` — Dame Solenne Ward
+#### `adv_solenne_ward` — Dame Solenne
 
 Court plate. Soft and scrap-metal read as mud on the tiles — she will not wear a clang.
+
+| Identity | Value |
+|---|---|
+| True name | **Dame Solenne Aurelia Ward** — `Aurelia` marks her maternal court line |
+| Public name | **Dame Solenne** |
+| Epithet | **The Unclanging Ward** |
+
+**Background.** House Ward protects court proceedings where one noisy step can become a political confession. Solenne inherited the Aurelia line's ceremonial obligations, but left the inner court after refusing to disguise compromised armor as pageantry; her severe taste is professional discipline, not simple vanity.
+
+**In-game presentation.** Her first appearance is formal and gives **Dame Solenne**, House Ward's seal, and no family lecture. Her full style is spoken at a later court hearing; **The Unclanging Ward** is granted only when the player delivers a Royal build with no negative synergy.
 
 | Field | Value |
 |---|---|
 | id | `adv_solenne_ward` |
-| Display | Dame Solenne Ward |
+| Display | Dame Solenne |
 | Job | Knight (`job_knight`) |
 | Build intent | **Defensive / neg-avoid** — Royal mid; no starter Soft / Metal dump |
 | Requirement tags | Royal **mid** (≥5). **Avoid** Soft; **avoid** Metal≥3 ∧ Silk≥3 (Ragged Mail); **avoid** Metal ∧ Silent (Clanging Hush) |
@@ -245,14 +299,24 @@ C3 punishes Metal: a Metal-mid Halden brief vs Gilded Warden is a **legal hard d
 
 Job-default alias: `adv_mage` → `adv_quill_lumen`.
 
-#### `adv_quill_lumen` — Quill Lumen
+#### `adv_quill_lumen` — Quill
 
 Road scholar. Wants the moon on the hood, not a clean-silk sermon.
+
+| Identity | Value |
+|---|---|
+| True name | **Quillian Lumen** |
+| Public name | **Quill** |
+| Epithet | **The Moon-Scribe** |
+
+**Background.** Quillian left a reputable observatory when its masters dismissed roadside omens as peasant superstition. He now walks the routes he once studied from a tower, recording how moonlight, weather, and ordinary people alter supposedly fixed magic.
+
+**In-game presentation.** His order is written as annotated field notes, with **Quill** signed in the margin and Lunar materials receiving curious comments. `Quillian Lumen` appears in an academy rejection letter; **The Moon-Scribe** unlocks after his Lunar signature result and becomes his later newspaper byline.
 
 | Field | Value |
 |---|---|
 | id | `adv_quill_lumen` |
-| Display | Quill Lumen |
+| Display | Quill |
 | Job | Mage (`job_mage`) |
 | Build intent | **Monostack** — Lunar mid |
 | Requirement tags | Lunar **mid** (≥5) |
@@ -276,14 +340,24 @@ Road scholar. Wants the moon on the hood, not a clean-silk sermon.
 | Character | Quiet curiosity (road scholar) |
 | Hook | Road scholar — wants the moon on the hood, not a clean-silk sermon. |
 
-#### `adv_neri_paleink` — Neri Pale-Ink
+#### `adv_neri_paleink` — Neri
 
 Signs in two inks. The aisle is still in session.
+
+| Identity | Value |
+|---|---|
+| True name | **Neria Pale-Ink** |
+| Public name | **Neri** |
+| Epithet | **The Two-Ink Clerk** |
+
+**Background.** Neria once authenticated records for an aisle court that kept one lawful ledger and one occult ledger. She signed the same forbidden judgment in both inks, proving the court's public history false and leaving her simultaneously wanted as a forger and needed as its only credible witness.
+
+**In-game presentation.** Her order card is stamped twice and she corrects the player's wording before discussing cloth. The full signature is visible from the start but its meaning enters the Dex only after a Pale Hex result; later court encounters recognize **The Two-Ink Clerk** before they recognize Neri.
 
 | Field | Value |
 |---|---|
 | id | `adv_neri_paleink` |
-| Display | Neri Pale-Ink |
+| Display | Neri |
 | Job | Mage (`job_mage`) |
 | Build intent | **Cross-tag** — Pale Hex |
 | Requirement tags | Lunar ≥1 ∧ Occult ≥1 (`syn_lunar_occult`). **Avoid** Pure (Schism Stitch / Pale Hex Pure risk) |
@@ -310,6 +384,16 @@ Signs in two inks. The aisle is still in session.
 #### `adv_marrowveil` — Sister Marrowveil
 
 Wants flow and a clean hood. Will not wear a bucket. Ivory still calls silk contempt.
+
+| Identity | Value |
+|---|---|
+| True name | **Elowen Marrow** |
+| Public name | **Sister Marrowveil** |
+| Epithet | **The Gentle Heresy** |
+
+**Background.** Elowen took the Marrowveil order-name after tending a plague convent where heavy ceremonial hoods trapped heat and cost lives. She teaches that grace and movement are forms of devotion, a merciful doctrine the Ivory Judge considers dangerously indulgent.
+
+**In-game presentation.** She introduces herself only as **Sister Marrowveil**, and her gentle inspection barks make the restrictive brief feel caring before its trap becomes clear. `Elowen Marrow` is revealed in a damaged convent register during her personal event; **The Gentle Heresy** first appears as an accusation, then becomes an earned Dex title.
 
 | Field | Value |
 |---|---|
@@ -346,14 +430,24 @@ Silk is a **starter tag**. This brief vs Ivory Judge is the M1 **trap row** — 
 
 Job-default alias: `adv_blade_dancer` → `adv_kite_thornreel`.
 
-#### `adv_kite_thornreel` — Kite Thornreel
+#### `adv_kite_thornreel` — Kite
 
 Edge and hem. Wants a choir of cuts, not a quiet bow.
+
+| Identity | Value |
+|---|---|
+| True name | **Kitarian Sableclaw Thornreel** — `Sableclaw` is the hunting-clan name he theatrically pretends not to care about |
+| Public name | **Kite** |
+| Epithet | **The Catsassin** |
+
+**Background.** Kitarian was raised by Sableclaw caravan hunters who expected him to inherit their patient stalking craft. He shortened the family form to Kite, turned the quiet techniques into an extravagant blade dance, and discovered that memorable entrances produce better contracts than anonymous kills.
+
+**In-game presentation.** Kite interrupts his own introduction to demand **The Catsassin**, while other characters pointedly call him only Kite. His full name is revealed when an unimpressed clan letter reaches the atelier; the epithet becomes legitimate on the result screen only after a Sharp signature success.
 
 | Field | Value |
 |---|---|
 | id | `adv_kite_thornreel` |
-| Display | Kite Thornreel |
+| Display | Kite |
 | Job | Blade Dancer (`job_blade_dancer`) |
 | Build intent | **Monostack** — Sharp mid |
 | Requirement tags | Sharp **mid** (≥5) |
@@ -377,14 +471,24 @@ Edge and hem. Wants a choir of cuts, not a quiet bow.
 | Character | Dangerous / kinetic |
 | Hook | Edge and hem — wants a choir of cuts, not a quiet bow. |
 
-#### `adv_mask_circlet` — Mask Circlet
+#### `adv_mask_circlet` — Mask
 
 A bow that is also a lie. Court hush, not a dancing bell.
+
+| Identity | Value |
+|---|---|
+| True name | **Circlet Unit M-08** |
+| Public name | **Mask** |
+| Epithet | **The Borrowed Bow** |
+
+**Background.** M-08 was built to stand in for a court envoy after an assassination, reproducing posture and etiquette while the court concealed the death. Years of performing a person who no longer existed taught the construct that identity can be both false and sincerely chosen.
+
+**In-game presentation.** Ordinary UI says **Mask** and never treats the construct as a mystery box that must be solved immediately. The unit mark appears during an inspection animation; a court-memory event explains it, while **The Borrowed Bow** is used in intrigue reports after a clean Masked Crown result.
 
 | Field | Value |
 |---|---|
 | id | `adv_mask_circlet` |
-| Display | Mask Circlet |
+| Display | Mask |
 | Job | Blade Dancer (`job_blade_dancer`) |
 | Build intent | **Cross-tag** — Masked Crown |
 | Requirement tags | Royal ≥1 ∧ Silent ≥1 (`syn_royal_silent`). **Avoid** Metal (Clanging Hush kills Silent) |
@@ -408,14 +512,24 @@ A bow that is also a lie. Court hush, not a dancing bell.
 | Character | Emotionless (court lie) |
 | Hook | A bow that is also a lie — court hush, not a dancing bell. |
 
-#### `adv_whisper_hem` — Whisper Hem
+#### `adv_whisper_hem` — Whisper
 
 Already gone. Soft knives and ringing plate both ruin the act.
+
+| Identity | Value |
+|---|---|
+| True name | **Unknown** — deliberately erased |
+| Public name | **Whisper** |
+| Epithet | **The Vanishing Hem** |
+
+**Background.** Whisper was a shadow-elf route courier until a failed extraction exposed everyone attached to the route. They burned the route book, removed their own name from its final page, and now accept only work that leaves no one else carrying the evidence.
+
+**In-game presentation.** The first order appears without an arrival animation: it is simply already on the counter. Conflicting clues enter the Dex over repeat visits, but no canonical birth name is supplied; **The Vanishing Hem** is earned when a Silent result clears without spoiled-hush warnings.
 
 | Field | Value |
 |---|---|
 | id | `adv_whisper_hem` |
-| Display | Whisper Hem |
+| Display | Whisper |
 | Job | Blade Dancer (`job_blade_dancer`) |
 | Build intent | **Defensive / neg-avoid** — Silent mid; hush must survive |
 | Requirement tags | Silent **mid** (≥5). **Avoid** Metal ≥1 (Clanging Hush). **Avoid** Soft ∧ Sharp (Frayed Comfort — tunic is Soft-tagged in `12`, so Sharp dump is the trap) |
@@ -445,14 +559,24 @@ Already gone. Soft knives and ringing plate both ruin the act.
 
 Job-default alias: `adv_lagoon` → `adv_tide_glass`. Jonathan-named title. Not Salt Widow. Not an appointment.
 
-#### `adv_tide_glass` — Tide Glass
+#### `adv_tide_glass` — Tide
 
 Tide-hired. Wants the sky in the cloak, not a dry court.
+
+| Identity | Value |
+|---|---|
+| True name | **Thalassa Glass** |
+| Public name | **Tide** |
+| Epithet | **Stormglass** |
+
+**Background.** Thalassa piloted salvage crews through reef storms until a noble recovery contract ordered her to abandon stranded deckhands for cargo. She broke contract, saved the crew, and lost the license that once made her name respectable.
+
+**In-game presentation.** Her wet order slip uses the dock-call **Tide**, and Storm materials trigger open excitement instead of exposition. `Thalassa Glass` appears on the revoked pilot license in her rescue event; **Stormglass** becomes the name used by her returning crew after a signature build.
 
 | Field | Value |
 |---|---|
 | id | `adv_tide_glass` |
-| Display | Tide Glass |
+| Display | Tide |
 | Job | Lagoon (`job_lagoon`) |
 | Build intent | **Monostack** — Storm mid |
 | Requirement tags | Storm **mid** (≥5) |
@@ -476,14 +600,24 @@ Tide-hired. Wants the sky in the cloak, not a dry court.
 | Character | Brave & open (tide-hired) |
 | Hook | Tide-hired — wants the sky in the cloak, not a dry court. |
 
-#### `adv_brine_latch` — Brine Latch
+#### `adv_brine_latch` — Brine
 
 Steam in the spray. Parade glare wants fire; the lagoon still wants frost in the boot.
+
+| Identity | Value |
+|---|---|
+| True name | **BRN-L7 “Latch”** |
+| Public name | **Brine** |
+| Epithet | **The Tempered Latch** |
+
+**Background.** BRN-L7 regulated pressure in a brineworks until a dock explosion fused its heat and cooling governors into one unstable loop. It chose the name Brine after holding the ruptured floodgate long enough for the workers to escape, then repurposed its industrial frame for field work.
+
+**In-game presentation.** Heat and frost gauges flicker beside **Brine** during inspection, letting behavior establish the Temper theme. The maker designation becomes readable during a repair event; **The Tempered Latch** appears only if a successful Fire–Frost result keeps the construct operational.
 
 | Field | Value |
 |---|---|
 | id | `adv_brine_latch` |
-| Display | Brine Latch |
+| Display | Brine |
 | Job | Lagoon (`job_lagoon`) |
 | Build intent | **Cross-tag** — Temper (Fire ∧ Frost) |
 | Requirement tags | Fire ≥1 ∧ Frost ≥1 (`syn_fire_frost_clash`). **Avoid** Soft (Scorched Down if Fire is present) |
@@ -510,6 +644,16 @@ Steam in the spray. Parade glare wants fire; the lagoon still wants frost in the
 #### `adv_rime_peddler` — Rime Peddler
 
 Walks docks and mires the same. A cloak that rings like a pot lid is a failed order.
+
+| Identity | Value |
+|---|---|
+| True name | **Rurik Rimeward** |
+| Public name | **Rime Peddler** |
+| Epithet | **The Ringless Peddler** |
+
+**Background.** Rurik sold winter cloth between docks and mire villages, repairing garments in exchange for road gossip. A metal-rimmed cloak once drew lightning through a customer during a squall, and his fussy refusal of ringing trim is the guilt of a craftsman who already learned the lesson too late.
+
+**In-game presentation.** He arrives by trying to sell the player something before placing his own order, so **Rime Peddler** feels like a profession rather than a fantasy alias. His ledger reveals `Rurik Rimeward`; **The Ringless Peddler** is added after the player honors his no-Metal brief under pressure.
 
 | Field | Value |
 |---|---|
@@ -552,20 +696,30 @@ Every job: one **monostack**, one **cross-tag**, one **defensive / neg-avoid**. 
 
 M2 **starter-tag trap:** Pell White (`adv_pell_white`, Pure mid) vs `boss_sunspear_captain`. Same shape as Sister Marrowveil vs Ivory Judge.
 
-Face, race, tone, outfit, and backline for a redraw are **not** this roster table. Each of the 12 has a **Portrait uniqueness** subsection: **Race**, **Visual** (face / hair / age / body, race cue readable at 96×96), **Outfit** (silhouette + palette on that job’s constructions), **Character** (short tone), **Hook** (one sentence). Same schema on the M1 twelve. Gen rules: [M2 portrait uniqueness](#m2-portrait-uniqueness). #61 ids, display names, jobs, and `construction_ids` stay as written.
+Face, race, tone, outfit, and backline for a redraw are **not** this roster table. Each of the 12 has a **Portrait uniqueness** subsection: **Race**, **Visual** (face / hair / age / body, race cue readable at 96×96), **Outfit** (silhouette + palette on that job’s constructions), **Character** (short tone), **Hook** (one sentence). Same schema on the M1 twelve. Gen rules: [M2 portrait uniqueness](#m2-portrait-uniqueness). #61 ids, jobs, and `construction_ids` stay as written; Public display text follows the identity pass above.
 
 ### Wizard — `job_wizard` · `ord_wizard` · `con_robe` + `con_mantle`
 
 Job-default alias: `adv_wizard` → `adv_vesper_cant`. Requirement-tag family in `28`: Occult, Lunar, Royal. Not the mage order (robe + hood).
 
-#### `adv_vesper_cant` — Vesper Cant
+#### `adv_vesper_cant` — Vesper
 
 Court-adjacent caster. Wants the void in the seams, not a clean-silk sermon.
+
+| Identity | Value |
+|---|---|
+| True name | **Vesper Cant** |
+| Public name | **Vesper** |
+| Epithet | **The Void Cantor** |
+
+**Background.** Vesper served as a court music tutor until she heard a harmonic absence hidden inside a coronation cant. The court called it an error; she followed it into forbidden study and now dresses close enough to court fashion to remind them who first taught her to listen.
+
+**In-game presentation.** Her order begins with a single missing note in the text and uses **Vesper** without explanation. Court NPCs later supply the exile story, and **The Void Cantor** appears in the Dex after an Occult signature result makes the absent note audible.
 
 | Field | Value |
 |---|---|
 | id | `adv_vesper_cant` |
-| Display | Vesper Cant |
+| Display | Vesper |
 | Job | Wizard (`job_wizard`) |
 | Build intent | **Monostack** — Occult mid |
 | Requirement tags | Occult **mid** (≥5) |
@@ -589,14 +743,24 @@ Court-adjacent caster. Wants the void in the seams, not a clean-silk sermon.
 | Character | Dark / hungry quiet |
 | Hook | Court-adjacent caster who wants the void in the seams, not a clean-silk sermon. |
 
-#### `adv_nyx_vellum` — Nyx Vellum
+#### `adv_nyx_vellum` — Nyx
 
 Two inks on the mantle. A cleanse stitch splits the order.
+
+| Identity | Value |
+|---|---|
+| True name | **Nyxara Vellum** |
+| Public name | **Nyx** |
+| Epithet | **The Split-Ink Prodigy** |
+
+**Background.** Nyxara was the youngest copyist in the Vellum archive and learned to reproduce spells by layering lunar notation over occult corrections. A purification attempt erased half a living manuscript—and nearly half her memory—so her refusal of Pure work is fear grounded in experience.
+
+**In-game presentation.** Nyx speaks calmly while two differently colored annotations compete on her order card. `Nyxara Vellum` is recovered from the damaged manuscript during her story event; **The Split-Ink Prodigy** becomes a mastery title after Pale Hex succeeds without Schism Stitch.
 
 | Field | Value |
 |---|---|
 | id | `adv_nyx_vellum` |
-| Display | Nyx Vellum |
+| Display | Nyx |
 | Job | Wizard (`job_wizard`) |
 | Build intent | **Cross-tag** — Pale Hex |
 | Requirement tags | Lunar ≥1 ∧ Occult ≥1 (`syn_lunar_occult`). **Avoid** Pure (Schism Stitch `syn_neg_occult_pure`) |
@@ -620,14 +784,24 @@ Two inks on the mantle. A cleanse stitch splits the order.
 | Character | Calm / two-ink focus |
 | Hook | Two inks on the mantle — a cleanse stitch that splits the order. |
 
-#### `adv_orin_goldink` — Orin Gold-Ink
+#### `adv_orin_goldink` — Orin
 
 The room should bow. Hemp, mud, and tar on the mantle are an insult.
+
+| Identity | Value |
+|---|---|
+| True name | **Orinel Gold-Ink** |
+| Public name | **Orin** |
+| Epithet | **The Gilded Hand** |
+
+**Background.** Orinel belongs to a merchant family that purchased court access one exquisitely illuminated decree at a time. He performs aristocratic contempt because the court is waiting for any lapse that proves his family still belongs outside, making his vanity both unpleasant and strategically understandable.
+
+**In-game presentation.** His requirements arrive gold-embossed and his inspection barks react sharply to humble materials. The formal `Orinel` appears when a rival deliberately uses it to diminish him; **The Gilded Hand** is adopted after a flawless Royal commission wins public recognition.
 
 | Field | Value |
 |---|---|
 | id | `adv_orin_goldink` |
-| Display | Orin Gold-Ink |
+| Display | Orin |
 | Job | Wizard (`job_wizard`) |
 | Build intent | **Defensive / neg-avoid** — Royal mid; no peasant dump; no neg that kills a Royal / Pure court read |
 | Requirement tags | Royal **mid** (≥5). **Avoid** Soft, Earth, Wild. **Avoid** Sticky ≥1 (Tar at Court `syn_neg_sticky_royal`). **Avoid** Occult ≥1 ∧ Pure ≥1 (Schism Stitch `syn_neg_occult_pure`) |
@@ -657,14 +831,24 @@ The room should bow. Hemp, mud, and tar on the mantle are an insult.
 
 Job-default alias: `adv_hexer` → `adv_soot_cord`. Requirement-tag family in `28`: Occult, Sticky, Silent. Hood is in the order, so Bucket Head can fire.
 
-#### `adv_soot_cord` — Soot Cord
+#### `adv_soot_cord` — Soot
 
 Names and cords. The chapel already knows the knot.
+
+| Identity | Value |
+|---|---|
+| True name | **Suthra Cord** |
+| Public name | **Soot** |
+| Epithet | **The Knotkeeper** |
+
+**Background.** Suthra served a soot chapel that binds the names of the dangerous dead into knotted cords so they cannot be called back. One cord was cut from the archive without authorization, and Soot now follows its trail while hiding whether the escaped name belonged to a criminal, a saint, or family.
+
+**In-game presentation.** Soot offers a name-cord instead of a handshake, and each repeat visit adds one knot to the portrait prop. `Suthra Cord` is spoken only by the chapel during the missing-cord event; **The Knotkeeper** is earned after the player supports the Occult signature without a cleansing spike.
 
 | Field | Value |
 |---|---|
 | id | `adv_soot_cord` |
-| Display | Soot Cord |
+| Display | Soot |
 | Job | Hexer (`job_hexer`) |
 | Build intent | **Monostack** — Occult mid |
 | Requirement tags | Occult **mid** (≥5). Wraps already contribute Sticky; hood already contributes Silent — those are not the ask |
@@ -688,14 +872,24 @@ Names and cords. The chapel already knows the knot.
 | Character | Dangerous (named-cord) |
 | Hook | Names and cords — the chapel already knows the knot. |
 
-#### `adv_tar_veil` — Tar Veil
+#### `adv_tar_veil` — Tar
 
 Bind and a hex in the same wrap. `14` has no chrome for that pair.
+
+| Identity | Value |
+|---|---|
+| True name | **Tavra Veil** |
+| Public name | **Tar** |
+| Epithet | **Peatbound** |
+
+**Background.** Tavra kept curse-markers for a bog-orc settlement where names, paths, and graves shift with the mire. She wears the tar veil to filter prophetic spores and carries binding wraps because some village curses must be restrained before they can be understood.
+
+**In-game presentation.** Tar uses few words, but the peat map on her order changes as Sticky and Occult materials enter the plan. Her village calls her `Tavra` during a rescue event; **Peatbound** appears as a respectful communal title rather than a combat boast.
 
 | Field | Value |
 |---|---|
 | id | `adv_tar_veil` |
-| Display | Tar Veil |
+| Display | Tar |
 | Job | Hexer (`job_hexer`) |
 | Build intent | **Cross-tag intent** — Sticky ∧ Occult. **No** stamped cross |
 | Requirement tags | Occult ≥1 ∧ Sticky ≥1. **No** `syn_sticky_occult` and **no** `syn_sticky_silent` in `14`. Do not invent one. The only Sticky cross on file is Snaretooth (`syn_sticky_sharp`); Sharp is outside this job’s family — not this brief |
@@ -719,14 +913,24 @@ Bind and a hex in the same wrap. `14` has no chrome for that pair.
 | Character | Grim / peat-bound |
 | Hook | Bind and a hex in the same wrap — peat knot, no chrome for the pair. |
 
-#### `adv_ashen_cowl` — Ashen Cowl
+#### `adv_ashen_cowl` — Ash
 
 Already unheard. A metal hood is a bucket. Daylight washes the work out.
+
+| Identity | Value |
+|---|---|
+| True name | **ASH-CWL/04** |
+| Public name | **Ash** |
+| Epithet | **The Unheard** |
+
+**Background.** ASH-CWL/04 was built as a funerary listener, carrying final whispers from plague rooms to families who could not enter. When collectors began editing inconvenient last words, the construct fled with an archive of voices it refuses to surrender or repeat without consent.
+
+**In-game presentation.** Ash's dialogue is sparse, but muffled waveform motifs react visibly to noisy materials. The designation is found behind the cowl during a repair event; **The Unheard** becomes a Dex title after a clean Silent result and unlocks altered, slightly more personal barks.
 
 | Field | Value |
 |---|---|
 | id | `adv_ashen_cowl` |
-| Display | Ashen Cowl |
+| Display | Ash |
 | Job | Hexer (`job_hexer`) |
 | Build intent | **Defensive / neg-avoid** — Silent mid; no Pure / Solar wash; no Metal on the hood |
 | Requirement tags | Silent **mid** (≥5). **Avoid** Metal ≥1 (Bucket Head `syn_neg_hood_metal` on `con_hood`, and Clanging Hush `syn_neg_metal_silent`). **Avoid** Pure ≥1 (judge punish; Schism Stitch if Occult is also present). **Avoid** Solar ≥1 (day wash — no `syn_neg_solar_*` in `14`; the avoid is the brief) |
@@ -756,14 +960,24 @@ Already unheard. A metal hood is a bucket. Daylight washes the work out.
 
 Job-default alias: `adv_outrider` → `adv_harrow_gale`. Requirement-tag family in `28`: Wild, Storm, Silent. Coat does not ban Fire or Frost mats. There is no `syn_neg_coat_metal`; Iron Mantle Fail is `con_cloak` only.
 
-#### `adv_harrow_gale` — Harrow Gale
+#### `adv_harrow_gale` — Harrow
 
 Wagon-side. Wants the sky in the coat, not a second helping of bog.
+
+| Identity | Value |
+|---|---|
+| True name | **Harodan Gale** |
+| Public name | **Harrow** |
+| Epithet | **The Wagon Wall** |
+
+**Background.** Harodan guarded migrant wagons across open storm roads and learned that panic overturns more carts than lightning. He keeps the easy road smile and broad stance of someone who puts himself on the weather side first, but carries the names of a convoy he once failed to turn away from a flooded shortcut.
+
+**In-game presentation.** Wagon wheels announce Harrow before his portrait enters, and his requirement text reads like practical road advice. `Harodan Gale` appears on the old convoy roll; **The Wagon Wall** is bestowed by surviving travelers after a Storm signature success.
 
 | Field | Value |
 |---|---|
 | id | `adv_harrow_gale` |
-| Display | Harrow Gale |
+| Display | Harrow |
 | Job | Outrider (`job_outrider`) |
 | Build intent | **Monostack** — Storm mid |
 | Requirement tags | Storm **mid** (≥5). Wild is the job’s other staple and is **not** the ask — the bog punishes Wild |
@@ -789,14 +1003,24 @@ Boots are Earth (`12`). Bog King punishes Earth. One Earth from the boots is the
 | Character | Brave & straight (wagon-side) |
 | Hook | Wagon-side — wants the sky in the coat, not a second helping of bog. |
 
-#### `adv_flint_rime` — Flint Rime
+#### `adv_flint_rime` — Flint
 
 Steam on the mile. The parade wants fire. The coat can still carry frost.
+
+| Identity | Value |
+|---|---|
+| True name | **Flint Rimescale** |
+| Public name | **Flint** |
+| Epithet | **Steamrunner** |
+
+**Background.** Flint was born between an ember clan and a frost clan, each treating the other half of his scales as a defect to be corrected. He became an outrider to make the contradiction useful, learning to vent dangerous heat through motion rather than choose one inheritance.
+
+**In-game presentation.** Frost forms and evaporates around his portrait as Fire and Frost enter the plan, communicating Temper before any biography. `Rimescale` is revealed when both clans appear at a parade contract; **Steamrunner** is earned by completing that commission with the paired build intact.
 
 | Field | Value |
 |---|---|
 | id | `adv_flint_rime` |
-| Display | Flint Rime |
+| Display | Flint |
 | Job | Outrider (`job_outrider`) |
 | Build intent | **Cross-tag** — Temper (Fire ∧ Frost) |
 | Requirement tags | Fire ≥1 ∧ Frost ≥1 (`syn_fire_frost_clash`). **Avoid** Soft (Scorched Down `syn_neg_fire_soft` once Fire is present). `14` has **no** `syn_wild_storm` and **no** `syn_storm_silent`. Temper is the stamped fallback the coat allows. Greenmail (`syn_wild_earth`) is Wild ∧ Earth, not this pair, and Earth is the boot’s starter tag |
@@ -822,14 +1046,24 @@ Sunspear punishes Earth. The boots contribute one Earth. Fire mid is not the ask
 | Character | Restless / dual-temper |
 | Hook | Steam on the mile — the parade wants fire; the coat can still carry frost. |
 
-#### `adv_lark_mute` — Lark Mute
+#### `adv_lark_mute` — Lark
 
 Sleeps in the coat and leaves no ring. Plate and soft hemp both spoil the road.
+
+| Identity | Value |
+|---|---|
+| True name | **Larkin Mute** |
+| Public name | **Lark** |
+| Epithet | **The Ringless Road** |
+
+**Background.** Larkin comes from a halfling courier family whose routes are sung so they cannot be lost. After hostile listeners learned to follow those songs, Lark devised a silent route language and accepted `Mute` as an earned road-name rather than an insult.
+
+**In-game presentation.** Lark is first found asleep inside the coat and communicates the opening order with route marks and short phrases. The family route-book reveals `Larkin`; **The Ringless Road** appears after a Silent result and turns later route marks into readable shortcuts.
 
 | Field | Value |
 |---|---|
 | id | `adv_lark_mute` |
-| Display | Lark Mute |
+| Display | Lark |
 | Job | Outrider (`job_outrider`) |
 | Build intent | **Defensive / neg-avoid** — Silent mid; no Metal dump on the coat; no Soft trap |
 | Requirement tags | Silent **mid** (≥5). **Avoid** Metal ≥1 (Clanging Hush `syn_neg_metal_silent` — Silent powers disabled). **Avoid** Soft ≥1 (starter tag; this judge punishes Soft). Iron Mantle Fail (`syn_neg_cloak_metal`) does **not** apply — that row is `con_cloak` only, and this order is `con_coat` |
@@ -861,14 +1095,24 @@ Job-default alias: `adv_oathbound` → `adv_aurel_vow`. Requirement-tag family i
 
 `14` has no Solar ∧ Royal cross and no Solar ∧ Sharp cross. The stamped cross that uses this family is Dawn Vestment (`syn_solar_pure`). Masked Crown is Royal ∧ Silent — Silent is not this job’s family.
 
-#### `adv_aurel_vow` — Aurel Vow
+#### `adv_aurel_vow` — Aurel
 
 Sworn to the paper’s noon. The yard can keep its glare if the cloth holds the sun.
+
+| Identity | Value |
+|---|---|
+| True name | **Aurelian Vow** |
+| Public name | **Aurel** |
+| Epithet | **Noon’s Witness** |
+
+**Background.** Aurelian once served a noble patron who falsified a casualty list and expected his oathbound retinue to bless it. Aurel read the true names aloud at noon, surrendered the patron's name from his own, and now swears only to vows written where everyone can see them.
+
+**In-game presentation.** Aurel reads the order contract aloud and asks the player to confirm it, making honesty part of the interaction. `Aurelian Vow` appears on the uncensored casualty list; **Noon’s Witness** is reclaimed through a Solar signature result.
 
 | Field | Value |
 |---|---|
 | id | `adv_aurel_vow` |
-| Display | Aurel Vow |
+| Display | Aurel |
 | Job | Oathbound (`job_oathbound`) |
 | Build intent | **Monostack** — Solar mid |
 | Requirement tags | Solar **mid** (≥5). Royal is already on `con_mantle`; Sharp is welcome, not required |
@@ -894,14 +1138,24 @@ Same parade as Pell White, opposite ask. Solar is favored. Pure is punished. Aur
 | Character | Brave & straight (sworn noon) |
 | Hook | Sworn to the paper’s noon — the yard can keep its glare if the cloth holds the sun. |
 
-#### `adv_clarion_mantle` — Clarion Mantle
+#### `adv_clarion_mantle` — Clarion
 
 Dawn on sworn plate. Occult in the same weave argues with the vow.
+
+| Identity | Value |
+|---|---|
+| True name | **CLARION-MANTLE/07** |
+| Public name | **Clarion** |
+| Epithet | **The Seventh Dawn** |
+
+**Background.** CLARION-MANTLE/07 was forged to announce coronations and has watched six rulers use the same dawn language before betraying the vows beneath it. The seventh time, the construct refused the ceremony, left the palace, and chose to make the vow rather than merely proclaim it.
+
+**In-game presentation.** Clarion's first arrival uses a restrained ceremonial chime and the short Public name. The maker plate is exposed during a mantle repair; **The Seventh Dawn** appears after Dawn Vestment succeeds and marks the point where later dialogue shifts from recited formulae to chosen words.
 
 | Field | Value |
 |---|---|
 | id | `adv_clarion_mantle` |
-| Display | Clarion Mantle |
+| Display | Clarion |
 | Job | Oathbound (`job_oathbound`) |
 | Build intent | **Cross-tag** — Dawn Vestment |
 | Requirement tags | Solar ≥1 ∧ Pure ≥1 (`syn_solar_pure`). **Avoid** Occult ≥1 (Schism Stitch `syn_neg_occult_pure` mutes Pure and the Dawn read) |
@@ -927,14 +1181,24 @@ C3 punishes Metal. Solar ∧ Pure is the ask. The armor’s Metal tag vs this wa
 | Character | Solemn / ceremonial |
 | Hook | Dawn on sworn plate — Occult in the same weave argues with the vow. |
 
-#### `adv_pell_white` — Pell White
+#### `adv_pell_white` — Pell
 
 Wants the stitch of daylight. The sunspear yard calls that contempt.
+
+| Identity | Value |
+|---|---|
+| True name | **Pell Severin White** — `Severin` is the judgment-name of an old pale-elf house |
+| Public name | **Pell** |
+| Epithet | **The White Measure** |
+
+**Background.** House White trained Pell to treat purity as measurable law, and the inherited Severin name marks the family member expected to pronounce judgment. Pell's cold certainty conceals a deeper fear: if a Pure answer can fail at the Sunspear yard, then the standard governing their entire life may be incomplete.
+
+**In-game presentation.** Pell gives only the short name while the order bears the severe three-part seal, signaling lineage without an opening monologue. The full name is spoken at a house tribunal after the starter-tag trap is exposed; **The White Measure** can become either a proud or questioned Dex title depending on the result.
 
 | Field | Value |
 |---|---|
 | id | `adv_pell_white` |
-| Display | Pell White |
+| Display | Pell |
 | Job | Oathbound (`job_oathbound`) |
 | Build intent | **Defensive / neg-avoid** — Pure mid; no peasant dump. **Starter-tag trap** vs the parade |
 | Requirement tags | Pure **mid** (≥5). **Avoid** Soft, Earth, Wild (peasant staples). **Avoid** Occult ≥1 (Schism Stitch `syn_neg_occult_pure`). No `syn_neg_soft_metal` in `14` — do not invent one; Soft on this plate is still the peasant warn. Silk ≥3 on this armor also fires Ragged Mail (`syn_neg_metal_silk`) because `con_armor` is Metal |
@@ -1011,19 +1275,19 @@ Text-first UI on these surfaces stays legal until the file exists.
 
 Not the job stubs (`adv_knight`, `adv_mage`, `adv_blade_dancer`, `adv_lagoon`, and the four M2 aliases). Not the M2 twelve — those people are named above; this wave did not gen them. Not Scrap Duelist (`appt_scrap_duelist`).
 
-| Job | `adv_id` | Display |
+| Job | `adv_id` | Public display |
 |---|---|---|
-| Knight | `adv_halden_rook` | Ser Halden Rook |
-| Knight | `adv_vex_bramble` | Vex Bramble |
-| Knight | `adv_solenne_ward` | Dame Solenne Ward |
-| Mage | `adv_quill_lumen` | Quill Lumen |
-| Mage | `adv_neri_paleink` | Neri Pale-Ink |
+| Knight | `adv_halden_rook` | Ser Halden |
+| Knight | `adv_vex_bramble` | Vex |
+| Knight | `adv_solenne_ward` | Dame Solenne |
+| Mage | `adv_quill_lumen` | Quill |
+| Mage | `adv_neri_paleink` | Neri |
 | Mage | `adv_marrowveil` | Sister Marrowveil |
-| Blade Dancer | `adv_kite_thornreel` | Kite Thornreel |
-| Blade Dancer | `adv_mask_circlet` | Mask Circlet |
-| Blade Dancer | `adv_whisper_hem` | Whisper Hem |
-| Lagoon | `adv_tide_glass` | Tide Glass |
-| Lagoon | `adv_brine_latch` | Brine Latch |
+| Blade Dancer | `adv_kite_thornreel` | Kite |
+| Blade Dancer | `adv_mask_circlet` | Mask |
+| Blade Dancer | `adv_whisper_hem` | Whisper |
+| Lagoon | `adv_tide_glass` | Tide |
+| Lagoon | `adv_brine_latch` | Brine |
 | Lagoon | `adv_rime_peddler` | Rime Peddler |
 
 ### Art cut — Design default for stamp
@@ -1056,7 +1320,7 @@ Placeholder on each socket = **display name + job** (already on the ugly panel).
 
 ## M2 portrait uniqueness
 
-**Status:** **Stamped** (Jonathan ACCEPT all 24 on #63). Redraws landed (#64 M1, #65 M2) and replace the held #62 outlook. Schema on every named `adv_*` (M1 12 + M2 12 = **24**): **Race | Visual | Outfit | Character | Hook**. This section does **not** change roster ids, display names, jobs, `ask_*`, stats, requirement tags, or `construction_ids` (#61 held; M1 roster held). Do not regen. Do not revive #62.
+**Status:** **Stamped** (Jonathan ACCEPT all 24 on #63). Redraws landed (#64 M1, #65 M2) and replace the held #62 outlook. Schema on every named `adv_*` (M1 12 + M2 12 = **24**): **Race | Visual | Outfit | Character | Hook**. This section does **not** change roster ids, jobs, `ask_*`, stats, requirement tags, or `construction_ids` (#61 held; M1 roster held). Public display names may use the later identity layer; that text change does not reopen portrait art. Do not regen. Do not revive #62.
 
 After ACCEPT: Harribel soft-gate on the **12 M2 redraws only**, then Nnoitra reburn (replace the #62 assets). An M1 redraw is **not** opened by that ACCEPT. M1 regen needs a separate Jonathan stamp. The M1 rows are a docs lock on the landed files. Aizen owns the Jonathan 1:1.
 
@@ -1093,32 +1357,32 @@ Same socket and path as the landed M1 wave. No second folder. No posture sheet. 
 
 Five fields under each person, in this order: **Race**, **Visual**, **Outfit**, **Character**, **Hook**. M1 rows sit on the M1 roster. M2 rows sit on the M2 roster.
 
-| Pool | Job | `adv_id` | Display |
+| Pool | Job | `adv_id` | Public display |
 |---|---|---|---|
-| M1 | Knight | `adv_halden_rook` | Ser Halden Rook |
-| M1 | Knight | `adv_vex_bramble` | Vex Bramble |
-| M1 | Knight | `adv_solenne_ward` | Dame Solenne Ward |
-| M1 | Mage | `adv_quill_lumen` | Quill Lumen |
-| M1 | Mage | `adv_neri_paleink` | Neri Pale-Ink |
+| M1 | Knight | `adv_halden_rook` | Ser Halden |
+| M1 | Knight | `adv_vex_bramble` | Vex |
+| M1 | Knight | `adv_solenne_ward` | Dame Solenne |
+| M1 | Mage | `adv_quill_lumen` | Quill |
+| M1 | Mage | `adv_neri_paleink` | Neri |
 | M1 | Mage | `adv_marrowveil` | Sister Marrowveil |
-| M1 | Blade Dancer | `adv_kite_thornreel` | Kite Thornreel |
-| M1 | Blade Dancer | `adv_mask_circlet` | Mask Circlet |
-| M1 | Blade Dancer | `adv_whisper_hem` | Whisper Hem |
-| M1 | Lagoon | `adv_tide_glass` | Tide Glass |
-| M1 | Lagoon | `adv_brine_latch` | Brine Latch |
+| M1 | Blade Dancer | `adv_kite_thornreel` | Kite |
+| M1 | Blade Dancer | `adv_mask_circlet` | Mask |
+| M1 | Blade Dancer | `adv_whisper_hem` | Whisper |
+| M1 | Lagoon | `adv_tide_glass` | Tide |
+| M1 | Lagoon | `adv_brine_latch` | Brine |
 | M1 | Lagoon | `adv_rime_peddler` | Rime Peddler |
-| M2 | Wizard | `adv_vesper_cant` | Vesper Cant |
-| M2 | Wizard | `adv_nyx_vellum` | Nyx Vellum |
-| M2 | Wizard | `adv_orin_goldink` | Orin Gold-Ink |
-| M2 | Hexer | `adv_soot_cord` | Soot Cord |
-| M2 | Hexer | `adv_tar_veil` | Tar Veil |
-| M2 | Hexer | `adv_ashen_cowl` | Ashen Cowl |
-| M2 | Outrider | `adv_harrow_gale` | Harrow Gale |
-| M2 | Outrider | `adv_flint_rime` | Flint Rime |
-| M2 | Outrider | `adv_lark_mute` | Lark Mute |
-| M2 | Oathbound | `adv_aurel_vow` | Aurel Vow |
-| M2 | Oathbound | `adv_clarion_mantle` | Clarion Mantle |
-| M2 | Oathbound | `adv_pell_white` | Pell White |
+| M2 | Wizard | `adv_vesper_cant` | Vesper |
+| M2 | Wizard | `adv_nyx_vellum` | Nyx |
+| M2 | Wizard | `adv_orin_goldink` | Orin |
+| M2 | Hexer | `adv_soot_cord` | Soot |
+| M2 | Hexer | `adv_tar_veil` | Tar |
+| M2 | Hexer | `adv_ashen_cowl` | Ash |
+| M2 | Outrider | `adv_harrow_gale` | Harrow |
+| M2 | Outrider | `adv_flint_rime` | Flint |
+| M2 | Outrider | `adv_lark_mute` | Lark |
+| M2 | Oathbound | `adv_aurel_vow` | Aurel |
+| M2 | Oathbound | `adv_clarion_mantle` | Clarion |
+| M2 | Oathbound | `adv_pell_white` | Pell |
 
 ### QC / gen rules
 

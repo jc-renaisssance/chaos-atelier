@@ -522,7 +522,11 @@ func _refresh() -> void:
 	_rebuild_zones(session)
 	_rebuild_hand(session)
 	_refresh_readout(session)
-	_stock.text = "Draw %d  ·  Discard %d" % [session.draw_pile.size(), session.discard_pile.size()]
+	_stock.text = "Draw %d  ·  Discard %d  ·  Committed %d" % [
+		session.draw_pile.size(),
+		session.discard_pile.size(),
+		session.committed.size(),
+	]
 	var busy := session.is_finished() or AtelierSession.order_craft_done
 	_dig_btn.disabled = busy or not CraftRules.can_dig(session, AtelierSession.stock)
 	_finish_btn.disabled = busy

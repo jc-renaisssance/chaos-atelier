@@ -5,11 +5,11 @@ extends RefCounted
 
 const SKILL_BLURBS := {
 	"sk_next_mat_free": "Next material play costs 0 stamina.",
-	"sk_metal_str_double": "Double STR from Metal mats already in this piece (stub).",
-	"sk_wild_to_earth": "Consume 1 Wild mat in session → Earth mat into hand (stub).",
-	"sk_touch_up": "+1 to one chosen stat on one played material (stub).",
-	"sk_deep_dig": "Refresh hand; draw +1 extra (clamped to hand_size this slice).",
-	"sk_steady_hand": "Ignore first negative synergy this piece (stub).",
+	"sk_metal_str_double": "Double ATK from committed Metal materials in this item.",
+	"sk_wild_to_earth": "Convert the latest committed Wild material in this item to Earth affinity.",
+	"sk_touch_up": "+1 to the strongest positive stat on the latest committed material in this item.",
+	"sk_deep_dig": "Discard the unplayed hand and refill to hand size.",
+	"sk_steady_hand": "Ignore the first negative synergy on this item.",
 	"sk_ease_draw": "The next card played into a zone costs 1 less stamina, floor 0. Then draw 1",
 	"sk_scrap_breath": "Discard 1 other card from hand. If that discard happens, stamina +1 (AP).",
 	"sk_heavy_draw": "The next card played into a zone contributes ×1.5 stats, each stat rounded half away from zero. Tags stay as printed. Then draw 1",
@@ -93,11 +93,19 @@ const ENCHANTMENTS := {
 	"enc_sigil_vow": {"name": "Vow Sigil", "dollar": 5, "HP": 1, "ATK": 0, "DEF": 0, "RES": 1, "MOB": 0, "PRE": 2, "tags": ["Royal", "Pure"]},
 }
 
-## docs/39 letter B — 10 cards. 3 tagged / 4 no-tag / 3 skills. Replaces the docs/19 list at run start.
-const OWN_BASIC_STARTER := [
-	["mat_ember_silk", GameEnums.HandCardType.MATERIAL, "tagged"],
-	["mat_wool_grey", GameEnums.HandCardType.MATERIAL, "tagged"],
-	["mat_iron_scrap", GameEnums.HandCardType.MATERIAL, "tagged"],
+## docs/40 — one selected bolt supplies three tagged copies. Run-start selection is Later;
+## Ember is the production default until the three-start screen owns that choice.
+const STARTER_BOLTS := {
+	"ember": ["mat_ember_silk", "bolt_ember"],
+	"hearth": ["mat_hemp_plain", "bolt_hearth"],
+	"cairn": ["mat_clayweave", "bolt_cairn"],
+	"forge": ["mat_iron_scrap", "bolt_forge"],
+	"fineweave": ["mat_silk_pale", "bolt_fineweave"],
+}
+const DEFAULT_STARTER_BOLT := "ember"
+
+## 10 cards: 3 bolt materials / 4 neutral materials / 3 skills.
+const OWN_BASIC_COMMON_STARTER := [
 	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
 	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
 	["mat_hemp_plain", GameEnums.HandCardType.MATERIAL, "no_tag"],
@@ -108,9 +116,12 @@ const OWN_BASIC_STARTER := [
 ]
 
 
-static func own_basic_starter() -> Array[HandCard]:
+static func own_basic_starter(bolt_id: String = DEFAULT_STARTER_BOLT) -> Array[HandCard]:
 	var out: Array[HandCard] = []
-	for row in OWN_BASIC_STARTER:
+	var bolt: Array = STARTER_BOLTS.get(bolt_id, STARTER_BOLTS[DEFAULT_STARTER_BOLT])
+	for _i in range(3):
+		out.append(HandCard.make(String(bolt[0]), GameEnums.HandCardType.MATERIAL, "", false, String(bolt[1])))
+	for row in OWN_BASIC_COMMON_STARTER:
 		var kind: GameEnums.HandCardType = row[1]
 		out.append(HandCard.make(String(row[0]), kind, "", false, String(row[2])))
 	return out
@@ -148,17 +159,41 @@ static func skill_blurb(id: String) -> String:
 	return String(SKILL_BLURBS.get(id, "Owner skill — manipulates the session, then leaves."))
 
 
-## Shop hemp keeps Soft. A starter no_tag copy withholds the catalog list (docs/39 A).
+## Starter printings may withhold catalog tags so one bolt opens one readable direction.
 static func tags_for_card(card: HandCard) -> PackedStringArray:
-	if card == null or card.starter_role == "no_tag":
+	if card == null:
 		return PackedStringArray()
+	var override: Variant = _starter_tag_override(card.starter_role)
+	if override != null:
+		return override
 	return tags_of(card.id, card.type)
 
 
 static func tags_for_played(card: PlayedCard) -> PackedStringArray:
-	if card == null or card.starter_role == "no_tag":
+	if card == null:
 		return PackedStringArray()
+	var override: Variant = _starter_tag_override(card.starter_role)
+	if override != null:
+		return override
 	return tags_of(card.id, card.type)
+
+
+static func _starter_tag_override(starter_role: String):
+	match starter_role:
+		"no_tag":
+			return PackedStringArray()
+		"bolt_ember":
+			return PackedStringArray(["Fire"])
+		"bolt_hearth":
+			return PackedStringArray(["Soft"])
+		"bolt_cairn":
+			return PackedStringArray(["Earth"])
+		"bolt_forge":
+			return PackedStringArray(["Metal"])
+		"bolt_fineweave":
+			return PackedStringArray(["Silk"])
+		_:
+			return null
 
 
 ## n × 1.5, half away from zero (docs/39 sk_heavy_draw). 1 → 2, 2 → 3, −1 → −2.
@@ -192,6 +227,53 @@ static func tags_of(id: String, type: GameEnums.HandCardType) -> PackedStringArr
 			return PackedStringArray()
 	var tags: Array = row.get("tags", [])
 	return PackedStringArray(tags)
+
+
+## Existing tags migrate to one pip. Rows may author tag_pips overrides without
+## coupling intensity to price or rarity.
+static func tag_pips_of(id: String, type: GameEnums.HandCardType) -> Dictionary:
+	var row := {}
+	match type:
+		GameEnums.HandCardType.MATERIAL:
+			row = material(id)
+		GameEnums.HandCardType.RUNE:
+			row = enchantment(id)
+		_:
+			return {}
+	return _tag_pips_from_row(row)
+
+
+static func tag_pips_for_played(card: PlayedCard) -> Dictionary:
+	if card == null:
+		return {}
+	var override: Variant = _starter_tag_override(card.starter_role)
+	var pips := {}
+	if override != null:
+		for tag in override:
+			pips[String(tag)] = 1
+	else:
+		pips = tag_pips_of(card.id, card.type)
+	for tag in card.suppressed_tags:
+		pips.erase(String(tag))
+	for tag in card.tag_pip_bonus.keys():
+		pips[tag] = int(pips.get(tag, 0)) + int(card.tag_pip_bonus[tag])
+	if card.type == GameEnums.HandCardType.MATERIAL and tag_copies(card.mat_enchant_id) > 1:
+		for tag in pips.keys():
+			pips[tag] = int(pips[tag]) * 2
+	return pips
+
+
+static func construction_tag_pips(id: String) -> Dictionary:
+	return _tag_pips_from_row(construction(id))
+
+
+static func _tag_pips_from_row(row: Dictionary) -> Dictionary:
+	var out := {}
+	var authored: Dictionary = Dictionary(row.get("tag_pips", {}))
+	for tag in row.get("tags", []):
+		var key := String(tag)
+		out[key] = maxi(0, int(authored.get(key, 1)))
+	return out
 
 
 static func construction_tags(id: String) -> PackedStringArray:

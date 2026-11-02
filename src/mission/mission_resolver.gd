@@ -8,6 +8,7 @@ static func cant_craft_result() -> Dictionary:
 	## docs/20 assert 18 / docs/24: F, hp>0, aid 0, cleared false. No session.
 	return {
 		"tag_counts": {},
+		"affinity": {},
 		"craft_rarity": GameEnums.CraftRarity.NONE,
 		"powers_positive": PackedStringArray(),
 		"powers_negative": PackedStringArray(),
@@ -42,9 +43,12 @@ static func combine_pieces(piece_results: Array) -> Dictionary:
 	var outlook_order := 0
 	var cards_n := 0
 	var uniq := ""
+	var affinity_items: Array = []
 	if piece_results.is_empty():
 		return {
 			"tag_counts": bag,
+			"affinity_items": affinity_items,
+			"affinity": CraftResolver.combine_affinity(piece_results),
 			"craft_rarity": GameEnums.CraftRarity.NONE,
 			"powers_positive": positives,
 			"powers_negative": negatives,
@@ -56,6 +60,7 @@ static func combine_pieces(piece_results: Array) -> Dictionary:
 		}
 	for result in piece_results:
 		_merge_tags(bag, Dictionary(result.get("tag_counts", {})))
+		affinity_items.append(Dictionary(result.get("affinity", {})).duplicate(true))
 		var piece_stats: GearStats = result.get("stats", null)
 		if piece_stats != null:
 			stats.add_bag(piece_stats.to_dict())
@@ -72,6 +77,8 @@ static func combine_pieces(piece_results: Array) -> Dictionary:
 			uniq = u
 	return {
 		"tag_counts": bag,
+		"affinity_items": affinity_items,
+		"affinity": CraftResolver.combine_affinity(piece_results),
 		"craft_rarity": rarity,
 		"powers_positive": positives,
 		"powers_negative": negatives,
@@ -133,8 +140,16 @@ static func attach(
 	var negatives: PackedStringArray = PackedStringArray(out.get("powers_negative", PackedStringArray()))
 	var positives: PackedStringArray = PackedStringArray(out.get("powers_positive", PackedStringArray()))
 	var rarity = out.get("craft_rarity", GameEnums.CraftRarity.NONE)
-	var soak := float(maxi(0, stats.HP + stats.DEF + stats.RES))
-	var punch := float(maxi(0, stats.ATK)) + float(maxi(0, stats.MOB)) * 0.35 + float(maxi(0, stats.PRE)) * 0.35
+	var affinity: Dictionary = Dictionary(out.get("affinity", {}))
+	var affinity_value := _affinity_mission_value(affinity)
+	var affinity_soak := int(affinity_value.get("soak", 0))
+	var affinity_punch := int(affinity_value.get("punch", 0))
+	var soak := float(maxi(0, stats.HP + stats.DEF + stats.RES + affinity_soak))
+	var punch := (
+		float(maxi(0, stats.ATK + affinity_punch))
+		+ float(maxi(0, stats.MOB)) * 0.35
+		+ float(maxi(0, stats.PRE)) * 0.35
+	)
 	var pressure := _pressure(difficulty, is_boss, kind, appointment)
 	var soak_ratio := clampf(soak / float(8 + 2 * maxi(difficulty, 1)), 0.0, 0.55)
 	var favor_n := favor.size()
@@ -185,7 +200,36 @@ static func attach(
 	out["mission_stub"] = false
 	out["letter_id"] = _letter_id(rarity, negatives, is_boss, cleared, rating)
 	out["rating_score"] = clampi(int(round(score)), 0, 100)
+	out["affinity_soak"] = affinity_soak
+	out["affinity_punch"] = affinity_punch
 	return out
+
+
+static func _affinity_mission_value(affinity: Dictionary) -> Dictionary:
+	var fire: Dictionary = Dictionary(affinity.get("Fire", {}))
+	var soft: Dictionary = Dictionary(affinity.get("Soft", {}))
+	var earth: Dictionary = Dictionary(affinity.get("Earth", {}))
+	var metal: Dictionary = Dictionary(affinity.get("Metal", {}))
+	var silk: Dictionary = Dictionary(affinity.get("Silk", {}))
+	var soak := 0
+	var punch := 0
+	if int(soft.get("tier", 0)) > 0:
+		soak += int(soft.get("magnitude", 0))
+	if int(earth.get("tier", 0)) > 0:
+		soak += int(earth.get("magnitude", 0))
+		if int(earth.get("tier", 0)) >= 2:
+			soak += int(earth.get("magnitude", 0))
+	if int(metal.get("tier", 0)) > 0:
+		soak += int(metal.get("magnitude", 0))
+	if int(fire.get("tier", 0)) > 0:
+		punch += int(fire.get("magnitude", 0))
+	if int(metal.get("tier", 0)) >= 2:
+		punch += int(metal.get("magnitude", 0)) / 2
+	if int(silk.get("tier", 0)) >= 2:
+		punch += maxi(1, int(ceil(float(silk.get("magnitude", 0)) / 2.0)))
+	if int(silk.get("tier", 0)) >= 3:
+		punch += int(silk.get("magnitude", 0))
+	return {"soak": soak, "punch": punch}
 
 
 static func piece_is_empty(craft: Dictionary) -> bool:

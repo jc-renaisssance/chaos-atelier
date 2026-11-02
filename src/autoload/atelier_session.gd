@@ -442,7 +442,7 @@ func _open_session() -> void:
 	for con_id in craft_session.construction_ids:
 		names.append(CraftCatalog.construction_name(con_id))
 	last_note = (
-		"One session · %d zone(s) · stamina %d (12×%d). Listed: %s. Play must target a zone."
+		"One session · %d zone(s) · stamina %d (8×%d+2). Listed: %s. Play must target a zone."
 		% [
 			craft_session.zone_count,
 			craft_session.stamina_start,
@@ -2184,6 +2184,7 @@ func _write_run_save() -> void:
 		"chapter_events_resolved": chapter_events_resolved.duplicate(true),
 		"stock": cards,
 		"chapter_id": board.chapter_id,
+		"map_id": board.map_id,
 		"chapter_boss_id": board.chapter_boss_id,
 		"boss_pool_id": board.boss_pool_id,
 		"day_index": board.day_index,
@@ -2267,7 +2268,11 @@ func _load_run_save() -> bool:
 				bool(row.get("shiny", false)),
 				String(row.get("starter_role", ""))
 			))
-	board = ChapterSchedule.make_empty(chapter_id)
+	## Legacy saves predate map_id and were authored against map_m1.
+	var saved_map_id := String(data.get("map_id", MapCatalog.M1_MAP_ID))
+	if MapCatalog.map_row(saved_map_id).is_empty():
+		saved_map_id = MapCatalog.M1_MAP_ID
+	board = ChapterSchedule.make_empty(chapter_id, saved_map_id)
 	board.begin_live(String(data.get("chapter_boss_id", "")), String(data.get("boss_pool_id", "")))
 	board.day_index = int(data.get("day_index", 1))
 	board.route_path = _packed_ids(data.get("route_path", []))

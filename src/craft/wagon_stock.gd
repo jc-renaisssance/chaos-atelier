@@ -1,8 +1,8 @@
 class_name WagonStock
 extends RefCounted
 ## Atelier inventory between beats (docs/27). During a piece the run deck is
-## session hand + draw + discard. Shop sell / explicit loss still change stock.
-## Play leaves the hand → discard; persist via reshuffle, not in-hand.
+## session hand + draw + discard + committed. Shop sell / explicit loss still
+## change stock. Finish/abort returns every pile here.
 
 var cards: Array[HandCard] = []
 

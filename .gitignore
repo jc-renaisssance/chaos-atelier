@@ -1,9 +1,11 @@
 # Godot 4 generated
 .godot/
 .import/
+*.import
+*.uid
 *.translation
-export_presets.cfg
 export.cfg
+build/
 
 # Editor / OS
 .DS_Store

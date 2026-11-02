@@ -10,6 +10,7 @@ import ast
 import pathlib
 import re
 import struct
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -659,8 +660,18 @@ def check_shelf_icons() -> None:
         width, height = struct.unpack(">II", data[16:24])
         if (width, height) != (96, 96):
             fail(f"{item_id}.png is {width}x{height}, want 96x96")
+    tracked = set(
+        subprocess.run(
+            ["git", "ls-files", "*.import"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+    )
     for sidecar in icon_dir.glob("*.import"):
-        fail(f"do not commit Godot import sidecar {sidecar.name}")
+        if sidecar.relative_to(ROOT).as_posix() in tracked:
+            fail(f"do not commit Godot import sidecar {sidecar.name}")
 
 
 def check_formulas() -> None:

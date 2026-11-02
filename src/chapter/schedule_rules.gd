@@ -334,8 +334,12 @@ static func build_boss_client_draw(board: ChapterSchedule, job: Dictionary) -> D
 			% [_boss_draw_label(job_id), who, job_id, adv_id, String(job.get("order_id", ""))]
 			+ "Order constructions: %s. Taste: %s. "
 			% [", ".join(PackedStringArray(cons)), taste]
-			+ "Independent of chapter_boss_id=%s. Enter stamina craft (N=2, 12×2)."
-			% (board.chapter_boss_id if board != null else "")
+			+ "Independent of chapter_boss_id=%s. Enter stamina craft (N=%d, stamina=%d)."
+			% [
+				board.chapter_boss_id if board != null else "",
+				cons.size(),
+				GameConstants.session_stamina_start(cons.size()),
+			]
 		),
 		"stub": "craft",
 		"order_id": String(job.get("order_id", "")),

@@ -41,7 +41,7 @@ Bible rows below are the source. Code cites are what Client does now. This PR do
 | Threat tags, no HP bar | [17](17-chapter-bosses.md) | `src/data/catalog/threat_catalog.gd` — tags only |
 | Pressure, `hp_remaining`, aid, mission letters | not tabulated; harness shape in [20](20-harness-stamp.md) | `src/mission/mission_resolver.gd` `attach` / `_pressure` / `_letter` |
 | Order difficulty | not tabulated | `src/data/chapter/schedule_catalog.gd` — named `adv_*` route orders **2**; `appt_scrap_duelist` **3**. Boss **3** in `resolve_boss` |
-| Stamina | [27](27-craft-mode-stamina.md) draft `12 * N` | `src/autoload/game_constants.gd` |
+| Stamina | [40](40-item-trait-affinity.md) production `8 * N + 2` | `src/autoload/game_constants.gd` |
 | Purse knobs | [19](19-own-basic-starter.md) start **12**; [32](32-shop-and-events.md) | `game_constants.gd` `GOLD_START` **12** and the market consts |
 | Mission gold | [32](32-shop-and-events.md) “when Client pays them” — **no int** | `src/autoload/atelier_session.gd` `_apply_mission_payout` — **+1 only if** `artifact_coin_purse` is equipped, on clear and on fail |
 | Reps formula | [25](25-reps-meter.md) | `src/chapter/reps_rules.gd` |
@@ -82,14 +82,14 @@ Other appointment rows in `schedule_catalog.gd` are not on `map_m1`. They are no
 
 | Knob | Until-M2 |
 |---|---|
-| Session start | **`12 * N`** (N = piece count, 1..4) |
+| Session start | **`8 * N + 2`** (N = piece count, 1..4) |
 | Hand | **5** |
 | Dig | **2**, session-wide, not × N |
 | Material play | common **1** / uncommon **2** / rare or legendary **3** |
 | Rune play | **2** |
 | Zones | **1..4** |
 
-Delta: “Jonathan may retune” on the `12 * N` draft becomes this lock. The integers do not move. `artifact_oil_rag` **+2** stamina (not × N) stays the `32` effect.
+Production affinity supersession (2026-11-02): the earlier `12 * N` lock is replaced by `8 * N + 2`. `artifact_oil_rag` still adds **+2** after that base.
 
 ### Purse knobs already numbered
 

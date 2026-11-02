@@ -1,6 +1,6 @@
 # Item trait affinity — scalable production draft
 
-**Status:** Design draft (Jonathan direction, 2026-10-29). This is the proposed production replacement for the fixed-value `own_basic` combat-kit numbers in [39](39-starter-deck.md). The stamped `39` letters remain historical until this draft is tested and re-stamped.
+**Status:** **Production law — first implementation complete** (Jonathan GO, 2026-11-02). This replaces the fixed-value `own_basic` combat-kit numbers in [39](39-starter-deck.md). The older `39` kit tables remain historical evidence; the scalable rules in this file own live `own_basic` affinity. Coefficients remain balance knobs for playtest.
 
 The goals are:
 
